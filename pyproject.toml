@@ -50,6 +50,9 @@ Homepage = "https://github.com/ywatanabe1989/SciTeX-Scholar"
 Repository = "https://github.com/ywatanabe1989/SciTeX-Scholar"
 Documentation = "https://github.com/ywatanabe1989/SciTeX-Scholar"
 
+[project.entry-points."scitex_dev.docs"]
+scitex-scholar = "scitex_scholar"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 
