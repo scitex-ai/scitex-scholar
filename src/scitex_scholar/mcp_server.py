@@ -1,343 +1,420 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# Time-stamp: "2025-01-06 02:50:00 (ywatanabe)"
-# File: src/scitex_scholar/mcp_server.py
+# Timestamp: 2026-01-08
+# File: src/scitex/scholar/mcp_server.py
+# ----------------------------------------
 
-"""
-MCP server for SciTeX-Scholar document search engine.
+"""MCP Server for SciTeX Scholar - Scientific Literature Management.
 
-This module provides MCP server functionality to enable search and access
-to local documents through the Model Context Protocol.
+.. deprecated::
+    This standalone server is deprecated. Use the unified scitex MCP server instead:
+
+    CLI: scitex serve
+    Python: from scitex.mcp_server import run_server
+
+    The unified server includes all scholar tools plus other scitex tools.
+    Scholar tools are prefixed with 'scholar_' (e.g., scholar_search_papers).
+    Scholar resources are available at scholar://library and scholar://bibtex.
+
+Provides tools for:
+- Searching papers across multiple databases
+- Resolving DOIs from paper titles
+- Enriching BibTeX with metadata
+- Downloading PDFs with institutional access
+- Managing paper libraries
 """
+
+from __future__ import annotations
+
+import warnings
+
+warnings.warn(
+    "scitex_scholar.mcp_server is deprecated. Use 'scitex serve' or "
+    "'from scitex.mcp_server import run_server' for the unified MCP server.",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 import asyncio
-import json
-import logging
+import os
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
-import mcp.server.stdio
-import mcp.types as types
-from .search_engine import SearchEngine
-from .document_indexer import DocumentIndexer
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Graceful MCP dependency handling
+try:
+    import mcp.types as types
+    from mcp.server import NotificationOptions, Server
+    from mcp.server.models import InitializationOptions
+    from mcp.server.stdio import stdio_server
+
+    MCP_AVAILABLE = True
+except ImportError:
+    MCP_AVAILABLE = False
+    types = None  # type: ignore
+    Server = None  # type: ignore
+    NotificationOptions = None  # type: ignore
+    InitializationOptions = None  # type: ignore
+    stdio_server = None  # type: ignore
+
+__all__ = ["ScholarServer", "main", "MCP_AVAILABLE"]
+
+# Directory configuration
+SCITEX_BASE_DIR = Path(os.getenv("SCITEX_DIR", Path.home() / ".scitex"))
+SCITEX_SCHOLAR_DIR = SCITEX_BASE_DIR / "scholar"
 
 
-class SciTeXSearchServer:
-    """MCP server for document search functionality."""
-    
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
-        """Initialize the MCP server with configuration."""
-        self.config = config or {}
-        self.search_engine = SearchEngine()
-        self.indexer = DocumentIndexer(self.search_engine)
-        
-        # Load configuration
-        self.index_paths = self.config.get('index_paths', [Path.home()])
-        self.file_patterns = self.config.get('file_patterns', [
-            '*.pdf', '*.docx', '*.md', '*.txt', '*.tex', '*.py', '*.js'
-        ])
-        self.index_cache_path = Path(self.config.get(
-            'cache_path', 
-            Path.home() / '.scitex_scholar' / 'index.db'
-        ))
-        
-        # Ensure cache directory exists
-        self.index_cache_path.parent.mkdir(parents=True, exist_ok=True)
-        
-    async def initialize(self):
-        """Initialize the server and load existing index."""
-        logger.info("Initializing SciTeX-Scholar MCP server...")
-        
-        # Load existing index if available
-        if self.index_cache_path.exists():
-            await self.indexer.load_index(self.index_cache_path)
-            logger.info(f"Loaded index from {self.index_cache_path}")
-        else:
-            logger.info("No existing index found, starting fresh")
-    
-    async def handle_search(self, query: str, options: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
-        """
-        Handle document search requests.
-        
-        Args:
-            query: Search query string
-            options: Search options (filters, limit, etc.)
-            
-        Returns:
-            List of search results
-        """
-        options = options or {}
-        
-        # Extract search options
-        limit = options.get('limit', 10)
-        file_type = options.get('file_type')
-        path_filter = options.get('path')
-        exact_phrase = options.get('exact_phrase', False)
-        
-        # Build filters
-        filters = {}
-        if file_type:
-            filters['file_type'] = file_type
-        if path_filter:
-            filters['path_contains'] = path_filter
-        
-        # Perform search
-        results = self.search_engine.search(
-            query, 
-            exact_phrase=exact_phrase,
-            filters=filters
+def get_scholar_dir() -> Path:
+    """Get the scholar data directory."""
+    SCITEX_SCHOLAR_DIR.mkdir(parents=True, exist_ok=True)
+    return SCITEX_SCHOLAR_DIR
+
+
+class ScholarServer:
+    """MCP Server for Scientific Literature Management."""
+
+    def __init__(self):
+        self.server = Server("scitex-scholar")
+        self._scholar_instance = None
+        self.setup_handlers()
+
+    @property
+    def scholar(self):
+        """Lazy-load Scholar instance."""
+        if self._scholar_instance is None:
+            try:
+                from scitex_scholar import Scholar
+
+                self._scholar_instance = Scholar()
+            except ImportError as e:
+                raise RuntimeError(f"Scholar module not available: {e}") from e
+        return self._scholar_instance
+
+    def setup_handlers(self):
+        """Set up MCP server handlers."""
+        from ._mcp.crossref_handlers import (
+            crossref_citations_handler,
+            crossref_count_handler,
+            crossref_get_handler,
+            crossref_info_handler,
+            crossref_search_handler,
         )
-        
-        # Limit results
-        results = results[:limit]
-        
-        # Format results for MCP
-        formatted_results = []
-        for result in results:
-            formatted_results.append({
-                'path': result['metadata'].get('path', ''),
-                'title': result['metadata'].get('title', Path(result['metadata'].get('path', '')).name),
-                'score': result['score'],
-                'snippet': self._extract_snippet(result['content'], query),
-                'file_type': result['metadata'].get('file_type', 'unknown'),
-                'modified': result['metadata'].get('modified', '')
-            })
-        
-        return formatted_results
-    
-    async def handle_index(self, paths: Optional[List[str]] = None) -> Dict[str, Any]:
-        """
-        Handle document indexing requests.
-        
-        Args:
-            paths: Optional list of paths to index
-            
-        Returns:
-            Indexing status and statistics
-        """
-        if paths:
-            index_paths = [Path(p) for p in paths]
-        else:
-            index_paths = self.index_paths
-        
-        logger.info(f"Starting indexing for paths: {index_paths}")
-        
-        stats = await self.indexer.index_documents(
-            paths=index_paths,
-            patterns=self.file_patterns
+        from ._mcp.handlers import (
+            add_papers_to_project_handler,
+            authenticate_handler,
+            check_auth_status_handler,
+            create_project_handler,
+            download_pdf_handler,
+            download_pdfs_batch_handler,
+            enrich_bibtex_handler,
+            export_papers_handler,
+            get_library_status_handler,
+            list_projects_handler,
+            logout_handler,
+            parse_bibtex_handler,
+            parse_pdf_content_handler,
+            resolve_dois_handler,
+            resolve_openurls_handler,
+            search_papers_handler,
+            validate_pdfs_handler,
         )
-        
-        # Save updated index
-        await self.indexer.save_index(self.index_cache_path)
-        
-        return {
-            'status': 'completed',
-            'statistics': stats
-        }
-    
-    async def handle_get_document(self, path: str) -> Dict[str, Any]:
-        """
-        Get full document content by path.
-        
-        Args:
-            path: Document file path
-            
-        Returns:
-            Document content and metadata
-        """
-        doc_path = Path(path)
-        
-        if not doc_path.exists():
-            raise FileNotFoundError(f"Document not found: {path}")
-        
-        # Get document from index or parse it
-        doc_id = str(doc_path.absolute())
-        
-        if doc_id in self.search_engine.documents:
-            doc = self.search_engine.documents[doc_id]
-            return {
-                'path': path,
-                'content': doc['content'],
-                'metadata': doc['metadata'],
-                'processed': doc['processed']
-            }
-        else:
-            # Parse and return document
-            content, metadata = await self.indexer.parse_document(doc_path)
-            return {
-                'path': path,
-                'content': content,
-                'metadata': metadata
-            }
-    
-    def _extract_snippet(self, content: str, query: str, context_length: int = 150) -> str:
-        """Extract a relevant snippet from content based on query."""
-        content_lower = content.lower()
-        query_lower = query.lower()
-        
-        # Find query position
-        pos = content_lower.find(query_lower)
-        if pos == -1:
-            # If exact query not found, try first keyword
-            keywords = query_lower.split()
-            if keywords:
-                pos = content_lower.find(keywords[0])
-        
-        if pos == -1:
-            # Return beginning of content
-            return content[:context_length] + "..." if len(content) > context_length else content
-        
-        # Extract snippet around query
-        start = max(0, pos - context_length // 2)
-        end = min(len(content), pos + len(query) + context_length // 2)
-        
-        snippet = content[start:end]
-        
-        # Add ellipsis if needed
-        if start > 0:
-            snippet = "..." + snippet
-        if end < len(content):
-            snippet = snippet + "..."
-        
-        return snippet
+        from ._mcp.job_handlers import (
+            cancel_job_handler,
+            fetch_papers_handler,
+            get_job_result_handler,
+            get_job_status_handler,
+            list_jobs_handler,
+            start_job_handler,
+        )
+        from ._mcp.tool_schemas import get_tool_schemas
 
+        @self.server.list_tools()
+        async def handle_list_tools():
+            return get_tool_schemas()
 
-async def run_server():
-    """Run the MCP server."""
-    # Create server instance
-    server = mcp.server.stdio.Server("scitex-scholar")
-    
-    # Initialize SciTeX-Scholar server
-    config = {}  # Load from config file if needed
-    search_server = SciTeXSearchServer(config)
-    await search_server.initialize()
-    
-    @server.list_tools()
-    async def list_tools() -> List[types.Tool]:
-        """List available tools."""
-        return [
-            types.Tool(
-                name="search",
-                description="Search for documents using keywords or phrases",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "query": {
-                            "type": "string",
-                            "description": "Search query"
-                        },
-                        "limit": {
-                            "type": "integer",
-                            "description": "Maximum number of results (default: 10)",
-                            "default": 10
-                        },
-                        "file_type": {
-                            "type": "string",
-                            "description": "Filter by file type (pdf, docx, md, txt, etc.)"
-                        },
-                        "path": {
-                            "type": "string",
-                            "description": "Filter by path pattern"
-                        },
-                        "exact_phrase": {
-                            "type": "boolean",
-                            "description": "Search for exact phrase",
-                            "default": False
-                        }
-                    },
-                    "required": ["query"]
-                }
-            ),
-            types.Tool(
-                name="index",
-                description="Index documents in specified paths",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "paths": {
-                            "type": "array",
-                            "items": {"type": "string"},
-                            "description": "Paths to index (uses default if not specified)"
-                        }
-                    }
-                }
-            ),
-            types.Tool(
-                name="get_document",
-                description="Get full content of a document by path",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "path": {
-                            "type": "string",
-                            "description": "Full path to the document"
-                        }
-                    },
-                    "required": ["path"]
-                }
-            )
-        ]
-    
-    @server.call_tool()
-    async def call_tool(name: str, arguments: Any) -> List[types.TextContent]:
-        """Handle tool calls."""
-        try:
-            if name == "search":
-                results = await search_server.handle_search(
-                    arguments.get("query"),
-                    arguments
+        @self.server.call_tool()
+        async def handle_call_tool(name: str, arguments: dict):
+            # Search tools
+            if name == "search_papers":
+                return await self._wrap_result(search_papers_handler(**arguments))
+
+            # DOI Resolution
+            elif name == "resolve_dois":
+                return await self._wrap_result(resolve_dois_handler(**arguments))
+
+            # BibTeX Enrichment
+            elif name == "enrich_bibtex":
+                return await self._wrap_result(enrich_bibtex_handler(**arguments))
+
+            # PDF Download
+            elif name == "download_pdf":
+                return await self._wrap_result(download_pdf_handler(**arguments))
+
+            elif name == "download_pdfs_batch":
+                return await self._wrap_result(download_pdfs_batch_handler(**arguments))
+
+            # Library Status
+            elif name == "get_library_status":
+                return await self._wrap_result(get_library_status_handler(**arguments))
+
+            # Parse BibTeX
+            elif name == "parse_bibtex":
+                return await self._wrap_result(parse_bibtex_handler(**arguments))
+
+            # Validate PDFs
+            elif name == "validate_pdfs":
+                return await self._wrap_result(validate_pdfs_handler(**arguments))
+
+            # OpenURL Resolution
+            elif name == "resolve_openurls":
+                return await self._wrap_result(resolve_openurls_handler(**arguments))
+
+            # Authentication
+            elif name == "authenticate":
+                return await self._wrap_result(authenticate_handler(**arguments))
+
+            elif name == "check_auth_status":
+                return await self._wrap_result(check_auth_status_handler(**arguments))
+
+            elif name == "logout":
+                return await self._wrap_result(logout_handler(**arguments))
+
+            # Export
+            elif name == "export_papers":
+                return await self._wrap_result(export_papers_handler(**arguments))
+
+            # Project Management
+            elif name == "create_project":
+                return await self._wrap_result(create_project_handler(**arguments))
+
+            elif name == "list_projects":
+                return await self._wrap_result(list_projects_handler(**arguments))
+
+            elif name == "add_papers_to_project":
+                return await self._wrap_result(
+                    add_papers_to_project_handler(**arguments)
                 )
-                return [types.TextContent(
-                    type="text",
-                    text=json.dumps(results, indent=2)
-                )]
-            
-            elif name == "index":
-                status = await search_server.handle_index(
-                    arguments.get("paths")
-                )
-                return [types.TextContent(
-                    type="text", 
-                    text=json.dumps(status, indent=2)
-                )]
-            
-            elif name == "get_document":
-                document = await search_server.handle_get_document(
-                    arguments["path"]
-                )
-                return [types.TextContent(
-                    type="text",
-                    text=json.dumps(document, indent=2)
-                )]
-            
+
+            # PDF Content Parsing
+            elif name == "parse_pdf_content":
+                return await self._wrap_result(parse_pdf_content_handler(**arguments))
+
+            # Job Management (async fetch)
+            elif name == "fetch_papers":
+                return await self._wrap_result(fetch_papers_handler(**arguments))
+            elif name == "list_jobs":
+                return await self._wrap_result(list_jobs_handler(**arguments))
+            elif name == "get_job_status":
+                return await self._wrap_result(get_job_status_handler(**arguments))
+            elif name == "start_job":
+                return await self._wrap_result(start_job_handler(**arguments))
+            elif name == "cancel_job":
+                return await self._wrap_result(cancel_job_handler(**arguments))
+            elif name == "get_job_result":
+                return await self._wrap_result(get_job_result_handler(**arguments))
+
+            # CrossRef-Local Tools
+            elif name == "crossref_search":
+                return await self._wrap_result(crossref_search_handler(**arguments))
+            elif name == "crossref_get":
+                return await self._wrap_result(crossref_get_handler(**arguments))
+            elif name == "crossref_count":
+                return await self._wrap_result(crossref_count_handler(**arguments))
+            elif name == "crossref_citations":
+                return await self._wrap_result(crossref_citations_handler(**arguments))
+            elif name == "crossref_info":
+                return await self._wrap_result(crossref_info_handler(**arguments))
+
+            # OpenAlex-Local Tools
+            elif name == "openalex_search":
+                from ._mcp.openalex_handlers import openalex_search_handler
+
+                return await self._wrap_result(openalex_search_handler(**arguments))
+            elif name == "openalex_get":
+                from ._mcp.openalex_handlers import openalex_get_handler
+
+                return await self._wrap_result(openalex_get_handler(**arguments))
+            elif name == "openalex_count":
+                from ._mcp.openalex_handlers import openalex_count_handler
+
+                return await self._wrap_result(openalex_count_handler(**arguments))
+            elif name == "openalex_info":
+                from ._mcp.openalex_handlers import openalex_info_handler
+
+                return await self._wrap_result(openalex_info_handler(**arguments))
+
             else:
                 raise ValueError(f"Unknown tool: {name}")
-                
+
+        @self.server.list_resources()
+        async def handle_list_resources():
+            """List available library resources."""
+            scholar_dir = get_scholar_dir()
+            library_dir = scholar_dir / "library"
+
+            if not library_dir.exists():
+                return []
+
+            resources = []
+
+            # List projects as resources
+            for project_dir in library_dir.iterdir():
+                if project_dir.is_dir() and not project_dir.name.startswith("."):
+                    pdf_count = len(list(project_dir.rglob("*.pdf")))
+                    resources.append(
+                        types.Resource(
+                            uri=f"scholar://library/{project_dir.name}",
+                            name=f"Library: {project_dir.name}",
+                            description=f"Paper library with {pdf_count} PDFs",
+                            mimeType="application/json",
+                        )
+                    )
+
+            # List recent BibTeX files
+            for bib_file in sorted(
+                scholar_dir.rglob("*.bib"),
+                key=lambda p: p.stat().st_mtime,
+                reverse=True,
+            )[:10]:
+                mtime = datetime.fromtimestamp(bib_file.stat().st_mtime)
+                resources.append(
+                    types.Resource(
+                        uri=f"scholar://bibtex/{bib_file.name}",
+                        name=bib_file.name,
+                        description=f"BibTeX from {mtime.strftime('%Y-%m-%d %H:%M')}",
+                        mimeType="application/x-bibtex",
+                    )
+                )
+
+            return resources
+
+        @self.server.read_resource()
+        async def handle_read_resource(uri: str):
+            """Read a library resource."""
+            import json
+
+            if uri.startswith("scholar://library/"):
+                project_name = uri.replace("scholar://library/", "")
+                library_dir = get_scholar_dir() / "library" / project_name
+
+                if not library_dir.exists():
+                    raise ValueError(f"Project not found: {project_name}")
+
+                # Gather project info
+                metadata_files = list(library_dir.rglob("metadata.json"))
+                papers = []
+
+                for meta_file in metadata_files[:100]:
+                    try:
+                        with open(meta_file) as f:
+                            meta = json.load(f)
+                        pdf_exists = any(
+                            (meta_file.parent / f).exists()
+                            for f in meta_file.parent.glob("*.pdf")
+                        )
+                        papers.append(
+                            {
+                                "id": meta_file.parent.name,
+                                "title": meta.get("title"),
+                                "doi": meta.get("doi"),
+                                "has_pdf": pdf_exists,
+                            }
+                        )
+                    except Exception:
+                        pass
+
+                content = json.dumps(
+                    {
+                        "project": project_name,
+                        "paper_count": len(papers),
+                        "papers": papers,
+                    },
+                    indent=2,
+                )
+
+                return types.TextResourceContents(
+                    uri=uri,
+                    mimeType="application/json",
+                    text=content,
+                )
+
+            elif uri.startswith("scholar://bibtex/"):
+                filename = uri.replace("scholar://bibtex/", "")
+                bib_files = list(get_scholar_dir().rglob(filename))
+
+                if not bib_files:
+                    raise ValueError(f"BibTeX file not found: {filename}")
+
+                with open(bib_files[0]) as f:
+                    content = f.read()
+
+                return types.TextResourceContents(
+                    uri=uri,
+                    mimeType="application/x-bibtex",
+                    text=content,
+                )
+
+            else:
+                raise ValueError(f"Unknown resource URI: {uri}")
+
+    async def _wrap_result(self, coro):
+        """Wrap handler result as MCP TextContent."""
+        import json
+
+        try:
+            result = await coro
+            return [
+                types.TextContent(
+                    type="text",
+                    text=json.dumps(result, indent=2, default=str),
+                )
+            ]
         except Exception as e:
-            logger.error(f"Error in tool {name}: {str(e)}")
-            return [types.TextContent(
-                type="text",
-                text=json.dumps({"error": str(e)})
-            )]
-    
-    # Run the server
-    async with mcp.server.stdio.stdio_server() as (read_stream, write_stream):
-        await server.run(
+            return [
+                types.TextContent(
+                    type="text",
+                    text=json.dumps({"success": False, "error": str(e)}, indent=2),
+                )
+            ]
+
+
+async def _run_server():
+    """Run the MCP server (internal)."""
+    server = ScholarServer()
+    async with stdio_server() as (read_stream, write_stream):
+        await server.server.run(
             read_stream,
             write_stream,
-            server.create_initialization_options()
+            InitializationOptions(
+                server_name="scitex-scholar",
+                server_version="0.1.0",
+                capabilities=server.server.get_capabilities(
+                    notification_options=NotificationOptions(),
+                    experimental_capabilities={},
+                ),
+            ),
         )
 
 
 def main():
-    """Main entry point."""
-    asyncio.run(run_server())
+    """Run the MCP server."""
+    if not MCP_AVAILABLE:
+        import sys
+
+        print("=" * 60)
+        print("MCP Server 'scitex-scholar' requires the 'mcp' package.")
+        print()
+        print("Install with:")
+        print("  pip install mcp")
+        print()
+        print("Or install scitex with MCP support:")
+        print("  pip install scitex[mcp]")
+        print("=" * 60)
+        sys.exit(1)
+
+    asyncio.run(_run_server())
 
 
 if __name__ == "__main__":
     main()
+
 
 # EOF
