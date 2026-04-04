@@ -53,8 +53,14 @@ Documentation = "https://github.com/ywatanabe1989/SciTeX-Scholar"
 [project.entry-points."scitex_dev.docs"]
 scitex-scholar = "scitex_scholar"
 
+[project.entry-points."scitex_dev.skills"]
+scitex-scholar = "scitex_scholar"
+
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+scitex_scholar = ["skills/*.md", "skills/references/*.md"]
 
 [tool.setuptools.package-dir]
 "" = "src"
