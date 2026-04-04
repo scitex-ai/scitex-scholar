@@ -1,57 +1,68 @@
 [build-system]
-requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "scitex-scholar"
 version = "0.2.0"
-description = "A Python package for scientific text search and analysis"
+description = "Scientific paper search, enrichment, download, and management for the SciTeX ecosystem"
 readme = "README.md"
-requires-python = ">=3.8"
-license = {text = "MIT"}
+license = "AGPL-3.0"
+requires-python = ">=3.10"
 authors = [
-    {name = "Yusuke Watanabe", email = "ywatanabe@alumni.u-tokyo.ac.jp"}
+    { name = "Yusuke Watanabe", email = "ywatanabe@scitex.ai" },
 ]
-keywords = ["scientific", "text", "search", "latex", "research"]
+keywords = [
+    "scientific",
+    "scholar",
+    "literature",
+    "bibtex",
+    "pdf-download",
+    "metadata",
+    "research",
+]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: GNU Affero General Public License v3",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Scientific/Engineering",
-    "Topic :: Text Processing",
 ]
 dependencies = [
-    "scitex>=2.27.0",
+    "scitex-io>=0.2.0",
     "bibtexparser>=1.4.0",
     "feedparser>=6.0.0",
     "httpx>=0.24.0",
     "pydantic>=2.0.0",
     "requests>=2.28.0",
     "tenacity>=8.0.0",
-    "pdfplumber>=0.9.0",
-    "numpy>=1.20.0",
-    "mcp>=0.1.0",
-    "aiofiles>=23.0.0",
 ]
 
 [project.optional-dependencies]
+pdf = [
+    "pdfplumber>=0.9.0",
+]
+mcp = [
+    "fastmcp>=2.0.0",
+]
 dev = [
-    "pytest>=6.0",
-    "pytest-cov",
-    "black",
-    "isort",
-    "flake8",
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "numpy>=1.21.0",
+]
+all = [
+    "scitex-scholar[pdf,mcp,dev]",
 ]
 
 [project.urls]
-Homepage = "https://github.com/ywatanabe1989/SciTeX-Scholar"
-Repository = "https://github.com/ywatanabe1989/SciTeX-Scholar"
-Documentation = "https://github.com/ywatanabe1989/SciTeX-Scholar"
+Homepage = "https://github.com/ywatanabe1989/scitex-scholar"
+Repository = "https://github.com/ywatanabe1989/scitex-scholar"
+Issues = "https://github.com/ywatanabe1989/scitex-scholar/issues"
 
 [project.entry-points."scitex_dev.docs"]
 scitex-scholar = "scitex_scholar"
@@ -59,26 +70,18 @@ scitex-scholar = "scitex_scholar"
 [project.entry-points."scitex_dev.skills"]
 scitex-scholar = "scitex_scholar"
 
-[tool.setuptools.packages.find]
-where = ["src"]
-
-[tool.setuptools.package-data]
-scitex_scholar = ["skills/*.md", "skills/references/*.md"]
-
-[tool.setuptools.package-dir]
-"" = "src"
-
-[tool.black]
-line-length = 88
-target-version = ['py38']
-
-[tool.isort]
-profile = "black"
-multi_line_output = 3
+[tool.hatch.build.targets.wheel]
+packages = ["src/scitex_scholar"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
 addopts = "-v --tb=short"
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E501"]
