@@ -14,7 +14,7 @@ from typing import List, Optional, Union
 from playwright.async_api import BrowserContext
 
 from scitex import logging
-from scitex_scholar import ScholarConfig
+from scitex_scholar.config import ScholarConfig
 from scitex_scholar.pdf_download.strategies import (
     FlexibleFilenameGenerator,
     handle_manual_download_on_page_async,

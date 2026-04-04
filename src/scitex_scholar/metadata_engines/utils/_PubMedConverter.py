@@ -33,7 +33,7 @@ import requests
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from scitex import logging
-from scitex_scholar import ScholarConfig
+from scitex_scholar.config import ScholarConfig
 
 logger = logging.getLogger(__name__)
 

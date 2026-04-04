@@ -19,7 +19,7 @@ from playwright.async_api import Page
 
 from scitex import logging
 from scitex.browser import browser_logger
-from scitex_scholar import ScholarConfig
+from scitex_scholar.config import ScholarConfig
 
 logger = logging.getLogger(__name__)
 

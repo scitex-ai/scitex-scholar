@@ -25,7 +25,7 @@ from typing import Dict, List
 from tqdm import tqdm
 
 from scitex import logging
-from scitex_scholar import ScholarConfig
+from scitex_scholar.config import ScholarConfig
 
 from .individual import (
     ArXivEngine,

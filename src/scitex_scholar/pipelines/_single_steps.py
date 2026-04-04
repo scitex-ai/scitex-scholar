@@ -258,7 +258,7 @@ class PipelineStepsMixin:
     def _check_manual_download(self, io, paper=None):
         import time
 
-        from scitex_scholar import ScholarConfig
+        from scitex_scholar.config import ScholarConfig
 
         logger.warning(f"{self.name}: Automated download returned None")
         config = ScholarConfig()
