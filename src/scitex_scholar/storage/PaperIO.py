@@ -68,7 +68,7 @@ class PaperIO:
         self.name = self.__class__.__name__
 
         if base_dir is None:
-            from scitex_scholar import ScholarConfig
+            from scitex_scholar.config import ScholarConfig
 
             config = ScholarConfig()
             base_dir = config.get_library_master_dir()
@@ -94,7 +94,7 @@ class PaperIO:
         Returns path like: MASTER/{paper_id}/{FirstAuthor}-{year}-{Journal}.pdf
         If suffix provided: {FirstAuthor}-{year}-{Journal}-{suffix}.pdf
         """
-        from scitex_scholar import ScholarConfig
+        from scitex_scholar.config import ScholarConfig
 
         config = ScholarConfig()
 
@@ -152,7 +152,7 @@ class PaperIO:
         Returns formatted name like:
         PDF-01_CC-000113_IF-010_2017_Baldassano_Brain
         """
-        from scitex_scholar import ScholarConfig
+        from scitex_scholar.config import ScholarConfig
 
         config = ScholarConfig()
 

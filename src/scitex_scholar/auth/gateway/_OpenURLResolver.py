@@ -20,7 +20,7 @@ from playwright.async_api import Locator, Page
 
 from scitex import logging
 from scitex.browser.debugging import browser_logger
-from scitex_scholar import ScholarConfig
+from scitex_scholar.config import ScholarConfig
 from scitex_scholar.browser.utils import click_and_wait
 
 from ._OpenURLLinkFinder import OpenURLLinkFinder
