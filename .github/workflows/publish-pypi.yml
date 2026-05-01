@@ -1,10 +1,12 @@
 name: Publish to PyPI
 
 on:
-  push:
-    tags:
-      - 'v*'
-
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Tag to publish (e.g. v0.10.19) — must already exist on the repo'
+        required: true
+        type: string
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -15,6 +17,8 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.version }}
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
