@@ -1,10 +1,14 @@
 ---
 name: scitex-scholar
-description: Scientific-paper search, metadata enrichment, PDF download, and BibTeX library management for the SciTeX ecosystem. Use when searching the literature, resolving DOIs, enriching citations, downloading PDFs through institutional access, or managing a reproducible paper library.
-type: reference
+description: |
+  [WHAT] Scientific-paper search, metadata enrichment, PDF download, and BibTeX library management for the SciTeX ecosystem.
+  [WHEN] Use when searching the literature, resolving DOIs, enriching citations, downloading PDFs through institutional access, or managing a reproducible paper library.
+  [HOW] `import scitex_scholar` for the Python API; see leaf skills for entry points.
+tags: [scitex-scholar]
 allowed-tools: mcp__scitex__scholar_*
-tags: [scitex-scholar, scitex-package]
+type: reference
 ---
+
 
 # scitex-scholar
 

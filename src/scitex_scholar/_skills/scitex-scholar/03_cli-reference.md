@@ -1,8 +1,10 @@
 ---
-description: CLI commands for scitex-scholar.
-name: cli-reference
-tags: [scitex-scholar, scitex-package]
+description: |
+  [TOPIC] Cli Reference
+  [DETAILS] CLI commands for scitex-scholar.
+tags: [scitex-scholar-cli-reference, scitex-scholar]
 ---
+
 
 # CLI Reference
 

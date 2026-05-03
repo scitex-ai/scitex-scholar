@@ -1,8 +1,10 @@
 ---
-description: OpenAthens / Shibboleth SSO authentication for institutional PDF access.
-name: authentication
-tags: [scitex-scholar, scitex-package]
+description: |
+  [TOPIC] Authentication
+  [DETAILS] OpenAthens / Shibboleth SSO authentication for institutional PDF access.
+tags: [scitex-scholar-authentication, scitex-scholar]
 ---
+
 
 # Authentication
 

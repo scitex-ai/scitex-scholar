@@ -1,8 +1,10 @@
 ---
-description: Resolve DOIs from titles; resumable batches; rate-limit recovery.
-name: doi-resolution
-tags: [scitex-scholar, scitex-package]
+description: |
+  [TOPIC] Doi Resolution
+  [DETAILS] Resolve DOIs from titles; resumable batches; rate-limit recovery.
+tags: [scitex-scholar-doi-resolution, scitex-scholar]
 ---
+
 
 # DOI Resolution
 

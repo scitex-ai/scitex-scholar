@@ -1,9 +1,11 @@
 ---
-name: scholar-extraction-lessons
-description: Lessons from the April 2026 scitex-scholar extraction from the scitex-python monolith — failure-outcome metadata, artifact-count truthfulness, single-worker per publisher, Xvfb timeout handling, OpenAthens redirect semantics. These are scholar-implementation lore, not general arch rules. Use when working on the download / enrichment pipeline or auth flow.
+description: |
+  [TOPIC] Extraction Lessons
+  [DETAILS] failure-outcome metadata, artifact-count truthfulness, single-worker per publisher, Xvfb timeout handling, OpenAthens redirect semantics. These are scholar-implementation lore, not general arch rul...
+tags: [scitex-scholar-extraction-lessons, scitex-scholar, lessons]
 canonical-location: scitex-scholar/src/scitex_scholar/_skills/scitex-scholar/30_extraction-lessons.md
-tags: [scitex-scholar, lessons]
 ---
+
 
 # scitex-scholar — Extraction Lessons
 
