@@ -40,13 +40,20 @@ scitex.scholar.Scholar(...)
 See [../../general/02_interface-python-api.md] for the ecosystem-wide
 rule and empirical verification table.
 
-## Core / interfaces
+## Sub-skills
 
-- [01_quick-start.md](01_quick-start.md) — single-paper and BibTeX-batch workflows; project organization
-- [02_python-api.md](02_python-api.md) — `Scholar`, `Paper`, `Papers`, `ScholarConfig`, `ScholarAuthManager`
-- [03_cli-reference.md](03_cli-reference.md) — `scitex-scholar` and `scitex scholar` CLI commands
-- [04_mcp-tools.md](04_mcp-tools.md) — MCP tools for AI agents
+### Mandatory leaves
+- [01_installation.md](01_installation.md) — pip install + extras + smoke verify
+- [02_quick-start.md](02_quick-start.md) — minimal search-and-save example
+- [03_python-api.md](03_python-api.md) — top-level public callables
+- [04_cli-reference.md](04_cli-reference.md) — `scitex-scholar` subcommand summary
+
+### Core / interfaces
 - [05_api-overview.md](05_api-overview.md) — top-level re-exports, subpackages, storage layout, install extras
+- [06_quick-start.md](06_quick-start.md) — single-paper and BibTeX-batch workflows; project organization
+- [07_python-api.md](07_python-api.md) — `Scholar`, `Paper`, `Papers`, `ScholarConfig`, `ScholarAuthManager`
+- [08_cli-reference.md](08_cli-reference.md) — `scitex-scholar` and `scitex scholar` CLI commands
+- [09_mcp-tools.md](09_mcp-tools.md) — MCP tools for AI agents
 
 ## Workflows
 
