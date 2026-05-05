@@ -143,7 +143,10 @@ packages = ["src/scitex_scholar"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
-addopts = "-v --tb=short --cov=scitex_scholar --cov-report=term-missing"
+# importlib mode avoids module-name collisions across test subdirs (e.g.
+# two `test_base.py` files in different packages) without requiring
+# `__init__.py` files everywhere.
+addopts = "-v --tb=short --cov=scitex_scholar --cov-report=term-missing --import-mode=importlib"
 
 [tool.ruff]
 line-length = 88
