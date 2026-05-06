@@ -20,7 +20,7 @@ class MetadataConversionMixin:
 
     def _dotdict_to_dict(self, obj):
         """Recursively convert DotDict to plain dict for JSON serialization."""
-        from scitex.dict import DotDict
+        from scitex_dict import DotDict
 
         if isinstance(obj, DotDict):
             return {k: self._dotdict_to_dict(v) for k, v in obj._data.items()}
