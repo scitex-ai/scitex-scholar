@@ -25,8 +25,8 @@ import asyncio
 from typing import Optional
 
 import scitex_logging as logging
+from scitex_session import INJECTED, session
 
-import scitex as stx
 from scitex_scholar.storage import PaperIO
 
 from ._single_steps import PipelineHelpersMixin, PipelineStepsMixin
@@ -109,15 +109,18 @@ class ScholarPipelineSingle(PipelineStepsMixin, PipelineHelpersMixin):
             return paper, symlink_path
 
 
-@stx.session
+@session
 def main(
     doi_or_title: str = None,
     project: str = None,
     browser_mode: str = "stealth",
     chrome_profile: str = "system",
     force: bool = False,
-    CONFIG=stx.INJECTED,
-    logger=stx.INJECTED,
+    CONFIG=INJECTED,
+    COLORS=INJECTED,
+    logger=INJECTED,
+    plt=INJECTED,
+    rngg=INJECTED,
 ) -> int:
     """Orchestrate full paper acquisition pipeline.
 

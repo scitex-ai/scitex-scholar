@@ -33,7 +33,7 @@ from typing import Optional, Union
 
 import scitex_logging as logging
 
-import scitex as stx
+from scitex_session import INJECTED, session
 from scitex_scholar.core import Papers
 from scitex_scholar.pipelines.ScholarPipelineParallel import ScholarPipelineParallel
 from scitex_scholar.storage import BibTeXHandler
@@ -216,7 +216,7 @@ class ScholarPipelineBibTeX:
         return processed_collection
 
 
-@stx.session
+@session
 def main(
     bibtex: str = None,
     project: str = None,
@@ -224,8 +224,8 @@ def main(
     num_workers: int = 4,
     browser_mode: str = "stealth",
     chrome_profile: str = "system",
-    CONFIG=stx.INJECTED,
-    logger=stx.INJECTED,
+    CONFIG=INJECTED,
+    logger=INJECTED,
 ) -> int:
     """Process BibTeX files through parallel paper acquisition pipeline.
 
