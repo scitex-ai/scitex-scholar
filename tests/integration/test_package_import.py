@@ -44,11 +44,13 @@ class TestPackageImport(unittest.TestCase):
         sys.path.insert(0, "./src")
         import scitex_scholar
 
-        # Test required metadata attributes
+        # Test required metadata attributes (community project: no __email__)
         self.assertTrue(hasattr(scitex_scholar, "__author__"))
-        self.assertTrue(hasattr(scitex_scholar, "__email__"))
         self.assertEqual(scitex_scholar.__author__, "Yusuke Watanabe")
-        self.assertEqual(scitex_scholar.__email__, "ywatanabe@scitex.ai")
+        self.assertFalse(
+            hasattr(scitex_scholar, "__email__"),
+            "SciTeX community packages must not expose __email__ on the umbrella module",
+        )
 
 
 if __name__ == "__main__":

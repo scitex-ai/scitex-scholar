@@ -807,7 +807,7 @@ class BibTeXHandler:
         bibtex_lines.append(
             f"% Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
         )
-        bibtex_lines.append("% Author: Yusuke Watanabe (ywatanabe@scitex.ai)")
+        bibtex_lines.append("% Author: Yusuke Watanabe")
         bibtex_lines.append(
             "% ============================================================"
         )

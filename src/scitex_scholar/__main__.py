@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 def create_parser():
     """Create main argument parser with subcommands."""
     parser = argparse.ArgumentParser(
-        prog="python -m scitex.scholar",
+        prog="scitex-scholar",
         description="""
 SciTeX Scholar - Scientific Literature Management
 ═════════════════════════════════════════════════
@@ -45,7 +45,7 @@ STORAGE: ~/.scitex/scholar/library/
     subparsers = parser.add_subparsers(
         dest="command",
         help="Available commands",
-        required=True,
+        required=False,
     )
 
     # ========================================
@@ -354,6 +354,11 @@ async def main_async():
     """Main async entry point."""
     parser = create_parser()
     args = parser.parse_args()
+
+    # No subcommand: print help to stdout and exit 0
+    if args.command is None:
+        parser.print_help()
+        return 0
 
     # Route to appropriate pipeline
     if args.command == "single":

@@ -77,20 +77,20 @@ print(to_bibtex(top))
 
 <br>
 
-Entry point: `python -m scitex_scholar <subcommand>`.
+Entry point: `scitex-scholar <subcommand>`.
 
 ```bash
 # Single paper by DOI or title
-python -m scitex_scholar single --doi 10.1038/nature12373 --project demo
+scitex-scholar single --doi 10.1038/nature12373 --project demo
 
 # Multiple DOIs/titles in parallel
-python -m scitex_scholar parallel --dois 10.1038/xxx 10.1126/yyy --project demo --num-workers 4
+scitex-scholar parallel --dois 10.1038/xxx 10.1126/yyy --project demo --num-workers 4
 
 # Process a whole BibTeX file
-python -m scitex_scholar bibtex --bibtex refs.bib --project demo --output refs.enriched.bib
+scitex-scholar bibtex --bibtex refs.bib --project demo --output refs.enriched.bib
 
 # Start the (legacy) MCP server
-python -m scitex_scholar mcp
+scitex-scholar mcp
 ```
 
 Common flags: `--browser-mode {stealth,interactive}`, `--chrome-profile NAME`, `--force`.
@@ -104,8 +104,9 @@ Common flags: `--browser-mode {stealth,interactive}`, `--chrome-profile NAME`, `
 
 The package ships MCP tool handlers consumed by the unified `scitex serve`
 server (tools prefixed `scholar_*`). A standalone server at
-`scitex_scholar.mcp_server` is still shipped but deprecated. See
-`src/scitex_scholar/_skills/scitex-scholar/SKILL.md` for the full tool list.
+`scitex_scholar.mcp_server` is still shipped but deprecated. See the
+[Skills documentation](https://scitex-scholar.readthedocs.io/en/latest/skills.html)
+for the full tool list.
 
 </details>
 
@@ -114,7 +115,8 @@ server (tools prefixed `scholar_*`). A standalone server at
 
 <br>
 
-Agent skill pages live under `src/scitex_scholar/_skills/scitex-scholar/`.
+Agent skill pages are published at
+[scitex-scholar.readthedocs.io/en/latest/skills.html](https://scitex-scholar.readthedocs.io/en/latest/skills.html).
 The `semantic-highlight` skill documents the PDF-highlighting workflow.
 
 </details>
@@ -166,7 +168,8 @@ print(result.counts(), result.annotations_added)
 ```
 
 Also exposed as the `scholar_highlight_pdf` MCP tool (unified `scitex serve` server) and as the
-`semantic-highlight` agent skill under `src/scitex_scholar/_skills/scitex-scholar/`.
+`semantic-highlight` agent skill (see
+[skills documentation](https://scitex-scholar.readthedocs.io/en/latest/skills.html)).
 
 ## Storage layout
 

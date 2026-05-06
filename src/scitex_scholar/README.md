@@ -117,6 +117,6 @@ MIT
 
 ## Contact
 
-Yusuke Watanabe (ywatanabe@scitex.ai)
+Yusuke Watanabe
 
 <!-- EOF -->
