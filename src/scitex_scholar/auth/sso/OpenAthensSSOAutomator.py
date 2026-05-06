@@ -296,23 +296,27 @@ class OpenAthensSSOAutomator(BaseSSOAutomator):
             self.logger.error(f"{self.name}: Failed waiting for redirect: {e}")
             return False
 
-    async def _take_debug_screenshot_async(self, page: Page):
-        """Take debug screenshot."""
-        try:
-            import time
-            from pathlib import Path
+    async def _take_debug_screenshot_async(
+        self, page: Page, label: str = "openathens_debug"
+    ):
+        """Capture screenshot + page HTML via the shared helper.
 
-            screenshot_path = (
-                Path.home()
-                / ".scitex"
-                / "scholar"
-                / f"openathens_debug_{int(time.time())}.png"
-            )
-            screenshot_path.parent.mkdir(parents=True, exist_ok=True)
-            await page.screenshot(path=str(screenshot_path))
-            self.logger.debug(f"{self.name}: Debug screenshot: {screenshot_path}")
-        except Exception as e:
-            self.logger.debug(f"{self.name}: Screenshot failed: {e}")
+        See _skills/general/02_package_09_browser-automation-debugging.md.
+        """
+        from pathlib import Path
+
+        from scitex_browser.debugging import capture_debug_artifacts_async
+
+        await capture_debug_artifacts_async(
+            page,
+            label=label,
+            base_dir=Path.home()
+            / ".scitex"
+            / "scholar"
+            / "cache"
+            / "engine"
+            / "screenshots",
+        )
 
 
 if __name__ == "__main__":
