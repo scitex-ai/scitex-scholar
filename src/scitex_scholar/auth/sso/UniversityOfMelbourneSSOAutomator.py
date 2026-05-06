@@ -188,23 +188,29 @@ class UniversityOfMelbourneSSOAutomator(BaseSSOAutomator):
             return False
 
     async def _save_debug_screenshot_async(self, page: Page, label: str) -> None:
-        """Always-on debug screenshot. Writes to scholar's screenshots cache.
+        """Capture screenshot + page HTML via the shared scitex-browser helper.
 
-        Failures are non-fatal — debugging shouldn't break the auth flow.
+        Writes both artifacts to
+        `~/.scitex/scholar/cache/engine/screenshots/sso_<label>_<ts>.{png,html}`.
+
+        Browser automation is fundamentally unreliable; HTML alongside
+        the screenshot is what makes "the locator picked the wrong row"
+        post-mortem actually possible.
         """
-        try:
-            from datetime import datetime
-            from pathlib import Path
+        from pathlib import Path
 
-            ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-            cache_root = Path.home() / ".scitex" / "scholar" / "cache" / "engine"
-            screenshots_dir = cache_root / "screenshots"
-            screenshots_dir.mkdir(parents=True, exist_ok=True)
-            dest = screenshots_dir / f"sso_{label}_{ts}.png"
-            await page.screenshot(path=str(dest), full_page=True)
-            self.logger.info(f"Screenshot: {dest}")
-        except Exception as e:
-            self.logger.debug(f"Screenshot failed ({label}): {e}")
+        from scitex_browser.debugging import capture_debug_artifacts_async
+
+        await capture_debug_artifacts_async(
+            page,
+            label=f"sso_{label}",
+            base_dir=Path.home()
+            / ".scitex"
+            / "scholar"
+            / "cache"
+            / "engine"
+            / "screenshots",
+        )
 
     async def _handle_mfa_select_step_async(self, page: Page) -> bool:
         """Pick an MFA method on the post-password 'Verify it's you with a
