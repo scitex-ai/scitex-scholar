@@ -49,11 +49,8 @@ rule and empirical verification table.
 - [04_cli-reference.md](04_cli-reference.md) — `scitex-scholar` subcommand summary
 
 ### Core / interfaces
-- [05_api-overview.md](05_api-overview.md) — top-level re-exports, subpackages, storage layout, install extras
-- [06_quick-start.md](06_quick-start.md) — single-paper and BibTeX-batch workflows; project organization
-- [07_python-api.md](07_python-api.md) — `Scholar`, `Paper`, `Papers`, `ScholarConfig`, `ScholarAuthManager`
-- [08_cli-reference.md](08_cli-reference.md) — `scitex-scholar` and `scitex scholar` CLI commands
-- [09_mcp-tools.md](09_mcp-tools.md) — MCP tools for AI agents
+- [05_mcp-tools.md](05_mcp-tools.md) — MCP tools (`scholar_*` namespace)
+- [06_api-overview.md](06_api-overview.md) — top-level re-exports, subpackages, storage layout, install extras
 
 ## Workflows
 

@@ -5,7 +5,8 @@
 nouns:
   - bibtex
   - pdf
-  - lookup
 
-verbs:
+# Transitive verbs (require an object — typically take a positional or `--key`).
+transitive_verbs:
+  - lookup
   - dedupe
