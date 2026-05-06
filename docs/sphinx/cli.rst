@@ -1,12 +1,16 @@
 CLI Reference
 =============
 
-The ``scitex-scholar`` command provides a noun-verb subcommand interface. Every
-group has ``--help``:
+The ``scitex-scholar`` command provides a Click-based noun-verb subcommand
+interface. Every group has ``--help``; pass ``--help-recursive`` at the top
+level for a full overview, ``--version``/``-V`` for the installed version, and
+``--json`` (where supported) for machine-readable output.
 
 .. code-block:: bash
 
    scitex-scholar --help
+   scitex-scholar --help-recursive
+   scitex-scholar --version
    scitex-scholar paper --help
    scitex-scholar library --help
 
@@ -21,11 +25,14 @@ Operate on a paper / batch of papers.
 .. code-block:: bash
 
    # Single paper from DOI or title (was: ``single``)
-   scitex-scholar paper process --doi "10.1093/brain/awx173" --project my_project
-   scitex-scholar paper process --title "Seizure prediction with iEEG" --project my_project
+   scitex-scholar paper fetch --doi "10.1093/brain/awx173" --project my_project
+   scitex-scholar paper fetch --title "Seizure prediction with iEEG" --project my_project
 
    # Multiple papers in parallel (was: ``parallel``)
-   scitex-scholar paper batch --dois 10.1/x 10.2/y --project my_project --num-workers 4
+   scitex-scholar paper fetch-batch --dois 10.1/x --dois 10.2/y --project my_project --num-workers 4
+
+Mutating verbs (``fetch``, ``fetch-batch``, ``import``, ``build``, etc.) accept
+``--dry-run`` and ``-y/--yes``.
 
 bibtex
 ~~~~~~
@@ -35,8 +42,8 @@ Operate on a BibTeX file.
 .. code-block:: bash
 
    # Process every entry (was: top-level ``bibtex --bibtex …``)
-   scitex-scholar bibtex process --bibtex refs.bib --project my_project \
-                                 --num-workers 4 --browser-mode stealth
+   scitex-scholar bibtex import --bibtex refs.bib --project my_project \
+                                --num-workers 4 --browser-mode stealth
 
 mcp
 ~~~
@@ -45,9 +52,11 @@ MCP server commands (Model Context Protocol).
 
 .. code-block:: bash
 
-   scitex-scholar mcp start          # start stdio server
-   scitex-scholar mcp list-tools     # print scholar_* tool names
-   scitex-scholar mcp doctor         # check fastmcp + handler imports
+   scitex-scholar mcp start                  # start stdio server
+   scitex-scholar mcp start --dry-run        # print plan, exit
+   scitex-scholar mcp list-tools             # print scholar_* tool names
+   scitex-scholar mcp list-tools --json      # machine-readable
+   scitex-scholar mcp doctor                 # check fastmcp + handler imports
    scitex-scholar mcp install --claude-code  # config snippet
 
 Prefer the unified ``scitex serve`` server when integrating with the rest of
@@ -96,12 +105,35 @@ Library-tree management.
    scitex-scholar library dematerialize <path>
 
    # Library SQLite index
+   scitex-scholar library db build --dry-run
    scitex-scholar library db build
    scitex-scholar library db migrate
-   scitex-scholar library db lookup --doi 10.1/x
-   scitex-scholar library db list --limit 20
-   scitex-scholar library db dedupe --apply
-   scitex-scholar library db audit
+   scitex-scholar library db lookup --doi 10.1/x --json
+   scitex-scholar library db list --limit 20 --json
+   scitex-scholar library db audit --json
+
+skills
+~~~~~~
+
+Bundled SciTeX-Scholar skill leaves (under
+``src/scitex_scholar/_skills/scitex-scholar/``).
+
+.. code-block:: bash
+
+   scitex-scholar skills list
+   scitex-scholar skills list --json
+   scitex-scholar skills get 04_cli-reference
+   scitex-scholar skills install            # symlink into ~/.claude/skills/
+   scitex-scholar skills install --copy --force --dry-run
+
+Python API introspection
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: bash
+
+   scitex-scholar list-python-apis           # one name per line
+   scitex-scholar list-python-apis -v        # with signatures
+   scitex-scholar list-python-apis --json    # machine-readable
 
 Migration from pre-1.3.0
 ------------------------

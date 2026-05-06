@@ -36,6 +36,7 @@ classifiers = [
     "Topic :: Scientific/Engineering",
 ]
 dependencies = [
+    "click>=8.0",
     "mcp",
     # scitex[session] provides @stx.session decorator (+ matplotlib, PyYAML)
     # used in pipelines/, metadata_engines/, impact_factor/jcr/.
