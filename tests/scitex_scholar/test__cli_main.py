@@ -21,8 +21,8 @@ from unittest.mock import patch
 import pytest
 from click.testing import CliRunner
 
-from scitex_scholar.__main__ import cli
-from scitex_scholar.__main__ import main as cli_main
+from scitex_scholar._cli_main import cli
+from scitex_scholar._cli_main import main as cli_main
 
 # ---------------------------------------------------------------------------
 # Top-level universal flags

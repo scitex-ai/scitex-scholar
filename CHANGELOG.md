@@ -5,6 +5,40 @@ All notable changes to `scitex-scholar` are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.1] - 2026-05-06
+
+### Added
+- **`scitex_scholar._mcp_server`** — FastMCP server exposing every handler in
+  `_mcp.all_handlers` as a `scholar_<verb>_<noun>` MCP tool, plus the per-§5
+  required `scholar_skills_list` / `scholar_skills_get` introspection tools.
+  Discoverable as `scitex_scholar._mcp_server.mcp` by `scitex-dev ecosystem
+  audit-mcp-tools`. Replaces the legacy `scitex_scholar.mcp_server` (still
+  shipped, deprecation-warning-only).
+
+### Fixed (skills audit clearance)
+- **§1d vocabulary**: `lookup` moved from `nouns` to `transitive_verbs` in
+  `.scitex/dev/cli-audit-dict.yaml` (was `verbs`, which is not a key the
+  auditor recognises). `library db lookup` now passes §1d.
+- **§2 read-verb `--json`**: added `--json` flag to `skills get`.
+- **§11 argparse residue**: replaced the only remaining `argparse.Namespace`
+  use in `_cli_main.py` with `types.SimpleNamespace` (compat shim for
+  `pdf_highlight._cli.run` which still takes a Namespace-shaped object).
+- **SK109**: renumbered skill leaves so `05_mcp-tools.md` exists at the
+  expected slot (was `09_mcp-tools.md`); `api-overview` shifted to `06`.
+- **PS204**: extracted Click app from `__main__.py` to `_cli_main.py` so the
+  test mirror `tests/scitex_scholar/test__cli_main.py` resolves to a unique
+  src file (was: 3 `__main__.py` files share basename, regex blind spot).
+  `__main__.py` is now a thin shim.
+
+### Known (architectural divergence — won't fix)
+- audit-mcp-tools §6 reports 12 Python APIs without MCP-tool matches and 24
+  MCP tools without Python-API matches. The two surfaces are deliberately
+  different shapes: the Python API exposes facade classes (`Scholar`,
+  `Paper`, `Papers`, `ScholarConfig`), the MCP API exposes per-operation
+  tools (`scholar_search_papers`, `scholar_resolve_dois`, …). Aligning them
+  would require collapsing the API or fragmenting the MCP surface — neither
+  is desirable.
+
 ## [1.3.0] - 2026-05-06
 
 ### BREAKING — CLI noun-verb grammar refactor
