@@ -199,26 +199,45 @@ STORAGE: ~/.scitex/scholar/library/
     # ========================================
     mcp_parser = subparsers.add_parser(
         "mcp",
-        help="Start MCP server for LLM integration",
-        description="Start the MCP (Model Context Protocol) server for Claude/LLM integration",
+        help="MCP (Model Context Protocol) server commands",
+        description="MCP (Model Context Protocol) server commands.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     mcp_sub = mcp_parser.add_subparsers(dest="mcp_command", required=False)
-    mcp_sub.add_parser(
+
+    mcp_start = mcp_sub.add_parser(
         "start",
-        help="Start the standalone MCP server (deprecated; prefer `scitex serve`)",
-        description=(
-            "Start the standalone scitex-scholar MCP server. The unified "
-            "`scitex serve` is preferred — this remains for backward compat."
-        ),
+        help="Start the scitex-scholar MCP server",
+        description="Start the standalone scitex-scholar MCP server.",
     )
+    mcp_start.add_argument(
+        "--dry-run", action="store_true", help="Print launch plan without starting."
+    )
+
     mcp_sub.add_parser(
         "list-tools",
-        help="List the MCP tool names this package registers (scholar_*)",
+        help="List available MCP tools",
         description=(
-            "Print the MCP tool names exposed by scitex-scholar. Read-only; "
-            "does not start the server."
+            "Print the MCP tool names exposed by scitex-scholar (scholar_*). "
+            "Read-only; does not start the server."
         ),
+    )
+
+    mcp_sub.add_parser(
+        "doctor",
+        help="Check MCP server dependencies",
+        description="Verify fastmcp is installed and the server module imports.",
+    )
+
+    mcp_install = mcp_sub.add_parser(
+        "install",
+        help="Show MCP installation instructions",
+        description="Print installation / Claude Code config instructions.",
+    )
+    mcp_install.add_argument(
+        "--claude-code",
+        action="store_true",
+        help="Show Claude Code MCP config snippet.",
     )
 
     # ========================================
@@ -385,18 +404,9 @@ async def main_async():
     elif args.command == "bibtex":
         return await run_bibtex_pipeline(args)
     elif args.command == "mcp":
-        sub = getattr(args, "mcp_command", None)
-        if sub == "list-tools":
-            from ._mcp.all_handlers import __all__ as _handler_names
+        from .cli._mcp_commands import run_mcp_subcommand
 
-            for name in sorted(_handler_names):
-                # handlers are registered in the unified server with the
-                # `scholar_` prefix and the trailing `_handler` stripped.
-                tool = "scholar_" + name.removesuffix("_handler")
-                print(tool)
-            return 0
-        # `start` (explicit) and bare `mcp` (back-compat) both start the server.
-        return await run_mcp_server()
+        return await run_mcp_subcommand(args, run_server=run_mcp_server)
     elif args.command == "highlight":
         from .pdf_highlight._cli import run as run_highlight
 
