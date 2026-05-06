@@ -5,6 +5,33 @@ All notable changes to `scitex-scholar` are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-05-06
+
+### BREAKING — CLI noun-verb grammar refactor
+
+The CLI top-level commands have been regrouped under noun-verb groups to comply
+with the SciTeX subcommand grammar standard
+(`~/.claude/skills/scitex/general/03_interface_02_cli/02_subcommand-structure-noun-verb.md`).
+
+The pre-1.3.0 top-level forms still work but emit a one-line `DeprecationWarning`
+on stderr and will be **removed in 1.4.0**.
+
+#### Migration
+
+| Old (deprecated, emits DeprecationWarning) | New (1.3.0+)                       |
+|--------------------------------------------|------------------------------------|
+| `scitex-scholar single …`                  | `scitex-scholar paper process …`   |
+| `scitex-scholar parallel …`                | `scitex-scholar paper batch …`     |
+| `scitex-scholar bibtex --bibtex …`         | `scitex-scholar bibtex process --bibtex …` |
+| `scitex-scholar highlight …`               | `scitex-scholar pdf highlight …`   |
+| `scitex-scholar link-project-tree …`       | `scitex-scholar library link-project-tree …` |
+| `scitex-scholar materialize …`             | `scitex-scholar library materialize …` |
+| `scitex-scholar dematerialize …`           | `scitex-scholar library dematerialize …` |
+| `scitex-scholar db {build,migrate,lookup,list,dedupe,audit}` | `scitex-scholar library db {build,migrate,lookup,list,dedupe,audit}` |
+| `scitex-scholar mcp {start,list-tools,doctor,install}` | _(unchanged — already noun-verb)_ |
+
+Old and new forms route to the same handler, so behaviour is identical.
+
 ## [1.2.4] - 2026-05-06
 
 ### Fixed

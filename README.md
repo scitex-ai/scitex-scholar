@@ -90,19 +90,25 @@ Entry point: `scitex-scholar <subcommand>`.
 
 ```bash
 # Single paper by DOI or title
-scitex-scholar single --doi 10.1038/nature12373 --project demo
+scitex-scholar paper process --doi 10.1038/nature12373 --project demo
 
 # Multiple DOIs/titles in parallel
-scitex-scholar parallel --dois 10.1038/xxx 10.1126/yyy --project demo --num-workers 4
+scitex-scholar paper batch --dois 10.1038/xxx 10.1126/yyy --project demo --num-workers 4
 
 # Process a whole BibTeX file
-scitex-scholar bibtex --bibtex refs.bib --project demo --output refs.enriched.bib
+scitex-scholar bibtex process --bibtex refs.bib --project demo --output refs.enriched.bib
 
 # Start the (legacy) MCP server
-scitex-scholar mcp
+scitex-scholar mcp start
 ```
 
 Common flags: `--browser-mode {stealth,interactive}`, `--chrome-profile NAME`, `--force`.
+
+> **Migration (1.3.0):** the CLI moved to noun-verb groups. Old top-level commands
+> (`single`, `parallel`, top-level `bibtex --bibtex`, `highlight`, `link-project-tree`,
+> `materialize`, `dematerialize`, `db`) still work but emit a `DeprecationWarning`
+> and will be removed in 1.4.0. See [CHANGELOG.md](CHANGELOG.md) for the full
+> migration table.
 
 </details>
 
@@ -166,8 +172,8 @@ for full details.
 
 ```bash
 export ANTHROPIC_API_KEY=sk-ant-...
-scitex-scholar highlight paper.pdf            # sentence-level, Haiku, writes paper.highlighted.pdf
-scitex-scholar highlight paper.pdf --stub     # offline keyword heuristic (no API calls)
+scitex-scholar pdf highlight paper.pdf        # sentence-level, Haiku, writes paper.highlighted.pdf
+scitex-scholar pdf highlight paper.pdf --stub # offline keyword heuristic (no API calls)
 ```
 
 ```python
