@@ -1337,3 +1337,14 @@ if __name__ == "__main__":
 
 
 # EOF
+
+
+# audit §4 — inject version into root --help
+try:
+    from importlib.metadata import version as _v
+    cli.help = (
+        f"scitex-scholar (v{_v('scitex-scholar')}) — "
+        + (cli.help or "").lstrip()
+    )
+except Exception:
+    pass
