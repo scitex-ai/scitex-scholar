@@ -233,17 +233,21 @@ class UniversityOfMelbourneSSOAutomator(BaseSSOAutomator):
             await self._save_debug_screenshot_async(page, "mfa_picker_before")
             self.logger.info("MFA method picker detected — preferring Okta Verify push")
 
-            # Use Playwright Locator API with row-scoped filtering. CSS
-            # `div:has-text('X') >> button` was matching ANY ancestor that
-            # contains the text — including the outer container that holds
-            # both options — so first-DOM-match (the top row, 'Enter a
-            # code') won regardless of preference.
+            # Use Playwright Locator API with row-scoped filtering AND
+            # negative filtering. `.filter(has_text='X')` alone matches
+            # any ancestor whose subtree contains 'X' — including the
+            # outer container that contains BOTH options. The first-DOM
+            # Select inside that container is 'Enter a code' (top row),
+            # so push always lost. Add `has_not_text` to exclude rows
+            # that *also* contain the other option's text — the leaf
+            # row passes (only its own text), the outer container fails
+            # (has both).
             row_candidates = (
-                # MFA option rows often wrap in <li> or <div> with Select inside.
                 (
                     "push",
                     page.locator("li, div")
                     .filter(has_text="Get a push notification")
+                    .filter(has_not_text="Enter a code")
                     .get_by_text("Select", exact=True)
                     .first,
                 ),
@@ -251,6 +255,7 @@ class UniversityOfMelbourneSSOAutomator(BaseSSOAutomator):
                     "code",
                     page.locator("li, div")
                     .filter(has_text="Enter a code")
+                    .filter(has_not_text="Get a push notification")
                     .get_by_text("Select", exact=True)
                     .first,
                 ),
