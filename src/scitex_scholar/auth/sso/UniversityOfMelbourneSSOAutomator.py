@@ -145,11 +145,15 @@ class UniversityOfMelbourneSSOAutomator(BaseSSOAutomator):
             return False
 
     async def _handle_password_step_async(self, page: Page) -> bool:
-        """Handle password entry using proven working selector."""
-        try:
-            # Use the proven working selector for password
-            password_selector = "input[name='credentials.passcode']"
+        """Handle password entry — Okta UI refresh 2026-05-06.
 
+        The Verify button is now a `<button type='submit'>` with text
+        'Verify' (was `<input type='submit' value='Verify'>` pre-2026-05).
+        Try the legacy selector first for backward compat, then fall
+        back to the new shape.
+        """
+        try:
+            password_selector = "input[name='credentials.passcode']"
             success = await fill_with_fallbacks_async(
                 page, password_selector, self.password
             )
@@ -159,18 +163,69 @@ class UniversityOfMelbourneSSOAutomator(BaseSSOAutomator):
 
             self.logger.info("Password filled successfully")
 
-            # Click Verify button using proven working selector and JavaScript click
-            verify_selector = "input[type='submit'][value='Verify']"
-            success = await click_with_fallbacks_async(page, verify_selector)
-            if not success:
-                self.logger.error("Failed to click Verify button")
-                return False
+            for verify_selector in (
+                "input[type='submit'][value='Verify']",
+                "button[type='submit']:has-text('Verify')",
+                "button.button-primary:has-text('Verify')",
+                "form button[type='submit']",
+            ):
+                if await click_with_fallbacks_async(page, verify_selector):
+                    self.logger.info(
+                        f"Verify button clicked successfully "
+                        f"(selector={verify_selector!r})"
+                    )
+                    # Okta sometimes shows a new MFA-method picker after
+                    # password. Handle if present.
+                    await page.wait_for_timeout(1500)
+                    await self._handle_mfa_select_step_async(page)
+                    return True
 
-            self.logger.info("Verify button clicked successfully")
-            return True
+            self.logger.error("Failed to click Verify button — all selectors failed")
+            return False
 
         except Exception as e:
             self.logger.error(f"Password step failed: {e}")
+            return False
+
+    async def _handle_mfa_select_step_async(self, page: Page) -> bool:
+        """Pick an MFA method on the post-password 'Verify it's you with a
+        security method' page (Okta UI refresh 2026-05-06).
+
+        Page typically shows two 'Select' buttons — one for Okta Verify
+        push notification, one for Okta Verify code entry. Push is the
+        cleanest hand-off (user just taps phone), so prefer that.
+
+        No-op if the page isn't a method picker.
+        """
+        try:
+            # Heuristic: only fire on the picker page.
+            heading = await page.query_selector(
+                "h2:has-text('security method'), h2:has-text('Verify it')"
+            )
+            if heading is None:
+                return False
+
+            self.logger.info("MFA method picker detected — preferring Okta Verify push")
+            for selector in (
+                # Push notification row.
+                "div:has-text('Get a push notification') >> button:has-text('Select')",
+                "div:has-text('Get a push notification') >> a:has-text('Select')",
+                # Code-entry row as fallback (user must enter code manually).
+                "div:has-text('Enter a code') >> button:has-text('Select')",
+                "div:has-text('Enter a code') >> a:has-text('Select')",
+                # Last-ditch: any visible Select button.
+                "button:has-text('Select')",
+                "a:has-text('Select')",
+            ):
+                if await click_with_fallbacks_async(page, selector):
+                    self.logger.info(f"MFA Select clicked (selector={selector!r})")
+                    await page.wait_for_timeout(2000)
+                    return True
+
+            self.logger.warning("MFA Select button not clicked — manual fallback")
+            return False
+        except Exception as e:
+            self.logger.warning(f"MFA select step skipped: {e}")
             return False
 
     async def _handle_generic_login_async(self, page: Page) -> bool:
