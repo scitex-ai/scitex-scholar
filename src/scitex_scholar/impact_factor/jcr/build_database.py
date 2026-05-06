@@ -40,12 +40,10 @@ from typing import Dict, Iterator, Optional
 import openpyxl
 import scitex_logging as logging
 
-try:
-    import scitex as stx
-except ImportError:
-    stx = None
-
 logger = logging.getLogger(__name__)
+
+# `import scitex as stx` is moved into the demo trailer (run_main) to
+# keep module-import umbrella-free per PA304.
 
 """Parameters"""
 # Data paths
@@ -233,7 +231,7 @@ def run_main() -> None:
     import sys
 
     import matplotlib.pyplot as plt
-
+    import scitex as stx  # lazy umbrella import — demo only (PA304-clean)
 
     args = parse_args()
 

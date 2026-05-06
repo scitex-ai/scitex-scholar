@@ -47,12 +47,10 @@ import scitex_logging as logging
 from sql_manager import DynamicModel, Manager
 from sqlalchemy import Column, Float, String, func
 
-try:
-    import scitex as stx
-except ImportError:
-    stx = None
-
 logger = logging.getLogger(__name__)
+
+# `import scitex as stx` is moved into the demo trailer (run_main, ~L285)
+# to keep module-import umbrella-free per PA304.
 
 """Parameters"""
 # Use absolute path based on package location
@@ -279,6 +277,7 @@ def run_main() -> None:
     import sys
 
     import matplotlib.pyplot as plt
+    import scitex as stx  # lazy umbrella import — demo only (PA304-clean)
 
     args = parse_args()
 
