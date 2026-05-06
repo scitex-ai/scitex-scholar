@@ -29,8 +29,8 @@ from typing import Any, Dict, List, Optional
 
 from playwright.async_api import async_playwright
 
-from scitex import logging
-from scitex.logging import ScholarError
+import scitex_logging as logging
+from scitex_logging import ScholarError
 from scitex_scholar.config import ScholarConfig
 
 from ..core.BrowserAuthenticator import BrowserAuthenticator

@@ -27,7 +27,7 @@ from typing import Optional
 
 from playwright.async_api import Page
 
-from scitex.browser.debugging import browser_logger
+from scitex_browser.debugging import browser_logger
 
 
 class FlexibleFilenameGenerator:
@@ -442,7 +442,7 @@ async def show_stop_automation_button_async(
     """
     try:
         # Log that we're about to show the button
-        from scitex import logging
+        import scitex_logging as logging
 
         logger = logging.getLogger(__name__)
         logger.info(
@@ -932,7 +932,7 @@ async def wait_for_manual_mode_activation_async(
         timeout_sec: Timeout in seconds (0 = wait forever)
     """
     try:
-        from scitex import logging
+        import scitex_logging as logging
 
         logger = logging.getLogger(__name__)
         logger.info(

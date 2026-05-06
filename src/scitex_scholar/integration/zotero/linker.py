@@ -17,7 +17,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set
 
-from scitex import logging
+import scitex_logging as logging
 from scitex_scholar.core.Paper import Paper
 from scitex_scholar.storage import LibraryManager
 

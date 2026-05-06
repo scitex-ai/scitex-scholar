@@ -17,7 +17,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Optional, Union
 
-from scitex import logging
+import scitex_logging as logging
 from scitex_scholar.config import ScholarConfig
 
 from ._mixins import (

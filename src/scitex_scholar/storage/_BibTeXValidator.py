@@ -12,7 +12,7 @@ from enum import Enum
 from pathlib import Path
 from typing import List, Optional, Set, Tuple
 
-from scitex import logging
+import scitex_logging as logging
 
 logger = logging.getLogger(__name__)
 

@@ -25,7 +25,7 @@ except ImportError:
     _FIGRECIPE_AVAILABLE = False
 
 try:
-    from scitex.plt._figrecipe_integration import draw_graph as _stx_draw_graph
+    from scitex_plt._figrecipe_integration import draw_graph as _stx_draw_graph
 
     _SCITEX_PLT_AVAILABLE = True
 except ImportError:
@@ -104,8 +104,7 @@ def _plot_figrecipe(G, output=None, **kwargs):
 
 def _plot_scitex_plt(G, output=None, **kwargs):
     """Render with scitex.plt (AxisWrapper + CSV auto-export)."""
-    import scitex.plt as stx_plt
-
+    import scitex_plt as stx_plt
     preset = _fr_get_preset("citation") if _FIGRECIPE_AVAILABLE else {}
     merged = {**preset, **kwargs}
 
@@ -113,8 +112,7 @@ def _plot_scitex_plt(G, output=None, **kwargs):
     result = _stx_draw_graph(ax, G, **merged)
 
     if output:
-        import scitex.io
-
+        import scitex_io as scitex_io
         scitex.io.save(fig, output)
 
     return {"fig": fig, "ax": ax, "pos": result["pos"], "backend": "scitex.plt"}

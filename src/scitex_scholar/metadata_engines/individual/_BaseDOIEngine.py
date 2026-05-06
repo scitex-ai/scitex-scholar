@@ -29,7 +29,7 @@ from typing import List, Optional
 
 import requests
 
-from scitex import logging
+import scitex_logging as logging
 
 from ..utils import (
     PubMedConverter,

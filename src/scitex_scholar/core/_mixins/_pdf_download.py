@@ -17,7 +17,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Dict, List, Optional, Union
 
-from scitex import logging
+import scitex_logging as logging
 from scitex_scholar.auth.core.AuthenticationGateway import AuthenticationGateway
 from scitex_scholar.pdf_download.ScholarPDFDownloader import ScholarPDFDownloader
 

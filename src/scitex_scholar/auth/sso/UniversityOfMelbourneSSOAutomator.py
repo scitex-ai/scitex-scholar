@@ -17,7 +17,7 @@ from typing import Optional
 from playwright.async_api import Page, TimeoutError
 
 # from scitex_scholar.browser import BrowserUtils
-from scitex.browser.interaction import (
+from scitex_browser.interaction import (
     click_with_fallbacks_async,
     fill_with_fallbacks_async,
 )

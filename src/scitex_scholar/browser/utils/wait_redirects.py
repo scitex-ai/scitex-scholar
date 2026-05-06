@@ -28,7 +28,7 @@ from urllib.parse import urlparse
 
 from playwright.async_api import Page, Response
 
-from scitex import logging
+import scitex_logging as logging
 
 logger = logging.getLogger(__name__)
 
@@ -235,7 +235,7 @@ async def wait_redirects(
         dict with redirect information
     """
     if show_progress:
-        from scitex.browser import browser_logger
+        from scitex_browser import browser_logger
 
     start_time = asyncio.get_event_loop().time()
     start_url = page.url
@@ -409,7 +409,7 @@ async def wait_redirects(
                             f"{func_name}: CAPTCHA detected on page: {current_url[:80]}"
                         )
                         if show_progress:
-                            from scitex.browser import browser_logger
+                            from scitex_browser import browser_logger
 
                             asyncio.create_task(
                                 browser_logger.info(
@@ -486,7 +486,7 @@ async def wait_redirects(
                             f"{func_name}: CAPTCHA appears to be solved, waiting for redirect..."
                         )
                         if show_progress:
-                            from scitex.browser import browser_logger
+                            from scitex_browser import browser_logger
 
                             asyncio.create_task(
                                 browser_logger.info(
@@ -514,7 +514,7 @@ async def wait_redirects(
                             f"{func_name}: CAPTCHA solver timeout (60s) - continuing anyway"
                         )
                         if show_progress:
-                            from scitex.browser import browser_logger
+                            from scitex_browser import browser_logger
 
                             asyncio.create_task(
                                 browser_logger.info(

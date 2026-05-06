@@ -18,8 +18,8 @@ from urllib.parse import quote
 
 from playwright.async_api import Locator, Page
 
-from scitex import logging
-from scitex.browser.debugging import browser_logger
+import scitex_logging as logging
+from scitex_browser.debugging import browser_logger
 from scitex_scholar.config import ScholarConfig
 from scitex_scholar.browser.utils import click_and_wait
 

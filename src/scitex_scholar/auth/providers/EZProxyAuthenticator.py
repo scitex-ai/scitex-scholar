@@ -27,7 +27,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 from urllib.parse import quote, urlparse
 
-from scitex import logging
+import scitex_logging as logging
 
 try:
     from playwright.async_api import Browser, Page, async_playwright
@@ -36,7 +36,7 @@ except ImportError:
     Page = None
     Browser = None
 
-from scitex.logging import ScholarError
+from scitex_logging import ScholarError
 
 from .BaseAuthenticator import BaseAuthenticator
 

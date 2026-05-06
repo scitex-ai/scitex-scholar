@@ -13,7 +13,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, List, Optional, Union
 
-from scitex import logging
+import scitex_logging as logging
 
 if TYPE_CHECKING:
     from ..Papers import Papers

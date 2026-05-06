@@ -14,7 +14,7 @@ __DIR__ = os.path.dirname(__FILE__)
 import argparse
 import asyncio
 
-from scitex import logging
+import scitex_logging as logging
 
 logger = logging.getLogger(__name__)
 

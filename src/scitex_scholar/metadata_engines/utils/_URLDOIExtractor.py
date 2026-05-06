@@ -27,7 +27,7 @@ import re
 from typing import Dict, List, Optional
 from urllib.parse import urlparse
 
-from scitex import logging
+import scitex_logging as logging
 
 logger = logging.getLogger(__name__)
 

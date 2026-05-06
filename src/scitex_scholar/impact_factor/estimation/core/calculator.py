@@ -15,7 +15,7 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 
-from scitex.logging import getLogger
+from scitex_logging import getLogger
 
 from ..fetchers import CrossrefFetcher, OpenAlexFetcher, SemanticScholarFetcher
 from .cache_manager import CacheManager

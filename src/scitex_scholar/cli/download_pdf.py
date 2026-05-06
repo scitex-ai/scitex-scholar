@@ -23,7 +23,7 @@ Usage:
 import argparse
 import sys
 
-from scitex import logging
+import scitex_logging as logging
 from scitex_scholar.core import Paper
 from scitex_scholar.pdf_download.ScholarPDFDownloader import ScholarPDFDownloader
 

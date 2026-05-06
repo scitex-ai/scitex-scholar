@@ -17,7 +17,7 @@ import time
 from pathlib import Path
 from typing import Dict, Optional
 
-from scitex import logging
+import scitex_logging as logging
 from scitex_scholar.config import ScholarConfig
 
 from .DOIValidator import DOIValidator

@@ -30,7 +30,7 @@ IO:
 from datetime import datetime
 from typing import Any, Dict, List, Literal, Optional
 
-from scitex import logging
+import scitex_logging as logging
 from scitex_scholar.pipelines.ScholarPipelineSearchParallel import (
     ScholarPipelineSearchParallel,
 )

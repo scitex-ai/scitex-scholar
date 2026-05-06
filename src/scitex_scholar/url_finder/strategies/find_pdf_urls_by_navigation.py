@@ -23,7 +23,7 @@ from urllib.parse import urljoin
 
 from playwright.async_api import Page
 
-from scitex.browser.debugging import browser_logger
+from scitex_browser.debugging import browser_logger
 from scitex_scholar.config import ScholarConfig
 from scitex_scholar.browser.utils import wait_redirects
 

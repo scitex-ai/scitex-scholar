@@ -7,7 +7,7 @@ import json
 import re
 from typing import Optional
 
-from scitex import logging
+import scitex_logging as logging
 from scitex_scholar.storage import LibraryManager
 
 from .local_reader import ZoteroLocalReader

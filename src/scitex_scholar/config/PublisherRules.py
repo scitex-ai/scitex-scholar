@@ -5,7 +5,7 @@
 import re
 from typing import Dict, List
 
-from scitex import logging
+import scitex_logging as logging
 from scitex_scholar.config import ScholarConfig
 
 logger = logging.getLogger(__name__)

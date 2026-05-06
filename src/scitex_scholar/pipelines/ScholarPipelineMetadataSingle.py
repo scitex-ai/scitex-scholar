@@ -27,7 +27,7 @@ IO:
 import asyncio
 from typing import Optional
 
-from scitex import logging
+import scitex_logging as logging
 from scitex_scholar._utils import DOIValidator
 from scitex_scholar.config import ScholarConfig
 from scitex_scholar.core import Paper

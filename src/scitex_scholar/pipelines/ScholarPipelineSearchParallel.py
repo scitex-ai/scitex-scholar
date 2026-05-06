@@ -29,7 +29,7 @@ import asyncio
 from datetime import datetime
 from typing import Any, Callable, Dict, List, Optional
 
-from scitex import logging
+import scitex_logging as logging
 from scitex_scholar.core import Paper, normalize_journal_name
 from scitex_scholar.search_engines.individual.ArXivSearchEngine import ArXivSearchEngine
 from scitex_scholar.search_engines.individual.CrossRefSearchEngine import (

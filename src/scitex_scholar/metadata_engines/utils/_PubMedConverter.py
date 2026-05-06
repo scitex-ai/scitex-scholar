@@ -32,7 +32,7 @@ import aiohttp
 import requests
 from tenacity import retry, stop_after_attempt, wait_exponential
 
-from scitex import logging
+import scitex_logging as logging
 from scitex_scholar.config import ScholarConfig
 
 logger = logging.getLogger(__name__)

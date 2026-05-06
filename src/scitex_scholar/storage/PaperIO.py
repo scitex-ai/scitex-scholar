@@ -45,7 +45,7 @@ import shutil
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from scitex import logging
+import scitex_logging as logging
 from scitex_scholar.core import Paper
 
 logger = logging.getLogger(__name__)

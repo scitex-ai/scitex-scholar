@@ -6,7 +6,7 @@ from __future__ import annotations
 import shutil
 from typing import Dict, List, Optional
 
-from scitex import logging
+import scitex_logging as logging
 from scitex_scholar.storage import LibraryManager
 
 from ._attachment_resolver import ResolvedAttachment, ZoteroAttachmentResolver

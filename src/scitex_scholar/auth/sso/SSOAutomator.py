@@ -15,7 +15,7 @@ __DIR__ = os.path.dirname(__FILE__)
 
 from typing import Dict, Optional
 
-from scitex import logging
+import scitex_logging as logging
 from scitex_scholar.config import ScholarConfig
 
 from .BaseSSOAutomator import BaseSSOAutomator

@@ -11,7 +11,7 @@ No arguments should be defined anywhere else.
 import argparse
 from typing import Dict, Optional
 
-from scitex import logging
+import scitex_logging as logging
 
 from ._argument_groups import ArgumentDef, ArgumentGroups
 

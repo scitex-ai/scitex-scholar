@@ -29,7 +29,7 @@ IO:
 import asyncio
 from typing import Any, Callable, Dict, List, Optional
 
-from scitex import logging
+import scitex_logging as logging
 from scitex_scholar.config import ScholarConfig
 from scitex_scholar.core import Paper, Papers
 from scitex_scholar.pipelines.ScholarPipelineMetadataSingle import (

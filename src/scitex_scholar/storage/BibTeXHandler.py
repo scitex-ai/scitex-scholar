@@ -13,7 +13,7 @@ import tempfile
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
-from scitex import logging
+import scitex_logging as logging
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ class BibTeXHandler:
 
     def _extract_primitive(self, value):
         """Extract primitive value from DotDict or nested structure."""
-        from scitex.dict import DotDict
+        from scitex_dict import DotDict
 
         if value is None:
             return None
@@ -93,7 +93,7 @@ class BibTeXHandler:
                 for warning in result.warnings:
                     logger.warning(f"BibTeX: {warning}")
 
-        from scitex.io import load
+        from scitex_io import load
 
         entries = load(str(bibtex_path))
 
@@ -113,7 +113,7 @@ class BibTeXHandler:
             temp_path = f.name
 
         try:
-            from scitex.io import load
+            from scitex_io import load
 
             entries = load(temp_path)
         finally:

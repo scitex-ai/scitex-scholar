@@ -19,7 +19,7 @@ from typing import Dict, List, Optional, Union
 
 import requests
 
-from scitex import logging
+import scitex_logging as logging
 
 from ..utils import standardize_metadata
 from ._BaseDOIEngine import BaseDOIEngine

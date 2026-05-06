@@ -15,7 +15,7 @@ from collections import Counter
 from difflib import SequenceMatcher
 from typing import Dict, List, Optional, Tuple
 
-from scitex.logging import getLogger
+from scitex_logging import getLogger
 
 logger = getLogger(__name__)
 

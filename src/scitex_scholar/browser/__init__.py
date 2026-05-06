@@ -11,13 +11,13 @@ __FILE__ = __file__
 __DIR__ = os.path.dirname(__FILE__)
 # ----------------------------------------
 
-from scitex.browser.debugging import browser_logger, show_grid_async
-from scitex.browser.interaction import (
+from scitex_browser.debugging import browser_logger, show_grid_async
+from scitex_browser.interaction import (
     PopupHandler,
     click_center_async,
     close_popups_async,
 )
-from scitex.browser.pdf import (
+from scitex_browser.pdf import (
     click_download_for_chrome_pdf_viewer_async,
     detect_chrome_pdf_viewer_async,
 )

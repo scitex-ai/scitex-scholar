@@ -14,7 +14,7 @@ import json
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional, Union
 
-from scitex import logging
+import scitex_logging as logging
 
 if TYPE_CHECKING:
     from ..Papers import Papers

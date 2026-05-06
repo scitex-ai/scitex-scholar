@@ -30,7 +30,7 @@ from typing import Dict, List, Optional
 
 from playwright.async_api import BrowserContext, Page
 
-from scitex import logging
+import scitex_logging as logging
 from scitex_scholar.config import ScholarConfig
 
 logger = logging.getLogger(__name__)
@@ -340,7 +340,7 @@ class AuthenticationGateway:
 
         # Visit OpenURL and click through to publisher
         # This uses the existing OpenURLResolver flow
-        from scitex.browser import browser_logger
+        from scitex_browser import browser_logger
         from scitex_scholar.auth.gateway._OpenURLResolver import OpenURLResolver
 
         resolver = OpenURLResolver(config=self.config)

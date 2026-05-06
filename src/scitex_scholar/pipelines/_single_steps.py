@@ -9,7 +9,7 @@ import hashlib
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from scitex import logging
+import scitex_logging as logging
 from scitex_scholar.core import Paper
 
 if TYPE_CHECKING:

@@ -13,7 +13,7 @@ import os
 from pathlib import Path
 from typing import Dict, List, Optional
 
-from scitex import logging
+import scitex_logging as logging
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ class SymlinkHandlersMixin:
         journal: Optional[str] = None,
     ) -> str:
         """Generate readable symlink name from metadata."""
-        from scitex.dict import DotDict
+        from scitex_dict import DotDict
 
         # Extract author
         first_author = "Unknown"

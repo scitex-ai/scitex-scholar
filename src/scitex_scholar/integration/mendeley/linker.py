@@ -7,7 +7,7 @@ Mendeley linker - Live synchronization with Mendeley.
 import os
 from typing import Optional
 
-from scitex import logging
+import scitex_logging as logging
 
 from ..base import BaseLinker
 from .exporter import MendeleyExporter

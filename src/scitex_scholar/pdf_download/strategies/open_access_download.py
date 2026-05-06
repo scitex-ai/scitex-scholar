@@ -13,7 +13,7 @@ from typing import Any, Dict, Optional
 
 import aiohttp
 
-from scitex import logging
+import scitex_logging as logging
 
 logger = logging.getLogger(__name__)
 

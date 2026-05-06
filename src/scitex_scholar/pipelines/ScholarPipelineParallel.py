@@ -30,8 +30,8 @@ import asyncio
 from typing import List, Optional
 
 import scitex as stx
-from scitex import logging
-from scitex.browser.core import ChromeProfileManager
+import scitex_logging as logging
+from scitex_browser.core import ChromeProfileManager
 from scitex_scholar.auth import ScholarAuthManager
 from scitex_scholar.core import Paper
 from scitex_scholar.pipelines.ScholarPipelineSingle import ScholarPipelineSingle

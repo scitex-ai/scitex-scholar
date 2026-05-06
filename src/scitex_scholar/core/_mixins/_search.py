@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, List, Optional
 
-from scitex import logging
+import scitex_logging as logging
 
 if TYPE_CHECKING:
     from ..Papers import Papers

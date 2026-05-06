@@ -20,7 +20,7 @@ from typing import Optional
 
 from playwright.async_api import BrowserContext, Page
 
-from scitex.logging import getLogger
+from scitex_logging import getLogger
 from scitex_scholar.config import ScholarConfig
 
 logger = getLogger(__name__)

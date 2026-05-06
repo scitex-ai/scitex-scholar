@@ -16,7 +16,7 @@ __FILE__ = __file__
 import re
 from typing import List
 
-from scitex.browser.debugging import browser_logger
+from scitex_browser.debugging import browser_logger
 
 
 async def find_pdf_urls_by_publisher_patterns(

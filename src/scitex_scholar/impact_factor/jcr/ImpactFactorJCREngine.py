@@ -47,7 +47,7 @@ from sql_manager import DynamicModel, Manager
 from sqlalchemy import Column, Float, String, func
 
 import scitex as stx
-from scitex import logging
+import scitex_logging as logging
 
 logger = logging.getLogger(__name__)
 
@@ -124,7 +124,7 @@ class ImpactFactorJCREngine:
         -------
             List of matching journal records as dictionaries
         """
-        from scitex.context import suppress_output
+        from scitex_context import suppress_output
 
         default_keys = ["issn", "eissn", "nlm_id", "journal", "journal_abbr"]
         keys = [key] if key else default_keys
@@ -158,7 +158,7 @@ class ImpactFactorJCREngine:
         -------
             List of matching journal records
         """
-        from scitex.context import suppress_output
+        from scitex_context import suppress_output
 
         # Suppress SQLAlchemy echo output during queries
         with suppress_output():

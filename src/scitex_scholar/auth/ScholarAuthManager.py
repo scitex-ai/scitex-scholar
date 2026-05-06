@@ -23,8 +23,8 @@ interface for authentication operations.
 
 from typing import Any, Dict, List, Optional
 
-from scitex import logging
-from scitex.logging import AuthenticationError
+import scitex_logging as logging
+from scitex_logging import AuthenticationError
 from scitex_scholar.config import ScholarConfig
 
 from .providers.BaseAuthenticator import BaseAuthenticator

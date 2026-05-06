@@ -13,7 +13,7 @@ import argparse
 import os
 import sys
 
-from scitex import logging
+import scitex_logging as logging
 
 from .exporter import ZoteroExporter
 from .importer import ZoteroImporter

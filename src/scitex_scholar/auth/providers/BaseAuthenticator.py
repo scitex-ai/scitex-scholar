@@ -22,8 +22,8 @@ This module provides the base interface that all authenticators
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional
 
-from scitex import logging
-from scitex.logging import AuthenticationError
+import scitex_logging as logging
+from scitex_logging import AuthenticationError
 
 """Logger"""
 logger = logging.getLogger(__name__)

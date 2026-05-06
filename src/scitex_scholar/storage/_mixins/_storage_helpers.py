@@ -12,7 +12,7 @@ import json
 from datetime import datetime
 from typing import TYPE_CHECKING, Dict, Optional
 
-from scitex import logging
+import scitex_logging as logging
 
 if TYPE_CHECKING:
     from scitex_scholar.core.Paper import Paper

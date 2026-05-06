@@ -1372,7 +1372,7 @@ async def parse_pdf_content_handler(
 
             # Use scitex.io PDF loader
             try:
-                from scitex.io import load
+                from scitex_io import load
 
                 result = load(str(target_path), mode=mode)
 

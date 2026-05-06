@@ -22,7 +22,7 @@ from tenacity import (
     wait_exponential,
 )
 
-from scitex import logging
+import scitex_logging as logging
 
 from ..utils import standardize_metadata
 from ._BaseDOIEngine import BaseDOIEngine

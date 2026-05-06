@@ -32,7 +32,7 @@ from pathlib import Path
 from typing import Optional, Union
 
 import scitex as stx
-from scitex import logging
+import scitex_logging as logging
 from scitex_scholar.core import Papers
 from scitex_scholar.pipelines.ScholarPipelineParallel import ScholarPipelineParallel
 from scitex_scholar.storage import BibTeXHandler

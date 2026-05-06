@@ -256,7 +256,7 @@ def collect_recent_screenshots(
         List of screenshot paths (most recent first)
     """
     if screenshot_dir is None:
-        from scitex.config import get_paths
+        from scitex_config import get_paths
 
         screenshot_dir = get_paths().resolve("browser_screenshots")
 

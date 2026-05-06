@@ -17,7 +17,7 @@ __FILE__ = __file__
 
 from playwright.async_api import BrowserContext, Page
 
-from scitex.browser.debugging import browser_logger
+from scitex_browser.debugging import browser_logger
 
 
 async def close_unwanted_pages(

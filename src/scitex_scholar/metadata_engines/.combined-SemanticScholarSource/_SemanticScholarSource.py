@@ -22,7 +22,7 @@ from typing import List, Optional
 
 from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential
 
-from scitex import logging
+import scitex_logging as logging
 
 from ._BaseDOISource import BaseDOISource
 

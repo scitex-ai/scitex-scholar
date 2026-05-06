@@ -13,7 +13,7 @@ __DIR__ = os.path.dirname(__FILE__)
 
 """Process cleanup utilities for Scholar."""
 
-from scitex import logging
+import scitex_logging as logging
 
 logger = logging.getLogger(__name__)
 

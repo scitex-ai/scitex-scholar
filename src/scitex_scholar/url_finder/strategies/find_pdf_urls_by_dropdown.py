@@ -8,8 +8,8 @@ from typing import List
 
 from playwright.async_api import Page
 
-from scitex import logging
-from scitex.browser.debugging import browser_logger
+import scitex_logging as logging
+from scitex_browser.debugging import browser_logger
 from scitex_scholar.config import ScholarConfig
 
 logger = logging.getLogger(__name__)

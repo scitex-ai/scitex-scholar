@@ -10,7 +10,7 @@ Install: pip install mendeley
 import os
 from typing import List, Optional
 
-from scitex import logging
+import scitex_logging as logging
 from scitex_scholar.core.Papers import Papers
 
 from ..base import BaseImporter

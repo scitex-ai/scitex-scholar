@@ -29,7 +29,7 @@ import time
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from scitex import logging
+import scitex_logging as logging
 from scitex_scholar.metadata_engines.individual.PubMedEngine import PubMedEngine
 
 from .._BaseSearchEngine import BaseSearchEngine

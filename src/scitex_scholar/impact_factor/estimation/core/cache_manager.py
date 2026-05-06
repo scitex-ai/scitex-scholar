@@ -19,8 +19,8 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
-from scitex.config import get_paths
-from scitex.logging import getLogger
+from scitex_config import get_paths
+from scitex_logging import getLogger
 
 logger = getLogger(__name__)
 

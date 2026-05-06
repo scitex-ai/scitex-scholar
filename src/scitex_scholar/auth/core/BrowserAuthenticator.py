@@ -21,9 +21,9 @@ from typing import Any, Dict, List, Optional
 
 from playwright.async_api import Page, async_playwright
 
-from scitex import logging
-from scitex.browser.core import BrowserMixin
-from scitex.browser.interaction import (
+import scitex_logging as logging
+from scitex_browser.core import BrowserMixin
+from scitex_browser.interaction import (
     click_with_fallbacks_async,
     fill_with_fallbacks_async,
 )

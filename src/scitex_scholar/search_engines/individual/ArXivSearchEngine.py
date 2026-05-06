@@ -17,7 +17,7 @@ import xml.etree.ElementTree as ET
 from typing import Any, Dict, List, Optional
 from urllib.parse import quote
 
-from scitex import logging
+import scitex_logging as logging
 from scitex_scholar.metadata_engines.individual.ArXivEngine import ArXivEngine
 
 from .._BaseSearchEngine import BaseSearchEngine

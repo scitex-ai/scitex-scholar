@@ -6,7 +6,7 @@
 
 from pathlib import Path
 
-from scitex import logging
+import scitex_logging as logging
 
 logger = logging.getLogger(__name__)
 

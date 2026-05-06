@@ -7,7 +7,7 @@
 from pathlib import Path
 from typing import Union
 
-from scitex.logging import getLogger
+from scitex_logging import getLogger
 
 logger = getLogger(__name__)
 

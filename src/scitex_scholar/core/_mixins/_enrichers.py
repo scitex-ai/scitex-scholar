@@ -17,7 +17,7 @@ from typing import TYPE_CHECKING, Dict, Optional, Union
 
 import nest_asyncio
 
-from scitex import logging
+import scitex_logging as logging
 from scitex_scholar.impact_factor.ImpactFactorEngine import ImpactFactorEngine
 
 if TYPE_CHECKING:

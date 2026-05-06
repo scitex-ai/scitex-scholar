@@ -23,7 +23,7 @@ Business logic has been moved to Scholar and utility functions.
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, List, Optional, Union
 
-from scitex import logging
+import scitex_logging as logging
 from scitex_scholar.config import ScholarConfig
 from scitex_scholar.core.Paper import Paper
 

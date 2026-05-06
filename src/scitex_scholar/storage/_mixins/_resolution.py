@@ -13,7 +13,7 @@ import re
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from scitex import logging
+import scitex_logging as logging
 from scitex_scholar._utils import TextNormalizer
 
 logger = logging.getLogger(__name__)

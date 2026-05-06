@@ -22,7 +22,7 @@ from typing import Optional, Tuple
 
 import requests
 
-from scitex import logging
+import scitex_logging as logging
 
 logger = logging.getLogger(__name__)
 

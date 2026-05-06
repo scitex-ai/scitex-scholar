@@ -7,7 +7,7 @@ Mendeley exporter - Export from Scholar library to Mendeley.
 import os
 from typing import Dict, List, Optional, Union
 
-from scitex import logging
+import scitex_logging as logging
 from scitex_scholar.core.Paper import Paper
 from scitex_scholar.core.Papers import Papers
 

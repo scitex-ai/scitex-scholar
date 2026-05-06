@@ -16,8 +16,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Union
 
-from scitex import logging
-from scitex.logging import ScholarError
+import scitex_logging as logging
+from scitex_logging import ScholarError
 
 logger = logging.getLogger(__name__)
 

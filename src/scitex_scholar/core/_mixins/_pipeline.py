@@ -13,7 +13,7 @@ from __future__ import annotations
 import asyncio
 from typing import TYPE_CHECKING, List, Optional, Union
 
-from scitex import logging
+import scitex_logging as logging
 from scitex_scholar.pdf_download.ScholarPDFDownloader import ScholarPDFDownloader
 from scitex_scholar.url_finder.ScholarURLFinder import ScholarURLFinder
 

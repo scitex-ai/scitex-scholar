@@ -17,7 +17,7 @@ from typing import Dict, Optional
 
 from playwright.async_api import Locator
 
-from scitex import logging
+import scitex_logging as logging
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +56,7 @@ async def click_and_wait(
             'timed_out': bool,
         }
     """
-    from scitex.browser.debugging import browser_logger, highlight_element_async
+    from scitex_browser.debugging import browser_logger, highlight_element_async
 
     from .wait_redirects import wait_redirects
 
