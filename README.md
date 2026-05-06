@@ -26,6 +26,15 @@
 
 ---
 
+## Problem and Solution
+
+
+| # | Problem | Solution |
+|---|---------|----------|
+| 1 | **Literature search is balkanized** -- CrossRef / OpenAlex / Semantic Scholar / arXiv / PubMed each have different APIs, rate limits, auth | **Unified search** -- `scitex scholar search "topic"` federates across all, deduplicates by DOI, returns ranked results |
+| 2 | **BibTeX from the wild is missing abstracts / DOIs / impact factors** -- manuscript prep wastes hours | **`scitex scholar bibtex` enrichment** -- one call resolves DOIs, fetches abstracts, adds impact factors, normalizes formatting |
+| 3 | **Paywalled PDFs require institutional login per journal** -- manual login-download-rename is the bottleneck | **Browser-automation + OAuth** -- persistent Chrome profile with stealth; `scitex scholar fetch 10.1038/...` grabs the PDF end-to-end |
+
 ## Problem
 
 Literature management spans many tools and APIs: searching databases, resolving DOIs, downloading PDFs through institutional access, enriching BibTeX metadata, and keeping a reproducible, deduplicated library. Each step speaks a different library, auth flow, and data format.

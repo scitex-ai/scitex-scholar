@@ -205,12 +205,19 @@ STORAGE: ~/.scitex/scholar/library/
     )
     mcp_sub = mcp_parser.add_subparsers(dest="mcp_command", required=False)
     mcp_sub.add_parser(
+        "start",
+        help="Start the standalone MCP server (deprecated; prefer `scitex serve`)",
+        description=(
+            "Start the standalone scitex-scholar MCP server. The unified "
+            "`scitex serve` is preferred — this remains for backward compat."
+        ),
+    )
+    mcp_sub.add_parser(
         "list-tools",
         help="List the MCP tool names this package registers (scholar_*)",
         description=(
-            "Print the MCP tool names exposed by scitex-scholar. "
-            "When `mcp` is invoked with no subcommand, the standalone server "
-            "starts (deprecated; prefer the unified `scitex serve`)."
+            "Print the MCP tool names exposed by scitex-scholar. Read-only; "
+            "does not start the server."
         ),
     )
 
@@ -378,7 +385,8 @@ async def main_async():
     elif args.command == "bibtex":
         return await run_bibtex_pipeline(args)
     elif args.command == "mcp":
-        if getattr(args, "mcp_command", None) == "list-tools":
+        sub = getattr(args, "mcp_command", None)
+        if sub == "list-tools":
             from ._mcp.all_handlers import __all__ as _handler_names
 
             for name in sorted(_handler_names):
@@ -387,6 +395,7 @@ async def main_async():
                 tool = "scholar_" + name.removesuffix("_handler")
                 print(tool)
             return 0
+        # `start` (explicit) and bare `mcp` (back-compat) both start the server.
         return await run_mcp_server()
     elif args.command == "highlight":
         from .pdf_highlight._cli import run as run_highlight
