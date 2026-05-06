@@ -1416,9 +1416,13 @@ def auth_logout(provider: str | None, yes: bool, dry_run: bool) -> int:
     click.echo(f"Will clear: {[str(p) for p in paths]}")
     if dry_run:
         return 0
-    if not yes and not click.confirm("Proceed?", default=True):
-        click.echo("Aborted.")
-        return 1
+    if not yes:
+        click.echo(
+            "Refusing to proceed without --yes/-y "
+            "(mutating action; non-interactive by design).",
+            err=True,
+        )
+        return 2
     cleared = 0
     for p in paths:
         try:
