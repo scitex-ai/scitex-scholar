@@ -16,12 +16,7 @@ import pytest
 # ===== AUTO-GENERATED: cross-package imports =====
 CROSS_PACKAGE_IMPORTS = [
     'scitex',
-    'scitex.config',
-    'scitex.context',
-    'scitex.dict',
-    'scitex.io',
     'scitex.notify',
-    'scitex.plt',
     'scitex.utils._email',
     'scitex_browser',
     'scitex_browser.automation',
@@ -31,9 +26,14 @@ CROSS_PACKAGE_IMPORTS = [
     'scitex_browser.pdf',
     'scitex_browser.stealth',
     'scitex_clew',
+    'scitex_config',
+    'scitex_context',
+    'scitex_dev._cli._completion',
     'scitex_dev.click_helpers',
+    'scitex_dict',
     'scitex_io',
     'scitex_logging',
+    'scitex_plt',
     'scitex_session',
 ]
 # ===== END AUTO-GENERATED =====
