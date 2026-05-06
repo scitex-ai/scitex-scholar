@@ -105,7 +105,7 @@ class UniversityOfMelbourneSSOAutomator(BaseSSOAutomator):
 
         except Exception as e:
             self.logger.error(f"UniMelb SSO login failed: {e}")
-            await self._take_debug_screenshot_async(page)
+            await self._save_debug_screenshot_async(page)
 
             # Send failure notification
             await self.notify_user_async("authentication_failed", error=str(e))
@@ -317,6 +317,7 @@ class UniversityOfMelbourneSSOAutomator(BaseSSOAutomator):
     async def _handle_generic_login_async(self, page: Page) -> bool:
         """Handle generic login form as fallback."""
         try:
+            await self._save_debug_screenshot_async(page, label="generic_login_entry")
             # Find any username/email input field
             username_elements = await page.query_selector_all(
                 'input[type="text"], input[type="email"], input[name*="user"], input[id*="user"]'
@@ -328,6 +329,9 @@ class UniversityOfMelbourneSSOAutomator(BaseSSOAutomator):
                     {"element": username_elements[0], "value": self.username},
                 )
                 self.logger.info("Filled generic username field")
+                await self._save_debug_screenshot_async(
+                    page, label="generic_login_after_username"
+                )
 
             # Find any password field
             password_elements = await page.query_selector_all('input[type="password"]')
@@ -337,6 +341,9 @@ class UniversityOfMelbourneSSOAutomator(BaseSSOAutomator):
                     {"element": password_elements[0], "value": self.password},
                 )
                 self.logger.info("Filled generic password field")
+                await self._save_debug_screenshot_async(
+                    page, label="generic_login_after_password"
+                )
 
             # Find and click submit button
             login_buttons = await page.query_selector_all(
@@ -344,14 +351,26 @@ class UniversityOfMelbourneSSOAutomator(BaseSSOAutomator):
             )
 
             if login_buttons:
+                await self._save_debug_screenshot_async(
+                    page, label="generic_login_before_submit"
+                )
                 await login_buttons[0].click()
                 self.logger.info("Generic login button clicked")
+                await self._save_debug_screenshot_async(
+                    page, label="generic_login_after_submit"
+                )
                 return True
 
+            await self._save_debug_screenshot_async(
+                page, label="generic_login_no_button"
+            )
             return False
 
         except Exception as e:
             self.logger.error(f"Generic login failed: {e}")
+            await self._save_debug_screenshot_async(
+                page, label="generic_login_exception"
+            )
             return False
 
     async def _handle_duo_authentication_async(self, page: Page) -> bool:
