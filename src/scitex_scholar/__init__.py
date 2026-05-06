@@ -15,7 +15,9 @@ Installation:
 from __future__ import annotations
 
 try:
-    from importlib.metadata import version as _v, PackageNotFoundError
+    from importlib.metadata import PackageNotFoundError
+    from importlib.metadata import version as _v
+
     try:
         __version__ = _v("scitex-scholar")
     except PackageNotFoundError:
@@ -24,7 +26,6 @@ try:
 except ImportError:  # pragma: no cover — only on ancient Pythons
     __version__ = "0.0.0+local"
 __author__ = "Yusuke Watanabe"
-__email__ = "ywatanabe@scitex.ai"
 
 from ._utils.text._TextNormalizer import TextNormalizer as _TextNormalizer
 from .auth import ScholarAuthManager

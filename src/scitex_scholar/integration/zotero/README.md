@@ -333,4 +333,4 @@ Part of SciTeX Scholar module - see main project LICENSE.
 
 ## Author
 
-Yusuke Watanabe (ywatanabe@scitex.ai)
+Yusuke Watanabe

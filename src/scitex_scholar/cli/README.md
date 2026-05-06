@@ -349,7 +349,6 @@ Multiple DOIs  ──┘
 ## 📞 Support
 
 - **GitHub Issues**: https://github.com/ywatanabe1989/SciTeX-Code/issues
-- **Email**: ywatanabe@scitex.ai
 - **Documentation**: This file and main README.md
 
 ## 🎓 Citation

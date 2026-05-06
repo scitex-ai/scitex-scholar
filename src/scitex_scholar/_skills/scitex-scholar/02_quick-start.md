@@ -33,6 +33,35 @@ papers.save("output.bib")
 Resolves DOIs from titles, fills missing abstracts / impact factors, and
 writes a clean BibTeX with provenance comments.
 
+## CLI — single paper
+
+```bash
+# By DOI
+scitex-scholar single --doi "10.1093/brain/awx173" --project NeuroVista
+
+# By title (resolves DOI automatically)
+scitex-scholar single --title "Critical slowing down as a biomarker for seizure susceptibility" \
+                      --project NeuroVista
+```
+
+## CLI — BibTeX batch
+
+```bash
+scitex-scholar bibtex --bibtex /path/to/refs.bib \
+                      --project NeuroVista \
+                      --browser-mode stealth \
+                      --num-workers 4
+```
+
+The pipeline parses BibTeX → resolves missing DOIs → resolves OpenURL →
+downloads PDFs → stores under `MASTER/{ID}/` with project symlinks.
+All long-running operations checkpoint per-paper and resume on re-run.
+
+## Browser modes
+
+- `stealth` — headless Chrome with anti-bot evasion (default for batches)
+- `interactive` — visible browser; use when CAPTCHA or SSO MFA expected
+
 ## Where files land
 
 Library at `~/.scitex/scholar/library/MASTER/{8DIGIT-ID}/`, with
@@ -41,6 +70,6 @@ See `15_library-management.md`.
 
 ## Next steps
 
-- `06_quick-start.md` — extended workflows (parallel, BibTeX, projects)
-- `07_python-api.md` — full API surface
-- `08_cli-reference.md` — `scitex-scholar single|parallel|bibtex|mcp|...`
+- `03_python-api.md` — full API surface
+- `04_cli-reference.md` — `scitex-scholar single|parallel|bibtex|mcp|...`
+- `15_library-management.md` — storage layout details

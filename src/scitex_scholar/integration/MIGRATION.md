@@ -135,4 +135,4 @@ If you have issues migrating:
 
 ## Author
 
-Yusuke Watanabe (ywatanabe@scitex.ai)
+Yusuke Watanabe

@@ -8,6 +8,7 @@ Top-level package
    :members:
    :undoc-members:
    :show-inheritance:
+   :no-index:
 
 Semantic Highlighter
 --------------------

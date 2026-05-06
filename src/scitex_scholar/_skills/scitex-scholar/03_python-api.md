@@ -54,5 +54,48 @@ Top-level public surface re-exported from `scitex_scholar`.
 | `apply_filters`  | Apply year / journal / quartile filters to `Papers`      |
 | `clean_abstract` | Normalise whitespace / encoding in abstract text         |
 
-See `07_python-api.md` for the legacy reference, and
-`05_api-overview.md` for storage layout and subpackages.
+See `05_api-overview.md` for storage layout and subpackages.
+
+## Concrete examples
+
+```python
+from scitex_scholar import (
+    Scholar, Paper, Papers, ScholarConfig, ScholarAuthManager,
+    apply_filters, to_bibtex, to_ris, to_endnote, to_text_citation,
+    generate_cite_key, make_citation_key,
+)
+
+# Scholar facade
+scholar = Scholar()
+papers  = scholar.search("seizure forecasting", limit=20)
+paper   = scholar.fetch(doi="10.1093/brain/awx173", project="NeuroVista")
+
+# Papers collection
+papers = Papers.from_bibtex("refs.bib")
+papers = papers.filter(year_min=2018)
+papers.save("filtered.bib")
+papers.save("filtered.csv")
+
+# Paper record
+p = Paper(doi="10.1093/brain/awx173")
+p.enrich()                         # fills metadata in-place
+p.download(project="NeuroVista")   # PDF
+
+# Config
+cfg = ScholarConfig()
+cfg.library_dir          # ~/.scitex/scholar/library
+cfg.cache_dir
+
+# Auth
+auth = ScholarAuthManager()
+auth.check_status(method="openathens", verify_live=True)
+auth.authenticate(method="openathens", institution="University of Melbourne")
+auth.logout(method="openathens")
+
+# Citation keys & formatting
+key = generate_cite_key(author="Karoly", year=2017, title="The circadian profile...")
+to_bibtex(papers); to_ris(papers); to_endnote(papers); to_text_citation(papers)
+
+# Filters
+hits = apply_filters(papers, year_min=2020, journals=["Nature Communications", "Brain"])
+```

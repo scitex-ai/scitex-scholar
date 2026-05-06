@@ -53,30 +53,39 @@ class Scholar(
     Main interface for SciTeX Scholar - scientific literature management made simple.
 
     By default, papers are automatically enriched with:
+
     - Journal impact factors from impact_factor package (2024 JCR data)
     - Citation counts from Semantic Scholar (via DOI/title matching)
 
-    Example usage:
-        # Basic search with automatic enrichment
+    Examples
+    --------
+    Basic search with automatic enrichment::
+
         scholar = Scholar()
         papers = scholar.search("deep learning neuroscience")
         # Papers now have impact_factor and citation_count populated
         papers.save("my_pac.bib")
 
-        # Disable automatic enrichment if needed
+    Disable automatic enrichment if needed::
+
         config = ScholarConfig(enable_auto_enrich=False)
         scholar = Scholar(config=config)
 
-        # Search specific source
+    Search a specific source::
+
         papers = scholar.search("transformer models", sources='arxiv')
 
-        # Advanced workflow
-        papers = scholar.search("transformer models", year_min=2020) \\
-                      .filter(min_citations=50) \\
-                      .sort_by("impact_factor") \\
-                      .save("transformers.bib")
+    Advanced workflow::
 
-        # Local library
+        papers = (
+            scholar.search("transformer models", year_min=2020)
+                   .filter(min_citations=50)
+                   .sort_by("impact_factor")
+                   .save("transformers.bib")
+        )
+
+    Local library::
+
         scholar._index_local_pdfs("./my_papers")
         local_papers = scholar.search_local("attention mechanism")
     """
@@ -95,14 +104,20 @@ class Scholar(
     ):
         """Initialize Scholar with configuration.
 
-        Args:
-            config: Can be:
-                   - ScholarConfig instance
-                   - Path to YAML config file (str or Path)
-                   - None (uses ScholarConfig.load() to find config)
-            project: Default project name for operations
-            project_description: Optional description for the project
-            browser_mode: Browser mode ('stealth', 'interactive', 'manual')
+        Parameters
+        ----------
+        config
+            One of:
+
+            - ``ScholarConfig`` instance
+            - Path to YAML config file (str or Path)
+            - ``None`` (uses ``ScholarConfig.load()`` to find config)
+        project
+            Default project name for operations.
+        project_description
+            Optional description for the project.
+        browser_mode
+            Browser mode (``'stealth'``, ``'interactive'``, ``'manual'``).
         """
         self.config = self._init_config(config)
         self.browser_mode = browser_mode or "stealth"
