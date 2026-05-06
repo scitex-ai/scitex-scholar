@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Overview: module code &mdash; SciTeX Scholar v1.2.3</title>
+  <title>Overview: module code &mdash; SciTeX Scholar v1.2.4</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=590429e0"></script>
+      <script src="../_static/documentation_options.js?v=928db92d"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,9 +50,109 @@
 <li class="toctree-l2"><a class="reference internal" href="../installation.html#development">Development</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick Start</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#python-api">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#semantic-pdf-highlighting">Semantic PDF Highlighting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#cli">CLI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#next-steps">Next Steps</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">CLI Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../cli.html#subcommands">Subcommands</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#single">single</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#parallel">parallel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#bibtex">bibtex</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#mcp">mcp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#highlight">highlight</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../mcp.html">MCP Server</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../mcp.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mcp.html#starting-the-server">Starting the Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mcp.html#mcp-client-configuration">MCP Client Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mcp.html#available-scholar-tools">Available Scholar Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mcp.html#handler-integration">Handler Integration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../semantic_highlight.html">Semantic PDF Highlighting</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../semantic_highlight.html#pipeline">Pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../semantic_highlight.html#four-interfaces">Four Interfaces</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../semantic_highlight.html#python-api">Python API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../semantic_highlight.html#cli">CLI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../semantic_highlight.html#mcp">MCP</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../semantic_highlight.html#skill">Skill</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../semantic_highlight.html#model-selection">Model Selection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../semantic_highlight.html#known-limitations">Known Limitations</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/index.html#top-level-package">Top-level package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/index.html#module-scitex_scholar.pdf_highlight">Semantic Highlighter</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight.Block.id"><code class="docutils literal notranslate"><span class="pre">Block.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight.Block.page"><code class="docutils literal notranslate"><span class="pre">Block.page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight.Block.bbox"><code class="docutils literal notranslate"><span class="pre">Block.bbox</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight.Block.text"><code class="docutils literal notranslate"><span class="pre">Block.text</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight.Block.category"><code class="docutils literal notranslate"><span class="pre">Block.category</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight.Block.confidence"><code class="docutils literal notranslate"><span class="pre">Block.confidence</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight.Block.__init__"><code class="docutils literal notranslate"><span class="pre">Block.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight.HighlightResult"><code class="docutils literal notranslate"><span class="pre">HighlightResult</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight.HighlightResult.input_path"><code class="docutils literal notranslate"><span class="pre">HighlightResult.input_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight.HighlightResult.output_path"><code class="docutils literal notranslate"><span class="pre">HighlightResult.output_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight.HighlightResult.blocks"><code class="docutils literal notranslate"><span class="pre">HighlightResult.blocks</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight.HighlightResult.pages"><code class="docutils literal notranslate"><span class="pre">HighlightResult.pages</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight.HighlightResult.annotations_added"><code class="docutils literal notranslate"><span class="pre">HighlightResult.annotations_added</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight.HighlightResult.counts"><code class="docutils literal notranslate"><span class="pre">HighlightResult.counts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight.HighlightResult.__init__"><code class="docutils literal notranslate"><span class="pre">HighlightResult.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight.apply_classifications"><code class="docutils literal notranslate"><span class="pre">apply_classifications()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight.extract_blocks"><code class="docutils literal notranslate"><span class="pre">extract_blocks()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight.highlight_pdf"><code class="docutils literal notranslate"><span class="pre">highlight_pdf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight.save_with_highlights"><code class="docutils literal notranslate"><span class="pre">save_with_highlights()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/index.html#module-scitex_scholar.pdf_highlight._colors">Colour Scheme</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/index.html#module-scitex_scholar.pdf_highlight._blocks">Block Extraction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight._blocks.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight._blocks._split_sentences"><code class="docutils literal notranslate"><span class="pre">_split_sentences()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight._blocks.extract_blocks"><code class="docutils literal notranslate"><span class="pre">extract_blocks()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/index.html#module-scitex_scholar.pdf_highlight._classifier">Classifier</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight._classifier.classify_llm"><code class="docutils literal notranslate"><span class="pre">classify_llm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight._classifier.classify_stub"><code class="docutils literal notranslate"><span class="pre">classify_stub()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/index.html#module-scitex_scholar.pdf_highlight._annotator">Annotator</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight._annotator._line_quads_in_rect"><code class="docutils literal notranslate"><span class="pre">_line_quads_in_rect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight._annotator._search_quads_for_sentence"><code class="docutils literal notranslate"><span class="pre">_search_quads_for_sentence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight._annotator.apply_highlights"><code class="docutils literal notranslate"><span class="pre">apply_highlights()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight._annotator._corner_rect"><code class="docutils literal notranslate"><span class="pre">_corner_rect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight._annotator._draw_legend_overlay"><code class="docutils literal notranslate"><span class="pre">_draw_legend_overlay()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight._annotator.add_legend"><code class="docutils literal notranslate"><span class="pre">add_legend()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight._annotator.add_legend_page"><code class="docutils literal notranslate"><span class="pre">add_legend_page()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight._annotator.add_legend_footer"><code class="docutils literal notranslate"><span class="pre">add_legend_footer()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/index.html#module-scitex_scholar.pdf_highlight._mcp">MCP Tool Spec</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight._mcp.run_tool"><code class="docutils literal notranslate"><span class="pre">run_tool()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../api/core.html">scitex_scholar.core</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../api/core.html#scitex_scholar.core.Paper"><code class="docutils literal notranslate"><span class="pre">Paper</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../api/core.html#scitex_scholar.core.Paper.model_dump"><code class="docutils literal notranslate"><span class="pre">Paper.model_dump()</span></code></a></li>
