@@ -109,14 +109,34 @@ scitex-scholar library link-project-tree .
 scitex-scholar library db build --dry-run
 scitex-scholar library db audit --json
 
+# Auth (institutional SSO — OpenAthens / EZProxy / Shibboleth)
+scitex-scholar auth status              # exit 0 if any session valid, 1 otherwise
+scitex-scholar auth login               # trigger SSO flow now (debug-friendly)
+scitex-scholar auth logout -y           # clear cached cookies (--yes required)
+scitex-scholar auth refresh             # logout + login
+
 # MCP server
 scitex-scholar mcp start
 scitex-scholar mcp list-tools --json
+
+# Shell completion
+scitex-scholar install-shell-completion --shell bash
+scitex-scholar print-shell-completion --shell bash
 
 # Skills + Python API introspection
 scitex-scholar skills list
 scitex-scholar list-python-apis -v
 ```
+
+### Debugging the SSO automator
+
+Every browser-automation step writes a screenshot + HTML pair to
+`~/.scitex/scholar/cache/engine/screenshots/` and
+`~/.scitex/browser/cache/debug/`. When a selector breaks (e.g. an
+Okta UI refresh), `ls -lt` the artifact dirs to get a frame-by-frame
+storyboard — the screenshot shows what was rendered, the HTML
+shows what the locator was reasoning over. See
+`_skills/scitex-browser/11_debugging-visuals.md` for the full pattern.
 
 Mutating verbs accept `--dry-run` and `-y/--yes`. Read verbs support `--json`.
 Common paper/bibtex flags: `--browser-mode {stealth,interactive}`, `--chrome-profile NAME`, `--force`.

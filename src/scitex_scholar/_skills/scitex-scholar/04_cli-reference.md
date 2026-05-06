@@ -25,19 +25,22 @@ list-tools`, `library db list`, `library db lookup`, `library db audit`,
 
 ## Top-level groups
 
-| Group               | Verb / sub-noun                                 | Purpose                                                |
-|---------------------|-------------------------------------------------|--------------------------------------------------------|
-| `paper`             | `fetch`                                         | Fetch one paper (DOI or title)                         |
-| `paper`             | `fetch-batch`                                   | Fetch many papers in parallel                          |
-| `bibtex`            | `import`                                        | Import & enrich every entry in a `.bib` file           |
-| `pdf`               | `highlight`                                     | Overlay semantic highlights on a PDF                   |
-| `library`           | `link-project-tree`                             | Symlink a project's `.scitex/scholar/library`          |
-| `library`           | `materialize`                                   | Replace a library symlink with a real bib-filtered dir |
-| `library`           | `dematerialize`                                 | Replace a materialized dir with a symlink              |
-| `library`           | `db {build,migrate,lookup,list,audit}`          | Manage the library SQLite index                        |
-| `mcp`               | `start`, `list-tools`, `doctor`, `install`      | MCP server commands                                    |
-| `skills`            | `list`, `get`, `install`                        | Bundled skill leaves under `_skills/scitex-scholar/`   |
-| `list-python-apis`  | —                                               | Print public callables in `scitex_scholar.__all__`     |
+| Group                       | Verb / sub-noun                                 | Purpose                                                |
+|-----------------------------|-------------------------------------------------|--------------------------------------------------------|
+| `paper`                     | `fetch`                                         | Fetch one paper (DOI or title)                         |
+| `paper`                     | `fetch-batch`                                   | Fetch many papers in parallel                          |
+| `bibtex`                    | `import`                                        | Import & enrich every entry in a `.bib` file           |
+| `pdf`                       | `highlight`                                     | Overlay semantic highlights on a PDF                   |
+| `library`                   | `link-project-tree`                             | Symlink a project's `.scitex/scholar/library`          |
+| `library`                   | `materialize`                                   | Replace a library symlink with a real bib-filtered dir |
+| `library`                   | `dematerialize`                                 | Replace a materialized dir with a symlink              |
+| `library`                   | `db {build,migrate,lookup,list,audit}`          | Manage the library SQLite index                        |
+| `auth`                      | `status`, `login`, `logout`, `refresh`          | Institutional SSO session lifecycle (OpenAthens etc.)  |
+| `mcp`                       | `start`, `list-tools`, `doctor`, `install`      | MCP server commands                                    |
+| `skills`                    | `list`, `get`, `install`                        | Bundled skill leaves under `_skills/scitex-scholar/`   |
+| `list-python-apis`          | —                                               | Print public callables in `scitex_scholar.__all__`     |
+| `install-shell-completion`  | —                                               | Wire up `<TAB>` completion in `~/.bashrc`/`~/.zshrc`   |
+| `print-shell-completion`    | —                                               | Print completion script to stdout                      |
 
 ## Library layout
 
