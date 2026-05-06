@@ -292,6 +292,13 @@ class EZProxyAuthenticator(BaseAuthenticator):
                             timeout=30000,
                         )
                     except Exception as e:
+                        from scitex_browser.debugging import (
+                            capture_debug_artifacts_async,
+                        )
+
+                        await capture_debug_artifacts_async(
+                            page, label="ezproxy_login_error"
+                        )
                         if "Login failed" in str(e):
                             raise EZProxyError("Invalid credentials")
                         # Continue if timeout - might still be authenticate_async

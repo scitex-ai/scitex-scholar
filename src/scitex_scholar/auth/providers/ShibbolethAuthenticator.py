@@ -302,6 +302,13 @@ class ShibbolethAuthenticator(BaseAuthenticator):
                         timeout=30000,
                     )
                 except Exception as exc:
+                    from scitex_browser.debugging import (
+                        capture_debug_artifacts_async,
+                    )
+
+                    await capture_debug_artifacts_async(
+                        page, label="shibboleth_redirect_timeout"
+                    )
                     # Continue anyway - might still be authenticate_async
                     logger.debug(
                         f"Shibboleth redirect wait timed out "
