@@ -53,7 +53,7 @@ class ScholarConfig:
         self._setup_path_manager()
 
     def __getattr__(self, name):
-        """Delegate all get_ methods to path_manager"""
+        """Delegate all ``get_*`` methods to ``path_manager``."""
         if name.startswith("get_") and hasattr(self.path_manager, name):
             return getattr(self.path_manager, name)
         raise AttributeError(
@@ -61,7 +61,7 @@ class ScholarConfig:
         )
 
     def __dir__(self):
-        """Include path_manager's get_ methods in dir() output"""
+        """Include ``path_manager``'s ``get_*`` methods in ``dir()`` output."""
         own_attrs = object.__dir__(self)
         path_manager_get_methods = [
             attr

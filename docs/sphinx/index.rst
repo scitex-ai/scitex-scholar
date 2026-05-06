@@ -8,11 +8,21 @@ SciTeX Scholar
    :caption: Getting Started
 
    installation
+   quickstart
+
+.. toctree::
+   :maxdepth: 2
+   :caption: User Guide
+
+   cli
+   mcp
+   semantic_highlight
 
 .. toctree::
    :maxdepth: 2
    :caption: API Reference
 
+   api/index
    api/core
    api/auth
    api/browser

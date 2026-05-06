@@ -197,11 +197,21 @@ STORAGE: ~/.scitex/scholar/library/
     # ========================================
     # Subcommand: mcp
     # ========================================
-    subparsers.add_parser(
+    mcp_parser = subparsers.add_parser(
         "mcp",
         help="Start MCP server for LLM integration",
         description="Start the MCP (Model Context Protocol) server for Claude/LLM integration",
         formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    mcp_sub = mcp_parser.add_subparsers(dest="mcp_command", required=False)
+    mcp_sub.add_parser(
+        "list-tools",
+        help="List the MCP tool names this package registers (scholar_*)",
+        description=(
+            "Print the MCP tool names exposed by scitex-scholar. "
+            "When `mcp` is invoked with no subcommand, the standalone server "
+            "starts (deprecated; prefer the unified `scitex serve`)."
+        ),
     )
 
     # ========================================
@@ -368,6 +378,15 @@ async def main_async():
     elif args.command == "bibtex":
         return await run_bibtex_pipeline(args)
     elif args.command == "mcp":
+        if getattr(args, "mcp_command", None) == "list-tools":
+            from ._mcp.all_handlers import __all__ as _handler_names
+
+            for name in sorted(_handler_names):
+                # handlers are registered in the unified server with the
+                # `scholar_` prefix and the trailing `_handler` stripped.
+                tool = "scholar_" + name.removesuffix("_handler")
+                print(tool)
+            return 0
         return await run_mcp_server()
     elif args.command == "highlight":
         from .pdf_highlight._cli import run as run_highlight
