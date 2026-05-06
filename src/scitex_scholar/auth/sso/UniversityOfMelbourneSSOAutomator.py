@@ -206,19 +206,43 @@ class UniversityOfMelbourneSSOAutomator(BaseSSOAutomator):
                 return False
 
             self.logger.info("MFA method picker detected — preferring Okta Verify push")
-            for selector in (
-                # Push notification row.
-                "div:has-text('Get a push notification') >> button:has-text('Select')",
-                "div:has-text('Get a push notification') >> a:has-text('Select')",
-                # Code-entry row as fallback (user must enter code manually).
-                "div:has-text('Enter a code') >> button:has-text('Select')",
-                "div:has-text('Enter a code') >> a:has-text('Select')",
-                # Last-ditch: any visible Select button.
-                "button:has-text('Select')",
-                "a:has-text('Select')",
-            ):
+            options = [
+                (
+                    "push",
+                    "div:has-text('Get a push notification') >> button:has-text('Select')",
+                ),
+                (
+                    "push",
+                    "div:has-text('Get a push notification') >> a:has-text('Select')",
+                ),
+                ("code", "div:has-text('Enter a code') >> button:has-text('Select')"),
+                ("code", "div:has-text('Enter a code') >> a:has-text('Select')"),
+                ("any", "button:has-text('Select')"),
+                ("any", "a:has-text('Select')"),
+            ]
+            for kind, selector in options:
                 if await click_with_fallbacks_async(page, selector):
-                    self.logger.info(f"MFA Select clicked (selector={selector!r})")
+                    self.logger.info(
+                        f"MFA Select clicked (selector={selector!r}, kind={kind})"
+                    )
+                    if kind == "push":
+                        bar = "=" * 60
+                        self.logger.info(bar)
+                        self.logger.info(
+                            "  ACTION REQUIRED: tap the Okta Verify push "
+                            "notification on your phone now"
+                        )
+                        self.logger.info(
+                            "  (the 'Waiting for login...' polling below is "
+                            "expected — not a hang)"
+                        )
+                        self.logger.info(bar)
+                    elif kind == "code":
+                        self.logger.info(
+                            "ACTION REQUIRED: open Okta Verify on your "
+                            "phone, read the 6-digit code, type it into the "
+                            "browser window"
+                        )
                     await page.wait_for_timeout(2000)
                     return True
 
