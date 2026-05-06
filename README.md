@@ -86,23 +86,46 @@ print(to_bibtex(top))
 
 <br>
 
-Entry point: `scitex-scholar <subcommand>`.
+Entry point: `scitex-scholar <subcommand>` (Click-based).
 
 ```bash
-# Single paper by DOI or title
-scitex-scholar single --doi 10.1038/nature12373 --project demo
+# Discover everything
+scitex-scholar --help
+scitex-scholar --help-recursive          # full overview, every leaf
+scitex-scholar --version                  # or -V
 
-# Multiple DOIs/titles in parallel
-scitex-scholar parallel --dois 10.1038/xxx 10.1126/yyy --project demo --num-workers 4
+# Paper(s)
+scitex-scholar paper fetch --doi 10.1038/nature12373 --project demo
+scitex-scholar paper fetch-batch --dois 10.1038/xxx --dois 10.1126/yyy --project demo --num-workers 4
 
-# Process a whole BibTeX file
-scitex-scholar bibtex --bibtex refs.bib --project demo --output refs.enriched.bib
+# BibTeX file
+scitex-scholar bibtex import --bibtex refs.bib --project demo --output refs.enriched.bib
 
-# Start the (legacy) MCP server
-scitex-scholar mcp
+# PDF post-processing
+scitex-scholar pdf highlight paper.pdf
+
+# Library
+scitex-scholar library link-project-tree .
+scitex-scholar library db build --dry-run
+scitex-scholar library db audit --json
+
+# MCP server
+scitex-scholar mcp start
+scitex-scholar mcp list-tools --json
+
+# Skills + Python API introspection
+scitex-scholar skills list
+scitex-scholar list-python-apis -v
 ```
 
-Common flags: `--browser-mode {stealth,interactive}`, `--chrome-profile NAME`, `--force`.
+Mutating verbs accept `--dry-run` and `-y/--yes`. Read verbs support `--json`.
+Common paper/bibtex flags: `--browser-mode {stealth,interactive}`, `--chrome-profile NAME`, `--force`.
+
+> **Migration (1.3.0):** the CLI moved to noun-verb groups. Old top-level commands
+> (`single`, `parallel`, top-level `bibtex --bibtex`, `highlight`, `link-project-tree`,
+> `materialize`, `dematerialize`, `db`) still work but emit a `DeprecationWarning`
+> and will be removed in 1.4.0. See [CHANGELOG.md](CHANGELOG.md) for the full
+> migration table.
 
 </details>
 
@@ -166,8 +189,8 @@ for full details.
 
 ```bash
 export ANTHROPIC_API_KEY=sk-ant-...
-scitex-scholar highlight paper.pdf            # sentence-level, Haiku, writes paper.highlighted.pdf
-scitex-scholar highlight paper.pdf --stub     # offline keyword heuristic (no API calls)
+scitex-scholar pdf highlight paper.pdf        # sentence-level, Haiku, writes paper.highlighted.pdf
+scitex-scholar pdf highlight paper.pdf --stub # offline keyword heuristic (no API calls)
 ```
 
 ```python

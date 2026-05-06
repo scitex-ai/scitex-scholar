@@ -1,0 +1,11 @@
+# Custom CLI vocabulary for scitex-scholar.
+# Words listed here are accepted by the §1d audit on top of the global
+# catalog and Moby POS dictionary.
+
+nouns:
+  - bibtex
+  - pdf
+  - lookup
+
+verbs:
+  - dedupe
