@@ -145,7 +145,12 @@ class OpenURLResolver:
                         )
                         await page.wait_for_timeout(1000)
 
-                # All links failed
+                # All links failed — capture for post-mortem.
+                from scitex_browser.debugging import capture_debug_artifacts_async
+
+                await capture_debug_artifacts_async(
+                    page, label=f"openurl_no_publisher_link_{doi[:20]}"
+                )
                 await browser_logger.info(
                     page, f"{self.name}: ✗ All publisher links failed"
                 )
@@ -153,6 +158,11 @@ class OpenURLResolver:
                 return None
 
             except Exception as e:
+                from scitex_browser.debugging import capture_debug_artifacts_async
+
+                await capture_debug_artifacts_async(
+                    page, label=f"openurl_attempt{attempt + 1}_error_{doi[:20]}"
+                )
                 if attempt < 2:
                     wait_time = (attempt + 1) * 2
                     logger.warning(

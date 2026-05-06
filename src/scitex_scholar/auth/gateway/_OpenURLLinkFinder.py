@@ -71,9 +71,21 @@ class OpenURLLinkFinder:
                     f"{self.name}: Found {len(publishers)} link elements for: {', '.join(publishers)}"
                 )
                 return found_links
+
+            # No publisher links found at all — capture for post-mortem.
+            from scitex_browser.debugging import capture_debug_artifacts_async
+
+            await capture_debug_artifacts_async(
+                page, label=f"linkfinder_no_links_{doi[:20]}"
+            )
             return []
 
         except Exception as e:
+            from scitex_browser.debugging import capture_debug_artifacts_async
+
+            await capture_debug_artifacts_async(
+                page, label=f"linkfinder_error_{doi[:20]}"
+            )
             logger.fail(f"{self.name}: Did not find any urls from {page.url}: {e}")
             return []
 
