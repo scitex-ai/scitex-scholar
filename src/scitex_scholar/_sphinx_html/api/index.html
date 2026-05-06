@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>API Reference &mdash; SciTeX Scholar v1.2.4</title>
+  <title>API Reference &mdash; SciTeX Scholar v1.3.0</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=928db92d"></script>
+      <script src="../_static/documentation_options.js?v=1f29e9d3"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -64,14 +64,17 @@
 <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../cli.html">CLI Reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../cli.html#subcommands">Subcommands</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../cli.html#single">single</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../cli.html#parallel">parallel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cli.html#top-level-groups">Top-level groups</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#paper">paper</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../cli.html#bibtex">bibtex</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../cli.html#mcp">mcp</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../cli.html#highlight">highlight</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#pdf">pdf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#library">library</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#skills">skills</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#python-api-introspection">Python API introspection</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../cli.html#migration-from-pre-1-3-0">Migration from pre-1.3.0</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../mcp.html">MCP Server</a><ul>
@@ -503,6 +506,9 @@ papers.save(“results.bib”)</p>
 <dt>Installation:</dt><dd><p>pip install scitex-scholar</p>
 </dd>
 </dl>
+<p>This module uses PEP 562 lazy <cite>__getattr__</cite> so <cite>import scitex_scholar</cite>
+stays under 500ms cold-start. Submodules are imported on first attribute
+access only.</p>
 <dl class="py class">
 <dt class="sig sig-object py">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scitex_scholar.</span></span><span class="sig-name descname"><span class="pre">Scholar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">browser_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/Scholar.html#Scholar"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
@@ -1893,31 +1899,13 @@ Supported keys:</p>
 
 <dl class="py function">
 <dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">scitex_scholar.</span></span><span class="sig-name descname"><span class="pre">clean_abstract</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar.html#clean_abstract"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="sig-prename descclassname"><span class="pre">scitex_scholar.</span></span><span class="sig-name descname"><span class="pre">clean_abstract</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Strip HTML/JATS XML tags from a CrossRef-style abstract.</p>
-<p>Handles <cite>&lt;jats:p&gt;</cite>, <cite>&lt;jats:italic&gt;</cite>, <cite>&lt;jats:bold&gt;</cite>, <cite>&lt;jats:sup&gt;</cite>,
-<cite>&lt;jats:sub&gt;</cite> and their plain-HTML counterparts (<cite>&lt;p&gt;</cite>, <cite>&lt;i&gt;</cite>,
-<cite>&lt;b&gt;</cite>, <cite>&lt;em&gt;</cite>, <cite>&lt;strong&gt;</cite>, <cite>&lt;sup&gt;</cite>, <cite>&lt;sub&gt;</cite>), plus common HTML
-entities (<cite>&amp;amp;</cite>, <cite>&amp;lt;</cite>, <cite>&amp;gt;</cite>, <cite>&amp;quot;</cite>, <cite>&amp;apos;</cite>, <cite>&amp;nbsp;</cite>).
-Normalizes whitespace.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>text</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Raw abstract text from CrossRef API (or similar).</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Abstract with markup removed, safe for display.</p>
-</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
 </dd>
 </dl>
-<div class="admonition-examples admonition">
-<p class="admonition-title">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">clean_abstract</span><span class="p">(</span><span class="s2">&quot;&lt;jats:p&gt;Objective. &lt;jats:italic&gt;in vitro&lt;/jats:italic&gt;.&lt;/jats:p&gt;&quot;</span><span class="p">)</span>
-<span class="go">&#39;Objective. in vitro.&#39;</span>
-</pre></div>
-</div>
-</div>
 </dd></dl>
 
 </section>
