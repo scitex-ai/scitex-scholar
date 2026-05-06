@@ -187,6 +187,25 @@ class UniversityOfMelbourneSSOAutomator(BaseSSOAutomator):
             self.logger.error(f"Password step failed: {e}")
             return False
 
+    async def _save_debug_screenshot_async(self, page: Page, label: str) -> None:
+        """Always-on debug screenshot. Writes to scholar's screenshots cache.
+
+        Failures are non-fatal — debugging shouldn't break the auth flow.
+        """
+        try:
+            from datetime import datetime
+            from pathlib import Path
+
+            ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+            cache_root = Path.home() / ".scitex" / "scholar" / "cache" / "engine"
+            screenshots_dir = cache_root / "screenshots"
+            screenshots_dir.mkdir(parents=True, exist_ok=True)
+            dest = screenshots_dir / f"sso_{label}_{ts}.png"
+            await page.screenshot(path=str(dest), full_page=True)
+            self.logger.info(f"Screenshot: {dest}")
+        except Exception as e:
+            self.logger.debug(f"Screenshot failed ({label}): {e}")
+
     async def _handle_mfa_select_step_async(self, page: Page) -> bool:
         """Pick an MFA method on the post-password 'Verify it's you with a
         security method' page (Okta UI refresh 2026-05-06).
@@ -194,6 +213,12 @@ class UniversityOfMelbourneSSOAutomator(BaseSSOAutomator):
         Page typically shows two 'Select' buttons — one for Okta Verify
         push notification, one for Okta Verify code entry. Push is the
         cleanest hand-off (user just taps phone), so prefer that.
+
+        Implementation note: a CSS chain `div:has-text('X') >> button` is
+        ambiguous on Okta's layout — any ancestor container that *also*
+        contains the other row's text matches, and the first-DOM Select
+        (top row, 'Enter a code') gets clicked regardless of preference.
+        Use Playwright `Locator.filter(has_text=...)` to scope by ROW.
 
         No-op if the page isn't a method picker.
         """
@@ -205,48 +230,74 @@ class UniversityOfMelbourneSSOAutomator(BaseSSOAutomator):
             if heading is None:
                 return False
 
+            await self._save_debug_screenshot_async(page, "mfa_picker_before")
             self.logger.info("MFA method picker detected — preferring Okta Verify push")
-            options = [
-                (
-                    "push",
-                    "div:has-text('Get a push notification') >> button:has-text('Select')",
-                ),
-                (
-                    "push",
-                    "div:has-text('Get a push notification') >> a:has-text('Select')",
-                ),
-                ("code", "div:has-text('Enter a code') >> button:has-text('Select')"),
-                ("code", "div:has-text('Enter a code') >> a:has-text('Select')"),
-                ("any", "button:has-text('Select')"),
-                ("any", "a:has-text('Select')"),
-            ]
-            for kind, selector in options:
-                if await click_with_fallbacks_async(page, selector):
-                    self.logger.info(
-                        f"MFA Select clicked (selector={selector!r}, kind={kind})"
-                    )
-                    if kind == "push":
-                        bar = "=" * 60
-                        self.logger.info(bar)
-                        self.logger.info(
-                            "  ACTION REQUIRED: tap the Okta Verify push "
-                            "notification on your phone now"
-                        )
-                        self.logger.info(
-                            "  (the 'Waiting for login...' polling below is "
-                            "expected — not a hang)"
-                        )
-                        self.logger.info(bar)
-                    elif kind == "code":
-                        self.logger.info(
-                            "ACTION REQUIRED: open Okta Verify on your "
-                            "phone, read the 6-digit code, type it into the "
-                            "browser window"
-                        )
-                    await page.wait_for_timeout(2000)
-                    return True
 
-            self.logger.warning("MFA Select button not clicked — manual fallback")
+            # Use Playwright Locator API with row-scoped filtering. CSS
+            # `div:has-text('X') >> button` was matching ANY ancestor that
+            # contains the text — including the outer container that holds
+            # both options — so first-DOM-match (the top row, 'Enter a
+            # code') won regardless of preference.
+            row_candidates = (
+                # MFA option rows often wrap in <li> or <div> with Select inside.
+                (
+                    "push",
+                    page.locator("li, div")
+                    .filter(has_text="Get a push notification")
+                    .get_by_text("Select", exact=True)
+                    .first,
+                ),
+                (
+                    "code",
+                    page.locator("li, div")
+                    .filter(has_text="Enter a code")
+                    .get_by_text("Select", exact=True)
+                    .first,
+                ),
+            )
+
+            for kind, locator in row_candidates:
+                try:
+                    count = await locator.count()
+                except Exception:
+                    count = 0
+                if not count:
+                    self.logger.debug(f"No row-scoped Select for kind={kind}")
+                    continue
+                try:
+                    await locator.click(timeout=5000)
+                except Exception as e:
+                    self.logger.debug(f"Row-scoped click failed (kind={kind}): {e}")
+                    continue
+                await self._save_debug_screenshot_async(
+                    page, f"mfa_picker_after_{kind}"
+                )
+                self.logger.info(f"MFA Select clicked (kind={kind})")
+                if kind == "push":
+                    bar = "=" * 60
+                    self.logger.info(bar)
+                    self.logger.info(
+                        "  ACTION REQUIRED: tap the Okta Verify push "
+                        "notification on your phone now"
+                    )
+                    self.logger.info(
+                        "  (the 'Waiting for login...' polling below is "
+                        "expected — not a hang)"
+                    )
+                    self.logger.info(bar)
+                elif kind == "code":
+                    self.logger.info(
+                        "ACTION REQUIRED: open Okta Verify on your phone, "
+                        "read the 6-digit code, type it into the browser window"
+                    )
+                await page.wait_for_timeout(2000)
+                return True
+
+            self.logger.warning(
+                "MFA Select button not clicked — neither row matched. "
+                "Manual completion required (see screenshot)."
+            )
+            await self._save_debug_screenshot_async(page, "mfa_picker_no_match")
             return False
         except Exception as e:
             self.logger.warning(f"MFA select step skipped: {e}")
