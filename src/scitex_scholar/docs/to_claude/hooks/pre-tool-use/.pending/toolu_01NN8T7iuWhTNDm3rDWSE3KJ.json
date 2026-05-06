@@ -1,4 +1,0 @@
-{
-  "stage": "until ! ps aux",
-  "cwd": "/home/ywatanabe/proj/scitex-scholar/src/scitex_scholar"
-}

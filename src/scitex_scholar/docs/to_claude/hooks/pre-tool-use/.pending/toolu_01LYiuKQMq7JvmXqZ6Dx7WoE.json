@@ -1,4 +1,0 @@
-{
-  "stage": "from scitex\\.browser\" src/ 2>/dev/null",
-  "cwd": "/home/ywatanabe/proj/scitex-scholar/src/scitex_scholar"
-}

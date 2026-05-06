@@ -1,8 +1,10 @@
 ---
-description: Enrich BibTeX entries with metadata (abstract, citations, IF) and per-field provenance.
-name: bibtex-enrichment
-tags: [scitex-scholar, scitex-package]
+description: |
+  [TOPIC] Bibtex Enrichment
+  [DETAILS] Enrich BibTeX entries with metadata (abstract, citations, IF) and per-field provenance.
+tags: [scitex-scholar-bibtex-enrichment, scitex-scholar]
 ---
+
 
 # BibTeX Enrichment
 

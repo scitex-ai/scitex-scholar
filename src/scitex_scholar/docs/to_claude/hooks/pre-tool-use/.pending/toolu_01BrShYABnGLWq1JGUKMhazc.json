@@ -1,4 +1,0 @@
-{
-  "stage": "print([x for x in dir(scitex_logging) if not x.startswith('_')])\"",
-  "cwd": "/home/ywatanabe/proj/scitex-scholar/src/scitex_scholar"
-}

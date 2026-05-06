@@ -1,4 +1,0 @@
-{
-  "stage": "Xvfb :99 -screen 0 1920x1080x24 &>/tmp/xvfb99.log &",
-  "cwd": "/home/ywatanabe/proj/scitex-scholar/src/scitex_scholar"
-}

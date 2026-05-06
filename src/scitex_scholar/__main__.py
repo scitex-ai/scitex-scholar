@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 def create_parser():
     """Create main argument parser with subcommands."""
     parser = argparse.ArgumentParser(
-        prog="python -m scitex.scholar",
+        prog="scitex-scholar",
         description="""
 SciTeX Scholar - Scientific Literature Management
 ═════════════════════════════════════════════════
@@ -45,7 +45,7 @@ STORAGE: ~/.scitex/scholar/library/
     subparsers = parser.add_subparsers(
         dest="command",
         help="Available commands",
-        required=True,
+        required=False,
     )
 
     # ========================================
@@ -197,11 +197,47 @@ STORAGE: ~/.scitex/scholar/library/
     # ========================================
     # Subcommand: mcp
     # ========================================
-    subparsers.add_parser(
+    mcp_parser = subparsers.add_parser(
         "mcp",
-        help="Start MCP server for LLM integration",
-        description="Start the MCP (Model Context Protocol) server for Claude/LLM integration",
+        help="MCP (Model Context Protocol) server commands",
+        description="MCP (Model Context Protocol) server commands.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    mcp_sub = mcp_parser.add_subparsers(dest="mcp_command", required=False)
+
+    mcp_start = mcp_sub.add_parser(
+        "start",
+        help="Start the scitex-scholar MCP server",
+        description="Start the standalone scitex-scholar MCP server.",
+    )
+    mcp_start.add_argument(
+        "--dry-run", action="store_true", help="Print launch plan without starting."
+    )
+
+    mcp_sub.add_parser(
+        "list-tools",
+        help="List available MCP tools",
+        description=(
+            "Print the MCP tool names exposed by scitex-scholar (scholar_*). "
+            "Read-only; does not start the server."
+        ),
+    )
+
+    mcp_sub.add_parser(
+        "doctor",
+        help="Check MCP server dependencies",
+        description="Verify fastmcp is installed and the server module imports.",
+    )
+
+    mcp_install = mcp_sub.add_parser(
+        "install",
+        help="Show MCP installation instructions",
+        description="Print installation / Claude Code config instructions.",
+    )
+    mcp_install.add_argument(
+        "--claude-code",
+        action="store_true",
+        help="Show Claude Code MCP config snippet.",
     )
 
     # ========================================
@@ -355,6 +391,11 @@ async def main_async():
     parser = create_parser()
     args = parser.parse_args()
 
+    # No subcommand: print help to stdout and exit 0
+    if args.command is None:
+        parser.print_help()
+        return 0
+
     # Route to appropriate pipeline
     if args.command == "single":
         return await run_single_pipeline(args)
@@ -363,7 +404,9 @@ async def main_async():
     elif args.command == "bibtex":
         return await run_bibtex_pipeline(args)
     elif args.command == "mcp":
-        return await run_mcp_server()
+        from .cli._mcp_commands import run_mcp_subcommand
+
+        return await run_mcp_subcommand(args, run_server=run_mcp_server)
     elif args.command == "highlight":
         from .pdf_highlight._cli import run as run_highlight
 

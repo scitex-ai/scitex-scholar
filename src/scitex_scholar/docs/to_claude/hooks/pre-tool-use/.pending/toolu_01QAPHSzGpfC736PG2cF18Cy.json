@@ -1,4 +1,0 @@
-{
-  "stage": "until grep -q \"FINAL\" /tmp/retry_paywalled.log 2>/dev/null",
-  "cwd": "/home/ywatanabe/proj/scitex-scholar/src/scitex_scholar"
-}

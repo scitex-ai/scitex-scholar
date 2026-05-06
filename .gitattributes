@@ -1,0 +1,2 @@
+# Sphinx-generated docs bundle — exclude from GitHub language stats.
+src/*/_sphinx_html/** linguist-generated

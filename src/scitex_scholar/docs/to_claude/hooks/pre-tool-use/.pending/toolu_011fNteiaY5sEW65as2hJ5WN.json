@@ -1,4 +1,0 @@
-{
-  "stage": "from scitex_scholar import.*ScholarURLFinder\" /home/ywatanabe/proj/scitex-scholar/src /home/ywatanabe/proj/scitex-browser/src",
-  "cwd": "/home/ywatanabe/proj/scitex-scholar/src/scitex_scholar"
-}

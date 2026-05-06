@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; SciTeX Scholar v1.2.3</title>
+  <title>Index &mdash; SciTeX Scholar v1.2.4</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=590429e0"></script>
+      <script src="_static/documentation_options.js?v=928db92d"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,9 +50,109 @@
 <li class="toctree-l2"><a class="reference internal" href="installation.html#development">Development</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#python-api">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#semantic-pdf-highlighting">Semantic PDF Highlighting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#cli">CLI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#next-steps">Next Steps</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">CLI Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#subcommands">Subcommands</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#single">single</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#parallel">parallel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#bibtex">bibtex</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#mcp">mcp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#highlight">highlight</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mcp.html">MCP Server</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mcp.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mcp.html#starting-the-server">Starting the Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mcp.html#mcp-client-configuration">MCP Client Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mcp.html#available-scholar-tools">Available Scholar Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mcp.html#handler-integration">Handler Integration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="semantic_highlight.html">Semantic PDF Highlighting</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="semantic_highlight.html#pipeline">Pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="semantic_highlight.html#four-interfaces">Four Interfaces</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="semantic_highlight.html#python-api">Python API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="semantic_highlight.html#cli">CLI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="semantic_highlight.html#mcp">MCP</a></li>
+<li class="toctree-l3"><a class="reference internal" href="semantic_highlight.html#skill">Skill</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="semantic_highlight.html#model-selection">Model Selection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="semantic_highlight.html#known-limitations">Known Limitations</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/index.html#top-level-package">Top-level package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/index.html#module-scitex_scholar.pdf_highlight">Semantic Highlighter</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight.Block.id"><code class="docutils literal notranslate"><span class="pre">Block.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight.Block.page"><code class="docutils literal notranslate"><span class="pre">Block.page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight.Block.bbox"><code class="docutils literal notranslate"><span class="pre">Block.bbox</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight.Block.text"><code class="docutils literal notranslate"><span class="pre">Block.text</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight.Block.category"><code class="docutils literal notranslate"><span class="pre">Block.category</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight.Block.confidence"><code class="docutils literal notranslate"><span class="pre">Block.confidence</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight.Block.__init__"><code class="docutils literal notranslate"><span class="pre">Block.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight.HighlightResult"><code class="docutils literal notranslate"><span class="pre">HighlightResult</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight.HighlightResult.input_path"><code class="docutils literal notranslate"><span class="pre">HighlightResult.input_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight.HighlightResult.output_path"><code class="docutils literal notranslate"><span class="pre">HighlightResult.output_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight.HighlightResult.blocks"><code class="docutils literal notranslate"><span class="pre">HighlightResult.blocks</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight.HighlightResult.pages"><code class="docutils literal notranslate"><span class="pre">HighlightResult.pages</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight.HighlightResult.annotations_added"><code class="docutils literal notranslate"><span class="pre">HighlightResult.annotations_added</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight.HighlightResult.counts"><code class="docutils literal notranslate"><span class="pre">HighlightResult.counts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight.HighlightResult.__init__"><code class="docutils literal notranslate"><span class="pre">HighlightResult.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight.apply_classifications"><code class="docutils literal notranslate"><span class="pre">apply_classifications()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight.extract_blocks"><code class="docutils literal notranslate"><span class="pre">extract_blocks()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight.highlight_pdf"><code class="docutils literal notranslate"><span class="pre">highlight_pdf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight.save_with_highlights"><code class="docutils literal notranslate"><span class="pre">save_with_highlights()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/index.html#module-scitex_scholar.pdf_highlight._colors">Colour Scheme</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/index.html#module-scitex_scholar.pdf_highlight._blocks">Block Extraction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight._blocks.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight._blocks._split_sentences"><code class="docutils literal notranslate"><span class="pre">_split_sentences()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight._blocks.extract_blocks"><code class="docutils literal notranslate"><span class="pre">extract_blocks()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/index.html#module-scitex_scholar.pdf_highlight._classifier">Classifier</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight._classifier.classify_llm"><code class="docutils literal notranslate"><span class="pre">classify_llm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight._classifier.classify_stub"><code class="docutils literal notranslate"><span class="pre">classify_stub()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/index.html#module-scitex_scholar.pdf_highlight._annotator">Annotator</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight._annotator._line_quads_in_rect"><code class="docutils literal notranslate"><span class="pre">_line_quads_in_rect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight._annotator._search_quads_for_sentence"><code class="docutils literal notranslate"><span class="pre">_search_quads_for_sentence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight._annotator.apply_highlights"><code class="docutils literal notranslate"><span class="pre">apply_highlights()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight._annotator._corner_rect"><code class="docutils literal notranslate"><span class="pre">_corner_rect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight._annotator._draw_legend_overlay"><code class="docutils literal notranslate"><span class="pre">_draw_legend_overlay()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight._annotator.add_legend"><code class="docutils literal notranslate"><span class="pre">add_legend()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight._annotator.add_legend_page"><code class="docutils literal notranslate"><span class="pre">add_legend_page()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight._annotator.add_legend_footer"><code class="docutils literal notranslate"><span class="pre">add_legend_footer()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/index.html#module-scitex_scholar.pdf_highlight._mcp">MCP Tool Spec</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight._mcp.run_tool"><code class="docutils literal notranslate"><span class="pre">run_tool()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="api/core.html">scitex_scholar.core</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/core.html#scitex_scholar.core.Paper"><code class="docutils literal notranslate"><span class="pre">Paper</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/core.html#scitex_scholar.core.Paper.model_dump"><code class="docutils literal notranslate"><span class="pre">Paper.model_dump()</span></code></a></li>
@@ -422,23 +522,11 @@
       <ul>
         <li><a href="api/core.html#scitex_scholar.core.Papers.__dir__">(scitex_scholar.core.Papers method)</a>
 </li>
-        <li><a href="api/index.html#scitex_scholar.Papers.__dir__">(scitex_scholar.Papers method)</a>
-</li>
-        <li><a href="api/index.html#scitex_scholar.ScholarConfig.__dir__">(scitex_scholar.ScholarConfig method)</a>
-</li>
       </ul></li>
       <li><a href="api/config.html#scitex_scholar.config.ScholarConfig.__getattr__">__getattr__() (scitex_scholar.config.ScholarConfig method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.ScholarConfig.__getattr__">(scitex_scholar.ScholarConfig method)</a>
 </li>
-      </ul></li>
       <li><a href="api/core.html#scitex_scholar.core.Papers.__getitem__">__getitem__() (scitex_scholar.core.Papers method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.Papers.__getitem__">(scitex_scholar.Papers method)</a>
 </li>
-      </ul></li>
       <li><a href="api/auth.html#scitex_scholar.auth.AuthenticationGateway.__init__">__init__() (scitex_scholar.auth.AuthenticationGateway method)</a>
 
       <ul>
@@ -455,8 +543,6 @@
         <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.__init__">(scitex_scholar.citation_graph.CitationGraphBuilder method)</a>
 </li>
         <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.PaperNode.__init__">(scitex_scholar.citation_graph.PaperNode method)</a>
-</li>
-        <li><a href="api/index.html#scitex_scholar.CitationGraphBuilder.__init__">(scitex_scholar.CitationGraphBuilder method)</a>
 </li>
         <li><a href="api/config.html#scitex_scholar.config.PublisherRules.__init__">(scitex_scholar.config.PublisherRules method)</a>
 </li>
@@ -476,8 +562,6 @@
 </li>
         <li><a href="api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine.__init__">(scitex_scholar.metadata_engines.ScholarEngine method)</a>
 </li>
-        <li><a href="api/index.html#scitex_scholar.Papers.__init__">(scitex_scholar.Papers method)</a>
-</li>
         <li><a href="api/pdf_download.html#scitex_scholar.pdf_download.ScholarPDFDownloader.__init__">(scitex_scholar.pdf_download.ScholarPDFDownloader method)</a>
 </li>
         <li><a href="api/index.html#scitex_scholar.pdf_highlight._blocks.Block.__init__">(scitex_scholar.pdf_highlight._blocks.Block method)</a>
@@ -486,84 +570,38 @@
 </li>
         <li><a href="api/index.html#scitex_scholar.pdf_highlight.HighlightResult.__init__">(scitex_scholar.pdf_highlight.HighlightResult method)</a>
 </li>
-        <li><a href="api/index.html#scitex_scholar.Scholar.__init__">(scitex_scholar.Scholar method)</a>
-</li>
-        <li><a href="api/index.html#scitex_scholar.ScholarAuthManager.__init__">(scitex_scholar.ScholarAuthManager method)</a>
-</li>
-        <li><a href="api/index.html#scitex_scholar.ScholarBrowserManager.__init__">(scitex_scholar.ScholarBrowserManager method)</a>
-</li>
-        <li><a href="api/index.html#scitex_scholar.ScholarConfig.__init__">(scitex_scholar.ScholarConfig method)</a>
-</li>
-        <li><a href="api/index.html#scitex_scholar.ScholarURLFinder.__init__">(scitex_scholar.ScholarURLFinder method)</a>
-</li>
       </ul></li>
       <li><a href="api/core.html#scitex_scholar.core.Papers.__iter__">__iter__() (scitex_scholar.core.Papers method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.Papers.__iter__">(scitex_scholar.Papers method)</a>
 </li>
-      </ul></li>
       <li><a href="api/core.html#scitex_scholar.core.Papers.__len__">__len__() (scitex_scholar.core.Papers method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.Papers.__len__">(scitex_scholar.Papers method)</a>
 </li>
-      </ul></li>
       <li><a href="api/core.html#scitex_scholar.core.Papers.__repr__">__repr__() (scitex_scholar.core.Papers method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.Papers.__repr__">(scitex_scholar.Papers method)</a>
 </li>
-      </ul></li>
       <li><a href="api/core.html#scitex_scholar.core.Papers.__str__">__str__() (scitex_scholar.core.Papers method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.Papers.__str__">(scitex_scholar.Papers method)</a>
 </li>
-      </ul></li>
       <li><a href="api/core.html#scitex_scholar.core.JournalNormalizer._add_journal">_add_journal() (scitex_scholar.core.JournalNormalizer method)</a>
 </li>
-      <li><a href="api/index.html#scitex_scholar.ScholarURLFinder._as_pdf_dicts">_as_pdf_dicts() (scitex_scholar.ScholarURLFinder method)</a>
-</li>
       <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._auto_detect">_auto_detect() (scitex_scholar.citation_graph.CitationGraphBuilder method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.CitationGraphBuilder._auto_detect">(scitex_scholar.CitationGraphBuilder method)</a>
 </li>
-      </ul></li>
       <li><a href="api/core.html#scitex_scholar.core.Papers._bibtex_entry_to_paper">_bibtex_entry_to_paper() (scitex_scholar.core.Papers static method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.Papers._bibtex_entry_to_paper">(scitex_scholar.Papers static method)</a>
 </li>
-      </ul></li>
       <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._build_citation_edges">_build_citation_edges() (scitex_scholar.citation_graph.CitationGraphBuilder method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.CitationGraphBuilder._build_citation_edges">(scitex_scholar.CitationGraphBuilder method)</a>
 </li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/auth.html#scitex_scholar.auth.AuthenticationGateway._check_auth_requirements">_check_auth_requirements() (scitex_scholar.auth.AuthenticationGateway method)</a>
 </li>
       <li><a href="api/auth.html#scitex_scholar.auth.AuthenticationGateway._check_auth_requirements_from_doi">_check_auth_requirements_from_doi() (scitex_scholar.auth.AuthenticationGateway method)</a>
 </li>
       <li><a href="api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._combine_metadata">_combine_metadata() (scitex_scholar.metadata_engines.ScholarEngine method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/index.html#scitex_scholar.pdf_highlight._annotator._corner_rect">_corner_rect() (in module scitex_scholar.pdf_highlight._annotator)</a>
 </li>
       <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._create_paper_node">_create_paper_node() (scitex_scholar.citation_graph.CitationGraphBuilder method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.CitationGraphBuilder._create_paper_node">(scitex_scholar.CitationGraphBuilder method)</a>
 </li>
-      </ul></li>
       <li><a href="api/index.html#scitex_scholar.pdf_highlight._annotator._draw_legend_overlay">_draw_legend_overlay() (in module scitex_scholar.pdf_highlight._annotator)</a>
 </li>
       <li><a href="api/auth.html#scitex_scholar.auth.AuthenticationGateway._establish_authentication_async">_establish_authentication_async() (scitex_scholar.auth.AuthenticationGateway method)</a>
-</li>
-      <li><a href="api/index.html#scitex_scholar.ScholarURLFinder._extract_doi">_extract_doi() (scitex_scholar.ScholarURLFinder method)</a>
 </li>
       <li><a href="api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._extract_identifiers">_extract_identifiers() (scitex_scholar.metadata_engines.ScholarEngine method)</a>
 </li>
@@ -575,24 +613,10 @@
 </li>
       <li><a href="api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_sync">_fetch_oa_sources_sync() (scitex_scholar.core.OASourcesCache method)</a>
 </li>
-      <li><a href="api/index.html#scitex_scholar.ScholarURLFinder._find_from_page">_find_from_page() (scitex_scholar.ScholarURLFinder method)</a>
-</li>
-      <li><a href="api/index.html#scitex_scholar.ScholarURLFinder._find_from_url_string">_find_from_url_string() (scitex_scholar.ScholarURLFinder method)</a>
-</li>
-      <li><a href="api/index.html#scitex_scholar.ScholarURLFinder._find_pdf_urls_with_strategies">_find_pdf_urls_with_strategies() (scitex_scholar.ScholarURLFinder method)</a>
-</li>
       <li><a href="api/core.html#scitex_scholar.core.Papers._from_bibtex_file">_from_bibtex_file() (scitex_scholar.core.Papers class method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.Papers._from_bibtex_file">(scitex_scholar.Papers class method)</a>
 </li>
-      </ul></li>
       <li><a href="api/core.html#scitex_scholar.core.Papers._from_bibtex_text">_from_bibtex_text() (scitex_scholar.core.Papers class method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.Papers._from_bibtex_text">(scitex_scholar.Papers class method)</a>
 </li>
-      </ul></li>
       <li><a href="api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._get_cache_key">_get_cache_key() (scitex_scholar.metadata_engines.ScholarEngine method)</a>
 </li>
       <li><a href="api/impact_factor.html#scitex_scholar.impact_factor.ImpactFactorEngine._get_jcr_year">_get_jcr_year() (scitex_scholar.impact_factor.ImpactFactorEngine method)</a>
@@ -610,11 +634,7 @@
       <li><a href="api/index.html#scitex_scholar.pdf_highlight._annotator._line_quads_in_rect">_line_quads_in_rect() (in module scitex_scholar.pdf_highlight._annotator)</a>
 </li>
       <li><a href="api/browser.html#scitex_scholar.browser.ScholarBrowserManager._load_auth_cookies_to_persistent_context_async">_load_auth_cookies_to_persistent_context_async() (scitex_scholar.browser.ScholarBrowserManager method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.ScholarBrowserManager._load_auth_cookies_to_persistent_context_async">(scitex_scholar.ScholarBrowserManager method)</a>
 </li>
-      </ul></li>
       <li><a href="api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._load_cache">_load_cache() (scitex_scholar.metadata_engines.ScholarEngine method)</a>
 </li>
       <li><a href="api/core.html#scitex_scholar.core.JournalNormalizer._load_from_cache">_load_from_cache() (scitex_scholar.core.JournalNormalizer method)</a>
@@ -623,22 +643,12 @@
         <li><a href="api/core.html#scitex_scholar.core.OASourcesCache._load_from_cache">(scitex_scholar.core.OASourcesCache method)</a>
 </li>
       </ul></li>
-      <li><a href="api/index.html#scitex_scholar.ScholarURLFinder._managed_page">_managed_page() (scitex_scholar.ScholarURLFinder method)</a>
-</li>
       <li><a href="api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._merge_metadata_structures">_merge_metadata_structures() (scitex_scholar.metadata_engines.ScholarEngine method)</a>
 </li>
       <li><a href="api/browser.html#scitex_scholar.browser.ScholarBrowserManager._new_context_async">_new_context_async() (scitex_scholar.browser.ScholarBrowserManager method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.ScholarBrowserManager._new_context_async">(scitex_scholar.ScholarBrowserManager method)</a>
 </li>
-      </ul></li>
       <li><a href="api/auth.html#scitex_scholar.auth.ScholarAuthManager._register_provider">_register_provider() (scitex_scholar.auth.ScholarAuthManager method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.ScholarAuthManager._register_provider">(scitex_scholar.ScholarAuthManager method)</a>
 </li>
-      </ul></li>
       <li><a href="api/auth.html#scitex_scholar.auth.AuthenticationGateway._resolve_publisher_url_async">_resolve_publisher_url_async() (scitex_scholar.auth.AuthenticationGateway method)</a>
 </li>
       <li><a href="api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._save_cache">_save_cache() (scitex_scholar.metadata_engines.ScholarEngine method)</a>
@@ -662,11 +672,7 @@
       <li><a href="api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._validate_paper_consistency">_validate_paper_consistency() (scitex_scholar.metadata_engines.ScholarEngine method)</a>
 </li>
       <li><a href="api/browser.html#scitex_scholar.browser.ScholarBrowserManager._verify_xvfb_running">_verify_xvfb_running() (scitex_scholar.browser.ScholarBrowserManager method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.ScholarBrowserManager._verify_xvfb_running">(scitex_scholar.ScholarBrowserManager method)</a>
 </li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -682,21 +688,13 @@
       <li><a href="api/index.html#scitex_scholar.pdf_highlight.HighlightResult.annotations_added">annotations_added (scitex_scholar.pdf_highlight.HighlightResult attribute)</a>
 </li>
       <li><a href="api/core.html#scitex_scholar.core.Papers.append">append() (scitex_scholar.core.Papers method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.Papers.append">(scitex_scholar.Papers method)</a>
 </li>
-      </ul></li>
       <li><a href="api/index.html#scitex_scholar.pdf_highlight.apply_classifications">apply_classifications() (in module scitex_scholar.pdf_highlight)</a>
 </li>
-      <li><a href="api/index.html#scitex_scholar.apply_filters">apply_filters() (in module scitex_scholar)</a>
-
-      <ul>
-        <li><a href="api/filters.html#scitex_scholar.filters.apply_filters">(in module scitex_scholar.filters)</a>
-</li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/filters.html#scitex_scholar.filters.apply_filters">apply_filters() (in module scitex_scholar.filters)</a>
+</li>
       <li><a href="api/index.html#scitex_scholar.pdf_highlight._annotator.apply_highlights">apply_highlights() (in module scitex_scholar.pdf_highlight._annotator)</a>
 </li>
       <li><a href="api/auth.html#scitex_scholar.auth.URLContext.auth_gateway_url">auth_gateway_url (scitex_scholar.auth.URLContext attribute)</a>
@@ -704,11 +702,7 @@
       <li><a href="api/auth.html#scitex_scholar.auth.URLContext.auth_provider">auth_provider (scitex_scholar.auth.URLContext attribute)</a>
 </li>
       <li><a href="api/auth.html#scitex_scholar.auth.ScholarAuthManager.authenticate_async">authenticate_async() (scitex_scholar.auth.ScholarAuthManager method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.ScholarAuthManager.authenticate_async">(scitex_scholar.ScholarAuthManager method)</a>
 </li>
-      </ul></li>
       <li><a href="api/auth.html#scitex_scholar.auth.AuthenticationGateway">AuthenticationGateway (class in scitex_scholar.auth)</a>
 </li>
       <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.PaperNode.authors">authors (scitex_scholar.citation_graph.PaperNode attribute)</a>
@@ -731,30 +725,18 @@
         <li><a href="api/index.html#scitex_scholar.pdf_highlight._blocks.Block">(class in scitex_scholar.pdf_highlight._blocks)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/index.html#scitex_scholar.pdf_highlight.HighlightResult.blocks">blocks (scitex_scholar.pdf_highlight.HighlightResult attribute)</a>
 </li>
       <li><a href="api/core.html#scitex_scholar.core.OAStatus.BRONZE">BRONZE (scitex_scholar.core.OAStatus attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.build">build() (scitex_scholar.citation_graph.CitationGraphBuilder method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.CitationGraphBuilder.build">(scitex_scholar.CitationGraphBuilder method)</a>
 </li>
-      </ul></li>
       <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.build_from_dois">build_from_dois() (scitex_scholar.citation_graph.CitationGraphBuilder method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.CitationGraphBuilder.build_from_dois">(scitex_scholar.CitationGraphBuilder method)</a>
 </li>
-      </ul></li>
       <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.build_from_query">build_from_query() (scitex_scholar.citation_graph.CitationGraphBuilder method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.CitationGraphBuilder.build_from_query">(scitex_scholar.CitationGraphBuilder method)</a>
 </li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -783,36 +765,22 @@
 </li>
       <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.CitationGraph">CitationGraph (class in scitex_scholar.citation_graph)</a>
 </li>
-      <li><a href="api/index.html#scitex_scholar.CitationGraphBuilder">CitationGraphBuilder (class in scitex_scholar)</a>
-
-      <ul>
-        <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder">(class in scitex_scholar.citation_graph)</a>
-</li>
-      </ul></li>
-      <li><a href="api/index.html#scitex_scholar.pdf_highlight._classifier.classify_llm">classify_llm() (in module scitex_scholar.pdf_highlight._classifier)</a>
+      <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder">CitationGraphBuilder (class in scitex_scholar.citation_graph)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/index.html#scitex_scholar.pdf_highlight._classifier.classify_stub">classify_stub() (in module scitex_scholar.pdf_highlight._classifier)</a>
+      <li><a href="api/index.html#scitex_scholar.pdf_highlight._classifier.classify_llm">classify_llm() (in module scitex_scholar.pdf_highlight._classifier)</a>
 </li>
-      <li><a href="api/index.html#scitex_scholar.clean_abstract">clean_abstract() (in module scitex_scholar)</a>
+      <li><a href="api/index.html#scitex_scholar.pdf_highlight._classifier.classify_stub">classify_stub() (in module scitex_scholar.pdf_highlight._classifier)</a>
 </li>
       <li><a href="api/formatting.html#scitex_scholar.formatting.clean_bibtex_for_arxiv">clean_bibtex_for_arxiv() (in module scitex_scholar.formatting)</a>
 </li>
       <li><a href="api/formatting.html#scitex_scholar.formatting.clean_text">clean_text() (in module scitex_scholar.formatting)</a>
 </li>
       <li><a href="api/config.html#scitex_scholar.config.ScholarConfig.clear_log">clear_log() (scitex_scholar.config.ScholarConfig method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.ScholarConfig.clear_log">(scitex_scholar.ScholarConfig method)</a>
 </li>
-      </ul></li>
       <li><a href="api/browser.html#scitex_scholar.browser.ScholarBrowserManager.close">close() (scitex_scholar.browser.ScholarBrowserManager method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.ScholarBrowserManager.close">(scitex_scholar.ScholarBrowserManager method)</a>
 </li>
-      </ul></li>
       <li><a href="api/core.html#scitex_scholar.core.OAStatus.CLOSED">CLOSED (scitex_scholar.core.OAStatus attribute)</a>
 </li>
       <li><a href="api/core.html#scitex_scholar.core.OAResult.confidence">confidence (scitex_scholar.core.OAResult attribute)</a>
@@ -834,11 +802,7 @@
       <li><a href="api/core.html#scitex_scholar.core.detect_oa_from_identifiers">detect_oa_from_identifiers() (in module scitex_scholar.core)</a>
 </li>
       <li><a href="api/core.html#scitex_scholar.core.Paper.detect_open_access">detect_open_access() (scitex_scholar.core.Paper method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.Paper.detect_open_access">(scitex_scholar.Paper method)</a>
 </li>
-      </ul></li>
       <li><a href="api/auth.html#scitex_scholar.auth.URLContext.doi">doi (scitex_scholar.auth.URLContext attribute)</a>
 
       <ul>
@@ -868,11 +832,7 @@
       <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.CitationGraph.edges">edges (scitex_scholar.citation_graph.CitationGraph attribute)</a>
 </li>
       <li><a href="api/auth.html#scitex_scholar.auth.ScholarAuthManager.ensure_authenticate_async">ensure_authenticate_async() (scitex_scholar.auth.ScholarAuthManager method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.ScholarAuthManager.ensure_authenticate_async">(scitex_scholar.ScholarAuthManager method)</a>
 </li>
-      </ul></li>
       <li><a href="api/core.html#scitex_scholar.core.JournalNormalizer.ensure_loaded">ensure_loaded() (scitex_scholar.core.JournalNormalizer method)</a>
 
       <ul>
@@ -882,17 +842,9 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.export_json">export_json() (scitex_scholar.citation_graph.CitationGraphBuilder method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.CitationGraphBuilder.export_json">(scitex_scholar.CitationGraphBuilder method)</a>
 </li>
-      </ul></li>
       <li><a href="api/core.html#scitex_scholar.core.Papers.extend">extend() (scitex_scholar.core.Papers method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.Papers.extend">(scitex_scholar.Papers method)</a>
 </li>
-      </ul></li>
       <li><a href="api/index.html#scitex_scholar.pdf_highlight.extract_blocks">extract_blocks() (in module scitex_scholar.pdf_highlight)</a>
 
       <ul>
@@ -906,91 +858,45 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/core.html#scitex_scholar.core.Papers.filter">filter() (scitex_scholar.core.Papers method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.Papers.filter">(scitex_scholar.Papers method)</a>
 </li>
-      </ul></li>
       <li><a href="api/config.html#scitex_scholar.config.PublisherRules.filter_pdf_urls">filter_pdf_urls() (scitex_scholar.config.PublisherRules method)</a>
 </li>
-      <li><a href="api/index.html#scitex_scholar.ScholarURLFinder.find_pdf_urls">find_pdf_urls() (scitex_scholar.ScholarURLFinder method)</a>
-</li>
-      <li><a href="api/core.html#scitex_scholar.core.Papers.from_bibtex">from_bibtex() (scitex_scholar.core.Papers class method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.Papers.from_bibtex">(scitex_scholar.Papers class method)</a>
-</li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/index.html#scitex_scholar.from_connected_papers">from_connected_papers() (in module scitex_scholar)</a>
-
-      <ul>
-        <li><a href="api/migration.html#scitex_scholar.migration.from_connected_papers">(in module scitex_scholar.migration)</a>
+      <li><a href="api/core.html#scitex_scholar.core.Papers.from_bibtex">from_bibtex() (scitex_scholar.core.Papers class method)</a>
 </li>
-      </ul></li>
+      <li><a href="api/migration.html#scitex_scholar.migration.from_connected_papers">from_connected_papers() (in module scitex_scholar.migration)</a>
+</li>
       <li><a href="api/core.html#scitex_scholar.core.Paper.from_dict">from_dict() (scitex_scholar.core.Paper class method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.Paper.from_dict">(scitex_scholar.Paper class method)</a>
 </li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/index.html#scitex_scholar.generate_cite_key">generate_cite_key() (in module scitex_scholar)</a>
-
-      <ul>
-        <li><a href="api/formatting.html#scitex_scholar.formatting.generate_cite_key">(in module scitex_scholar.formatting)</a>
+      <li><a href="api/formatting.html#scitex_scholar.formatting.generate_cite_key">generate_cite_key() (in module scitex_scholar.formatting)</a>
 </li>
-      </ul></li>
       <li><a href="api/config.html#scitex_scholar.config.ScholarConfig.get">get() (scitex_scholar.config.ScholarConfig method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.ScholarConfig.get">(scitex_scholar.ScholarConfig method)</a>
 </li>
-      </ul></li>
       <li><a href="api/core.html#scitex_scholar.core.JournalNormalizer.get_abbreviation">get_abbreviation() (scitex_scholar.core.JournalNormalizer method)</a>
 </li>
       <li><a href="api/auth.html#scitex_scholar.auth.ScholarAuthManager.get_active_provider">get_active_provider() (scitex_scholar.auth.ScholarAuthManager method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.ScholarAuthManager.get_active_provider">(scitex_scholar.ScholarAuthManager method)</a>
 </li>
-      </ul></li>
       <li><a href="api/auth.html#scitex_scholar.auth.ScholarAuthManager.get_auth_cookies_async">get_auth_cookies_async() (scitex_scholar.auth.ScholarAuthManager method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.ScholarAuthManager.get_auth_cookies_async">(scitex_scholar.ScholarAuthManager method)</a>
 </li>
-      </ul></li>
       <li><a href="api/auth.html#scitex_scholar.auth.ScholarAuthManager.get_auth_headers_async">get_auth_headers_async() (scitex_scholar.auth.ScholarAuthManager method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.ScholarAuthManager.get_auth_headers_async">(scitex_scholar.ScholarAuthManager method)</a>
 </li>
-      </ul></li>
       <li><a href="api/auth.html#scitex_scholar.auth.ScholarAuthManager.get_auth_options">get_auth_options() (scitex_scholar.auth.ScholarAuthManager method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.ScholarAuthManager.get_auth_options">(scitex_scholar.ScholarAuthManager method)</a>
 </li>
-      </ul></li>
       <li><a href="api/browser.html#scitex_scholar.browser.ScholarBrowserManager.get_authenticated_browser_and_context_async">get_authenticated_browser_and_context_async() (scitex_scholar.browser.ScholarBrowserManager method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.ScholarBrowserManager.get_authenticated_browser_and_context_async">(scitex_scholar.ScholarBrowserManager method)</a>
 </li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/config.html#scitex_scholar.config.PublisherRules.get_config_for_url">get_config_for_url() (scitex_scholar.config.PublisherRules method)</a>
 </li>
       <li><a href="api/impact_factor.html#scitex_scholar.impact_factor.ImpactFactorEngine.get_database_info">get_database_info() (scitex_scholar.impact_factor.ImpactFactorEngine method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/core.html#scitex_scholar.core.JournalNormalizer.get_instance">get_instance() (scitex_scholar.core.JournalNormalizer class method)</a>
 
       <ul>
@@ -1010,11 +916,7 @@
       <li><a href="api/core.html#scitex_scholar.core.get_oa_cache">get_oa_cache() (in module scitex_scholar.core)</a>
 </li>
       <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.get_paper_summary">get_paper_summary() (scitex_scholar.citation_graph.CitationGraphBuilder method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.CitationGraphBuilder.get_paper_summary">(scitex_scholar.CitationGraphBuilder method)</a>
 </li>
-      </ul></li>
       <li><a href="api/core.html#scitex_scholar.core.OAStatus.GOLD">GOLD (scitex_scholar.core.OAStatus attribute)</a>
 </li>
       <li><a href="api/core.html#scitex_scholar.core.OAStatus.GREEN">GREEN (scitex_scholar.core.OAStatus attribute)</a>
@@ -1052,11 +954,7 @@
       <li><a href="api/core.html#scitex_scholar.core.is_arxiv_id">is_arxiv_id() (in module scitex_scholar.core)</a>
 </li>
       <li><a href="api/auth.html#scitex_scholar.auth.ScholarAuthManager.is_authenticate_async">is_authenticate_async() (scitex_scholar.auth.ScholarAuthManager method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.ScholarAuthManager.is_authenticate_async">(scitex_scholar.ScholarAuthManager method)</a>
 </li>
-      </ul></li>
       <li><a href="api/core.html#scitex_scholar.core.OASourcesCache.is_oa_issn">is_oa_issn() (scitex_scholar.core.OASourcesCache method)</a>
 </li>
       <li><a href="api/core.html#scitex_scholar.core.is_oa_journal_cached">is_oa_journal_cached() (in module scitex_scholar.core)</a>
@@ -1069,8 +967,6 @@
 
       <ul>
         <li><a href="api/core.html#scitex_scholar.core.Paper.is_open_access">(scitex_scholar.core.Paper property)</a>
-</li>
-        <li><a href="api/index.html#scitex_scholar.Paper.is_open_access">(scitex_scholar.Paper property)</a>
 </li>
       </ul></li>
       <li><a href="api/core.html#scitex_scholar.core.JournalNormalizer.is_open_access">is_open_access() (scitex_scholar.core.JournalNormalizer method)</a>
@@ -1114,43 +1010,23 @@
       <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.list_backends">list_backends() (in module scitex_scholar.citation_graph)</a>
 </li>
       <li><a href="api/auth.html#scitex_scholar.auth.ScholarAuthManager.list_providers">list_providers() (scitex_scholar.auth.ScholarAuthManager method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.ScholarAuthManager.list_providers">(scitex_scholar.ScholarAuthManager method)</a>
 </li>
-      </ul></li>
-      <li><a href="api/config.html#scitex_scholar.config.ScholarConfig.load">load() (scitex_scholar.config.ScholarConfig class method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.ScholarConfig.load">(scitex_scholar.ScholarConfig class method)</a>
-</li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/config.html#scitex_scholar.config.ScholarConfig.load">load() (scitex_scholar.config.ScholarConfig class method)</a>
+</li>
       <li><a href="api/config.html#scitex_scholar.config.ScholarConfig.load_yaml">load_yaml() (scitex_scholar.config.ScholarConfig method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.ScholarConfig.load_yaml">(scitex_scholar.ScholarConfig method)</a>
 </li>
-      </ul></li>
       <li><a href="api/auth.html#scitex_scholar.auth.ScholarAuthManager.logout_async">logout_async() (scitex_scholar.auth.ScholarAuthManager method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.ScholarAuthManager.logout_async">(scitex_scholar.ScholarAuthManager method)</a>
 </li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/index.html#scitex_scholar.make_citation_key">make_citation_key() (in module scitex_scholar)</a>
-
-      <ul>
-        <li><a href="api/formatting.html#scitex_scholar.formatting.make_citation_key">(in module scitex_scholar.formatting)</a>
+      <li><a href="api/formatting.html#scitex_scholar.formatting.make_citation_key">make_citation_key() (in module scitex_scholar.formatting)</a>
 </li>
-      </ul></li>
       <li><a href="api/config.html#scitex_scholar.config.PublisherRules.merge_with_config">merge_with_config() (scitex_scholar.config.PublisherRules method)</a>
 </li>
       <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.CitationGraph.metadata">metadata (scitex_scholar.citation_graph.CitationGraph attribute)</a>
@@ -1160,17 +1036,11 @@
 </li>
       </ul></li>
       <li><a href="api/core.html#scitex_scholar.core.Paper.model_dump">model_dump() (scitex_scholar.core.Paper method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.Paper.model_dump">(scitex_scholar.Paper method)</a>
 </li>
-      </ul></li>
       <li>
     module
 
       <ul>
-        <li><a href="api/index.html#module-scitex_scholar">scitex_scholar</a>
-</li>
         <li><a href="api/auth.html#module-scitex_scholar.auth">scitex_scholar.auth</a>
 </li>
         <li><a href="api/browser.html#module-scitex_scholar.browser">scitex_scholar.browser</a>
@@ -1217,13 +1087,11 @@
       <ul>
         <li><a href="api/core.html#scitex_scholar.core.Scholar.name">(scitex_scholar.core.Scholar property)</a>
 </li>
-        <li><a href="api/index.html#scitex_scholar.Scholar.name">(scitex_scholar.Scholar property)</a>
-</li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.CitationGraph.node_count">node_count (scitex_scholar.citation_graph.CitationGraph property)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.CitationGraph.nodes">nodes (scitex_scholar.citation_graph.CitationGraph attribute)</a>
 </li>
       <li><a href="api/core.html#scitex_scholar.core.JournalNormalizer.normalize">normalize() (scitex_scholar.core.JournalNormalizer method)</a>
@@ -1260,64 +1128,34 @@
         <li><a href="api/index.html#scitex_scholar.pdf_highlight.Block.page">(scitex_scholar.pdf_highlight.Block attribute)</a>
 </li>
       </ul></li>
-      <li><a href="api/index.html#scitex_scholar.ScholarURLFinder.PAGE_LOAD_TIMEOUT">PAGE_LOAD_TIMEOUT (scitex_scholar.ScholarURLFinder attribute)</a>
-</li>
       <li><a href="api/index.html#scitex_scholar.pdf_highlight.HighlightResult.pages">pages (scitex_scholar.pdf_highlight.HighlightResult attribute)</a>
 </li>
-      <li><a href="api/index.html#scitex_scholar.Paper">Paper (class in scitex_scholar)</a>
-
-      <ul>
-        <li><a href="api/core.html#scitex_scholar.core.Paper">(class in scitex_scholar.core)</a>
+      <li><a href="api/core.html#scitex_scholar.core.Paper">Paper (class in scitex_scholar.core)</a>
 </li>
-      </ul></li>
       <li><a href="api/formatting.html#scitex_scholar.formatting.paper_from_search_result">paper_from_search_result() (in module scitex_scholar.formatting)</a>
 </li>
       <li><a href="api/formatting.html#scitex_scholar.formatting.paper_normalize">paper_normalize() (in module scitex_scholar.formatting)</a>
 </li>
       <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.PaperNode">PaperNode (class in scitex_scholar.citation_graph)</a>
 </li>
-      <li><a href="api/index.html#scitex_scholar.Papers">Papers (class in scitex_scholar)</a>
-
-      <ul>
-        <li><a href="api/core.html#scitex_scholar.core.Papers">(class in scitex_scholar.core)</a>
+      <li><a href="api/core.html#scitex_scholar.core.Papers">Papers (class in scitex_scholar.core)</a>
 </li>
-      </ul></li>
-      <li><a href="api/core.html#scitex_scholar.core.Papers.papers">papers (scitex_scholar.core.Papers property)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.Papers.papers">(scitex_scholar.Papers property)</a>
-</li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/index.html#scitex_scholar.papers_to_format">papers_to_format() (in module scitex_scholar)</a>
-
-      <ul>
-        <li><a href="api/formatting.html#scitex_scholar.formatting.papers_to_format">(in module scitex_scholar.formatting)</a>
+      <li><a href="api/core.html#scitex_scholar.core.Papers.papers">papers (scitex_scholar.core.Papers property)</a>
 </li>
-      </ul></li>
+      <li><a href="api/formatting.html#scitex_scholar.formatting.papers_to_format">papers_to_format() (in module scitex_scholar.formatting)</a>
+</li>
       <li><a href="api/config.html#scitex_scholar.config.ScholarConfig.paths">paths (scitex_scholar.config.ScholarConfig property)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.ScholarConfig.paths">(scitex_scholar.ScholarConfig property)</a>
 </li>
-      </ul></li>
       <li><a href="api/auth.html#scitex_scholar.auth.URLContext.pdf_urls">pdf_urls (scitex_scholar.auth.URLContext attribute)</a>
 </li>
-      <li><a href="api/index.html#scitex_scholar.plot_citation_graph">plot_citation_graph() (in module scitex_scholar)</a>
-
-      <ul>
-        <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.plot_citation_graph">(in module scitex_scholar.citation_graph)</a>
+      <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.plot_citation_graph">plot_citation_graph() (in module scitex_scholar.citation_graph)</a>
 </li>
-      </ul></li>
       <li><a href="api/auth.html#scitex_scholar.auth.AuthenticationGateway.prepare_context_async">prepare_context_async() (scitex_scholar.auth.AuthenticationGateway method)</a>
 </li>
       <li><a href="api/config.html#scitex_scholar.config.ScholarConfig.print">print() (scitex_scholar.config.ScholarConfig method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.ScholarConfig.print">(scitex_scholar.ScholarConfig method)</a>
 </li>
-      </ul></li>
       <li><a href="api/config.html#scitex_scholar.config.PublisherRules">PublisherRules (class in scitex_scholar.config)</a>
 </li>
   </ul></td>
@@ -1330,16 +1168,12 @@
 </li>
       <li><a href="api/core.html#scitex_scholar.core.refresh_oa_cache">refresh_oa_cache() (in module scitex_scholar.core)</a>
 </li>
-      <li><a href="api/auth.html#scitex_scholar.auth.URLContext.requires_auth">requires_auth (scitex_scholar.auth.URLContext attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/config.html#scitex_scholar.config.ScholarConfig.resolve">resolve() (scitex_scholar.config.ScholarConfig method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.ScholarConfig.resolve">(scitex_scholar.ScholarConfig method)</a>
+      <li><a href="api/auth.html#scitex_scholar.auth.URLContext.requires_auth">requires_auth (scitex_scholar.auth.URLContext attribute)</a>
 </li>
-      </ul></li>
+      <li><a href="api/config.html#scitex_scholar.config.ScholarConfig.resolve">resolve() (scitex_scholar.config.ScholarConfig method)</a>
+</li>
       <li><a href="api/index.html#scitex_scholar.pdf_highlight._mcp.run_tool">run_tool() (in module scitex_scholar.pdf_highlight._mcp)</a>
 </li>
   </ul></td>
@@ -1351,50 +1185,21 @@
       <li><a href="api/formatting.html#scitex_scholar.formatting.sanitize_filename">sanitize_filename() (in module scitex_scholar.formatting)</a>
 </li>
       <li><a href="api/core.html#scitex_scholar.core.Papers.save">save() (scitex_scholar.core.Papers method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.Papers.save">(scitex_scholar.Papers method)</a>
 </li>
-      </ul></li>
       <li><a href="api/index.html#scitex_scholar.pdf_highlight.save_with_highlights">save_with_highlights() (in module scitex_scholar.pdf_highlight)</a>
 </li>
-      <li><a href="api/index.html#scitex_scholar.Scholar">Scholar (class in scitex_scholar)</a>
-
-      <ul>
-        <li><a href="api/core.html#scitex_scholar.core.Scholar">(class in scitex_scholar.core)</a>
+      <li><a href="api/core.html#scitex_scholar.core.Scholar">Scholar (class in scitex_scholar.core)</a>
 </li>
-      </ul></li>
-      <li><a href="api/index.html#scitex_scholar.ScholarAuthManager">ScholarAuthManager (class in scitex_scholar)</a>
-
-      <ul>
-        <li><a href="api/auth.html#scitex_scholar.auth.ScholarAuthManager">(class in scitex_scholar.auth)</a>
+      <li><a href="api/auth.html#scitex_scholar.auth.ScholarAuthManager">ScholarAuthManager (class in scitex_scholar.auth)</a>
 </li>
-      </ul></li>
-      <li><a href="api/index.html#scitex_scholar.ScholarBrowserManager">ScholarBrowserManager (class in scitex_scholar)</a>
-
-      <ul>
-        <li><a href="api/browser.html#scitex_scholar.browser.ScholarBrowserManager">(class in scitex_scholar.browser)</a>
+      <li><a href="api/browser.html#scitex_scholar.browser.ScholarBrowserManager">ScholarBrowserManager (class in scitex_scholar.browser)</a>
 </li>
-      </ul></li>
-      <li><a href="api/index.html#scitex_scholar.ScholarConfig">ScholarConfig (class in scitex_scholar)</a>
-
-      <ul>
-        <li><a href="api/config.html#scitex_scholar.config.ScholarConfig">(class in scitex_scholar.config)</a>
+      <li><a href="api/config.html#scitex_scholar.config.ScholarConfig">ScholarConfig (class in scitex_scholar.config)</a>
 </li>
-      </ul></li>
       <li><a href="api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine">ScholarEngine (class in scitex_scholar.metadata_engines)</a>
 </li>
       <li><a href="api/pdf_download.html#scitex_scholar.pdf_download.ScholarPDFDownloader">ScholarPDFDownloader (class in scitex_scholar.pdf_download)</a>
 </li>
-      <li><a href="api/index.html#scitex_scholar.ScholarURLFinder">ScholarURLFinder (class in scitex_scholar)</a>
-</li>
-      <li>
-    scitex_scholar
-
-      <ul>
-        <li><a href="api/index.html#module-scitex_scholar">module</a>
-</li>
-      </ul></li>
       <li>
     scitex_scholar.auth
 
@@ -1458,8 +1263,6 @@
         <li><a href="api/metadata_engines.html#module-scitex_scholar.metadata_engines">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     scitex_scholar.migration
 
@@ -1467,6 +1270,8 @@
         <li><a href="api/migration.html#module-scitex_scholar.migration">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     scitex_scholar.pdf_download
 
@@ -1527,19 +1332,11 @@
       <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.CitationGraph.seed_dois">seed_dois (scitex_scholar.citation_graph.CitationGraph attribute)</a>
 </li>
       <li><a href="api/auth.html#scitex_scholar.auth.ScholarAuthManager.set_active_provider">set_active_provider() (scitex_scholar.auth.ScholarAuthManager method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.ScholarAuthManager.set_active_provider">(scitex_scholar.ScholarAuthManager method)</a>
 </li>
-      </ul></li>
       <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.PaperNode.similarity_score">similarity_score (scitex_scholar.citation_graph.PaperNode attribute)</a>
 </li>
       <li><a href="api/core.html#scitex_scholar.core.Papers.sort_by">sort_by() (scitex_scholar.core.Papers method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.Papers.sort_by">(scitex_scholar.Papers method)</a>
 </li>
-      </ul></li>
       <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.CitationEdge.source">source (scitex_scholar.citation_graph.CitationEdge attribute)</a>
 
       <ul>
@@ -1549,25 +1346,13 @@
       <li><a href="api/core.html#scitex_scholar.core.OASourcesCache.source_count">source_count (scitex_scholar.core.OASourcesCache property)</a>
 </li>
       <li><a href="api/browser.html#scitex_scholar.browser.ScholarBrowserManager.start_periodic_screenshots_async">start_periodic_screenshots_async() (scitex_scholar.browser.ScholarBrowserManager method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.ScholarBrowserManager.start_periodic_screenshots_async">(scitex_scholar.ScholarBrowserManager method)</a>
 </li>
-      </ul></li>
       <li><a href="api/core.html#scitex_scholar.core.OAResult.status">status (scitex_scholar.core.OAResult attribute)</a>
 </li>
       <li><a href="api/browser.html#scitex_scholar.browser.ScholarBrowserManager.stop_periodic_screenshots_async">stop_periodic_screenshots_async() (scitex_scholar.browser.ScholarBrowserManager method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.ScholarBrowserManager.stop_periodic_screenshots_async">(scitex_scholar.ScholarBrowserManager method)</a>
 </li>
-      </ul></li>
       <li><a href="api/core.html#scitex_scholar.core.Papers.summary">summary() (scitex_scholar.core.Papers method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.Papers.summary">(scitex_scholar.Papers method)</a>
 </li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -1575,11 +1360,7 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/browser.html#scitex_scholar.browser.ScholarBrowserManager.take_screenshot_async">take_screenshot_async() (scitex_scholar.browser.ScholarBrowserManager method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.ScholarBrowserManager.take_screenshot_async">(scitex_scholar.ScholarBrowserManager method)</a>
 </li>
-      </ul></li>
       <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.CitationEdge.target">target (scitex_scholar.citation_graph.CitationEdge attribute)</a>
 </li>
       <li><a href="api/index.html#scitex_scholar.pdf_highlight._blocks.Block.text">text (scitex_scholar.pdf_highlight._blocks.Block attribute)</a>
@@ -1594,26 +1375,16 @@
         <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.PaperNode.title">(scitex_scholar.citation_graph.PaperNode attribute)</a>
 </li>
       </ul></li>
-      <li><a href="api/index.html#scitex_scholar.to_bibtex">to_bibtex() (in module scitex_scholar)</a>
-
-      <ul>
-        <li><a href="api/formatting.html#scitex_scholar.formatting.to_bibtex">(in module scitex_scholar.formatting)</a>
+      <li><a href="api/formatting.html#scitex_scholar.formatting.to_bibtex">to_bibtex() (in module scitex_scholar.formatting)</a>
 </li>
-      </ul></li>
-      <li><a href="api/index.html#scitex_scholar.to_connected_papers">to_connected_papers() (in module scitex_scholar)</a>
-
-      <ul>
-        <li><a href="api/migration.html#scitex_scholar.migration.to_connected_papers">(in module scitex_scholar.migration)</a>
+      <li><a href="api/migration.html#scitex_scholar.migration.to_connected_papers">to_connected_papers() (in module scitex_scholar.migration)</a>
 </li>
-      </ul></li>
       <li><a href="api/formatting.html#scitex_scholar.formatting.to_csv_row">to_csv_row() (in module scitex_scholar.formatting)</a>
 </li>
       <li><a href="api/core.html#scitex_scholar.core.Papers.to_dataframe">to_dataframe() (scitex_scholar.core.Papers method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.Papers.to_dataframe">(scitex_scholar.Papers method)</a>
 </li>
-      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.CitationEdge.to_dict">to_dict() (scitex_scholar.citation_graph.CitationEdge method)</a>
 
       <ul>
@@ -1625,39 +1396,17 @@
 </li>
         <li><a href="api/core.html#scitex_scholar.core.Papers.to_dict">(scitex_scholar.core.Papers method)</a>
 </li>
-        <li><a href="api/index.html#scitex_scholar.Paper.to_dict">(scitex_scholar.Paper method)</a>
-</li>
-        <li><a href="api/index.html#scitex_scholar.Papers.to_dict">(scitex_scholar.Papers method)</a>
-</li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/index.html#scitex_scholar.to_endnote">to_endnote() (in module scitex_scholar)</a>
-
-      <ul>
-        <li><a href="api/formatting.html#scitex_scholar.formatting.to_endnote">(in module scitex_scholar.formatting)</a>
+      <li><a href="api/formatting.html#scitex_scholar.formatting.to_endnote">to_endnote() (in module scitex_scholar.formatting)</a>
 </li>
-      </ul></li>
       <li><a href="api/core.html#scitex_scholar.core.Papers.to_list">to_list() (scitex_scholar.core.Papers method)</a>
-
-      <ul>
-        <li><a href="api/index.html#scitex_scholar.Papers.to_list">(scitex_scholar.Papers method)</a>
 </li>
-      </ul></li>
       <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.CitationGraph.to_networkx">to_networkx() (scitex_scholar.citation_graph.CitationGraph method)</a>
 </li>
-      <li><a href="api/index.html#scitex_scholar.to_ris">to_ris() (in module scitex_scholar)</a>
-
-      <ul>
-        <li><a href="api/formatting.html#scitex_scholar.formatting.to_ris">(in module scitex_scholar.formatting)</a>
+      <li><a href="api/formatting.html#scitex_scholar.formatting.to_ris">to_ris() (in module scitex_scholar.formatting)</a>
 </li>
-      </ul></li>
-      <li><a href="api/index.html#scitex_scholar.to_text_citation">to_text_citation() (in module scitex_scholar)</a>
-
-      <ul>
-        <li><a href="api/formatting.html#scitex_scholar.formatting.to_text_citation">(in module scitex_scholar.formatting)</a>
+      <li><a href="api/formatting.html#scitex_scholar.formatting.to_text_citation">to_text_citation() (in module scitex_scholar.formatting)</a>
 </li>
-      </ul></li>
   </ul></td>
 </tr></table>
 

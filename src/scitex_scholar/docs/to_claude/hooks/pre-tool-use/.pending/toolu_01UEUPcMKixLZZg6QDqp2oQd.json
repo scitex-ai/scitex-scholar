@@ -1,4 +1,0 @@
-{
-  "stage": "for t in test_document_indexer.py test_vector_search_engine.py test_paper_acquisition.py test_scientific_pdf_parser.py test_literature_review_workflow.py",
-  "cwd": "/home/ywatanabe/proj/scitex-scholar/src/scitex_scholar"
-}

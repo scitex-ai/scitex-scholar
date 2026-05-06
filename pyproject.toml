@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "scitex-scholar"
-version = "1.2.3"
+version = "1.2.4"
 description = "Scientific paper search, enrichment, download, and management for the SciTeX ecosystem"
 readme = "README.md"
 license = "AGPL-3.0-only"
@@ -96,6 +96,14 @@ dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
     "numpy>=1.21.0",
+    # Mirror all optional extras so a fresh `pip install -e .[dev]`
+    # runs the full test suite without ImportError on guarded imports.
+    "playwright>=1.40.0",
+    "openpyxl>=3.1.0",
+    "fastmcp>=2.0.0",
+    "aiohttp>=3.8.0",
+    "flask>=2.3.0",
+    "watchdog>=3.0.0",
 ]
 docs = [
     "sphinx>=7.0",
@@ -135,7 +143,10 @@ packages = ["src/scitex_scholar"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
-addopts = "-v --tb=short --cov=scitex_scholar --cov-report=term-missing"
+# importlib mode avoids module-name collisions across test subdirs (e.g.
+# two `test_base.py` files in different packages) without requiring
+# `__init__.py` files everywhere.
+addopts = "-v --tb=short --cov=scitex_scholar --cov-report=term-missing --import-mode=importlib"
 
 [tool.ruff]
 line-length = 88

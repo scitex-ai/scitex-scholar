@@ -1,20 +1,28 @@
 # SciTeX Scholar (`scitex-scholar`)
 
-<!-- scitex-badges:start -->
-[![PyPI](https://img.shields.io/pypi/v/scitex-scholar.svg)](https://pypi.org/project/scitex-scholar/)
-[![Python](https://img.shields.io/pypi/pyversions/scitex-scholar.svg)](https://pypi.org/project/scitex-scholar/)
-[![Tests](https://github.com/ywatanabe1989/scitex-scholar/actions/workflows/test.yml/badge.svg)](https://github.com/ywatanabe1989/scitex-scholar/actions/workflows/test.yml)
-[![Install Test](https://github.com/ywatanabe1989/scitex-scholar/actions/workflows/install-test.yml/badge.svg)](https://github.com/ywatanabe1989/scitex-scholar/actions/workflows/install-test.yml)
-[![Coverage](https://codecov.io/gh/ywatanabe1989/scitex-scholar/graph/badge.svg)](https://codecov.io/gh/ywatanabe1989/scitex-scholar)
-[![Docs](https://readthedocs.org/projects/scitex-scholar/badge/?version=latest)](https://scitex-scholar.readthedocs.io/en/latest/)
-[![License: AGPL v3](https://img.shields.io/badge/license-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
-<!-- scitex-badges:end -->
+<p align="center">
+  <a href="https://scitex.ai">
+    <img src="docs/scitex-logo-blue-cropped.png" alt="SciTeX" width="400">
+  </a>
+</p>
 
 <p align="center"><b>Scientific paper search, enrichment, PDF download, and library management for reproducible research.</b></p>
 
 <p align="center">
   <a href="https://scitex-scholar.readthedocs.io/">Full Documentation</a> · <code>pip install scitex-scholar</code>
 </p>
+
+<!-- scitex-badges:start -->
+<p align="center">
+  <a href="https://pypi.org/project/scitex-scholar/"><img src="https://img.shields.io/pypi/v/scitex-scholar.svg" alt="PyPI"></a>
+  <a href="https://pypi.org/project/scitex-scholar/"><img src="https://img.shields.io/pypi/pyversions/scitex-scholar.svg" alt="Python"></a>
+  <a href="https://github.com/ywatanabe1989/scitex-scholar/actions/workflows/test.yml"><img src="https://github.com/ywatanabe1989/scitex-scholar/actions/workflows/test.yml/badge.svg" alt="Tests"></a>
+  <a href="https://github.com/ywatanabe1989/scitex-scholar/actions/workflows/install-test.yml"><img src="https://github.com/ywatanabe1989/scitex-scholar/actions/workflows/install-test.yml/badge.svg" alt="Install Test"></a>
+  <a href="https://codecov.io/gh/ywatanabe1989/scitex-scholar"><img src="https://codecov.io/gh/ywatanabe1989/scitex-scholar/graph/badge.svg" alt="Coverage"></a>
+  <a href="https://scitex-scholar.readthedocs.io/en/latest/"><img src="https://readthedocs.org/projects/scitex-scholar/badge/?version=latest" alt="Docs"></a>
+  <a href="https://www.gnu.org/licenses/agpl-3.0"><img src="https://img.shields.io/badge/license-AGPL_v3-blue.svg" alt="License: AGPL v3"></a>
+</p>
+<!-- scitex-badges:end -->
 
 ---
 
@@ -52,7 +60,12 @@ pip install "scitex-scholar[browser]"      # Playwright automation
 pip install "scitex-scholar[all]"          # everything
 ```
 
-## Python usage
+## 4 Interfaces
+
+<details open>
+<summary><strong>Python API</strong></summary>
+
+<br>
 
 ```python
 from scitex_scholar import Scholar, Paper, Papers, apply_filters, to_bibtex
@@ -66,25 +79,56 @@ top = apply_filters(papers, min_citations=50, min_impact_factor=5.0)
 print(to_bibtex(top))
 ```
 
-## CLI
+</details>
 
-Entry point: `python -m scitex_scholar <subcommand>`.
+<details>
+<summary><strong>CLI</strong></summary>
+
+<br>
+
+Entry point: `scitex-scholar <subcommand>`.
 
 ```bash
 # Single paper by DOI or title
-python -m scitex_scholar single --doi 10.1038/nature12373 --project demo
+scitex-scholar single --doi 10.1038/nature12373 --project demo
 
 # Multiple DOIs/titles in parallel
-python -m scitex_scholar parallel --dois 10.1038/xxx 10.1126/yyy --project demo --num-workers 4
+scitex-scholar parallel --dois 10.1038/xxx 10.1126/yyy --project demo --num-workers 4
 
 # Process a whole BibTeX file
-python -m scitex_scholar bibtex --bibtex refs.bib --project demo --output refs.enriched.bib
+scitex-scholar bibtex --bibtex refs.bib --project demo --output refs.enriched.bib
 
 # Start the (legacy) MCP server
-python -m scitex_scholar mcp
+scitex-scholar mcp
 ```
 
 Common flags: `--browser-mode {stealth,interactive}`, `--chrome-profile NAME`, `--force`.
+
+</details>
+
+<details>
+<summary><strong>MCP Server</strong></summary>
+
+<br>
+
+The package ships MCP tool handlers consumed by the unified `scitex serve`
+server (tools prefixed `scholar_*`). A standalone server at
+`scitex_scholar.mcp_server` is still shipped but deprecated. See the
+[Skills documentation](https://scitex-scholar.readthedocs.io/en/latest/skills.html)
+for the full tool list.
+
+</details>
+
+<details>
+<summary><strong>Skills</strong></summary>
+
+<br>
+
+Agent skill pages are published at
+[scitex-scholar.readthedocs.io/en/latest/skills.html](https://scitex-scholar.readthedocs.io/en/latest/skills.html).
+The `semantic-highlight` skill documents the PDF-highlighting workflow.
+
+</details>
 
 ## Core API
 
@@ -133,11 +177,8 @@ print(result.counts(), result.annotations_added)
 ```
 
 Also exposed as the `scholar_highlight_pdf` MCP tool (unified `scitex serve` server) and as the
-`semantic-highlight` agent skill under `src/scitex_scholar/_skills/scitex-scholar/`.
-
-## MCP integration
-
-The package ships MCP tool handlers consumed by the unified `scitex serve` server (tools prefixed `scholar_*`). A standalone server at `scitex_scholar.mcp_server` is still shipped but deprecated. See `src/scitex_scholar/_skills/scitex-scholar/SKILL.md` for the full tool list.
+`semantic-highlight` agent skill (see
+[skills documentation](https://scitex-scholar.readthedocs.io/en/latest/skills.html)).
 
 ## Storage layout
 
@@ -171,5 +212,5 @@ the umbrella with `pip install scitex[scholar]` to use as
 ---
 
 <p align="center">
-  <a href="https://scitex.ai" target="_blank"><b>SciTeX</b></a>
+  <a href="https://scitex.ai" target="_blank"><img src="docs/scitex-icon-navy-inverted.png" alt="SciTeX" width="40"/></a>
 </p>

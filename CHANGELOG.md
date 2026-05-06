@@ -5,6 +5,37 @@ All notable changes to `scitex-scholar` are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.4] - 2026-05-06
+
+### Fixed
+- **CLI no-args UX**: `scitex-scholar` (no subcommand) now prints help and exits 0
+  instead of `error: the following arguments are required: command` (exit 2).
+- **CLI prog name**: was `python -m scitex.scholar` (legacy/wrong namespace);
+  now `scitex-scholar`, matching the installed entry point.
+- **Sphinx strict build**: 38 warnings → 0. Adds previously-unlinked toctree
+  entries (`api/index`, `cli`, `mcp`, `quickstart`, `semantic_highlight`),
+  fixes Numpy-style docstring formatting in `Papers.filter`, `Papers.sort_by`,
+  `Scholar.__init__`, `apply_filters`, `ScholarConfig.__dir__/__getattr__`.
+- **`.readthedocs.yaml`**: `fail_on_warning: false` → `true` to prevent regression.
+
+### Added
+- **CLI `scitex-scholar mcp list-tools`**: print the MCP tool names this package
+  registers (`scholar_*`) without starting the server. Introspection helper.
+
+### Changed (community-project compliance)
+- Drop `__email__` from `scitex_scholar.__init__`; scrub `ywatanabe@scitex.ai`
+  from package-shipped READMEs and the BibTeX export comment header (CLA legal
+  block in `CLA.md` retained).
+- README skill links now point at the published RTD pages instead of internal
+  `src/scitex_scholar/_skills/...` paths that don't resolve for pip-installed
+  users.
+- README CLI examples standardized on `scitex-scholar <subcommand>` form.
+- Drop duplicate skill leaves under `_skills/scitex-scholar/`: merged
+  `06_quick-start.md`, `07_python-api.md`, `08_cli-reference.md` content into
+  the canonical `02/03/04` leaves.
+- `_skills/scitex-scholar/05_api-overview.md`: drop redundant `scitex-scholar`
+  tag (slug-form-only per SK710).
+
 ## [1.2.1] - 2026-04-21
 
 ### Fixed

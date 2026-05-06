@@ -28,34 +28,39 @@ def apply_filters(
 ) -> List[Dict[str, Any]]:
     """Filter a list of paper dicts by various criteria.
 
-    Args:
-        papers: List of paper dicts.  Each dict should contain the keys
-            described in the module docstring; missing keys are treated as
-            empty / zero values.
-        filters: Dict of filter criteria extracted from a search form or URL
-            parameters.  Supported keys:
-                year_from, year_to          – year range (int)
-                min_citations, max_citations – citation range (int)
-                min_impact_factor           – minimum IF (float)
-                max_impact_factor           – maximum IF (float)
-                authors                     – list of author name strings (legacy)
-                journal                     – journal name substring (legacy, str)
-                open_access                 – bool
-                doc_type                    – "review" | "preprint" | other
-                language                    – language string ("english" passes)
-        parsed_operators: Dict produced by
-            SearchQueryParser.from_shell_syntax() or the equivalent
-            parse_query_operators() function from scitex-cloud.  Supported
-            keys:
-                title_includes, title_excludes   – list[str]
-                author_includes, author_excludes – list[str]
-                journal_includes, journal_excludes – list[str]
-                year_min, year_max               – int
-                citations_min, citations_max     – int
-                impact_factor_min, impact_factor_max – float
+    Parameters
+    ----------
+    papers
+        List of paper dicts. Each dict should contain the keys described in
+        the module docstring; missing keys are treated as empty / zero values.
+    filters
+        Dict of filter criteria extracted from a search form or URL
+        parameters. Supported keys:
+
+        - ``year_from``, ``year_to`` -- year range (int)
+        - ``min_citations``, ``max_citations`` -- citation range (int)
+        - ``min_impact_factor`` -- minimum IF (float)
+        - ``max_impact_factor`` -- maximum IF (float)
+        - ``authors`` -- list of author name strings (legacy)
+        - ``journal`` -- journal name substring (legacy, str)
+        - ``open_access`` -- bool
+        - ``doc_type`` -- ``"review"`` | ``"preprint"`` | other
+        - ``language`` -- language string (``"english"`` passes)
+    parsed_operators
+        Dict produced by ``SearchQueryParser.from_shell_syntax()`` or the
+        equivalent ``parse_query_operators()`` function from scitex-cloud.
+        Supported keys:
+
+        - ``title_includes``, ``title_excludes`` -- list[str]
+        - ``author_includes``, ``author_excludes`` -- list[str]
+        - ``journal_includes``, ``journal_excludes`` -- list[str]
+        - ``year_min``, ``year_max`` -- int
+        - ``citations_min``, ``citations_max`` -- int
+        - ``impact_factor_min``, ``impact_factor_max`` -- float
 
     Returns
     -------
+    list of dict
         Filtered list of paper dicts (same objects, not copies).
     """
     if not filters and not parsed_operators:

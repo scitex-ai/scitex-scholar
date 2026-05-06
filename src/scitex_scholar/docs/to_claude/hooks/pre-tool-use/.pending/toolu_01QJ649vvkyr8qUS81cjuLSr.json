@@ -1,4 +1,0 @@
-{
-  "stage": "fix(pipeline): record pdf_download_status on success",
-  "cwd": "/home/ywatanabe/proj/scitex-scholar/src/scitex_scholar"
-}
