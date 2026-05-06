@@ -5,6 +5,52 @@ All notable changes to `scitex-scholar` are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-05-06
+
+### BREAKING — CLI noun-verb grammar refactor
+
+The CLI top-level commands have been regrouped under noun-verb groups to comply
+with the SciTeX subcommand grammar standard
+(`~/.claude/skills/scitex/general/03_interface_02_cli/02_subcommand-structure-noun-verb.md`).
+
+The pre-1.3.0 top-level forms still work but emit a one-line `DeprecationWarning`
+on stderr and will be **removed in 1.4.0**.
+
+#### Migration
+
+| Old (deprecated, emits DeprecationWarning) | New (1.3.0+)                                 |
+|--------------------------------------------|----------------------------------------------|
+| `scitex-scholar single …`                  | `scitex-scholar paper fetch …`               |
+| `scitex-scholar parallel …`                | `scitex-scholar paper fetch-batch …`         |
+| `scitex-scholar bibtex --bibtex …`         | `scitex-scholar bibtex import --bibtex …`    |
+| `scitex-scholar highlight …`               | `scitex-scholar pdf highlight …`             |
+| `scitex-scholar link-project-tree …`       | `scitex-scholar library link-project-tree …` |
+| `scitex-scholar materialize …`             | `scitex-scholar library materialize …`       |
+| `scitex-scholar dematerialize …`           | `scitex-scholar library dematerialize …`     |
+| `scitex-scholar db {build,migrate,lookup,list,audit}` | `scitex-scholar library db {build,migrate,lookup,list,audit}` |
+| `scitex-scholar mcp {start,list-tools,doctor,install}` | _(unchanged — already noun-verb)_ |
+
+Old and new forms route to the same handler, so behaviour is identical.
+
+### Added (CLI ecosystem compliance)
+
+- **Click migration** — CLI rewritten in Click (was: argparse). Matches the canonical SciTeX framework; unlocks shared infrastructure (`--help-recursive`, ecosystem-wide `--json`).
+- **Cold-start latency** — `import scitex_scholar` is now ~64ms (was 4.5s) via PEP 562 lazy `__getattr__` in `__init__.py`. Tab-completion latency drops by ~70×.
+- **Universal flags at top level**: `-V/--version`, `--help-recursive`, `--json`.
+- **New top-level commands**:
+  - `list-python-apis` — print public callables in `scitex_scholar.__all__`.
+  - `skills {list, get, install}` — list / read / install bundled skill leaves.
+- **Per-leaf flags**:
+  - Mutating verbs (`paper fetch`, `paper fetch-batch`, `bibtex import`, `pdf highlight`, `library link-project-tree`, `library materialize`, `library dematerialize`, `library db build`, `mcp start`, `mcp install`): `--dry-run`, `--yes/-y`.
+  - Read verbs (`mcp list-tools`, `library db list`, `library db lookup`, `library db audit`, `skills list`, `list-python-apis`): `--json`.
+  - Every leaf has a concrete `Example:` block in `--help`.
+- `.scitex/dev/cli-audit-dict.yaml` — vocabulary entries for `bibtex`, `pdf`, `lookup`, `dedupe`.
+
+### Fixed
+
+- **PS102** — Removed orphan visible `./scitex/` directory at repo root (held a stale `clew.db`; the live state lives in hidden `.scitex/`).
+- **PS204** — Renamed `tests/scitex_scholar/cli/test_noun_verb_grammar.py` → `tests/scitex_scholar/cli/test___main__.py` to mirror its src file.
+
 ## [1.2.4] - 2026-05-06
 
 ### Fixed

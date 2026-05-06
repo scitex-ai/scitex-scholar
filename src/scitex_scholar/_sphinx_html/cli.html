@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CLI Reference &mdash; SciTeX Scholar v1.2.4</title>
+  <title>CLI Reference &mdash; SciTeX Scholar v1.3.0</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=928db92d"></script>
+      <script src="_static/documentation_options.js?v=1f29e9d3"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -64,14 +64,17 @@
 <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">CLI Reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#subcommands">Subcommands</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#single">single</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#parallel">parallel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#top-level-groups">Top-level groups</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#paper">paper</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#bibtex">bibtex</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#mcp">mcp</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#highlight">highlight</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pdf">pdf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#library">library</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#skills">skills</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#python-api-introspection">Python API introspection</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#migration-from-pre-1-3-0">Migration from pre-1.3.0</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="mcp.html">MCP Server</a><ul>
@@ -491,61 +494,71 @@
              
   <section id="cli-reference">
 <h1>CLI Reference<a class="headerlink" href="#cli-reference" title="Link to this heading"></a></h1>
-<p>The <code class="docutils literal notranslate"><span class="pre">scitex-scholar</span></code> command provides five subcommands. Every subcommand has
-<code class="docutils literal notranslate"><span class="pre">--help</span></code> for option listings.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">scitex-scholar</span></code> command provides a Click-based noun-verb subcommand
+interface. Every group has <code class="docutils literal notranslate"><span class="pre">--help</span></code>; pass <code class="docutils literal notranslate"><span class="pre">--help-recursive</span></code> at the top
+level for a full overview, <code class="docutils literal notranslate"><span class="pre">--version</span></code>/<code class="docutils literal notranslate"><span class="pre">-V</span></code> for the installed version, and
+<code class="docutils literal notranslate"><span class="pre">--json</span></code> (where supported) for machine-readable output.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>scitex-scholar<span class="w"> </span>--help
+scitex-scholar<span class="w"> </span>--help-recursive
+scitex-scholar<span class="w"> </span>--version
+scitex-scholar<span class="w"> </span>paper<span class="w"> </span>--help
+scitex-scholar<span class="w"> </span>library<span class="w"> </span>--help
 </pre></div>
 </div>
-<section id="subcommands">
-<h2>Subcommands<a class="headerlink" href="#subcommands" title="Link to this heading"></a></h2>
-<section id="single">
-<h3>single<a class="headerlink" href="#single" title="Link to this heading"></a></h3>
-<p>Process a single paper from DOI or title through the full pipeline (resolve → enrich →
-download → organize).</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>scitex-scholar<span class="w"> </span>single<span class="w"> </span>--doi<span class="w"> </span><span class="s2">&quot;10.1093/brain/awx173&quot;</span><span class="w"> </span>--project<span class="w"> </span>my_project
-scitex-scholar<span class="w"> </span>single<span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;Seizure prediction with iEEG&quot;</span><span class="w"> </span>--project<span class="w"> </span>my_project
+<section id="top-level-groups">
+<h2>Top-level groups<a class="headerlink" href="#top-level-groups" title="Link to this heading"></a></h2>
+<section id="paper">
+<h3>paper<a class="headerlink" href="#paper" title="Link to this heading"></a></h3>
+<p>Operate on a paper / batch of papers.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Single paper from DOI or title (was: ``single``)</span>
+scitex-scholar<span class="w"> </span>paper<span class="w"> </span>fetch<span class="w"> </span>--doi<span class="w"> </span><span class="s2">&quot;10.1093/brain/awx173&quot;</span><span class="w"> </span>--project<span class="w"> </span>my_project
+scitex-scholar<span class="w"> </span>paper<span class="w"> </span>fetch<span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;Seizure prediction with iEEG&quot;</span><span class="w"> </span>--project<span class="w"> </span>my_project
+
+<span class="c1"># Multiple papers in parallel (was: ``parallel``)</span>
+scitex-scholar<span class="w"> </span>paper<span class="w"> </span>fetch-batch<span class="w"> </span>--dois<span class="w"> </span><span class="m">10</span>.1/x<span class="w"> </span>--dois<span class="w"> </span><span class="m">10</span>.2/y<span class="w"> </span>--project<span class="w"> </span>my_project<span class="w"> </span>--num-workers<span class="w"> </span><span class="m">4</span>
 </pre></div>
 </div>
-</section>
-<section id="parallel">
-<h3>parallel<a class="headerlink" href="#parallel" title="Link to this heading"></a></h3>
-<p>Process multiple papers concurrently from a list.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>scitex-scholar<span class="w"> </span>parallel<span class="w"> </span>--dois<span class="w"> </span><span class="s2">&quot;10.1...,10.2...&quot;</span><span class="w"> </span>--project<span class="w"> </span>my_project<span class="w"> </span>--num-workers<span class="w"> </span><span class="m">4</span>
-</pre></div>
-</div>
+<p>Mutating verbs (<code class="docutils literal notranslate"><span class="pre">fetch</span></code>, <code class="docutils literal notranslate"><span class="pre">fetch-batch</span></code>, <code class="docutils literal notranslate"><span class="pre">import</span></code>, <code class="docutils literal notranslate"><span class="pre">build</span></code>, etc.) accept
+<code class="docutils literal notranslate"><span class="pre">--dry-run</span></code> and <code class="docutils literal notranslate"><span class="pre">-y/--yes</span></code>.</p>
 </section>
 <section id="bibtex">
 <h3>bibtex<a class="headerlink" href="#bibtex" title="Link to this heading"></a></h3>
-<p>Run the full pipeline across every entry in a BibTeX file. Resumable.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>scitex-scholar<span class="w"> </span>bibtex<span class="w"> </span>--bibtex<span class="w"> </span>refs.bib<span class="w"> </span>--project<span class="w"> </span>my_project<span class="w"> </span><span class="se">\</span>
-<span class="w">                      </span>--num-workers<span class="w"> </span><span class="m">4</span><span class="w"> </span>--browser-mode<span class="w"> </span>stealth
+<p>Operate on a BibTeX file.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Process every entry (was: top-level ``bibtex --bibtex …``)</span>
+scitex-scholar<span class="w"> </span>bibtex<span class="w"> </span>import<span class="w"> </span>--bibtex<span class="w"> </span>refs.bib<span class="w"> </span>--project<span class="w"> </span>my_project<span class="w"> </span><span class="se">\</span>
+<span class="w">                             </span>--num-workers<span class="w"> </span><span class="m">4</span><span class="w"> </span>--browser-mode<span class="w"> </span>stealth
 </pre></div>
 </div>
 </section>
 <section id="mcp">
 <h3>mcp<a class="headerlink" href="#mcp" title="Link to this heading"></a></h3>
-<p>Start the deprecated standalone MCP server. Prefer the unified <code class="docutils literal notranslate"><span class="pre">scitex</span> <span class="pre">serve</span></code> server
-instead, which exposes scholar tools alongside the rest of the SciTeX ecosystem.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>scitex-scholar<span class="w"> </span>mcp<span class="w">      </span><span class="c1"># deprecated — use &#39;scitex serve&#39;</span>
-scitex<span class="w"> </span>serve<span class="w">            </span><span class="c1"># unified server, recommended</span>
+<p>MCP server commands (Model Context Protocol).</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>scitex-scholar<span class="w"> </span>mcp<span class="w"> </span>start<span class="w">                  </span><span class="c1"># start stdio server</span>
+scitex-scholar<span class="w"> </span>mcp<span class="w"> </span>start<span class="w"> </span>--dry-run<span class="w">        </span><span class="c1"># print plan, exit</span>
+scitex-scholar<span class="w"> </span>mcp<span class="w"> </span>list-tools<span class="w">             </span><span class="c1"># print scholar_* tool names</span>
+scitex-scholar<span class="w"> </span>mcp<span class="w"> </span>list-tools<span class="w"> </span>--json<span class="w">      </span><span class="c1"># machine-readable</span>
+scitex-scholar<span class="w"> </span>mcp<span class="w"> </span>doctor<span class="w">                 </span><span class="c1"># check fastmcp + handler imports</span>
+scitex-scholar<span class="w"> </span>mcp<span class="w"> </span>install<span class="w"> </span>--claude-code<span class="w">  </span><span class="c1"># config snippet</span>
 </pre></div>
 </div>
+<p>Prefer the unified <code class="docutils literal notranslate"><span class="pre">scitex</span> <span class="pre">serve</span></code> server when integrating with the rest of
+the SciTeX ecosystem.</p>
 </section>
-<section id="highlight">
-<h3>highlight<a class="headerlink" href="#highlight" title="Link to this heading"></a></h3>
-<p>Overlay semantic highlights on a PDF. See <a class="reference internal" href="semantic_highlight.html"><span class="doc">Semantic PDF Highlighting</span></a>.</p>
+<section id="pdf">
+<h3>pdf<a class="headerlink" href="#pdf" title="Link to this heading"></a></h3>
+<p>PDF post-processing. See <a class="reference internal" href="semantic_highlight.html"><span class="doc">Semantic PDF Highlighting</span></a>.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_API_KEY</span><span class="o">=</span>sk-ant-...
 
-scitex-scholar<span class="w"> </span>highlight<span class="w"> </span>paper.pdf<span class="w">                  </span><span class="c1"># sentence-level, Haiku, default output</span>
-scitex-scholar<span class="w"> </span>highlight<span class="w"> </span>paper.pdf<span class="w"> </span>-o<span class="w"> </span>out.pdf
-scitex-scholar<span class="w"> </span>highlight<span class="w"> </span>paper.pdf<span class="w"> </span>--model<span class="w"> </span>claude-sonnet-4-6
-scitex-scholar<span class="w"> </span>highlight<span class="w"> </span>paper.pdf<span class="w"> </span>--stub<span class="w">           </span><span class="c1"># offline keyword heuristic</span>
-scitex-scholar<span class="w"> </span>highlight<span class="w"> </span>paper.pdf<span class="w"> </span>--dry-run
-scitex-scholar<span class="w"> </span>highlight<span class="w"> </span>paper.pdf<span class="w"> </span>--max-blocks<span class="w"> </span><span class="m">20</span><span class="w">  </span><span class="c1"># smoke test</span>
+scitex-scholar<span class="w"> </span>pdf<span class="w"> </span>highlight<span class="w"> </span>paper.pdf
+scitex-scholar<span class="w"> </span>pdf<span class="w"> </span>highlight<span class="w"> </span>paper.pdf<span class="w"> </span>-o<span class="w"> </span>out.pdf
+scitex-scholar<span class="w"> </span>pdf<span class="w"> </span>highlight<span class="w"> </span>paper.pdf<span class="w"> </span>--model<span class="w"> </span>claude-sonnet-4-6
+scitex-scholar<span class="w"> </span>pdf<span class="w"> </span>highlight<span class="w"> </span>paper.pdf<span class="w"> </span>--stub
+scitex-scholar<span class="w"> </span>pdf<span class="w"> </span>highlight<span class="w"> </span>paper.pdf<span class="w"> </span>--dry-run
+scitex-scholar<span class="w"> </span>pdf<span class="w"> </span>highlight<span class="w"> </span>paper.pdf<span class="w"> </span>--max-blocks<span class="w"> </span><span class="m">20</span>
 
 <span class="c1"># Offline label-apply workflow</span>
-scitex-scholar<span class="w"> </span>highlight<span class="w"> </span>paper.pdf<span class="w"> </span>--labels-dump<span class="w"> </span>blocks.json
-scitex-scholar<span class="w"> </span>highlight<span class="w"> </span>paper.pdf<span class="w"> </span>--labels-apply<span class="w"> </span>labels.json
+scitex-scholar<span class="w"> </span>pdf<span class="w"> </span>highlight<span class="w"> </span>paper.pdf<span class="w"> </span>--labels-dump<span class="w"> </span>blocks.json
+scitex-scholar<span class="w"> </span>pdf<span class="w"> </span>highlight<span class="w"> </span>paper.pdf<span class="w"> </span>--labels-apply<span class="w"> </span>labels.json
 </pre></div>
 </div>
 <p>Also available as a standalone module:</p>
@@ -553,6 +566,56 @@ scitex-scholar<span class="w"> </span>highlight<span class="w"> </span>paper.pdf
 </pre></div>
 </div>
 </section>
+<section id="library">
+<h3>library<a class="headerlink" href="#library" title="Link to this heading"></a></h3>
+<p>Library-tree management.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Symlink &lt;project&gt;/.scitex/scholar/library → ~/.scitex/scholar/library/</span>
+scitex-scholar<span class="w"> </span>library<span class="w"> </span>link-project-tree<span class="w"> </span>.
+
+<span class="c1"># Replace a library-symlink with a bib-filtered real directory</span>
+scitex-scholar<span class="w"> </span>library<span class="w"> </span>materialize<span class="w"> </span>&lt;link_path&gt;<span class="w"> </span>--bib<span class="w"> </span>refs.bib
+
+<span class="c1"># Replace a materialized directory with a symlink to ~/.scitex/scholar/library</span>
+scitex-scholar<span class="w"> </span>library<span class="w"> </span>dematerialize<span class="w"> </span>&lt;path&gt;
+
+<span class="c1"># Library SQLite index</span>
+scitex-scholar<span class="w"> </span>library<span class="w"> </span>db<span class="w"> </span>build<span class="w"> </span>--dry-run
+scitex-scholar<span class="w"> </span>library<span class="w"> </span>db<span class="w"> </span>build
+scitex-scholar<span class="w"> </span>library<span class="w"> </span>db<span class="w"> </span>migrate
+scitex-scholar<span class="w"> </span>library<span class="w"> </span>db<span class="w"> </span>lookup<span class="w"> </span>--doi<span class="w"> </span><span class="m">10</span>.1/x<span class="w"> </span>--json
+scitex-scholar<span class="w"> </span>library<span class="w"> </span>db<span class="w"> </span>list<span class="w"> </span>--limit<span class="w"> </span><span class="m">20</span><span class="w"> </span>--json
+scitex-scholar<span class="w"> </span>library<span class="w"> </span>db<span class="w"> </span>audit<span class="w"> </span>--json
+</pre></div>
+</div>
+</section>
+<section id="skills">
+<h3>skills<a class="headerlink" href="#skills" title="Link to this heading"></a></h3>
+<p>Bundled SciTeX-Scholar skill leaves (under
+<code class="docutils literal notranslate"><span class="pre">src/scitex_scholar/_skills/scitex-scholar/</span></code>).</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>scitex-scholar<span class="w"> </span>skills<span class="w"> </span>list
+scitex-scholar<span class="w"> </span>skills<span class="w"> </span>list<span class="w"> </span>--json
+scitex-scholar<span class="w"> </span>skills<span class="w"> </span>get<span class="w"> </span>04_cli-reference
+scitex-scholar<span class="w"> </span>skills<span class="w"> </span>install<span class="w">            </span><span class="c1"># symlink into ~/.claude/skills/</span>
+scitex-scholar<span class="w"> </span>skills<span class="w"> </span>install<span class="w"> </span>--copy<span class="w"> </span>--force<span class="w"> </span>--dry-run
+</pre></div>
+</div>
+</section>
+<section id="python-api-introspection">
+<h3>Python API introspection<a class="headerlink" href="#python-api-introspection" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>scitex-scholar<span class="w"> </span>list-python-apis<span class="w">           </span><span class="c1"># one name per line</span>
+scitex-scholar<span class="w"> </span>list-python-apis<span class="w"> </span>-v<span class="w">        </span><span class="c1"># with signatures</span>
+scitex-scholar<span class="w"> </span>list-python-apis<span class="w"> </span>--json<span class="w">    </span><span class="c1"># machine-readable</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="migration-from-pre-1-3-0">
+<h2>Migration from pre-1.3.0<a class="headerlink" href="#migration-from-pre-1-3-0" title="Link to this heading"></a></h2>
+<p>The pre-1.3.0 top-level commands (<code class="docutils literal notranslate"><span class="pre">single</span></code>, <code class="docutils literal notranslate"><span class="pre">parallel</span></code>, top-level
+<code class="docutils literal notranslate"><span class="pre">bibtex</span> <span class="pre">--bibtex</span></code>, <code class="docutils literal notranslate"><span class="pre">highlight</span></code>, <code class="docutils literal notranslate"><span class="pre">link-project-tree</span></code>, <code class="docutils literal notranslate"><span class="pre">materialize</span></code>,
+<code class="docutils literal notranslate"><span class="pre">dematerialize</span></code>, <code class="docutils literal notranslate"><span class="pre">db</span></code>) still work but emit a one-line <code class="docutils literal notranslate"><span class="pre">DeprecationWarning</span></code>
+on stderr and will be <strong>removed in 1.4.0</strong>. See the project <code class="docutils literal notranslate"><span class="pre">CHANGELOG.md</span></code> for
+the full migration table.</p>
 </section>
 </section>
 
