@@ -49,6 +49,7 @@ class ScholarPipelineSingle(PipelineStepsMixin, PipelineHelpersMixin):
         doi_or_title: str,
         project: Optional[str] = None,
         force: bool = False,
+        pdf_path: Optional[str] = None,
     ):
         """Process single paper from query (DOI or Title) to complete storage.
 
@@ -85,19 +86,25 @@ class ScholarPipelineSingle(PipelineStepsMixin, PipelineHelpersMixin):
             # Step 4: Metadata
             paper = await self._step_04_resolve_metadata(paper, io, force)
 
-            # Steps 5-7: Browser and PDF
-            browser_manager, context, auth_gateway = await self._step_05_setup_browser(
-                paper, io
-            )
-            if context:
-                await self._step_06_find_pdf_urls(
-                    paper, io, context, auth_gateway, force, browser_manager
-                )
-                await self._step_07_download_pdf(
-                    paper, io, context, auth_gateway, force, browser_manager
-                )
-            if browser_manager:
-                await browser_manager.close()
+            # Steps 5-7: PDF acquisition. With --pdf, skip the browser
+            # download stack and copy the user-provided file directly.
+            if pdf_path:
+                self._step_07_import_pdf(paper, io, pdf_path, force)
+            else:
+                (
+                    browser_manager,
+                    context,
+                    auth_gateway,
+                ) = await self._step_05_setup_browser(paper, io)
+                if context:
+                    await self._step_06_find_pdf_urls(
+                        paper, io, context, auth_gateway, force, browser_manager
+                    )
+                    await self._step_07_download_pdf(
+                        paper, io, context, auth_gateway, force, browser_manager
+                    )
+                if browser_manager:
+                    await browser_manager.close()
 
             # Step 8: Content extraction
             self._step_08_extract_content(io, force)

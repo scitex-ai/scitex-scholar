@@ -26,9 +26,38 @@ class PipelineStepsMixin:
     # Steps
     # ----------------------------------------
     def _step_01_normalize_as_doi(self, doi_or_title):
+        """Accept bare DOIs and DOI-bearing URLs.
+
+        Examples that all normalize to ``10.1002/epi.70076``:
+          • ``10.1002/epi.70076``
+          • ``doi:10.1002/epi.70076``
+          • ``https://doi.org/10.1002/epi.70076``
+          • ``http://dx.doi.org/10.1002/epi.70076``
+          • ``https://www.doi.org/10.1002/epi.70076``
+        Anything else returns ``None`` (treated as a title query).
+        """
         logger.info(f"{self.name}: Processing Query: {doi_or_title}")
-        is_doi = doi_or_title.strip().startswith("10.")
-        return doi_or_title.strip() if is_doi else None
+        s = (doi_or_title or "").strip()
+        if not s:
+            return None
+
+        if s.lower().startswith("doi:"):
+            s = s[4:].strip()
+
+        if s.lower().startswith(("http://", "https://")):
+            # Look for "doi.org/<DOI>" anywhere in the URL.
+            for marker in ("doi.org/", "dx.doi.org/"):
+                idx = s.lower().find(marker)
+                if idx >= 0:
+                    s = s[idx + len(marker) :]
+                    break
+            else:
+                # Not a DOI URL — treat as title.
+                return None
+            # Trim query/fragment.
+            s = s.split("?")[0].split("#")[0]
+
+        return s if s.startswith("10.") else None
 
     async def _step_02_create_paper(self, doi, doi_or_title):
         """Create Paper object and resolve DOI from title if needed."""
@@ -187,6 +216,43 @@ class PipelineStepsMixin:
                 self._check_manual_download(io, paper)
         elif io.has_pdf():
             logger.info(f"{self.name}: PDF already exists, skipping download")
+
+    def _step_07_import_pdf(self, paper, io, pdf_path, force):
+        """Place a user-provided PDF into MASTER as if it had been downloaded.
+
+        Same metadata + symlink contract as ``_step_07_download_pdf``; just
+        replaces the actual download with a copy from ``pdf_path``.
+        """
+        import shutil
+        from datetime import datetime, timezone
+        from pathlib import Path as _Path
+
+        src = _Path(pdf_path).expanduser().resolve()
+        if not src.exists():
+            logger.fail(f"{self.name}: --pdf path missing: {src}")
+            return
+
+        dest = io.get_pdf_path()
+        if dest.exists() and not force:
+            logger.info(
+                f"{self.name}: PDF already present at {dest}; pass --force to overwrite"
+            )
+            return
+
+        shutil.copy2(str(src), str(dest))
+        paper.metadata.path.pdfs = [str(dest)]
+        paper.metadata.path.pdfs_engines = ["manual_import"]
+        paper.metadata.access.pdf_download_attempted_at = datetime.now(
+            timezone.utc
+        ).isoformat()
+        paper.metadata.access.pdf_download_status = "success"
+        paper.metadata.access.pdf_download_error = None
+        try:
+            paper.container.pdf_size_bytes = dest.stat().st_size
+        except OSError:
+            pass
+        io.save_metadata()
+        logger.success(f"{self.name}: Imported user PDF -> {dest} (source: {src})")
 
     def _step_08_extract_content(self, io, force):
         if io.has_pdf() and (not io.has_content() or force):
