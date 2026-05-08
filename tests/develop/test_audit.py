@@ -26,17 +26,17 @@ def test_audit_all_clean():
                 # tracked under /overhaul-scitex.
                 "§6",
                 # README structure backlog (Demo + Architecture sections).
-                "PS141",
-                "PS142",
+                "PS-141",
+                "PS-142",
                 # Umbrella drag (`scitex[session]`) — would need migration.
-                "PS139",
+                "PS-139",
                 # Stale entry in cross-package import gate.
-                "PS140",
-                # PA305: every playwright-using module should call
+                "PS-140",
+                # PA-305: every playwright-using module should call
                 # `capture_debug_artifacts_async` for agent-readable
                 # failure artefacts. Sweeping ~24 browser files needs
                 # its own focused session.
-                "PA305",
+                "PA-305",
             ),
         )
     except TypeError:
