@@ -1559,7 +1559,13 @@ def library_bind(project, project_dir, unbind, dry_run, yes):
     help="--copy-links (rsync -L) follows symlinks (self-contained remote, "
     "default). --preserve-links keeps them as symlinks.",
 )
-def library_sync(host, project, pull, delete, dry_run, copy_links):
+@click.option(
+    "--remote-path",
+    default=None,
+    help="Remote path (relative to remote $HOME, or absolute starting with '/'). "
+    "Default: '.scitex/scholar/library/[<project>/]'.",
+)
+def library_sync(host, project, pull, delete, dry_run, copy_links, remote_path):
     """rsync the library to/from a remote HOST.
 
     \b
@@ -1588,10 +1594,18 @@ def library_sync(host, project, pull, delete, dry_run, copy_links):
     # so source/target paths are straightforward.
     if project:
         src = home_root / project
-        remote_path = f".scitex/scholar/library/{project}/"
+        default_remote = f".scitex/scholar/library/{project}/"
     else:
         src = home_root
-        remote_path = ".scitex/scholar/library/"
+        default_remote = ".scitex/scholar/library/"
+
+    # --remote-path overrides the default. Trailing slash is normalized so
+    # rsync syncs into the directory rather than nesting it.
+    if remote_path:
+        chosen = remote_path if remote_path.endswith("/") else remote_path + "/"
+        remote_path = chosen
+    else:
+        remote_path = default_remote
 
     if not src.exists():
         raise click.ClickException(f"Source missing: {src}")
