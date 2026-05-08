@@ -93,7 +93,7 @@ watch = [
     "watchdog>=3.0.0",
 ]
 dev = [
-    "scitex-dev",
+    "scitex-dev>=0.11.5",
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
     "numpy>=1.21.0",
