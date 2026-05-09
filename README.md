@@ -233,6 +233,47 @@ Also exposed as the `scholar_highlight_pdf` MCP tool (unified `scitex serve` ser
 
 Cache and auth state live under `~/.scitex/scholar/cache/` (URL resolver, Chrome profiles, OpenAthens cookies). Override with `SCITEX_DIR`.
 
+## Architecture
+
+```
+scitex_scholar/
+├── __init__.py            ← public API (Scholar, Paper, Papers, apply_filters, to_bibtex)
+├── _cli_main.py           ← `scitex-scholar` Click entry point (noun-verb groups)
+├── core/                  ← Scholar / Paper / Papers / ScholarConfig
+├── search_engines/        ← CrossRef, OpenAlex, Semantic Scholar, arXiv, PubMed federation
+├── metadata_engines/      ← DOI resolution, abstract / IF / citation enrichment
+├── auth/                  ← OpenAthens / EZProxy / Shibboleth / SSO automators
+├── browser/               ← persistent-profile Playwright manager (stealth + interactive)
+├── url_finder/            ← PDF URL discovery (translators + heuristic strategies)
+├── pdf_download/          ← `paper fetch` strategies (chrome viewer, direct, fallback)
+├── pdf_highlight/         ← claim/method/limitation overlay via Claude
+├── pipelines/             ← end-to-end @session-decorated workflows
+├── storage/               ← MASTER-hash library + per-project symlinks
+├── citation_graph/        ← optional citation network builder + plot
+├── integration/           ← Zotero / Mendeley / RefWorks / EndNote / Paperpile importers
+├── _mcp/                  ← MCP tool handlers (`scholar_*` tools for `scitex serve`)
+└── _skills/               ← agent-facing skill files (semantic-highlight, etc.)
+```
+
+The CLI is a thin layer over the Python API: every `scitex-scholar <noun> <verb>` command dispatches into one of `core/`, `pipelines/`, `storage/`, or `auth/`. The MCP server (`_mcp/`) exposes the same handlers as `scholar_*` tools consumed by the unified `scitex serve` server.
+
+## Demo
+
+```mermaid
+flowchart LR
+    Q["search query<br/>or .bib / DOI"] --> S["Scholar.search() /<br/>bibtex import"]
+    S --> E["metadata_engines<br/>(CrossRef · OpenAlex · arXiv ·<br/>PubMed · Semantic Scholar)"]
+    E --> P["Papers<br/>(deduped, enriched)"]
+    P --> U["url_finder<br/>(translators + heuristics)"]
+    U --> A["auth<br/>(OpenAthens / EZProxy /<br/>Shibboleth)"]
+    A --> D["pdf_download<br/>(Playwright strategies)"]
+    D --> L["~/.scitex/scholar/library/<br/>MASTER/&lt;HASH&gt;/"]
+    P -.-> H["pdf_highlight<br/>(claim / method / limitation)"]
+    L -.-> M["MCP: scholar_* tools<br/>(scitex serve)"]
+```
+
+`scitex-scholar paper fetch --doi 10.1038/...` exercises the full chain in one call: enrich → resolve URL → authenticate → download → store under `MASTER/<HASH>/` with metadata + PDF + per-project symlinks.
+
 ## License
 
 AGPL-3.0-only.
