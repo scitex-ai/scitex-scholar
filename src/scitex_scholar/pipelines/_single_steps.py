@@ -257,11 +257,11 @@ class PipelineStepsMixin:
     def _step_08_extract_content(self, io, force):
         if io.has_pdf() and (not io.has_content() or force):
             logger.info(f"{self.name}: Extracting content (text, tables, images)...")
-            import scitex
+            import scitex_io
 
             try:
                 pdf_path = io.get_pdf_path()
-                content = scitex.io.load(
+                content = scitex_io.load(
                     str(pdf_path),
                     ext="pdf",
                     mode="scientific",

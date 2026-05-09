@@ -277,11 +277,11 @@ def run_main() -> None:
     import sys
 
     import matplotlib.pyplot as plt
-    import scitex as stx  # lazy umbrella import — demo only (PA304-clean)
+    import scitex_session as session  # peer-standalone session lifecycle
 
     args = parse_args()
 
-    CONFIG, sys.stdout, sys.stderr, plt, CC, rng = stx.session.start(
+    CONFIG, sys.stdout, sys.stderr, plt, CC, rng = session.start(
         sys,
         plt,
         args=args,
@@ -293,7 +293,7 @@ def run_main() -> None:
 
     exit_status = main(args)
 
-    stx.session.close(
+    session.close(
         CONFIG,
         verbose=False,
         notify=False,

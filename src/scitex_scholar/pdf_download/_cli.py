@@ -130,11 +130,11 @@ def run_main() -> None:
 
     import matplotlib.pyplot as plt
 
-    import scitex as stx
+    import scitex_session as session
 
     args = parse_args()
 
-    CONFIG, sys.stdout, sys.stderr, plt, CC, rng = stx.session.start(
+    CONFIG, sys.stdout, sys.stderr, plt, CC, rng = session.start(
         sys,
         plt,
         args=args,
@@ -146,7 +146,7 @@ def run_main() -> None:
 
     exit_status = main(args)
 
-    stx.session.close(
+    session.close(
         CONFIG,
         verbose=False,
         notify=False,

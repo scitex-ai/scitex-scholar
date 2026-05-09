@@ -38,10 +38,17 @@ classifiers = [
 dependencies = [
     "click>=8.0",
     "mcp",
-    # scitex[session] provides @stx.session decorator (+ matplotlib, PyYAML)
-    # used in pipelines/, metadata_engines/, impact_factor/jcr/.
-    # Using the [session] extra keeps the dep minimal vs. the full scitex.
-    "scitex[session]>=2.0.0",
+    # Peer standalones replacing the previous `scitex[session]` umbrella
+    # (PS-139). Imported directly from their peer module:
+    #   storage/PaperIO.py, pdf_download/_cli.py, impact_factor/jcr/*  →
+    #     `import scitex_session as session` for session.start/close
+    #   pipelines/_single_steps.py, cli/handlers/project_handler.py    →
+    #     `import scitex_io` for load/save
+    # matplotlib is explicit because scitex-session enters/exits the @session
+    # context with the user-supplied `plt` module; without it the demo
+    # trailers in storage/ + pdf_download/ would NameError.
+    "scitex-session>=0.1.5",
+    "matplotlib>=3.5.0",
     "scitex-io>=0.2.0",
     "scitex-browser>=0.1.6",
     "scitex-logging>=0.1.0",
