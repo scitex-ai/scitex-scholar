@@ -33,7 +33,6 @@ CROSS_PACKAGE_IMPORTS = [
     'scitex_config',
     'scitex_context',
     'scitex_dev._cli._completion',
-    'scitex_dev.click_helpers',
     'scitex_dict',
     'scitex_io',
     'scitex_logging',
