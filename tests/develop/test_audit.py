@@ -25,18 +25,34 @@ def test_audit_all_clean():
                 # tools without API counterparts. Real surface mapping work
                 # tracked under /overhaul-scitex.
                 "§6",
-                # README structure backlog (Demo + Architecture sections).
-                "PS-141",
-                "PS-142",
-                # Umbrella drag (`scitex[session]`) — would need migration.
-                "PS-139",
-                # Stale entry in cross-package import gate.
-                "PS-140",
                 # PA-305: every playwright-using module should call
                 # `capture_debug_artifacts_async` for agent-readable
-                # failure artefacts. Sweeping ~24 browser files needs
+                # failure artefacts. Sweeping ~24 browser files + the
+                # ~720 url_finder/translators/_individual files needs
                 # its own focused session.
                 "PA-305",
+                # §2: CLI non-interactivity. Three real architectural
+                # backlogs we are not landing here:
+                #   (a) `library export` + `library sync` mutating verbs
+                #       missing --yes/-y. Adding the safety flag means
+                #       reworking each handler's confirmation flow and
+                #       updating every example/skill that calls them.
+                #   (b) auth/providers/{Shibboleth,EZProxy}Authenticator.py
+                #       fall back to input() / getpass.getpass() when the
+                #       caller didn't pass username/password. Proper fix:
+                #       raise ScholarError pointing at $SCHOLAR_USERNAME /
+                #       --username, but every existing CLI surface and
+                #       example currently relies on the prompt path.
+                #   (c) two click.confirm() calls in _cli_main.py
+                #       (around L1523 / L1536) gating the destructive
+                #       `library db reset` flow.
+                # Tracked under /overhaul-cli-noninteractive.
+                "§2",
+                # §4: `auth refresh` Click help missing concrete example
+                # block. One-line docstring fix; folded into the same
+                # CLI sweep as §2 to keep the auth surface internally
+                # consistent rather than landed piecemeal.
+                "§4",
             ),
         )
     except TypeError:
