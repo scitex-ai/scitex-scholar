@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CLI Reference &mdash; SciTeX Scholar v1.3.1</title>
+  <title>CLI Reference &mdash; SciTeX Scholar v1.4.0</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=bb516dca"></script>
+      <script src="_static/documentation_options.js?v=9172181d"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -69,7 +69,13 @@
 <li class="toctree-l3"><a class="reference internal" href="#bibtex">bibtex</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#mcp">mcp</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pdf">pdf</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#library">library</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#library">library</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#daily">Daily</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#layout">Layout</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#share">Share</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#database-integrity">Database / integrity</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#skills">skills</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#python-api-introspection">Python API introspection</a></li>
 </ul>
@@ -510,16 +516,40 @@ scitex-scholar<span class="w"> </span>library<span class="w"> </span>--help
 <section id="paper">
 <h3>paper<a class="headerlink" href="#paper" title="Link to this heading"></a></h3>
 <p>Operate on a paper / batch of papers.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Single paper from DOI or title (was: ``single``)</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Single paper from DOI or title</span>
 scitex-scholar<span class="w"> </span>paper<span class="w"> </span>fetch<span class="w"> </span>--doi<span class="w"> </span><span class="s2">&quot;10.1093/brain/awx173&quot;</span><span class="w"> </span>--project<span class="w"> </span>my_project
 scitex-scholar<span class="w"> </span>paper<span class="w"> </span>fetch<span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;Seizure prediction with iEEG&quot;</span><span class="w"> </span>--project<span class="w"> </span>my_project
 
-<span class="c1"># Multiple papers in parallel (was: ``parallel``)</span>
-scitex-scholar<span class="w"> </span>paper<span class="w"> </span>fetch-batch<span class="w"> </span>--dois<span class="w"> </span><span class="m">10</span>.1/x<span class="w"> </span>--dois<span class="w"> </span><span class="m">10</span>.2/y<span class="w"> </span>--project<span class="w"> </span>my_project<span class="w"> </span>--num-workers<span class="w"> </span><span class="m">4</span>
+<span class="c1"># ``--doi`` accepts URL form too: ``https://doi.org/...``,</span>
+<span class="c1"># ``http://dx.doi.org/...``, or ``doi:10.x/y``.</span>
+
+<span class="c1"># Multiple papers in parallel</span>
+scitex-scholar<span class="w"> </span>paper<span class="w"> </span>fetch-batch<span class="w"> </span>--dois<span class="w"> </span><span class="m">10</span>.1/x<span class="w"> </span>--dois<span class="w"> </span><span class="m">10</span>.2/y<span class="w"> </span><span class="se">\</span>
+<span class="w">                                 </span>--project<span class="w"> </span>my_project<span class="w"> </span>--num-workers<span class="w"> </span><span class="m">4</span>
 </pre></div>
 </div>
-<p>Mutating verbs (<code class="docutils literal notranslate"><span class="pre">fetch</span></code>, <code class="docutils literal notranslate"><span class="pre">fetch-batch</span></code>, <code class="docutils literal notranslate"><span class="pre">import</span></code>, <code class="docutils literal notranslate"><span class="pre">build</span></code>, etc.) accept
-<code class="docutils literal notranslate"><span class="pre">--dry-run</span></code> and <code class="docutils literal notranslate"><span class="pre">-y/--yes</span></code>.</p>
+<p>Local-PDF import (skips the browser/download stack):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Main PDF only — metadata enrichment still runs from --doi/--title</span>
+scitex-scholar<span class="w"> </span>paper<span class="w"> </span>fetch<span class="w"> </span>--doi<span class="w"> </span><span class="m">10</span>.1002/epi.70076<span class="w"> </span><span class="se">\</span>
+<span class="w">                           </span>--pdf-main<span class="w"> </span>~/Downloads/Liu_2026.pdf<span class="w"> </span><span class="se">\</span>
+<span class="w">                           </span>--project<span class="w"> </span>neurovista
+
+<span class="c1"># With supplementary files and attachments (both flags repeatable)</span>
+scitex-scholar<span class="w"> </span>paper<span class="w"> </span>fetch<span class="w"> </span>--doi<span class="w"> </span><span class="m">10</span>.1038/s41467-020-15908-3<span class="w"> </span><span class="se">\</span>
+<span class="w">                           </span>--pdf-main<span class="w"> </span>~/Downloads/main.pdf<span class="w"> </span><span class="se">\</span>
+<span class="w">                           </span>--pdf-supple<span class="w"> </span>~/Downloads/MOESM1_ESM.pdf<span class="w"> </span><span class="se">\</span>
+<span class="w">                           </span>--pdf-supple<span class="w"> </span>~/Downloads/MOESM2_ESM.pdf<span class="w"> </span><span class="se">\</span>
+<span class="w">                           </span>--attachment<span class="w"> </span>~/Downloads/dataset.csv<span class="w"> </span><span class="se">\</span>
+<span class="w">                           </span>--project<span class="w"> </span>neurovista
+</pre></div>
+</div>
+<p>Storage convention: <code class="docutils literal notranslate"><span class="pre">--pdf-main</span></code> is placed at
+<code class="docutils literal notranslate"><span class="pre">MASTER/&lt;id&gt;/&lt;First&gt;-&lt;Year&gt;-&lt;Journal&gt;.pdf</span></code> (chmod 444 — Zotero-style
+immutable canonical record). Supplementary files land as
+<code class="docutils literal notranslate"><span class="pre">supple-&lt;original_name&gt;</span></code> and attachments as
+<code class="docutils literal notranslate"><span class="pre">additional-&lt;original_name&gt;</span></code>. Each file is recorded with role + SHA-256
+in <code class="docutils literal notranslate"><span class="pre">metadata.path.files</span></code> so <code class="docutils literal notranslate"><span class="pre">library</span> <span class="pre">audit-files</span></code> can verify integrity.</p>
+<p>Mutating verbs accept <code class="docutils literal notranslate"><span class="pre">--dry-run</span></code> and <code class="docutils literal notranslate"><span class="pre">-y/--yes</span></code>.</p>
 </section>
 <section id="bibtex">
 <h3>bibtex<a class="headerlink" href="#bibtex" title="Link to this heading"></a></h3>
@@ -568,25 +598,91 @@ scitex-scholar<span class="w"> </span>pdf<span class="w"> </span>highlight<span 
 </section>
 <section id="library">
 <h3>library<a class="headerlink" href="#library" title="Link to this heading"></a></h3>
-<p>Library-tree management.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Symlink &lt;project&gt;/.scitex/scholar/library → ~/.scitex/scholar/library/</span>
+<p>Library-tree management. <code class="docutils literal notranslate"><span class="pre">--help</span></code> is <strong>categorized</strong> into four groups:
+<code class="docutils literal notranslate"><span class="pre">Daily</span></code> (the common workflow), <code class="docutils literal notranslate"><span class="pre">Layout</span></code> (where the data lives),
+<code class="docutils literal notranslate"><span class="pre">Share</span></code> (move it elsewhere), and <code class="docutils literal notranslate"><span class="pre">Database</span></code> (integrity / index).</p>
+<section id="daily">
+<h4>Daily<a class="headerlink" href="#daily" title="Link to this heading"></a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># All projects: counts only. Add ``-v`` / ``-vv`` / ``-vvv`` for detail.</span>
+scitex-scholar<span class="w"> </span>library<span class="w"> </span>list
+
+<span class="c1"># Single project: per-paper detail by default (auto-verbose).</span>
+scitex-scholar<span class="w"> </span>library<span class="w"> </span>list<span class="w"> </span>neurovista
+
+<span class="c1"># Open every paper-URL in a browser. ``--watch`` auto-imports any PDF</span>
+<span class="c1"># downloaded during the session (Playwright + watchdog dual-watch).</span>
+scitex-scholar<span class="w"> </span>library<span class="w"> </span>open-urls<span class="w"> </span>neurovista<span class="w"> </span>--watch
+
+<span class="c1"># One-button maintenance: reconcile container.projects ↔ symlinks,</span>
+<span class="c1"># regenerate readable names (PDF-NN_CC-..._IF-..._...). Optionally</span>
+<span class="c1"># rsync after; --sync HOST is repeatable.</span>
+scitex-scholar<span class="w"> </span>library<span class="w"> </span>refresh
+scitex-scholar<span class="w"> </span>library<span class="w"> </span>refresh<span class="w"> </span>neurovista
+scitex-scholar<span class="w"> </span>library<span class="w"> </span>refresh<span class="w"> </span>neurovista<span class="w"> </span>--sync<span class="w"> </span>spartan
+scitex-scholar<span class="w"> </span>library<span class="w"> </span>refresh<span class="w"> </span>neurovista<span class="w"> </span>--sync<span class="w"> </span>spartan<span class="w"> </span>--sync<span class="w"> </span>nas
+</pre></div>
+</div>
+</section>
+<section id="layout">
+<h4>Layout<a class="headerlink" href="#layout" title="Link to this heading"></a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Add a project-local view of the home library via one symlink:</span>
+<span class="c1">#   &lt;PROJECT-DIR&gt;/.scitex/scholar/library/&lt;project&gt; -&gt; ~/.scitex/scholar/library/&lt;project&gt;</span>
+<span class="c1"># No data is moved; --unbind removes the symlink.</span>
+scitex-scholar<span class="w"> </span>library<span class="w"> </span><span class="nb">bind</span><span class="w"> </span>neurovista<span class="w"> </span>~/proj/neurovista
+scitex-scholar<span class="w"> </span>library<span class="w"> </span><span class="nb">bind</span><span class="w"> </span>neurovista<span class="w"> </span>~/proj/neurovista<span class="w"> </span>--unbind
+
+<span class="c1"># Verbless shorthand (only when &lt;project&gt; already exists in home).</span>
+scitex-scholar<span class="w"> </span>library<span class="w"> </span>neurovista<span class="w"> </span>~/proj/neurovista
+
+<span class="c1"># Whole-library view symlink (older pattern).</span>
 scitex-scholar<span class="w"> </span>library<span class="w"> </span>link-project-tree<span class="w"> </span>.
 
-<span class="c1"># Replace a library-symlink with a bib-filtered real directory</span>
+<span class="c1"># Bib-filtered real directory ↔ view-symlink.</span>
 scitex-scholar<span class="w"> </span>library<span class="w"> </span>materialize<span class="w"> </span>&lt;link_path&gt;<span class="w"> </span>--bib<span class="w"> </span>refs.bib
-
-<span class="c1"># Replace a materialized directory with a symlink to ~/.scitex/scholar/library</span>
 scitex-scholar<span class="w"> </span>library<span class="w"> </span>dematerialize<span class="w"> </span>&lt;path&gt;
+</pre></div>
+</div>
+</section>
+<section id="share">
+<h4>Share<a class="headerlink" href="#share" title="Link to this heading"></a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># rsync the library to/from a remote host. ``--remote-path`` overrides</span>
+<span class="c1"># the default (``.scitex/scholar/library/[&lt;project&gt;/]``).</span>
+scitex-scholar<span class="w"> </span>library<span class="w"> </span>sync<span class="w"> </span>spartan<span class="w"> </span>--project<span class="w"> </span>neurovista
+scitex-scholar<span class="w"> </span>library<span class="w"> </span>sync<span class="w"> </span>spartan<span class="w"> </span>--project<span class="w"> </span>neurovista<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--remote-path<span class="w"> </span>proj/neurovista/.scitex/scholar/library/neurovista
+scitex-scholar<span class="w"> </span>library<span class="w"> </span>sync<span class="w"> </span>spartan<span class="w"> </span>--pull<span class="w"> </span>--project<span class="w"> </span>neurovista
 
-<span class="c1"># Library SQLite index</span>
+<span class="c1"># Portable export.</span>
+scitex-scholar<span class="w"> </span>library<span class="w"> </span><span class="nb">export</span><span class="w"> </span>neurovista<span class="w">                  </span><span class="c1"># tarball (default)</span>
+scitex-scholar<span class="w"> </span>library<span class="w"> </span><span class="nb">export</span><span class="w"> </span>neurovista<span class="w"> </span>--format<span class="w"> </span>bibtex
+scitex-scholar<span class="w"> </span>library<span class="w"> </span><span class="nb">export</span><span class="w"> </span>neurovista<span class="w"> </span>--format<span class="w"> </span>flat-pdfs
+
+<span class="c1"># Bidirectional Zotero migration (local SQLite, no API key).</span>
+<span class="c1"># Engine wired; verify on a real round-trip before relying on it.</span>
+scitex-scholar<span class="w"> </span>library<span class="w"> </span>zotero<span class="w"> </span>import<span class="w"> </span>--project<span class="w"> </span>demo<span class="w"> </span>--collection<span class="w"> </span>demo
+scitex-scholar<span class="w"> </span>library<span class="w"> </span>zotero<span class="w"> </span><span class="nb">export</span><span class="w"> </span>--project<span class="w"> </span>demo
+scitex-scholar<span class="w"> </span>library<span class="w"> </span>zotero<span class="w"> </span>diff<span class="w"> </span>--project<span class="w"> </span>demo
+</pre></div>
+</div>
+</section>
+<section id="database-integrity">
+<h4>Database / integrity<a class="headerlink" href="#database-integrity" title="Link to this heading"></a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># SQLite index.</span>
 scitex-scholar<span class="w"> </span>library<span class="w"> </span>db<span class="w"> </span>build<span class="w"> </span>--dry-run
 scitex-scholar<span class="w"> </span>library<span class="w"> </span>db<span class="w"> </span>build
 scitex-scholar<span class="w"> </span>library<span class="w"> </span>db<span class="w"> </span>migrate
 scitex-scholar<span class="w"> </span>library<span class="w"> </span>db<span class="w"> </span>lookup<span class="w"> </span>--doi<span class="w"> </span><span class="m">10</span>.1/x<span class="w"> </span>--json
 scitex-scholar<span class="w"> </span>library<span class="w"> </span>db<span class="w"> </span>list<span class="w"> </span>--limit<span class="w"> </span><span class="m">20</span><span class="w"> </span>--json
 scitex-scholar<span class="w"> </span>library<span class="w"> </span>db<span class="w"> </span>audit<span class="w"> </span>--json
+
+<span class="c1"># File integrity: verify metadata.path.files against disk</span>
+<span class="c1"># (presence + SHA-256, role-aware).</span>
+scitex-scholar<span class="w"> </span>library<span class="w"> </span>audit-files
+scitex-scholar<span class="w"> </span>library<span class="w"> </span>audit-files<span class="w"> </span>--project<span class="w"> </span>neurovista<span class="w"> </span>--json
+scitex-scholar<span class="w"> </span>library<span class="w"> </span>audit-files<span class="w"> </span>--no-rehash<span class="w">    </span><span class="c1"># presence only (fast)</span>
 </pre></div>
 </div>
+</section>
 </section>
 <section id="skills">
 <h3>skills<a class="headerlink" href="#skills" title="Link to this heading"></a></h3>
