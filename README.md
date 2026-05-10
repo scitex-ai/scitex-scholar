@@ -9,7 +9,7 @@
 <p align="center"><b>Scientific paper search, enrichment, PDF download, and library management for reproducible research.</b></p>
 
 <p align="center">
-  <a href="https://scitex-scholar.readthedocs.io/">Full Documentation</a> · <code>pip install scitex-scholar</code>
+  <a href="https://scitex-scholar.readthedocs.io/">Full Documentation</a> · <code>uv pip install scitex-scholar[all]</code>
 </p>
 
 <!-- scitex-badges:start -->
