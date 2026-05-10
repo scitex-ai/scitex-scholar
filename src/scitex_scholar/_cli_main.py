@@ -197,12 +197,29 @@ def _paper_fetch_options(f):
     )(f)
     f = click.option("--title", default=None, help="Paper title (resolves DOI).")(f)
     f = click.option(
-        "--pdf",
+        "--pdf-main",
+        "--pdf",  # back-compat alias
         "pdf_path",
         default=None,
         type=click.Path(dir_okay=False, path_type=Path),
-        help="Local PDF to import instead of downloading. Skips the browser "
-        "stack; metadata enrichment still runs from --doi/--title.",
+        help="Local main PDF to import. Skips the browser stack; metadata "
+        "enrichment still runs from --doi/--title.",
+    )(f)
+    f = click.option(
+        "--pdf-supple",
+        "pdf_supples",
+        multiple=True,
+        type=click.Path(dir_okay=False, path_type=Path),
+        help="Supplementary file (PDF/docx/xlsx). Repeatable. Stored as "
+        "'supple-<original_name>' in the paper dir.",
+    )(f)
+    f = click.option(
+        "--attachment",
+        "attachments",
+        multiple=True,
+        type=click.Path(dir_okay=False, path_type=Path),
+        help="Anything else (data, code, slides). Repeatable. Stored as "
+        "'additional-<original_name>' in the paper dir.",
     )(f)
     f = click.option("--project", default=None, help="Project name for organizing.")(f)
     f = click.option(
@@ -238,6 +255,8 @@ def paper_fetch(
     doi,
     title,
     pdf_path,
+    pdf_supples,
+    attachments,
     project,
     browser_mode,
     chrome_profile,
@@ -252,12 +271,17 @@ def paper_fetch(
     Examples:
       $ scitex-scholar paper fetch --doi 10.1038/nature12373 --project demo
       $ scitex-scholar paper fetch --doi 10.1002/epi.70076 \\
-            --pdf ~/Downloads/Liu_2026.pdf --project neurovista
+            --pdf-main ~/Downloads/Liu_2026.pdf --project neurovista
+      $ scitex-scholar paper fetch --doi 10.1038/s41467-020-15908-3 \\
+            --pdf-supple ~/Downloads/41467_2020_15908_MOESM1_ESM.pdf \\
+            --attachment ~/Downloads/dataset.csv --project neurovista
     """
     return _do_paper_fetch(
         doi=doi,
         title=title,
         pdf_path=pdf_path,
+        pdf_supples=list(pdf_supples or ()),
+        attachments=list(attachments or ()),
         project=project,
         browser_mode=browser_mode,
         chrome_profile=chrome_profile,
@@ -273,6 +297,8 @@ def _do_paper_fetch(
     doi,
     title,
     pdf_path,
+    pdf_supples=(),
+    attachments=(),
     project,
     browser_mode,
     chrome_profile,
@@ -281,8 +307,8 @@ def _do_paper_fetch(
     yes,
     as_json,
 ):
-    # If --pdf is given without --doi/--title, try to extract DOI from the
-    # PDF's first page so the user doesn't have to repeat themselves.
+    # If --pdf-main is given without --doi/--title, try to extract DOI
+    # from the PDF's first page.
     if pdf_path and not doi and not title:
         try:
             import re
@@ -302,13 +328,14 @@ def _do_paper_fetch(
 
     if not doi and not title:
         raise click.UsageError(
-            "Provide --doi, --title, or --pdf (with extractable DOI)."
+            "Provide --doi, --title, or --pdf-main (with extractable DOI)."
         )
     if dry_run:
         click.echo(
             f"DRY RUN — would fetch (doi={doi!r}, title={title!r}, "
-            f"pdf={pdf_path!r}, project={project!r}, "
-            f"browser_mode={browser_mode!r})"
+            f"pdf_main={pdf_path!r}, supples={list(pdf_supples)!r}, "
+            f"attachments={list(attachments)!r}, "
+            f"project={project!r}, browser_mode={browser_mode!r})"
         )
         return 0
     rc = asyncio.run(
@@ -316,6 +343,8 @@ def _do_paper_fetch(
             doi=doi,
             title=title,
             pdf_path=pdf_path,
+            pdf_supples=list(pdf_supples or ()),
+            attachments=list(attachments or ()),
             project=project,
             browser_mode=browser_mode,
             chrome_profile=chrome_profile,
@@ -326,7 +355,16 @@ def _do_paper_fetch(
 
 
 async def _run_paper_fetch_async(
-    *, doi, title, pdf_path, project, browser_mode, chrome_profile, force
+    *,
+    doi,
+    title,
+    pdf_path,
+    pdf_supples,
+    attachments,
+    project,
+    browser_mode,
+    chrome_profile,
+    force,
 ) -> int:
     from .pipelines.ScholarPipelineSingle import ScholarPipelineSingle
 
@@ -340,6 +378,8 @@ async def _run_paper_fetch_async(
         project=project,
         force=force,
         pdf_path=str(pdf_path) if pdf_path else None,
+        pdf_supples=[str(p) for p in pdf_supples] if pdf_supples else None,
+        attachments=[str(p) for p in attachments] if attachments else None,
     )
     return 0
 
@@ -679,8 +719,8 @@ class _LibraryGroup(_CategorizedGroup):
     SECTIONS = [
         ("Daily", ["list", "open-urls", "refresh"]),
         ("Layout", ["bind", "link-project-tree", "materialize", "dematerialize"]),
-        ("Share", ["sync", "export"]),
-        ("Database", ["db"]),
+        ("Share", ["sync", "export", "zotero"]),
+        ("Database", ["db", "audit-files"]),
     ]
 
     def get_command(self, ctx, name):
@@ -1029,6 +1069,289 @@ def _save_project_metadata(library_root: Path, project: str, data: dict) -> None
     p = _project_metadata_path(library_root, project)
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(_json.dumps(data, indent=2, ensure_ascii=False))
+
+
+# ----- library zotero (bidirectional migration) -------------------------
+
+
+@library.group("zotero", context_settings=CONTEXT_SETTINGS)
+def library_zotero():
+    """Bidirectional Zotero migration (local SQLite, no API key).
+
+    \b
+    Import:  Zotero -> Scholar  (papers + collections + tags + PDFs)
+    Export:  Scholar -> Zotero  (BibTeX + PDFs, ready for File > Import)
+    Diff:    show what's in one but not the other
+    """
+
+
+@library_zotero.command("import")
+@click.option("--project", default=None, help="Scholar project to import into.")
+@click.option("--collection", default=None, help="Limit to one Zotero collection.")
+@click.option("--tag", "tags", multiple=True, help="Filter by Zotero tag (repeatable).")
+@click.option(
+    "--match-all/--match-any",
+    default=False,
+    help="With --tag: require ALL tags (default: any).",
+)
+@click.option(
+    "--no-pdfs",
+    "include_pdfs",
+    flag_value=False,
+    default=True,
+    help="Skip PDF copying (metadata only).",
+)
+@click.option("--limit", type=int, default=None, help="Max items to import.")
+@click.option("--dry-run", is_flag=True)
+@click.option(
+    "--db", default=None, help="Path to zotero.sqlite (auto-detect if omitted)."
+)
+def library_zotero_import(
+    project, collection, tags, match_all, include_pdfs, limit, dry_run, db
+):
+    """Import from local Zotero database into the Scholar library."""
+    if not project:
+        raise click.UsageError("--project is required for Zotero import.")
+    from .integration.zotero import ZoteroLocalMigrator
+
+    mig = ZoteroLocalMigrator(db_path=db, project=project)
+
+    if collection:
+        report = mig.import_collection(
+            collection_name=collection, include_pdfs=include_pdfs, dry_run=dry_run
+        )
+    elif tags:
+        report = mig.import_by_tags(
+            tags=list(tags),
+            match_all=match_all,
+            include_pdfs=include_pdfs,
+            dry_run=dry_run,
+        )
+    else:
+        report = mig.import_all(limit=limit, include_pdfs=include_pdfs, dry_run=dry_run)
+
+    verb = "Would import" if dry_run else "Imported"
+    n = getattr(report, "total_imported", None)
+    if n is None:
+        n = getattr(report, "items_processed", "?")
+    click.secho(f"{verb} {n} item(s) into project '{project}'.", fg="green")
+
+
+@library_zotero.command("export")
+@click.option("--project", default=None, help="Scholar project to export.")
+@click.option(
+    "--output",
+    "output_dir",
+    default=None,
+    type=click.Path(file_okay=False, path_type=Path),
+    help="Output dir (default: ~/.scitex/scholar/exports/zotero-<ts>/).",
+)
+@click.option(
+    "--no-pdfs",
+    "include_pdfs",
+    flag_value=False,
+    default=True,
+    help="Skip bundling PDFs (BibTeX-only export).",
+)
+def library_zotero_export(project, output_dir, include_pdfs):
+    """Export Scholar papers as a Zotero-importable package (BibTeX + PDFs)."""
+    if not project:
+        raise click.UsageError("--project is required for Zotero export.")
+    from .integration.zotero import ZoteroLocalMigrator
+
+    mig = ZoteroLocalMigrator(project=project)
+
+    if output_dir is None:
+        ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+        output_dir = (
+            _default_library_root().parent / "exports" / f"zotero-{project}-{ts}"
+        )
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    pkg = mig.export_for_import(
+        project=project, output_dir=output_dir, include_pdfs=include_pdfs
+    )
+    bib = getattr(pkg, "bibtex_path", None) or getattr(pkg, "bib_path", None)
+    n = getattr(pkg, "items_exported", None) or getattr(pkg, "n_papers", "?")
+    click.secho(
+        f"Exported {n} paper(s) -> {output_dir}\n  BibTeX: {bib}",
+        fg="green",
+    )
+
+
+@library_zotero.command("diff")
+@click.option("--project", default=None, help="Scholar project to compare.")
+@click.option("--db", default=None, help="Path to zotero.sqlite (auto-detect).")
+@click.option("--json", "as_json", is_flag=True, help="JSON output.")
+def library_zotero_diff(project, db, as_json):
+    """Compare Zotero vs Scholar — show items present in one but not the other."""
+    if not project:
+        raise click.UsageError("--project is required.")
+    from .integration.zotero import ZoteroLocalMigrator
+
+    mig = ZoteroLocalMigrator(db_path=db, project=project)
+    diff = mig.diff() if hasattr(mig, "diff") else None
+    if diff is None:
+        raise click.ClickException(
+            "ZoteroLocalMigrator has no .diff() — engine update required."
+        )
+    if as_json:
+        click.echo(
+            _json.dumps(getattr(diff, "to_dict", lambda: diff)(), indent=2, default=str)
+        )
+        return
+    click.echo(
+        f"Only-in-Zotero:  {len(getattr(diff, 'only_in_zotero', []) or [])}\n"
+        f"Only-in-Scholar: {len(getattr(diff, 'only_in_scholar', []) or [])}\n"
+        f"Both:            {len(getattr(diff, 'both', []) or [])}"
+    )
+
+
+@library.command("audit-files")
+@click.option(
+    "--library-root",
+    default=None,
+    type=click.Path(path_type=Path),
+    help="Library root (default: ~/.scitex/scholar/library).",
+)
+@click.option("--project", default=None, help="Limit to a single project.")
+@click.option(
+    "--rehash/--no-rehash",
+    default=True,
+    show_default=True,
+    help="Recompute SHA-256 of every file on disk and verify against the "
+    "stored entry. Disable for a fast presence-only audit.",
+)
+@click.option("--json", "as_json", is_flag=True, help="JSON output.")
+def library_audit_files(library_root, project, rehash, as_json):
+    """Verify recorded files vs disk state for every paper.
+
+    \b
+    For each MASTER entry, cross-references ``metadata.path.files``
+    (role + sha256 + name) against what's actually in the directory.
+
+    \b
+    Reports:
+      • missing       — recorded file not on disk
+      • orphan        — file on disk with no record (role guessed from
+                        prefix: 'supple-' / 'additional-' / main PDF)
+      • hash_mismatch — name matches but content differs (file replaced)
+    """
+    import hashlib
+
+    root = Path(library_root) if library_root else _default_library_root()
+    master = root / "MASTER"
+    if not master.is_dir():
+        raise click.ClickException(f"MASTER dir not found: {master}")
+
+    def _sha(p: Path) -> str:
+        h = hashlib.sha256()
+        with open(p, "rb") as fh:
+            for chunk in iter(lambda: fh.read(1 << 20), b""):
+                h.update(chunk)
+        return h.hexdigest()
+
+    def _guess_role(name: str) -> str:
+        if name.startswith("supple-"):
+            return "supplementary"
+        if name.startswith("additional-"):
+            return "additional"
+        if name.lower().endswith(".pdf"):
+            return "main"
+        return "unknown"
+
+    report: dict = {
+        "papers": [],
+        "totals": {"papers": 0, "missing": 0, "orphan": 0, "hash_mismatch": 0},
+    }
+    for entry_dir in sorted(master.iterdir()):
+        if not entry_dir.is_dir():
+            continue
+        meta_file = entry_dir / "metadata.json"
+        if not meta_file.exists():
+            continue
+        try:
+            data = _json.loads(meta_file.read_text())
+        except (OSError, ValueError):
+            continue
+        if project:
+            projs = (data.get("container") or {}).get("projects") or []
+            if project not in projs:
+                continue
+
+        recorded = (data.get("metadata", {}).get("path", {}).get("files")) or []
+        recorded_by_name = {e["name"]: e for e in recorded if isinstance(e, dict)}
+        on_disk = {
+            p.name: p
+            for p in entry_dir.iterdir()
+            if p.is_file()
+            and p.suffix.lower() not in (".json", ".log")
+            and p.name != "metadata.json"
+        }
+
+        missing, orphan, mismatch = [], [], []
+        for name, entry in recorded_by_name.items():
+            if name not in on_disk:
+                missing.append(
+                    {
+                        "name": name,
+                        "role": entry.get("role"),
+                        "sha256": entry.get("sha256"),
+                    }
+                )
+                continue
+            if rehash and entry.get("sha256"):
+                actual = _sha(on_disk[name])
+                if actual != entry["sha256"]:
+                    mismatch.append(
+                        {
+                            "name": name,
+                            "role": entry.get("role"),
+                            "recorded_sha": entry["sha256"],
+                            "disk_sha": actual,
+                        }
+                    )
+        for name in on_disk:
+            if name not in recorded_by_name:
+                orphan.append({"name": name, "guessed_role": _guess_role(name)})
+
+        if missing or orphan or mismatch:
+            report["papers"].append(
+                {
+                    "paper_id": entry_dir.name,
+                    "missing": missing,
+                    "orphan": orphan,
+                    "hash_mismatch": mismatch,
+                }
+            )
+        report["totals"]["papers"] += 1
+        report["totals"]["missing"] += len(missing)
+        report["totals"]["orphan"] += len(orphan)
+        report["totals"]["hash_mismatch"] += len(mismatch)
+
+    if as_json:
+        click.echo(_json.dumps(report, indent=2, default=str))
+        return
+
+    t = report["totals"]
+    click.echo(
+        f"Scanned {t['papers']} papers. "
+        f"missing={t['missing']} orphan={t['orphan']} "
+        f"hash_mismatch={t['hash_mismatch']}"
+    )
+    for p in report["papers"][:30]:
+        click.secho(f"  [{p['paper_id']}]", fg="yellow")
+        for m in p["missing"]:
+            click.echo(f"    MISSING       {m['name']} (role={m['role']})")
+        for o in p["orphan"]:
+            click.echo(
+                f"    ORPHAN        {o['name']} (guessed_role={o['guessed_role']})"
+            )
+        for h in p["hash_mismatch"]:
+            click.echo(f"    HASH_MISMATCH {h['name']}")
+    if len(report["papers"]) > 30:
+        click.echo(f"  ... and {len(report['papers']) - 30} more")
 
 
 @library.command("refresh")
@@ -1559,7 +1882,13 @@ def library_bind(project, project_dir, unbind, dry_run, yes):
     help="--copy-links (rsync -L) follows symlinks (self-contained remote, "
     "default). --preserve-links keeps them as symlinks.",
 )
-def library_sync(host, project, pull, delete, dry_run, copy_links):
+@click.option(
+    "--remote-path",
+    default=None,
+    help="Remote path (relative to remote $HOME, or absolute starting with "
+    "'/'). Default: '.scitex/scholar/library/[<project>/]'.",
+)
+def library_sync(host, project, pull, delete, dry_run, copy_links, remote_path):
     """rsync the library to/from a remote HOST.
 
     \b
@@ -1588,10 +1917,18 @@ def library_sync(host, project, pull, delete, dry_run, copy_links):
     # so source/target paths are straightforward.
     if project:
         src = home_root / project
-        remote_path = f".scitex/scholar/library/{project}/"
+        default_remote = f".scitex/scholar/library/{project}/"
     else:
         src = home_root
-        remote_path = ".scitex/scholar/library/"
+        default_remote = ".scitex/scholar/library/"
+
+    # --remote-path overrides the default. Trailing slash is normalized so
+    # rsync syncs into the directory rather than nesting it under itself.
+    if remote_path:
+        chosen = remote_path if remote_path.endswith("/") else remote_path + "/"
+        remote_path = chosen
+    else:
+        remote_path = default_remote
 
     if not src.exists():
         raise click.ClickException(f"Source missing: {src}")
@@ -2276,6 +2613,8 @@ def alias_single(
     doi,
     title,
     pdf_path,
+    pdf_supples,
+    attachments,
     project,
     browser_mode,
     chrome_profile,
@@ -2290,6 +2629,8 @@ def alias_single(
         doi=doi,
         title=title,
         pdf_path=pdf_path,
+        pdf_supples=list(pdf_supples or ()),
+        attachments=list(attachments or ()),
         project=project,
         browser_mode=browser_mode,
         chrome_profile=chrome_profile,

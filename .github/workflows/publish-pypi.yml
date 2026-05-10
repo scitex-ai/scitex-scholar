@@ -1,41 +1,56 @@
 name: Publish to PyPI
 
+# Two trigger paths, both end in PyPI + GitHub Release:
+#   1. Push of a `v*.*.*` tag → tag-driven publish (typical).
+#   2. Manual workflow_dispatch with a `version` input → republish a
+#      specific tag (recovery / re-run after partial failure).
 on:
+  push:
+    tags:
+      - 'v*.*.*'
   workflow_dispatch:
     inputs:
       version:
-        description: 'Tag to publish (e.g. v0.10.19) — must already exist on the repo'
+        description: 'Tag to publish (e.g. v1.3.2) — must already exist on the repo'
         required: true
         type: string
+
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.version || github.ref }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build tools
+        run: pip install build
+
+      - name: Build distribution
+        run: python -m build
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+
   publish:
+    needs: build
     runs-on: ubuntu-latest
     environment:
       name: pypi
       url: https://pypi.org/p/scitex-scholar
     permissions:
-      id-token: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.version }}
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: Install build tools
-        run: pip install build
-      - name: Build distribution
-        run: python -m build
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-    needs: build
-    runs-on: ubuntu-latest
-    environment: pypi
-    permissions:
       id-token: write   # OIDC for trusted publisher
+
     steps:
-      - name: Download artifacts
+      - name: Download dist artifacts
         uses: actions/download-artifact@v4
         with:
           name: dist
@@ -48,15 +63,17 @@ jobs:
     # Sync a GitHub Release with every PyPI publish. Notes come from
     # CHANGELOG.md (section heading "## [VERSION]"); wheel + sdist
     # attach as release assets so users can audit what shipped without
-    # cloning. Tag was already pushed (this workflow is *triggered by*
-    # the tag); we just create the Release record on top of it.
+    # cloning.
     needs: publish
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/v') || inputs.version != ''
     runs-on: ubuntu-latest
     permissions:
       contents: write   # gh release create
+
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.version || github.ref }}
 
       - name: Download dist artifacts
         uses: actions/download-artifact@v4
@@ -67,7 +84,12 @@ jobs:
       - name: Extract release notes from CHANGELOG.md
         id: notes
         run: |
-          VERSION="${GITHUB_REF#refs/tags/v}"
+          if [ -n "${{ inputs.version }}" ]; then
+            VERSION="${{ inputs.version }}"
+            VERSION="${VERSION#v}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/v}"
+          fi
           # Capture lines from "## [VERSION] " up to (but not including)
           # the next "## [" heading. Falls back to a one-liner if the
           # section is missing so the release is still created.
@@ -85,7 +107,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "${GITHUB_REF#refs/tags/}" \
-            --title "v${{ steps.notes.outputs.version }}" \
+          TAG="v${{ steps.notes.outputs.version }}"
+          gh release create "$TAG" \
+            --title "$TAG" \
             --notes-file release-notes.md \
-            dist/*
+            dist/* || \
+          gh release upload "$TAG" dist/* --clobber

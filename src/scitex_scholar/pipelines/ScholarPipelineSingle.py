@@ -50,6 +50,8 @@ class ScholarPipelineSingle(PipelineStepsMixin, PipelineHelpersMixin):
         project: Optional[str] = None,
         force: bool = False,
         pdf_path: Optional[str] = None,
+        pdf_supples: Optional[list] = None,
+        attachments: Optional[list] = None,
     ):
         """Process single paper from query (DOI or Title) to complete storage.
 
@@ -86,10 +88,17 @@ class ScholarPipelineSingle(PipelineStepsMixin, PipelineHelpersMixin):
             # Step 4: Metadata
             paper = await self._step_04_resolve_metadata(paper, io, force)
 
-            # Steps 5-7: PDF acquisition. With --pdf, skip the browser
-            # download stack and copy the user-provided file directly.
-            if pdf_path:
-                self._step_07_import_pdf(paper, io, pdf_path, force)
+            # Steps 5-7: PDF acquisition. With --pdf-* flags, skip the
+            # browser download stack and copy the user-provided files.
+            if pdf_path or pdf_supples or attachments:
+                self._step_07_import_files(
+                    paper,
+                    io,
+                    pdf_main=pdf_path,
+                    pdf_supples=pdf_supples or [],
+                    attachments=attachments or [],
+                    force=force,
+                )
             else:
                 (
                     browser_manager,

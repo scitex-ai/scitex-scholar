@@ -46,7 +46,7 @@ Literature management spans many tools and APIs: searching databases, resolving 
 - **Search** across CrossRef, Semantic Scholar, PubMed, arXiv, and OpenAlex
 - **Resolve** DOIs from titles; enrich BibTeX with abstracts, citation counts, impact factors (JCR 2024), PMIDs, and arXiv IDs
 - **Download** PDFs through institutional access (OpenAthens / SSO) with Playwright browser automation
-- **Organize** papers in a MASTER-hash library with per-project symlinks at `~/.scitex/scholar/library/`
+- **Organize** papers in a MASTER-hash library with per-project symlinks at `~/.scitex/scholar/library/`. One-button maintenance via `library refresh` (reconcile → regenerate readable names → optional rsync to remote hosts)
 - **Highlight** each sentence of a PDF by rhetorical role — claim, method, limitation, supportive citation, contradicting citation — via Claude
 - **Automate** the same operations from the CLI, a Python API, or the SciTeX MCP server
 
@@ -104,8 +104,24 @@ scitex-scholar bibtex import --bibtex refs.bib --project demo --output refs.enri
 # PDF post-processing
 scitex-scholar pdf highlight paper.pdf
 
-# Library
-scitex-scholar library link-project-tree .
+# Library — daily workflow
+scitex-scholar library list                                   # all projects
+scitex-scholar library list neurovista                        # one project, per-paper
+scitex-scholar library open-urls neurovista --watch           # browser + auto-import
+scitex-scholar library refresh neurovista                     # one-button maintenance
+scitex-scholar library refresh neurovista --sync spartan      # +rsync push (repeatable)
+
+# Library — manual PDF import (when DBs haven't indexed yet, or no auto-download)
+scitex-scholar paper fetch --doi 10.1002/epi.70076 \
+    --pdf-main ~/Downloads/Liu_2026.pdf \
+    --pdf-supple ~/Downloads/MOESM1_ESM.pdf \
+    --attachment ~/Downloads/dataset.csv \
+    --project neurovista
+
+# Library — layout / share / integrity
+scitex-scholar library bind neurovista ~/proj/neurovista      # one symlink, no data move
+scitex-scholar library export neurovista --format bibtex
+scitex-scholar library audit-files --project neurovista
 scitex-scholar library db build --dry-run
 scitex-scholar library db audit --json
 
