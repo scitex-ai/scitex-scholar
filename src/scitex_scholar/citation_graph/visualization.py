@@ -14,15 +14,19 @@ Example
 
 from typing import Any, Dict, Optional
 
+from scitex_dev import try_import_optional
+
 # ── Backend availability flags ───────────────────────────────────────────────
 
-try:
-    from figrecipe import get_graph_preset as _fr_get_preset
-    from figrecipe._graph import draw_graph as _fr_draw_graph  # not yet in public API
-
-    _FIGRECIPE_AVAILABLE = True
-except ImportError:
-    _FIGRECIPE_AVAILABLE = False
+_figrecipe = try_import_optional("figrecipe")
+_figrecipe_graph = try_import_optional("figrecipe._graph")
+_FIGRECIPE_AVAILABLE = _figrecipe is not None and _figrecipe_graph is not None
+if _FIGRECIPE_AVAILABLE:
+    _fr_get_preset = _figrecipe.get_graph_preset
+    _fr_draw_graph = _figrecipe_graph.draw_graph
+else:
+    _fr_get_preset = None
+    _fr_draw_graph = None
 
 # scitex-plt is a thin re-export of figrecipe, so the _figrecipe_integration
 # shim is redundant; the figrecipe branch above covers both. Kept as an alias
@@ -30,12 +34,9 @@ except ImportError:
 _SCITEX_PLT_AVAILABLE = _FIGRECIPE_AVAILABLE
 _stx_draw_graph = _fr_draw_graph if _FIGRECIPE_AVAILABLE else None
 
-try:
-    from pyvis.network import Network as _PyvisNetwork
-
-    _PYVIS_AVAILABLE = True
-except ImportError:
-    _PYVIS_AVAILABLE = False
+_pyvis_network = try_import_optional("pyvis.network")
+_PYVIS_AVAILABLE = _pyvis_network is not None
+_PyvisNetwork = _pyvis_network.Network if _PYVIS_AVAILABLE else None
 
 _MATPLOTLIB_AVAILABLE = True  # always available (core dependency)
 
@@ -104,6 +105,7 @@ def _plot_figrecipe(G, output=None, **kwargs):
 def _plot_scitex_plt(G, output=None, **kwargs):
     """Render with scitex.plt (AxisWrapper + CSV auto-export)."""
     import scitex_plt as stx_plt
+
     preset = _fr_get_preset("citation") if _FIGRECIPE_AVAILABLE else {}
     merged = {**preset, **kwargs}
 
@@ -117,6 +119,7 @@ def _plot_scitex_plt(G, output=None, **kwargs):
 
     if output:
         import scitex_io as scitex_io
+
         scitex.io.save(fig, output)
 
     return {"fig": fig, "ax": ax, "pos": result["pos"], "backend": "scitex.plt"}
