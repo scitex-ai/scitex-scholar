@@ -15,7 +15,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        # Drop 3.10 — zarr>=3 (transitive via scitex-io) requires 3.11+.
+        # See general/02_package_11_ci-and-codecov.md.
+        python-version: ["3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
@@ -26,7 +28,7 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install pytest pytest-cov pytest-timeout
-          pip install -e ".[dev]" || pip install -e .
+          pip install -e ".[all,dev]" || pip install -e ".[dev]" || pip install -e .
       - name: Detect import name
         id: pkg
         run: |
@@ -38,9 +40,40 @@ jobs:
             --cov=src/${{ steps.pkg.outputs.import_name }} \
             --cov-report=xml --cov-report=term
       - name: Upload coverage to Codecov
-        if: matrix.python-version == '3.12'
-        uses: codecov/codecov-action@v4
+        # `if: always()` ensures coverage uploads even when tests fail —
+        # silence on failure was masking the real Codecov number.
+        if: always() && matrix.python-version == '3.12'
+        uses: codecov/codecov-action@v5
         with:
           files: coverage.xml
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
+
+  install-check:
+    # Catches undeclared runtime deps that the package's own test suite
+    # misses — `pip install <pkg>` in a clean venv must yield an importable
+    # package. Merged in from the now-deleted install-test.yml so the repo
+    # has one Test workflow / one badge.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build wheel
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build --wheel
+      - name: Install + import in a fresh venv
+        run: |
+          python -m venv /tmp/clean-venv
+          /tmp/clean-venv/bin/pip install --upgrade pip
+          /tmp/clean-venv/bin/pip install dist/*.whl
+          IMPORT_NAME=$(find src -maxdepth 2 -name __init__.py -printf '%h\n' \
+                          | head -1 | xargs -n1 basename)
+          if [ -z "$IMPORT_NAME" ]; then
+              echo "Could not detect import name under src/" >&2
+              exit 1
+          fi
+          echo "Importing $IMPORT_NAME ..."
+          /tmp/clean-venv/bin/python -c "import ${IMPORT_NAME}; print(f'OK: {${IMPORT_NAME}.__name__}')"

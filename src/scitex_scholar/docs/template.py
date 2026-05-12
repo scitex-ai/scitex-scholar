@@ -41,11 +41,11 @@ IO:
 import argparse
 
 import scitex_logging as logging
+from scitex_dev import try_import_optional
 
-try:
-    import scitex as stx
-except ImportError:
-    stx = None
+# The umbrella `scitex` is not declared as a dep (PS-139 forbids it); this
+# template merely demonstrates the canonical access pattern.
+stx = try_import_optional("scitex")
 
 logger = logging.getLogger(__name__)
 

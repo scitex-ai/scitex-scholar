@@ -112,6 +112,12 @@ dev = [
     "aiohttp>=3.8.0",
     "flask>=2.3.0",
     "watchdog>=3.0.0",
+    # tests/integration/test_clew_integration.py — used (with importorskip)
+    # to exercise the optional scitex-clew provenance path in storage/PaperIO.
+    "scitex-clew>=0.1.0",
+    # `[pdf]` extra completeness; pdfplumber is the bundled PDF text-layer
+    # backend exercised by pdf_highlight/* code paths.
+    "pdfplumber>=0.9.0",
 ]
 docs = [
     "sphinx>=7.0",
@@ -155,6 +161,17 @@ python_files = ["test_*.py"]
 # two `test_base.py` files in different packages) without requiring
 # `__init__.py` files everywhere.
 addopts = "-v --tb=short --cov=scitex_scholar --cov-report=term-missing --import-mode=importlib"
+
+[tool.coverage.run]
+# Subprocess-coverage wiring (general/05_development_06_subprocess-coverage.md).
+# `parallel = true` lets every child Python interpreter (test_demos.py
+# `python -m`, `jupyter nbconvert --execute`, pytest-xdist) write its own
+# `.coverage.<host>.<pid>` shard; `pytest-cov` runs `coverage combine` at
+# session end. `concurrency = ["multiprocessing", "thread"]` covers both
+# subprocess.run and threaded test paths.
+parallel = true
+source = ["scitex_scholar"]
+concurrency = ["multiprocessing", "thread"]
 
 [tool.ruff]
 line-length = 88
