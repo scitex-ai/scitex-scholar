@@ -1,4 +1,4 @@
-name: Publish to PyPI
+name: pypi
 
 # Two trigger paths, both end in PyPI + GitHub Release:
 #   1. Push of a `v*.*.*` tag → tag-driven publish (typical).
