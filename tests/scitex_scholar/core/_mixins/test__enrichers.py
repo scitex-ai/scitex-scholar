@@ -9,6 +9,9 @@ import importlib
 
 def test_import__enrichers_module():
     """Module imports without raising hard errors."""
+    # Arrange
+    # Act
+    # Assert
     try:
         importlib.import_module("scitex_scholar.core._mixins._enrichers")
     except ImportError:

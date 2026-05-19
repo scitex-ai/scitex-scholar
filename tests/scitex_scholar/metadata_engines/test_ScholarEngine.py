@@ -9,6 +9,9 @@ import importlib
 
 def test_import_ScholarEngine_module():
     """Module imports without raising hard errors."""
+    # Arrange
+    # Act
+    # Assert
     try:
         importlib.import_module("scitex_scholar.metadata_engines.ScholarEngine")
     except ImportError:

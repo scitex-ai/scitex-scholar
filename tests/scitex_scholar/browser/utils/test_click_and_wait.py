@@ -9,6 +9,9 @@ import importlib
 
 def test_import_click_and_wait_module():
     """Module imports without raising hard errors."""
+    # Arrange
+    # Act
+    # Assert
     try:
         importlib.import_module("scitex_scholar.browser.utils.click_and_wait")
     except ImportError:

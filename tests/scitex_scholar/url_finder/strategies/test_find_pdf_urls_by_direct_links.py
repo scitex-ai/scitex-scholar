@@ -9,6 +9,9 @@ import importlib
 
 def test_import_find_pdf_urls_by_direct_links_module():
     """Module imports without raising hard errors."""
+    # Arrange
+    # Act
+    # Assert
     try:
         importlib.import_module("scitex_scholar.url_finder.strategies.find_pdf_urls_by_direct_links")
     except ImportError:

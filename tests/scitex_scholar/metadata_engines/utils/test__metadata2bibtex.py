@@ -9,6 +9,9 @@ import importlib
 
 def test_import__metadata2bibtex_module():
     """Module imports without raising hard errors."""
+    # Arrange
+    # Act
+    # Assert
     try:
         importlib.import_module("scitex_scholar.metadata_engines.utils._metadata2bibtex")
     except ImportError:

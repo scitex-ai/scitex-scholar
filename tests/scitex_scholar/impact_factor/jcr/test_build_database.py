@@ -9,6 +9,9 @@ import importlib
 
 def test_import_build_database_module():
     """Module imports without raising hard errors."""
+    # Arrange
+    # Act
+    # Assert
     try:
         importlib.import_module("scitex_scholar.impact_factor.jcr.build_database")
     except ImportError:

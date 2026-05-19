@@ -9,6 +9,9 @@ import importlib
 
 def test_import_ScholarURLFinder_module():
     """Module imports without raising hard errors."""
+    # Arrange
+    # Act
+    # Assert
     try:
         importlib.import_module("scitex_scholar.url_finder.ScholarURLFinder")
     except ImportError:

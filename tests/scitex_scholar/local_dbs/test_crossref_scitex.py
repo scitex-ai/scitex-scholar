@@ -9,6 +9,9 @@ import importlib
 
 def test_import_crossref_scitex_module():
     """Module imports without raising hard errors."""
+    # Arrange
+    # Act
+    # Assert
     try:
         importlib.import_module("scitex_scholar.local_dbs.crossref_scitex")
     except ImportError:

@@ -9,6 +9,9 @@ import importlib
 
 def test_import_builder_module():
     """Module imports without raising hard errors."""
+    # Arrange
+    # Act
+    # Assert
     try:
         importlib.import_module("scitex_scholar.citation_graph.builder")
     except ImportError:
