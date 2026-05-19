@@ -9,6 +9,9 @@ import importlib
 
 def test_import_papers_utils_module():
     """Module imports without raising hard errors."""
+    # Arrange
+    # Act
+    # Assert
     try:
         importlib.import_module("scitex_scholar._utils.papers_utils")
     except ImportError:

@@ -9,6 +9,9 @@ import importlib
 
 def test_import__app_module():
     """Module imports without raising hard errors."""
+    # Arrange
+    # Act
+    # Assert
     try:
         importlib.import_module("scitex_scholar.gui._app")
     except ImportError:

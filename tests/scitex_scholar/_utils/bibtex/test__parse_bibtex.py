@@ -9,6 +9,9 @@ import importlib
 
 def test_import__parse_bibtex_module():
     """Module imports without raising hard errors."""
+    # Arrange
+    # Act
+    # Assert
     try:
         importlib.import_module("scitex_scholar._utils.bibtex._parse_bibtex")
     except ImportError:

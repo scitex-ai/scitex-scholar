@@ -25,17 +25,26 @@ from scitex_scholar.pdf_highlight._colors import CATEGORY_LABELS
 
 class TestColors(unittest.TestCase):
     def test_every_category_has_an_rgb_and_a_label(self):
+        # Arrange
+        # Act
+        # Assert
         for cat in CATEGORIES:
             self.assertIn(cat, COLOR_RGB, f"{cat} missing RGB")
             self.assertIn(cat, CATEGORY_LABELS, f"{cat} missing label")
 
     def test_rgb_tuples_are_in_unit_range(self):
+        # Arrange
+        # Act
+        # Assert
         for cat, (r, g, b) in COLOR_RGB.items():
             for v in (r, g, b):
                 self.assertGreaterEqual(v, 0.0, f"{cat} has negative channel")
                 self.assertLessEqual(v, 1.0, f"{cat} has channel > 1.0")
 
     def test_colours_are_distinct(self):
+        # Arrange
+        # Act
+        # Assert
         seen = set()
         for cat, rgb in COLOR_RGB.items():
             rounded = tuple(round(x, 3) for x in rgb)
@@ -47,12 +56,18 @@ class TestColors(unittest.TestCase):
 
 class TestSentenceSplitter(unittest.TestCase):
     def test_splits_on_period_space_capital(self):
+        # Arrange
+        # Act
+        # Assert
         s = "First sentence. Second sentence. Third one."
         self.assertEqual(
             _split_sentences(s), ["First sentence.", "Second sentence.", "Third one."]
         )
 
     def test_preserves_abbreviation_with_capitalized_follower(self):
+        # Arrange
+        # Act
+        # Assert
         s = "As shown in Fig. 2, the trend reverses. Later it stabilises."
         parts = _split_sentences(s)
         # "Fig." should not cause a split; whole first clause stays together.
@@ -61,22 +76,34 @@ class TestSentenceSplitter(unittest.TestCase):
         self.assertIn("2, the trend reverses.", parts[0])
 
     def test_preserves_eg_ie(self):
+        # Arrange
+        # Act
+        # Assert
         s = "We tested several methods, e.g. random forests. The best was GBM."
         parts = _split_sentences(s)
         self.assertEqual(len(parts), 2)
         self.assertIn("e.g.", parts[0])
 
     def test_preserves_et_al(self):
+        # Arrange
+        # Act
+        # Assert
         s = "Following Smith et al. 2019, we computed H. We found H=0.7."
         parts = _split_sentences(s)
         self.assertTrue(any("et al." in p for p in parts))
 
     def test_accepts_numbered_and_quoted_openers(self):
+        # Arrange
+        # Act
+        # Assert
         s = 'Methods follow. 1. Extract blocks. "Second step." done'
         parts = _split_sentences(s)
         self.assertGreaterEqual(len(parts), 2)
 
     def test_empty_and_whitespace_input(self):
+        # Arrange
+        # Act
+        # Assert
         self.assertEqual(_split_sentences(""), [])
         self.assertEqual(_split_sentences("   "), [])
 
@@ -86,6 +113,9 @@ class TestStubClassifier(unittest.TestCase):
         return Block(id=idx, page=0, bbox=(0, 0, 1, 1), text=text)
 
     def test_detects_claim_markers(self):
+        # Arrange
+        # Act
+        # Assert
         blocks = [
             self._block(0, "We demonstrated that X holds."),
             self._block(1, "Our results show a clear trend."),
@@ -97,16 +127,25 @@ class TestStubClassifier(unittest.TestCase):
         self.assertIsNone(blocks[2].category)
 
     def test_detects_limitation_markers(self):
+        # Arrange
+        # Act
+        # Assert
         blocks = [self._block(0, "A limitation of this study is sample size.")]
         classify_stub(blocks)
         self.assertEqual(blocks[0].category, "focal_limitation")
 
     def test_detects_method_markers(self):
+        # Arrange
+        # Act
+        # Assert
         blocks = [self._block(0, "We propose a new method based on wavelets.")]
         classify_stub(blocks)
         self.assertEqual(blocks[0].category, "focal_method")
 
     def test_detects_supportive_and_contradictive_markers(self):
+        # Arrange
+        # Act
+        # Assert
         s_blocks = [self._block(0, "This is consistent with Smith (2019).")]
         classify_stub(s_blocks)
         self.assertEqual(s_blocks[0].category, "related_supportive")
@@ -124,6 +163,9 @@ class TestApplyClassifications(unittest.TestCase):
         ]
 
     def test_applies_known_categories(self):
+        # Arrange
+        # Act
+        # Assert
         blocks = self._blocks()
         n = apply_classifications(
             blocks,
@@ -138,6 +180,9 @@ class TestApplyClassifications(unittest.TestCase):
         self.assertEqual(blocks[1].category, "focal_method")
 
     def test_drops_unknown_categories(self):
+        # Arrange
+        # Act
+        # Assert
         blocks = self._blocks()
         n = apply_classifications(
             blocks,
@@ -149,6 +194,9 @@ class TestApplyClassifications(unittest.TestCase):
         self.assertIsNone(blocks[0].category)
 
     def test_ignores_unknown_ids(self):
+        # Arrange
+        # Act
+        # Assert
         blocks = self._blocks()
         n = apply_classifications(
             blocks,

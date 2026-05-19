@@ -9,6 +9,9 @@ import importlib
 
 def test_import_journal_normalizer_module():
     """Module imports without raising hard errors."""
+    # Arrange
+    # Act
+    # Assert
     try:
         importlib.import_module("scitex_scholar.core.journal_normalizer")
     except ImportError:

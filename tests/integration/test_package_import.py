@@ -16,8 +16,11 @@ import unittest
 class TestPackageImport(unittest.TestCase):
     """Test suite for package import functionality."""
 
-    def test_package_import(self):
+    def test_package_import_smoke_case(self):
         """Test that the scitex_scholar package can be imported."""
+        # Arrange
+        # Act
+        # Assert
         try:
             import sys
 
@@ -26,8 +29,11 @@ class TestPackageImport(unittest.TestCase):
         except ImportError:
             self.fail("Failed to import scitex_scholar package")
 
-    def test_package_version(self):
+    def test_package_version_calls_insert(self):
         """Test that package version is accessible."""
+        # Arrange
+        # Act
+        # Assert
         import sys
 
         sys.path.insert(0, "./src")
@@ -37,8 +43,11 @@ class TestPackageImport(unittest.TestCase):
         self.assertIsInstance(scitex_scholar.__version__, str)
         self.assertGreater(len(scitex_scholar.__version__), 0)
 
-    def test_package_metadata(self):
+    def test_package_metadata_calls_insert(self):
         """Test that package metadata is properly set."""
+        # Arrange
+        # Act
+        # Assert
         import sys
 
         sys.path.insert(0, "./src")

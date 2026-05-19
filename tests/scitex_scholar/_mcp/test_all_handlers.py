@@ -9,6 +9,9 @@ import importlib
 
 def test_import_all_handlers_module():
     """Module imports without raising hard errors."""
+    # Arrange
+    # Act
+    # Assert
     try:
         importlib.import_module("scitex_scholar._mcp.all_handlers")
     except ImportError:

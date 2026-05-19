@@ -9,6 +9,9 @@ import importlib
 
 def test_import__cleanup_scholar_processes_module():
     """Module imports without raising hard errors."""
+    # Arrange
+    # Act
+    # Assert
     try:
         importlib.import_module("scitex_scholar._utils.cleanup._cleanup_scholar_processes")
     except ImportError:
