@@ -22,7 +22,7 @@ import pymupdf
 
 from ._annotator import add_legend_page, apply_highlights
 from ._blocks import Block, extract_blocks
-from ._classifier import classify_llm, classify_stub
+from ._classifier import API_KEY_ENV, classify_llm, classify_stub
 from ._colors import CATEGORIES, CATEGORY_LABELS, COLOR_RGB
 
 __all__ = [
@@ -86,16 +86,31 @@ def save_with_highlights(
     signature: Optional[str] = None,
     model_label: Optional[str] = None,
     source_name: Optional[str] = None,
+    min_confidence: float = 0.0,
+    on_info: Optional[Any] = None,
 ) -> int:
     """Write ``doc`` with highlight annotations for all labelled blocks.
 
     When ``add_legend=True`` (default) a colour legend + signature page is
-    prepended so readers can see which colour means what.
+    prepended so readers can see which colour means what. ``min_confidence``
+    suppresses highlights below that confidence.
+
+    ``on_info`` (optional callable) receives progress messages.
+
+    The save deliberately uses ``garbage=0, deflate=False``. The earlier
+    ``garbage=3, deflate=True`` recompressed every stream of the source
+    PDF, which on a large (20 MB+) image-heavy paper ran for minutes
+    entirely inside pymupdf's C code — and because CPython only delivers
+    ``KeyboardInterrupt`` between bytecode ops, that made the run both
+    slow *and* uninterruptible (Ctrl-C queued but never fired). Appending
+    the annotation objects without recompression is near-instant and keeps
+    the C calls short enough to stay responsive to signals.
 
     Returns the number of highlight annotations added (not counting the
     legend page).
     """
-    n = apply_highlights(doc, blocks)
+    info = on_info or (lambda _msg: None)
+    n = apply_highlights(doc, blocks, min_confidence=min_confidence, on_info=on_info)
     if add_legend:
         add_legend_page(
             doc,
@@ -103,7 +118,11 @@ def save_with_highlights(
             model_label=model_label,
             source_name=source_name or "(unknown)",
         )
-    doc.save(Path(output_path), garbage=3, deflate=True)
+    out = Path(output_path)
+    info(f"      writing {doc.page_count} pages → {out}")
+    doc.save(out, garbage=0, deflate=False)
+    size_mb = out.stat().st_size / 1e6
+    info(f"      wrote {size_mb:.1f} MB")
     return n
 
 
@@ -134,6 +153,8 @@ def highlight_pdf(
     min_chars: int = 40,
     sentence_level: bool = True,
     add_legend: bool = True,
+    min_confidence: float = 0.0,
+    concurrency: int = 4,
     on_info: Optional[Any] = None,
     on_warning: Optional[Any] = None,
 ) -> HighlightResult:
@@ -187,11 +208,20 @@ def highlight_pdf(
     if use_stub:
         classify_stub(blocks)
     else:
-        if not os.environ.get("ANTHROPIC_API_KEY"):
+        if not os.environ.get(API_KEY_ENV):
             raise RuntimeError(
-                "ANTHROPIC_API_KEY is not set (or call with use_stub=True)"
+                f"{API_KEY_ENV} is not set (or call with use_stub=True). "
+                "Scholar uses a namespaced key and does not read the ambient "
+                "ANTHROPIC_API_KEY."
             )
-        classify_llm(blocks, model=model, batch_size=batch_size, on_warning=warn)
+        classify_llm(
+            blocks,
+            model=model,
+            batch_size=batch_size,
+            concurrency=concurrency,
+            on_warning=warn,
+            on_info=info,
+        )
 
     added = 0
     if dry_run:
@@ -206,6 +236,8 @@ def highlight_pdf(
             add_legend=add_legend,
             model_label=(None if use_stub else model),
             source_name=pdf.name,
+            min_confidence=min_confidence,
+            on_info=info,
         )
         info(f"      added {added} highlight annotations")
 

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Iterable, Optional, cast
+from typing import Any, Iterable, Optional
 
 import pymupdf
 
@@ -10,36 +10,48 @@ from ._blocks import Block
 from ._colors import CATEGORIES, CATEGORY_LABELS, COLOR_RGB
 
 
-def _line_quads_in_rect(page: pymupdf.Page, rect: pymupdf.Rect) -> list[pymupdf.Quad]:
-    """Return tight per-line quads for any text inside ``rect``.
+def _chunk_quads_for_sentence(
+    page: pymupdf.Page, rect: pymupdf.Rect, sentence: str
+) -> list[pymupdf.Quad]:
+    """Locate a sentence piecewise via short word-window probes.
 
-    PyMuPDF's dict layout reports line-level bounding boxes that hug the
-    actual glyph extent, so highlights do not inflate into left/right
-    margins.
+    A whole-sentence ``search_for`` usually fails when the sentence wraps
+    across lines (the on-page text has line breaks / hyphenation that the
+    whitespace-normalised sentence string does not). We instead walk the
+    sentence in ~60-char word windows; each window almost always lives on
+    a single line, so ``search_for`` matches it and returns a tight quad.
+    Concatenating the windows' quads highlights *only* the sentence's
+    glyphs — never the surrounding paragraph.
     """
+    words = sentence.split()
     quads: list[pymupdf.Quad] = []
-    data = cast(dict, page.get_text("dict", clip=rect))
-    for blk in data.get("blocks", []):
-        if not isinstance(blk, dict) or blk.get("type") != 0:
-            continue
-        for line in blk.get("lines", []):
-            if not isinstance(line, dict):
-                continue
-            bb = line.get("bbox", (0, 0, 0, 0))
-            x0, y0, x1, y1 = (float(v) for v in bb)
-            if x1 <= x0 or y1 <= y0:
-                continue
-            quads.append(pymupdf.Rect(x0, y0, x1, y1).quad)
+    i = 0
+    while i < len(words):
+        window: list[str] = []
+        while i < len(words) and len(" ".join(window)) < 60:
+            window.append(words[i])
+            i += 1
+        probe = " ".join(window).strip()
+        if len(probe) < 8:
+            break
+        found = page.search_for(probe, clip=rect, quads=True)
+        if found:
+            quads.extend(found)
     return quads
 
 
 def _search_quads_for_sentence(
     page: pymupdf.Page, rect: pymupdf.Rect, sentence: str
 ) -> list[pymupdf.Quad]:
-    """Try PyMuPDF's text search for a sentence, with graceful fallbacks.
+    """Locate a sentence's glyphs, tightest-match first.
 
-    Returns an empty list when the sentence cannot be located — the
-    caller should then fall back to line-level quads within the clip.
+    1. Whole-sentence probes (fast path for single-line sentences).
+    2. Word-window chunks (handles sentences that wrap across lines).
+
+    Returns an empty list when the sentence cannot be located at all; the
+    caller decides whether to skip it. We deliberately do NOT fall back to
+    the paragraph's line boxes — that paints the entire paragraph and is
+    the source of the over-large block highlights.
     """
     probes: Iterable[str] = (
         sentence[:120] if len(sentence) > 120 else sentence,
@@ -53,35 +65,54 @@ def _search_quads_for_sentence(
         found = page.search_for(probe, clip=rect, quads=True)
         if found:
             return list(found)
-    return []
+    return _chunk_quads_for_sentence(page, rect, sentence)
 
 
-def apply_highlights(doc: pymupdf.Document, blocks: list[Block]) -> int:
-    """Overlay one highlight annotation per classified block. Returns count."""
+def apply_highlights(
+    doc: pymupdf.Document,
+    blocks: list[Block],
+    *,
+    min_confidence: float = 0.0,
+    on_info: Optional[Any] = None,
+) -> int:
+    """Overlay one highlight annotation per classified block. Returns count.
+
+    ``min_confidence`` skips any classified block whose confidence is below
+    the threshold, so a reader can thin out low-certainty highlights.
+
+    ``on_info`` (optional callable) receives periodic progress messages
+    while the per-sentence text search runs — this phase is CPU-bound and
+    otherwise silent, so without it a long PDF looks hung.
+    """
+    info = on_info or (lambda _msg: None)
+    candidates = [
+        b for b in blocks if b.category is not None and b.confidence >= min_confidence
+    ]
+    total = len(candidates)
+    info(f"      locating {total} sentence(s) to highlight across the PDF")
     added = 0
-    for b in blocks:
-        if b.category is None:
-            continue
+    for i, b in enumerate(candidates, start=1):
+        assert b.category is not None  # candidates filter guarantees this
         page = doc[b.page]
         rect = pymupdf.Rect(*b.bbox)
 
-        # Prefer sentence-level tight quads via text search; fall back to
-        # line-level bounding boxes within the clip; last-resort use the
-        # raw clip rect.
+        # Tight, glyph-hugging quads for the sentence's own text only. We do
+        # NOT fall back to the paragraph's line boxes: the bbox is the whole
+        # paragraph (sentence units share their paragraph's rect), so a line
+        # fill would paint every line of the paragraph — the over-large block
+        # highlight. If the sentence can't be located, skip it.
         quads = _search_quads_for_sentence(page, rect, b.text)
         if not quads:
-            quads = _line_quads_in_rect(page, rect)
-        if not quads:
-            quads = [rect.quad]
+            continue
 
         annot = page.add_highlight_annot(quads)
         annot.set_colors(stroke=COLOR_RGB[b.category])
-        annot.set_info(
-            title="scitex-scholar",
-            content=f"{b.category} (conf={b.confidence:.2f})",
-        )
+        # No popup note/comment: a bare highlight keeps the page clean (the
+        # colour legend already explains what each colour means).
         annot.update(opacity=0.4)
         added += 1
+        if i % 100 == 0 or i == total:
+            info(f"      located {i}/{total} ({added} highlighted)")
     return added
 
 

@@ -92,6 +92,29 @@ CategorizedGroup = _RootGroup  # used by @click.group(cls=...)
 
 CONTEXT_SETTINGS = {"help_option_names": ["-h", "--help"]}
 
+
+class _IntOrHelp(click.ParamType):
+    """An integer option type that treats ``-h``/``--help`` as a help request.
+
+    Click consumes the token after a value-taking option as that option's
+    value, so ``--batch-size -h`` would otherwise fail with "not a valid
+    integer". Here we detect a help token and print the command help instead.
+    """
+
+    name = "integer"
+
+    def convert(self, value, param, ctx):
+        if isinstance(value, str) and value in ("-h", "--help"):
+            click.echo(ctx.get_help())
+            ctx.exit()
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            self.fail(f"{value!r} is not a valid integer", param, ctx)
+
+
+_INT_OR_HELP = _IntOrHelp()
+
 COMMAND_CATEGORIES = [
     ("Paper", ["paper"]),
     ("Bibtex", ["bibtex"]),
@@ -613,7 +636,12 @@ def pdf() -> None:
 
 
 def _pdf_highlight_options(f):
-    f = click.argument("pdf_path", type=click.Path(dir_okay=False, path_type=Path))(f)
+    f = click.argument(
+        "pdf_paths",
+        nargs=-1,
+        required=True,
+        type=click.Path(dir_okay=False, path_type=Path),
+    )(f)
     f = click.option(
         "-o",
         "--output",
@@ -621,24 +649,72 @@ def _pdf_highlight_options(f):
         type=click.Path(dir_okay=False, path_type=Path),
         help="Output PDF (default: <input>.highlighted.pdf).",
     )(f)
-    f = click.option("--model", default="claude-haiku-4-5-20251001", show_default=True)(
-        f
-    )
+    f = click.option(
+        "--model",
+        default="claude-haiku-4-5-20251001",
+        show_default=True,
+        help="Anthropic model ID for classification. An unknown ID lists the "
+        "available models.",
+    )(f)
     f = click.option(
         "--stub", is_flag=True, help="Use offline keyword heuristic (no API calls)."
     )(f)
     f = click.option(
         "--dry-run", is_flag=True, help="Classify and print summary; do not write."
     )(f)
-    f = click.option("--yes", "-y", is_flag=True)(f)
-    f = click.option("--max-blocks", type=int, default=0)(f)
-    f = click.option("--batch-size", type=int, default=25)(f)
-    f = click.option("--min-chars", type=int, default=40)(f)
     f = click.option(
-        "--labels-dump", default=None, type=click.Path(dir_okay=False, path_type=Path)
+        "--yes",
+        "-y",
+        is_flag=True,
+        help="Assume yes to prompts; do not ask for confirmation.",
     )(f)
     f = click.option(
-        "--labels-apply", default=None, type=click.Path(dir_okay=False, path_type=Path)
+        "--max-blocks",
+        type=_INT_OR_HELP,
+        default=0,
+        show_default=True,
+        help="Classify only the first N text blocks (0 = all). For smoke tests.",
+    )(f)
+    f = click.option(
+        "--batch-size",
+        type=_INT_OR_HELP,
+        default=25,
+        show_default=True,
+        help="Number of text blocks sent to the model per API request.",
+    )(f)
+    f = click.option(
+        "--min-chars",
+        type=_INT_OR_HELP,
+        default=40,
+        show_default=True,
+        help="Skip text blocks shorter than this many characters.",
+    )(f)
+    f = click.option(
+        "--min-confidence",
+        type=float,
+        default=0.0,
+        show_default=True,
+        help="Skip highlights below this model confidence (0-1). "
+        "Try 0.85 to keep only high-certainty highlights.",
+    )(f)
+    f = click.option(
+        "--concurrency",
+        type=_INT_OR_HELP,
+        default=4,
+        show_default=True,
+        help="Classification batches sent to the model in parallel.",
+    )(f)
+    f = click.option(
+        "--labels-dump",
+        default=None,
+        type=click.Path(dir_okay=False, path_type=Path),
+        help="Write extracted blocks to this JSON file and exit (no API calls).",
+    )(f)
+    f = click.option(
+        "--labels-apply",
+        default=None,
+        type=click.Path(dir_okay=False, path_type=Path),
+        help="Apply pre-computed labels from this JSON file (no API calls).",
     )(f)
     return f
 
@@ -646,7 +722,7 @@ def _pdf_highlight_options(f):
 @pdf.command("highlight")
 @_pdf_highlight_options
 def pdf_highlight(
-    pdf_path,
+    pdf_paths,
     output,
     model,
     stub,
@@ -655,17 +731,24 @@ def pdf_highlight(
     max_blocks,
     batch_size,
     min_chars,
+    min_confidence,
+    concurrency,
     labels_dump,
     labels_apply,
 ):
-    """Overlay semantic highlights on a PDF.
+    """Overlay semantic highlights on one or more PDFs.
+
+    Accepts multiple paths (e.g. a shell glob), so ``*.pdf`` highlights a
+    whole directory in one invocation. Already-highlighted outputs
+    (``*.highlighted.pdf``) are skipped automatically.
 
     \b
     Example:
       $ scitex-scholar pdf highlight paper.pdf --stub
+      $ scitex-scholar pdf highlight refs/*.pdf
     """
     return _do_pdf_highlight(
-        pdf_path=pdf_path,
+        pdf_paths=pdf_paths,
         output=output,
         model=model,
         stub=stub,
@@ -673,6 +756,8 @@ def pdf_highlight(
         max_blocks=max_blocks,
         batch_size=batch_size,
         min_chars=min_chars,
+        min_confidence=min_confidence,
+        concurrency=concurrency,
         labels_dump=labels_dump,
         labels_apply=labels_apply,
     )
@@ -680,7 +765,7 @@ def pdf_highlight(
 
 def _do_pdf_highlight(
     *,
-    pdf_path,
+    pdf_paths,
     output,
     model,
     stub,
@@ -688,26 +773,70 @@ def _do_pdf_highlight(
     max_blocks,
     batch_size,
     min_chars,
+    min_confidence,
+    concurrency,
     labels_dump,
     labels_apply,
 ):
     from types import SimpleNamespace
 
+    from scitex_logging import getLogger
+
     from .pdf_highlight._cli import run as _run
 
-    ns = SimpleNamespace(
-        pdf=Path(pdf_path),
-        output=Path(output) if output else None,
-        model=model,
-        stub=stub,
-        dry_run=dry_run,
-        max_blocks=max_blocks,
-        batch_size=batch_size,
-        min_chars=min_chars,
-        labels_dump=Path(labels_dump) if labels_dump else None,
-        labels_apply=Path(labels_apply) if labels_apply else None,
-    )
-    sys.exit(_run(ns))
+    logger = getLogger(__name__)
+
+    # Skip already-highlighted outputs and de-dup (a glob commonly catches
+    # both a file and the symlink pointing at it).
+    seen: set[Path] = set()
+    targets: list[Path] = []
+    for p in pdf_paths:
+        rp = Path(p).resolve()
+        if rp.name.endswith(".highlighted.pdf"):
+            logger.info(f"skipping already-highlighted file: {p}")
+            continue
+        if rp in seen:
+            continue
+        seen.add(rp)
+        targets.append(Path(p))
+
+    if not targets:
+        logger.fail("no PDFs to highlight after filtering")
+        sys.exit(2)
+
+    # Single-input-only flags are ambiguous across a batch — fail loud
+    # rather than silently applying one output path to many inputs.
+    if len(targets) > 1:
+        for flag, val in (
+            ("--output", output),
+            ("--labels-dump", labels_dump),
+            ("--labels-apply", labels_apply),
+        ):
+            if val:
+                logger.fail(f"{flag} cannot be used with multiple input PDFs")
+                sys.exit(2)
+
+    multi = len(targets) > 1
+    rc = 0
+    for idx, pdf_path in enumerate(targets, start=1):
+        if multi:
+            logger.info(f"=== [{idx}/{len(targets)}] {pdf_path} ===")
+        ns = SimpleNamespace(
+            pdf=Path(pdf_path),
+            output=Path(output) if output else None,
+            model=model,
+            stub=stub,
+            dry_run=dry_run,
+            max_blocks=max_blocks,
+            batch_size=batch_size,
+            min_chars=min_chars,
+            min_confidence=min_confidence,
+            concurrency=concurrency,
+            labels_dump=Path(labels_dump) if labels_dump else None,
+            labels_apply=Path(labels_apply) if labels_apply else None,
+        )
+        rc = _run(ns) or rc
+    sys.exit(rc)
 
 
 # ---------------------------------------------------------------------------
@@ -2672,7 +2801,7 @@ def alias_parallel(
 @cli.command("highlight", hidden=True, context_settings=CONTEXT_SETTINGS)
 @_pdf_highlight_options
 def alias_highlight(
-    pdf_path,
+    pdf_paths,
     output,
     model,
     stub,
@@ -2681,13 +2810,15 @@ def alias_highlight(
     max_blocks,
     batch_size,
     min_chars,
+    min_confidence,
+    concurrency,
     labels_dump,
     labels_apply,
 ):
     """DEPRECATED: alias for `pdf highlight`."""
     _warn_deprecated("highlight", "pdf highlight")
     return _do_pdf_highlight(
-        pdf_path=pdf_path,
+        pdf_paths=pdf_paths,
         output=output,
         model=model,
         stub=stub,
@@ -2695,6 +2826,8 @@ def alias_highlight(
         max_blocks=max_blocks,
         batch_size=batch_size,
         min_chars=min_chars,
+        min_confidence=min_confidence,
+        concurrency=concurrency,
         labels_dump=labels_dump,
         labels_apply=labels_apply,
     )
