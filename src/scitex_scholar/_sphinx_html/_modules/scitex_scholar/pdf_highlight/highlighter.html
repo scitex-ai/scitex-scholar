@@ -139,12 +139,17 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/index.html#module-scitex_scholar.pdf_highlight._classifier">Classifier</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier._available_models"><code class="docutils literal notranslate"><span class="pre">_available_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier._model_not_found_error"><code class="docutils literal notranslate"><span class="pre">_model_not_found_error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier._retry_wait_seconds"><code class="docutils literal notranslate"><span class="pre">_retry_wait_seconds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier._classify_one_batch"><code class="docutils literal notranslate"><span class="pre">_classify_one_batch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier._apply_predictions"><code class="docutils literal notranslate"><span class="pre">_apply_predictions()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier.classify_llm"><code class="docutils literal notranslate"><span class="pre">classify_llm()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier.classify_stub"><code class="docutils literal notranslate"><span class="pre">classify_stub()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/index.html#module-scitex_scholar.pdf_highlight._annotator">Annotator</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._annotator._line_quads_in_rect"><code class="docutils literal notranslate"><span class="pre">_line_quads_in_rect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._annotator._chunk_quads_for_sentence"><code class="docutils literal notranslate"><span class="pre">_chunk_quads_for_sentence()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._annotator._search_quads_for_sentence"><code class="docutils literal notranslate"><span class="pre">_search_quads_for_sentence()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._annotator.apply_highlights"><code class="docutils literal notranslate"><span class="pre">apply_highlights()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._annotator._corner_rect"><code class="docutils literal notranslate"><span class="pre">_corner_rect()</span></code></a></li>
@@ -520,7 +525,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">._annotator</span><span class="w"> </span><span class="kn">import</span> <span class="n">add_legend_page</span><span class="p">,</span> <span class="n">apply_highlights</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">._blocks</span><span class="w"> </span><span class="kn">import</span> <span class="n">Block</span><span class="p">,</span> <span class="n">extract_blocks</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">._classifier</span><span class="w"> </span><span class="kn">import</span> <span class="n">classify_llm</span><span class="p">,</span> <span class="n">classify_stub</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._classifier</span><span class="w"> </span><span class="kn">import</span> <span class="n">API_KEY_ENV</span><span class="p">,</span> <span class="n">classify_llm</span><span class="p">,</span> <span class="n">classify_stub</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">._colors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CATEGORIES</span><span class="p">,</span> <span class="n">CATEGORY_LABELS</span><span class="p">,</span> <span class="n">COLOR_RGB</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
@@ -589,16 +594,31 @@
     <span class="n">signature</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">model_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">source_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">min_confidence</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">on_info</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Write ``doc`` with highlight annotations for all labelled blocks.</span>
 
 <span class="sd">    When ``add_legend=True`` (default) a colour legend + signature page is</span>
-<span class="sd">    prepended so readers can see which colour means what.</span>
+<span class="sd">    prepended so readers can see which colour means what. ``min_confidence``</span>
+<span class="sd">    suppresses highlights below that confidence.</span>
+
+<span class="sd">    ``on_info`` (optional callable) receives progress messages.</span>
+
+<span class="sd">    The save deliberately uses ``garbage=0, deflate=False``. The earlier</span>
+<span class="sd">    ``garbage=3, deflate=True`` recompressed every stream of the source</span>
+<span class="sd">    PDF, which on a large (20 MB+) image-heavy paper ran for minutes</span>
+<span class="sd">    entirely inside pymupdf&#39;s C code — and because CPython only delivers</span>
+<span class="sd">    ``KeyboardInterrupt`` between bytecode ops, that made the run both</span>
+<span class="sd">    slow *and* uninterruptible (Ctrl-C queued but never fired). Appending</span>
+<span class="sd">    the annotation objects without recompression is near-instant and keeps</span>
+<span class="sd">    the C calls short enough to stay responsive to signals.</span>
 
 <span class="sd">    Returns the number of highlight annotations added (not counting the</span>
 <span class="sd">    legend page).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="n">apply_highlights</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">blocks</span><span class="p">)</span>
+    <span class="n">info</span> <span class="o">=</span> <span class="n">on_info</span> <span class="ow">or</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">_msg</span><span class="p">:</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">apply_highlights</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">blocks</span><span class="p">,</span> <span class="n">min_confidence</span><span class="o">=</span><span class="n">min_confidence</span><span class="p">,</span> <span class="n">on_info</span><span class="o">=</span><span class="n">on_info</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">add_legend</span><span class="p">:</span>
         <span class="n">add_legend_page</span><span class="p">(</span>
             <span class="n">doc</span><span class="p">,</span>
@@ -606,7 +626,11 @@
             <span class="n">model_label</span><span class="o">=</span><span class="n">model_label</span><span class="p">,</span>
             <span class="n">source_name</span><span class="o">=</span><span class="n">source_name</span> <span class="ow">or</span> <span class="s2">&quot;(unknown)&quot;</span><span class="p">,</span>
         <span class="p">)</span>
-    <span class="n">doc</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">output_path</span><span class="p">),</span> <span class="n">garbage</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">deflate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
+    <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;      writing </span><span class="si">{</span><span class="n">doc</span><span class="o">.</span><span class="n">page_count</span><span class="si">}</span><span class="s2"> pages → </span><span class="si">{</span><span class="n">out</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">doc</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">garbage</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">deflate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">size_mb</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="o">/</span> <span class="mf">1e6</span>
+    <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;      wrote </span><span class="si">{</span><span class="n">size_mb</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MB&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">n</span></div>
 
 
@@ -646,6 +670,8 @@
     <span class="n">min_chars</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">40</span><span class="p">,</span>
     <span class="n">sentence_level</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">add_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">min_confidence</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">concurrency</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
     <span class="n">on_info</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">on_warning</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HighlightResult</span><span class="p">:</span>
@@ -699,11 +725,20 @@
     <span class="k">if</span> <span class="n">use_stub</span><span class="p">:</span>
         <span class="n">classify_stub</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ANTHROPIC_API_KEY&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">API_KEY_ENV</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="s2">&quot;ANTHROPIC_API_KEY is not set (or call with use_stub=True)&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">API_KEY_ENV</span><span class="si">}</span><span class="s2"> is not set (or call with use_stub=True). &quot;</span>
+                <span class="s2">&quot;Scholar uses a namespaced key and does not read the ambient &quot;</span>
+                <span class="s2">&quot;ANTHROPIC_API_KEY.&quot;</span>
             <span class="p">)</span>
-        <span class="n">classify_llm</span><span class="p">(</span><span class="n">blocks</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">on_warning</span><span class="o">=</span><span class="n">warn</span><span class="p">)</span>
+        <span class="n">classify_llm</span><span class="p">(</span>
+            <span class="n">blocks</span><span class="p">,</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+            <span class="n">concurrency</span><span class="o">=</span><span class="n">concurrency</span><span class="p">,</span>
+            <span class="n">on_warning</span><span class="o">=</span><span class="n">warn</span><span class="p">,</span>
+            <span class="n">on_info</span><span class="o">=</span><span class="n">info</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="n">added</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">if</span> <span class="n">dry_run</span><span class="p">:</span>
@@ -718,6 +753,8 @@
             <span class="n">add_legend</span><span class="o">=</span><span class="n">add_legend</span><span class="p">,</span>
             <span class="n">model_label</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span> <span class="k">if</span> <span class="n">use_stub</span> <span class="k">else</span> <span class="n">model</span><span class="p">),</span>
             <span class="n">source_name</span><span class="o">=</span><span class="n">pdf</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">min_confidence</span><span class="o">=</span><span class="n">min_confidence</span><span class="p">,</span>
+            <span class="n">on_info</span><span class="o">=</span><span class="n">info</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;      added </span><span class="si">{</span><span class="n">added</span><span class="si">}</span><span class="s2"> highlight annotations&quot;</span><span class="p">)</span>
 

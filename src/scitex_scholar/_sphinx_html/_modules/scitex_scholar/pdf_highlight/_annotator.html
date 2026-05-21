@@ -139,12 +139,17 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/index.html#module-scitex_scholar.pdf_highlight._classifier">Classifier</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier._available_models"><code class="docutils literal notranslate"><span class="pre">_available_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier._model_not_found_error"><code class="docutils literal notranslate"><span class="pre">_model_not_found_error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier._retry_wait_seconds"><code class="docutils literal notranslate"><span class="pre">_retry_wait_seconds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier._classify_one_batch"><code class="docutils literal notranslate"><span class="pre">_classify_one_batch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier._apply_predictions"><code class="docutils literal notranslate"><span class="pre">_apply_predictions()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier.classify_llm"><code class="docutils literal notranslate"><span class="pre">classify_llm()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier.classify_stub"><code class="docutils literal notranslate"><span class="pre">classify_stub()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/index.html#module-scitex_scholar.pdf_highlight._annotator">Annotator</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._annotator._line_quads_in_rect"><code class="docutils literal notranslate"><span class="pre">_line_quads_in_rect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._annotator._chunk_quads_for_sentence"><code class="docutils literal notranslate"><span class="pre">_chunk_quads_for_sentence()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._annotator._search_quads_for_sentence"><code class="docutils literal notranslate"><span class="pre">_search_quads_for_sentence()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._annotator.apply_highlights"><code class="docutils literal notranslate"><span class="pre">apply_highlights()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._annotator._corner_rect"><code class="docutils literal notranslate"><span class="pre">_corner_rect()</span></code></a></li>
@@ -500,7 +505,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">pymupdf</span>
 
@@ -508,28 +513,35 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">._colors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CATEGORIES</span><span class="p">,</span> <span class="n">CATEGORY_LABELS</span><span class="p">,</span> <span class="n">COLOR_RGB</span>
 
 
-<div class="viewcode-block" id="_line_quads_in_rect">
-<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.pdf_highlight._annotator._line_quads_in_rect">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">_line_quads_in_rect</span><span class="p">(</span><span class="n">page</span><span class="p">:</span> <span class="n">pymupdf</span><span class="o">.</span><span class="n">Page</span><span class="p">,</span> <span class="n">rect</span><span class="p">:</span> <span class="n">pymupdf</span><span class="o">.</span><span class="n">Rect</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">pymupdf</span><span class="o">.</span><span class="n">Quad</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return tight per-line quads for any text inside ``rect``.</span>
+<div class="viewcode-block" id="_chunk_quads_for_sentence">
+<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.pdf_highlight._annotator._chunk_quads_for_sentence">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_chunk_quads_for_sentence</span><span class="p">(</span>
+    <span class="n">page</span><span class="p">:</span> <span class="n">pymupdf</span><span class="o">.</span><span class="n">Page</span><span class="p">,</span> <span class="n">rect</span><span class="p">:</span> <span class="n">pymupdf</span><span class="o">.</span><span class="n">Rect</span><span class="p">,</span> <span class="n">sentence</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">pymupdf</span><span class="o">.</span><span class="n">Quad</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Locate a sentence piecewise via short word-window probes.</span>
 
-<span class="sd">    PyMuPDF&#39;s dict layout reports line-level bounding boxes that hug the</span>
-<span class="sd">    actual glyph extent, so highlights do not inflate into left/right</span>
-<span class="sd">    margins.</span>
+<span class="sd">    A whole-sentence ``search_for`` usually fails when the sentence wraps</span>
+<span class="sd">    across lines (the on-page text has line breaks / hyphenation that the</span>
+<span class="sd">    whitespace-normalised sentence string does not). We instead walk the</span>
+<span class="sd">    sentence in ~60-char word windows; each window almost always lives on</span>
+<span class="sd">    a single line, so ``search_for`` matches it and returns a tight quad.</span>
+<span class="sd">    Concatenating the windows&#39; quads highlights *only* the sentence&#39;s</span>
+<span class="sd">    glyphs — never the surrounding paragraph.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">words</span> <span class="o">=</span> <span class="n">sentence</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
     <span class="n">quads</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">pymupdf</span><span class="o">.</span><span class="n">Quad</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">page</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="s2">&quot;dict&quot;</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="n">rect</span><span class="p">))</span>
-    <span class="k">for</span> <span class="n">blk</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;blocks&quot;</span><span class="p">,</span> <span class="p">[]):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blk</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">or</span> <span class="n">blk</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">continue</span>
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">blk</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lines&quot;</span><span class="p">,</span> <span class="p">[]):</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                <span class="k">continue</span>
-            <span class="n">bb</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bbox&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-            <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span> <span class="o">=</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">bb</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">x1</span> <span class="o">&lt;=</span> <span class="n">x0</span> <span class="ow">or</span> <span class="n">y1</span> <span class="o">&lt;=</span> <span class="n">y0</span><span class="p">:</span>
-                <span class="k">continue</span>
-            <span class="n">quads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pymupdf</span><span class="o">.</span><span class="n">Rect</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">)</span><span class="o">.</span><span class="n">quad</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">):</span>
+        <span class="n">window</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">window</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">60</span><span class="p">:</span>
+            <span class="n">window</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">probe</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">window</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">probe</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">search_for</span><span class="p">(</span><span class="n">probe</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="n">rect</span><span class="p">,</span> <span class="n">quads</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">found</span><span class="p">:</span>
+            <span class="n">quads</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">found</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">quads</span></div>
 
 
@@ -539,10 +551,15 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_search_quads_for_sentence</span><span class="p">(</span>
     <span class="n">page</span><span class="p">:</span> <span class="n">pymupdf</span><span class="o">.</span><span class="n">Page</span><span class="p">,</span> <span class="n">rect</span><span class="p">:</span> <span class="n">pymupdf</span><span class="o">.</span><span class="n">Rect</span><span class="p">,</span> <span class="n">sentence</span><span class="p">:</span> <span class="nb">str</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">pymupdf</span><span class="o">.</span><span class="n">Quad</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Try PyMuPDF&#39;s text search for a sentence, with graceful fallbacks.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Locate a sentence&#39;s glyphs, tightest-match first.</span>
 
-<span class="sd">    Returns an empty list when the sentence cannot be located — the</span>
-<span class="sd">    caller should then fall back to line-level quads within the clip.</span>
+<span class="sd">    1. Whole-sentence probes (fast path for single-line sentences).</span>
+<span class="sd">    2. Word-window chunks (handles sentences that wrap across lines).</span>
+
+<span class="sd">    Returns an empty list when the sentence cannot be located at all; the</span>
+<span class="sd">    caller decides whether to skip it. We deliberately do NOT fall back to</span>
+<span class="sd">    the paragraph&#39;s line boxes — that paints the entire paragraph and is</span>
+<span class="sd">    the source of the over-large block highlights.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">probes</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">sentence</span><span class="p">[:</span><span class="mi">120</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sentence</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">120</span> <span class="k">else</span> <span class="n">sentence</span><span class="p">,</span>
@@ -556,38 +573,57 @@
         <span class="n">found</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">search_for</span><span class="p">(</span><span class="n">probe</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="n">rect</span><span class="p">,</span> <span class="n">quads</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">found</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">found</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">[]</span></div>
+    <span class="k">return</span> <span class="n">_chunk_quads_for_sentence</span><span class="p">(</span><span class="n">page</span><span class="p">,</span> <span class="n">rect</span><span class="p">,</span> <span class="n">sentence</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="apply_highlights">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.pdf_highlight._annotator.apply_highlights">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">apply_highlights</span><span class="p">(</span><span class="n">doc</span><span class="p">:</span> <span class="n">pymupdf</span><span class="o">.</span><span class="n">Document</span><span class="p">,</span> <span class="n">blocks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Block</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Overlay one highlight annotation per classified block. Returns count.&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">apply_highlights</span><span class="p">(</span>
+    <span class="n">doc</span><span class="p">:</span> <span class="n">pymupdf</span><span class="o">.</span><span class="n">Document</span><span class="p">,</span>
+    <span class="n">blocks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">min_confidence</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">on_info</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Overlay one highlight annotation per classified block. Returns count.</span>
+
+<span class="sd">    ``min_confidence`` skips any classified block whose confidence is below</span>
+<span class="sd">    the threshold, so a reader can thin out low-certainty highlights.</span>
+
+<span class="sd">    ``on_info`` (optional callable) receives periodic progress messages</span>
+<span class="sd">    while the per-sentence text search runs — this phase is CPU-bound and</span>
+<span class="sd">    otherwise silent, so without it a long PDF looks hung.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">info</span> <span class="o">=</span> <span class="n">on_info</span> <span class="ow">or</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">_msg</span><span class="p">:</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">candidates</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">b</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span> <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">category</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">b</span><span class="o">.</span><span class="n">confidence</span> <span class="o">&gt;=</span> <span class="n">min_confidence</span>
+    <span class="p">]</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">candidates</span><span class="p">)</span>
+    <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;      locating </span><span class="si">{</span><span class="n">total</span><span class="si">}</span><span class="s2"> sentence(s) to highlight across the PDF&quot;</span><span class="p">)</span>
     <span class="n">added</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">category</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">continue</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">candidates</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">b</span><span class="o">.</span><span class="n">category</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>  <span class="c1"># candidates filter guarantees this</span>
         <span class="n">page</span> <span class="o">=</span> <span class="n">doc</span><span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">page</span><span class="p">]</span>
         <span class="n">rect</span> <span class="o">=</span> <span class="n">pymupdf</span><span class="o">.</span><span class="n">Rect</span><span class="p">(</span><span class="o">*</span><span class="n">b</span><span class="o">.</span><span class="n">bbox</span><span class="p">)</span>
 
-        <span class="c1"># Prefer sentence-level tight quads via text search; fall back to</span>
-        <span class="c1"># line-level bounding boxes within the clip; last-resort use the</span>
-        <span class="c1"># raw clip rect.</span>
+        <span class="c1"># Tight, glyph-hugging quads for the sentence&#39;s own text only. We do</span>
+        <span class="c1"># NOT fall back to the paragraph&#39;s line boxes: the bbox is the whole</span>
+        <span class="c1"># paragraph (sentence units share their paragraph&#39;s rect), so a line</span>
+        <span class="c1"># fill would paint every line of the paragraph — the over-large block</span>
+        <span class="c1"># highlight. If the sentence can&#39;t be located, skip it.</span>
         <span class="n">quads</span> <span class="o">=</span> <span class="n">_search_quads_for_sentence</span><span class="p">(</span><span class="n">page</span><span class="p">,</span> <span class="n">rect</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">quads</span><span class="p">:</span>
-            <span class="n">quads</span> <span class="o">=</span> <span class="n">_line_quads_in_rect</span><span class="p">(</span><span class="n">page</span><span class="p">,</span> <span class="n">rect</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">quads</span><span class="p">:</span>
-            <span class="n">quads</span> <span class="o">=</span> <span class="p">[</span><span class="n">rect</span><span class="o">.</span><span class="n">quad</span><span class="p">]</span>
+            <span class="k">continue</span>
 
         <span class="n">annot</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">add_highlight_annot</span><span class="p">(</span><span class="n">quads</span><span class="p">)</span>
         <span class="n">annot</span><span class="o">.</span><span class="n">set_colors</span><span class="p">(</span><span class="n">stroke</span><span class="o">=</span><span class="n">COLOR_RGB</span><span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">category</span><span class="p">])</span>
-        <span class="n">annot</span><span class="o">.</span><span class="n">set_info</span><span class="p">(</span>
-            <span class="n">title</span><span class="o">=</span><span class="s2">&quot;scitex-scholar&quot;</span><span class="p">,</span>
-            <span class="n">content</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">b</span><span class="o">.</span><span class="n">category</span><span class="si">}</span><span class="s2"> (conf=</span><span class="si">{</span><span class="n">b</span><span class="o">.</span><span class="n">confidence</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="c1"># No popup note/comment: a bare highlight keeps the page clean (the</span>
+        <span class="c1"># colour legend already explains what each colour means).</span>
         <span class="n">annot</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">opacity</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
         <span class="n">added</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">==</span> <span class="n">total</span><span class="p">:</span>
+            <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;      located </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">total</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">added</span><span class="si">}</span><span class="s2"> highlighted)&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">added</span></div>
 
 

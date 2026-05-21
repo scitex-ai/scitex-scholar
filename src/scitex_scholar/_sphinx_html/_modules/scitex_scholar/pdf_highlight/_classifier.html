@@ -139,12 +139,17 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/index.html#module-scitex_scholar.pdf_highlight._classifier">Classifier</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier._available_models"><code class="docutils literal notranslate"><span class="pre">_available_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier._model_not_found_error"><code class="docutils literal notranslate"><span class="pre">_model_not_found_error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier._retry_wait_seconds"><code class="docutils literal notranslate"><span class="pre">_retry_wait_seconds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier._classify_one_batch"><code class="docutils literal notranslate"><span class="pre">_classify_one_batch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier._apply_predictions"><code class="docutils literal notranslate"><span class="pre">_apply_predictions()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier.classify_llm"><code class="docutils literal notranslate"><span class="pre">classify_llm()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier.classify_stub"><code class="docutils literal notranslate"><span class="pre">classify_stub()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/index.html#module-scitex_scholar.pdf_highlight._annotator">Annotator</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._annotator._line_quads_in_rect"><code class="docutils literal notranslate"><span class="pre">_line_quads_in_rect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._annotator._chunk_quads_for_sentence"><code class="docutils literal notranslate"><span class="pre">_chunk_quads_for_sentence()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._annotator._search_quads_for_sentence"><code class="docutils literal notranslate"><span class="pre">_search_quads_for_sentence()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._annotator.apply_highlights"><code class="docutils literal notranslate"><span class="pre">apply_highlights()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._annotator._corner_rect"><code class="docutils literal notranslate"><span class="pre">_corner_rect()</span></code></a></li>
@@ -501,36 +506,53 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="c1"># Namespaced so Scholar never silently consumes an ambient ANTHROPIC_API_KEY</span>
+<span class="c1"># (&quot;surprise use&quot;); the key must be set explicitly under the SciTeX Scholar</span>
+<span class="c1"># namespace. Mirrors the SCITEX_*/SAC_* convention used across the ecosystem.</span>
+<span class="n">API_KEY_ENV</span> <span class="o">=</span> <span class="s2">&quot;SCITEX_SCHOLAR_ANTHROPIC_API_KEY&quot;</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">._blocks</span><span class="w"> </span><span class="kn">import</span> <span class="n">Block</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">._colors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CATEGORIES</span>
 
-<span class="n">CLASSIFIER_SYSTEM</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;You tag sentences from an academic paper into at most one of these rhetorical categories. Emit &quot;none&quot; when nothing clearly fits — precision matters more than recall.</span>
+<span class="n">CLASSIFIER_SYSTEM</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;You tag sentences from an academic paper into at most one of these rhetorical categories. Be highly selective: the goal is a reader&#39;s highlighter, not a coverage map. The strong default is &quot;none&quot;. Most sentences — usually the large majority — are &quot;none&quot;. Only mark a sentence if a busy expert skimming the paper would deliberately underline it. When in doubt, &quot;none&quot;.</span>
 
 <span class="s2">Categories (use these exact strings):</span>
-<span class="s2">  focal_claim            — THIS paper states, clarifies, suggests, demonstrates, establishes, or</span>
-<span class="s2">                           reports a finding, result, or interpretation of its own. First-person</span>
-<span class="s2">                           stance markers (&quot;we show/find/demonstrate/suggest/clarify/establish&quot;,</span>
-<span class="s2">                           &quot;our results&quot;, &quot;this finding&quot;, &quot;these data indicate&quot;) are strong signals.</span>
-<span class="s2">                           Quantitative results (&quot;β = -1.5&quot;, &quot;5/6 subjects&quot;, &quot;accuracy 0.85&quot;) are</span>
-<span class="s2">                           usually claims when attached to the paper&#39;s own analysis.</span>
-<span class="s2">  focal_method           — description of THIS paper&#39;s own novel method, model, cohort, or analysis</span>
-<span class="s2">                           pipeline. NOT routine study logistics. NOT background on existing methods.</span>
-<span class="s2">  focal_limitation       — self-admitted limitation, caveat, confound, or threat to validity of</span>
-<span class="s2">                           THIS paper. Hedging that names a weakness in the paper&#39;s own work.</span>
+<span class="s2">  focal_claim            — a HEADLINE finding, result, or interpretation of THIS paper: something</span>
+<span class="s2">                           novel, surprising, or central to its conclusions. First-person stance</span>
+<span class="s2">                           markers (&quot;we show/find/demonstrate/establish&quot;, &quot;our results&quot;,</span>
+<span class="s2">                           &quot;these data indicate&quot;) plus a substantive result are strong signals.</span>
+<span class="s2">                           Mark the sentence that STATES the finding, not every sentence that</span>
+<span class="s2">                           restates or elaborates it. One claim per distinct finding — do not</span>
+<span class="s2">                           highlight a result and its three follow-up sentences.</span>
+<span class="s2">                           NOT routine or secondary numbers; NOT setup or transitions.</span>
+<span class="s2">  focal_method           — ONLY the one or few sentences that name THIS paper&#39;s core methodological</span>
+<span class="s2">                           CONTRIBUTION (the novel model/algorithm/design that makes the paper new).</span>
+<span class="s2">                           This is rare — typically a handful per paper. Routine procedure,</span>
+<span class="s2">                           parameter settings, software used, cohort logistics, and standard</span>
+<span class="s2">                           analysis steps are &quot;none&quot;, even when phrased in the first person.</span>
+<span class="s2">                           If you are tempted to mark many method sentences, mark none of them.</span>
+<span class="s2">  focal_limitation       — a self-admitted limitation, caveat, confound, or threat to validity of</span>
+<span class="s2">                           THIS paper&#39;s own work.</span>
 <span class="s2">  related_supportive     — a specific prior/other paper whose finding SUPPORTS this paper&#39;s position</span>
 <span class="s2">                           (&quot;consistent with X (2019)&quot;, &quot;as shown by Y&quot;, &quot;corroborates&quot;).</span>
 <span class="s2">  related_contradictive  — a specific prior/other paper whose finding CONTRADICTS this paper</span>
 <span class="s2">                           (&quot;in contrast to X&quot;, &quot;unlike Y&quot;, &quot;disagrees with&quot;).</span>
-<span class="s2">  none                   — background setup without a stance, reference list entries, headers,</span>
-<span class="s2">                           figure/table prose, boilerplate. Default when uncertain.</span>
+<span class="s2">  none                   — everything else: background, setup, transitions, routine procedure,</span>
+<span class="s2">                           reference entries, headers, figure/table prose, boilerplate. THE DEFAULT.</span>
 
-<span class="s2">Important: the priority is catching CLAIMS. If a sentence both describes a method and reports</span>
-<span class="s2">what that method yielded, prefer focal_claim. If a block mentions prior work but does not take a</span>
-<span class="s2">supportive or contradictive stance toward it, return &quot;none&quot;.</span>
+<span class="s2">Priority order when a sentence could fit two labels: focal_claim &gt; focal_limitation &gt;</span>
+<span class="s2">related_* &gt; focal_method. If a sentence both describes a method and reports what it yielded,</span>
+<span class="s2">prefer focal_claim. If it mentions prior work without taking a supportive or contradictive</span>
+<span class="s2">stance, return &quot;none&quot;.</span>
 
-<span class="s2">Confidence in [0,1]: &lt;0.5 = guess, &gt;0.8 = clear-cut.</span>
+<span class="s2">Confidence in [0,1], honestly calibrated: reserve &gt;0.85 for unambiguous, textbook-clear cases;</span>
+<span class="s2">0.5-0.7 means &quot;plausible but arguable&quot; — and for anything you would rate below ~0.6, prefer</span>
+<span class="s2">&quot;none&quot; outright. Do not inflate confidence to justify a label.</span>
 
 <span class="s2">Respond with ONLY a JSON array of objects: {&quot;id&quot;: int, &quot;category&quot;: str, &quot;confidence&quot;: float}. Include every input id exactly once.&quot;&quot;&quot;</span>
 
@@ -552,6 +574,127 @@
     <span class="k">return</span> <span class="n">raw</span>
 
 
+<div class="viewcode-block" id="_available_models">
+<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier._available_models">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_available_models</span><span class="p">(</span><span class="n">client</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Best-effort list of model IDs the account can call. Empty on failure.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">client</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">list</span><span class="p">()]</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+
+
+<div class="viewcode-block" id="_model_not_found_error">
+<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier._model_not_found_error">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_model_not_found_error</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a helpful error that hints the available model IDs.&quot;&quot;&quot;</span>
+    <span class="n">models</span> <span class="o">=</span> <span class="n">_available_models</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">models</span><span class="p">:</span>
+        <span class="n">hint</span> <span class="o">=</span> <span class="s2">&quot;available models:</span><span class="se">\n</span><span class="s2">  &quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">models</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">hint</span> <span class="o">=</span> <span class="s2">&quot;could not retrieve the list of available models&quot;</span>
+    <span class="k">return</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;unknown model: </span><span class="si">{</span><span class="n">model</span><span class="si">!r}</span><span class="se">\n</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_retry_wait_seconds">
+<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier._retry_wait_seconds">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_retry_wait_seconds</span><span class="p">(</span><span class="n">exc</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">cap</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Seconds to wait before the next retry.</span>
+
+<span class="sd">    Prefers the server&#39;s ``Retry-After`` header; otherwise uses exponential</span>
+<span class="sd">    backoff (``base * 2**attempt``, capped) with full jitter so concurrent</span>
+<span class="sd">    callers don&#39;t retry in lockstep.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">retry_after</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;retry-after&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">retry_after</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">retry_after</span><span class="p">))</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+        <span class="k">pass</span>
+    <span class="n">ceiling</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">cap</span><span class="p">,</span> <span class="n">base</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">attempt</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">ceiling</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">+</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_classify_one_batch">
+<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier._classify_one_batch">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_classify_one_batch</span><span class="p">(</span>
+    <span class="n">client</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">anthropic</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">batch</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span>
+    <span class="n">retryable</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span>
+    <span class="n">max_retries</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">backoff_base</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">backoff_cap</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">info</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Call the API for one batch, retrying transient errors with backoff.</span>
+
+<span class="sd">    Returns the message on success, or ``None`` if it stays unrecoverable</span>
+<span class="sd">    after ``max_retries``. Raises for non-retryable errors (bad model, other</span>
+<span class="sd">    4xx) so the whole run aborts on those.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">b</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">b</span><span class="o">.</span><span class="n">text</span><span class="p">}</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_retries</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">client</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+                <span class="n">max_tokens</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span>  <span class="c1"># stx-allow: STX-NL001</span>
+                <span class="n">system</span><span class="o">=</span><span class="n">CLASSIFIER_SYSTEM</span><span class="p">,</span>
+                <span class="n">messages</span><span class="o">=</span><span class="p">[</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Classify these </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span><span class="si">}</span><span class="s2"> units:</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span><span class="w"> </span><span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">),</span>
+                    <span class="p">}</span>
+                <span class="p">],</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="n">anthropic</span><span class="o">.</span><span class="n">NotFoundError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">_model_not_found_error</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">client</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+        <span class="k">except</span> <span class="n">retryable</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">attempt</span> <span class="o">&gt;=</span> <span class="n">max_retries</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="n">wait</span> <span class="o">=</span> <span class="n">_retry_wait_seconds</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="n">attempt</span><span class="p">,</span> <span class="n">backoff_base</span><span class="p">,</span> <span class="n">backoff_cap</span><span class="p">)</span>
+            <span class="n">kind</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;rate limited&quot;</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="n">anthropic</span><span class="o">.</span><span class="n">RateLimitError</span><span class="p">)</span>
+                <span class="k">else</span> <span class="s2">&quot;transient API error&quot;</span>
+            <span class="p">)</span>
+            <span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;      </span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s2">; waiting </span><span class="si">{</span><span class="n">wait</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">s then retrying &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;(attempt </span><span class="si">{</span><span class="n">attempt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">max_retries</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="p">)</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">wait</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">anthropic</span><span class="o">.</span><span class="n">APIStatusError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Anthropic API error (HTTP </span><span class="si">{</span><span class="n">exc</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">exc</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="_apply_predictions">
+<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier._apply_predictions">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_apply_predictions</span><span class="p">(</span><span class="n">batch</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span> <span class="n">raw</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse the model&#39;s JSON reply and write categories onto ``batch``.&quot;&quot;&quot;</span>
+    <span class="n">preds</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">_strip_code_fence</span><span class="p">(</span><span class="n">raw</span><span class="p">))</span>
+    <span class="n">by_id</span> <span class="o">=</span> <span class="p">{</span><span class="n">b</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">b</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">preds</span><span class="p">:</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">by_id</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">b</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">cat</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cat</span> <span class="ow">in</span> <span class="n">CATEGORIES</span><span class="p">:</span>
+            <span class="n">b</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">cat</span>
+            <span class="n">b</span><span class="o">.</span><span class="n">confidence</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;confidence&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span></div>
+
+
+
 <div class="viewcode-block" id="classify_llm">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier.classify_llm">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">classify_llm</span><span class="p">(</span>
@@ -559,44 +702,105 @@
     <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">25</span><span class="p">,</span>
     <span class="n">on_warning</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">on_info</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
+    <span class="n">backoff_base</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
+    <span class="n">backoff_cap</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">60.0</span><span class="p">,</span>
+    <span class="n">concurrency</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Classify blocks in-place by calling the Anthropic Messages API.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Classify blocks in-place by calling the Anthropic Messages API.</span>
+
+<span class="sd">    Batches are sent concurrently (up to ``concurrency`` in flight) to cut</span>
+<span class="sd">    wall-clock time, while each batch independently retries rate-limit (429)</span>
+<span class="sd">    and transient server/connection errors with exponential backoff that</span>
+<span class="sd">    honors any ``Retry-After`` header. A batch that stays unrecoverable is</span>
+<span class="sd">    skipped (its units stay unclassified) so the run still produces a partial</span>
+<span class="sd">    result. Per-batch progress is reported via ``on_info``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">concurrent.futures</span><span class="w"> </span><span class="kn">import</span> <span class="n">ThreadPoolExecutor</span><span class="p">,</span> <span class="n">as_completed</span>
+
     <span class="kn">import</span><span class="w"> </span><span class="nn">anthropic</span>
 
-    <span class="n">client</span> <span class="o">=</span> <span class="n">anthropic</span><span class="o">.</span><span class="n">Anthropic</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">start</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">),</span> <span class="n">batch_size</span><span class="p">):</span>
-        <span class="n">batch</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="n">start</span> <span class="p">:</span> <span class="n">start</span> <span class="o">+</span> <span class="n">batch_size</span><span class="p">]</span>
-        <span class="n">payload</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">b</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">b</span><span class="o">.</span><span class="n">text</span><span class="p">}</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">]</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
-            <span class="n">max_tokens</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span>
-            <span class="n">system</span><span class="o">=</span><span class="n">CLASSIFIER_SYSTEM</span><span class="p">,</span>
-            <span class="n">messages</span><span class="o">=</span><span class="p">[</span>
-                <span class="p">{</span>
-                    <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;Classify these </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span><span class="si">}</span><span class="s2"> units:</span><span class="se">\n\n</span><span class="s2">&quot;</span>
-                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span><span class="w"> </span><span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-                    <span class="p">),</span>
-                <span class="p">}</span>
-            <span class="p">],</span>
+    <span class="n">info</span> <span class="o">=</span> <span class="n">on_info</span> <span class="ow">or</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">_msg</span><span class="p">:</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">warn</span> <span class="o">=</span> <span class="n">on_warning</span> <span class="ow">or</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">_msg</span><span class="p">:</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">api_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">API_KEY_ENV</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">api_key</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">API_KEY_ENV</span><span class="si">}</span><span class="s2"> is not set. Scholar uses a namespaced key and &quot;</span>
+            <span class="s2">&quot;does not read the ambient ANTHROPIC_API_KEY. Export &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">API_KEY_ENV</span><span class="si">}</span><span class="s2">, or run with --stub for an offline pass.&quot;</span>
         <span class="p">)</span>
-        <span class="n">raw</span> <span class="o">=</span> <span class="n">_strip_code_fence</span><span class="p">(</span><span class="n">_extract_text_from_message</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">preds</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
-        <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">on_warning</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">on_warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;parse failure at batch </span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">continue</span>
-        <span class="n">by_id</span> <span class="o">=</span> <span class="p">{</span><span class="n">b</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">b</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">}</span>
-        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">preds</span><span class="p">:</span>
-            <span class="n">b</span> <span class="o">=</span> <span class="n">by_id</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">))</span>
-            <span class="k">if</span> <span class="n">b</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">continue</span>
-            <span class="n">cat</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">cat</span> <span class="ow">in</span> <span class="n">CATEGORIES</span><span class="p">:</span>
-                <span class="n">b</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">cat</span>
-                <span class="n">b</span><span class="o">.</span><span class="n">confidence</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;confidence&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span></div>
+    <span class="c1"># Pass the key explicitly (never let the SDK pick up ANTHROPIC_API_KEY).</span>
+    <span class="c1"># We drive retries ourselves for visibility, so disable the SDK&#39;s own</span>
+    <span class="c1"># silent retry loop. The client is thread-safe for concurrent requests.</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">anthropic</span><span class="o">.</span><span class="n">Anthropic</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="n">api_key</span><span class="p">,</span> <span class="n">max_retries</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">retryable</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">anthropic</span><span class="o">.</span><span class="n">RateLimitError</span><span class="p">,</span>
+        <span class="n">anthropic</span><span class="o">.</span><span class="n">APIConnectionError</span><span class="p">,</span>
+        <span class="n">anthropic</span><span class="o">.</span><span class="n">InternalServerError</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">batches</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">blocks</span><span class="p">[</span><span class="n">start</span> <span class="p">:</span> <span class="n">start</span> <span class="o">+</span> <span class="n">batch_size</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">start</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">),</span> <span class="n">batch_size</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">batches</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">total</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="n">workers</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">concurrency</span><span class="p">,</span> <span class="n">total</span><span class="p">))</span>
+    <span class="n">info</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;      </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span><span class="si">}</span><span class="s2"> units in </span><span class="si">{</span><span class="n">total</span><span class="si">}</span><span class="s2"> batches &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">workers</span><span class="si">}</span><span class="s2"> concurrent request</span><span class="si">{</span><span class="s1">&#39;s&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">workers</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">)&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+    <span class="n">counters</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;done&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;failed_units&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_run</span><span class="p">(</span><span class="n">batch</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Block</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">_classify_one_batch</span><span class="p">(</span>
+            <span class="n">client</span><span class="p">,</span>
+            <span class="n">anthropic</span><span class="p">,</span>
+            <span class="n">model</span><span class="p">,</span>
+            <span class="n">batch</span><span class="p">,</span>
+            <span class="n">retryable</span><span class="p">,</span>
+            <span class="n">max_retries</span><span class="p">,</span>
+            <span class="n">backoff_base</span><span class="p">,</span>
+            <span class="n">backoff_cap</span><span class="p">,</span>
+            <span class="n">info</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">failed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">msg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">failed</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">warn</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;a batch was skipped after </span><span class="si">{</span><span class="n">max_retries</span><span class="si">}</span><span class="s2"> retries &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;(rate limit / transient error); </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span><span class="si">}</span><span class="s2"> units stay &quot;</span>
+                <span class="s2">&quot;unclassified&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">_apply_predictions</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">_extract_text_from_message</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span>
+            <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="n">failed</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;parse failure in a batch: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">lock</span><span class="p">:</span>
+            <span class="n">counters</span><span class="p">[</span><span class="s2">&quot;done&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">failed</span><span class="p">:</span>
+                <span class="n">counters</span><span class="p">[</span><span class="s2">&quot;failed_units&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+            <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;      classified </span><span class="si">{</span><span class="n">counters</span><span class="p">[</span><span class="s1">&#39;done&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">total</span><span class="si">}</span><span class="s2"> batches&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="n">workers</span><span class="p">)</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+        <span class="n">futures</span> <span class="o">=</span> <span class="p">[</span><span class="n">ex</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">_run</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span> <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">batches</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">fut</span> <span class="ow">in</span> <span class="n">as_completed</span><span class="p">(</span><span class="n">futures</span><span class="p">):</span>
+            <span class="c1"># Re-raise non-retryable errors (e.g. unknown model) on the main</span>
+            <span class="c1"># thread so the run aborts with a clear message.</span>
+            <span class="n">fut</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">counters</span><span class="p">[</span><span class="s2">&quot;failed_units&quot;</span><span class="p">]:</span>
+        <span class="n">warn</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">counters</span><span class="p">[</span><span class="s1">&#39;failed_units&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span><span class="si">}</span><span class="s2"> units could not be &quot;</span>
+            <span class="s2">&quot;classified (left unhighlighted). Re-run later or use --stub.&quot;</span>
+        <span class="p">)</span></div>
 
 
 

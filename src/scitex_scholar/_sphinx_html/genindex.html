@@ -139,12 +139,17 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="api/index.html#module-scitex_scholar.pdf_highlight._classifier">Classifier</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight._classifier._available_models"><code class="docutils literal notranslate"><span class="pre">_available_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight._classifier._model_not_found_error"><code class="docutils literal notranslate"><span class="pre">_model_not_found_error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight._classifier._retry_wait_seconds"><code class="docutils literal notranslate"><span class="pre">_retry_wait_seconds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight._classifier._classify_one_batch"><code class="docutils literal notranslate"><span class="pre">_classify_one_batch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight._classifier._apply_predictions"><code class="docutils literal notranslate"><span class="pre">_apply_predictions()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight._classifier.classify_llm"><code class="docutils literal notranslate"><span class="pre">classify_llm()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight._classifier.classify_stub"><code class="docutils literal notranslate"><span class="pre">classify_stub()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="api/index.html#module-scitex_scholar.pdf_highlight._annotator">Annotator</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight._annotator._line_quads_in_rect"><code class="docutils literal notranslate"><span class="pre">_line_quads_in_rect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight._annotator._chunk_quads_for_sentence"><code class="docutils literal notranslate"><span class="pre">_chunk_quads_for_sentence()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight._annotator._search_quads_for_sentence"><code class="docutils literal notranslate"><span class="pre">_search_quads_for_sentence()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight._annotator.apply_highlights"><code class="docutils literal notranslate"><span class="pre">apply_highlights()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/index.html#scitex_scholar.pdf_highlight._annotator._corner_rect"><code class="docutils literal notranslate"><span class="pre">_corner_rect()</span></code></a></li>
@@ -590,7 +595,11 @@
 </li>
       <li><a href="api/core.html#scitex_scholar.core.JournalNormalizer._add_journal">_add_journal() (scitex_scholar.core.JournalNormalizer method)</a>
 </li>
+      <li><a href="api/index.html#scitex_scholar.pdf_highlight._classifier._apply_predictions">_apply_predictions() (in module scitex_scholar.pdf_highlight._classifier)</a>
+</li>
       <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._auto_detect">_auto_detect() (scitex_scholar.citation_graph.CitationGraphBuilder method)</a>
+</li>
+      <li><a href="api/index.html#scitex_scholar.pdf_highlight._classifier._available_models">_available_models() (in module scitex_scholar.pdf_highlight._classifier)</a>
 </li>
       <li><a href="api/core.html#scitex_scholar.core.Papers._bibtex_entry_to_paper">_bibtex_entry_to_paper() (scitex_scholar.core.Papers static method)</a>
 </li>
@@ -600,10 +609,14 @@
 </li>
       <li><a href="api/auth.html#scitex_scholar.auth.AuthenticationGateway._check_auth_requirements_from_doi">_check_auth_requirements_from_doi() (scitex_scholar.auth.AuthenticationGateway method)</a>
 </li>
-      <li><a href="api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._combine_metadata">_combine_metadata() (scitex_scholar.metadata_engines.ScholarEngine method)</a>
+      <li><a href="api/index.html#scitex_scholar.pdf_highlight._annotator._chunk_quads_for_sentence">_chunk_quads_for_sentence() (in module scitex_scholar.pdf_highlight._annotator)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/index.html#scitex_scholar.pdf_highlight._classifier._classify_one_batch">_classify_one_batch() (in module scitex_scholar.pdf_highlight._classifier)</a>
+</li>
+      <li><a href="api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._combine_metadata">_combine_metadata() (scitex_scholar.metadata_engines.ScholarEngine method)</a>
+</li>
       <li><a href="api/index.html#scitex_scholar.pdf_highlight._annotator._corner_rect">_corner_rect() (in module scitex_scholar.pdf_highlight._annotator)</a>
 </li>
       <li><a href="api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._create_paper_node">_create_paper_node() (scitex_scholar.citation_graph.CitationGraphBuilder method)</a>
@@ -640,8 +653,6 @@
         <li><a href="api/core.html#scitex_scholar.core.OASourcesCache._is_cache_valid">(scitex_scholar.core.OASourcesCache method)</a>
 </li>
       </ul></li>
-      <li><a href="api/index.html#scitex_scholar.pdf_highlight._annotator._line_quads_in_rect">_line_quads_in_rect() (in module scitex_scholar.pdf_highlight._annotator)</a>
-</li>
       <li><a href="api/browser.html#scitex_scholar.browser.ScholarBrowserManager._load_auth_cookies_to_persistent_context_async">_load_auth_cookies_to_persistent_context_async() (scitex_scholar.browser.ScholarBrowserManager method)</a>
 </li>
       <li><a href="api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._load_cache">_load_cache() (scitex_scholar.metadata_engines.ScholarEngine method)</a>
@@ -654,11 +665,15 @@
       </ul></li>
       <li><a href="api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._merge_metadata_structures">_merge_metadata_structures() (scitex_scholar.metadata_engines.ScholarEngine method)</a>
 </li>
+      <li><a href="api/index.html#scitex_scholar.pdf_highlight._classifier._model_not_found_error">_model_not_found_error() (in module scitex_scholar.pdf_highlight._classifier)</a>
+</li>
       <li><a href="api/browser.html#scitex_scholar.browser.ScholarBrowserManager._new_context_async">_new_context_async() (scitex_scholar.browser.ScholarBrowserManager method)</a>
 </li>
       <li><a href="api/auth.html#scitex_scholar.auth.ScholarAuthManager._register_provider">_register_provider() (scitex_scholar.auth.ScholarAuthManager method)</a>
 </li>
       <li><a href="api/auth.html#scitex_scholar.auth.AuthenticationGateway._resolve_publisher_url_async">_resolve_publisher_url_async() (scitex_scholar.auth.AuthenticationGateway method)</a>
+</li>
+      <li><a href="api/index.html#scitex_scholar.pdf_highlight._classifier._retry_wait_seconds">_retry_wait_seconds() (in module scitex_scholar.pdf_highlight._classifier)</a>
 </li>
       <li><a href="api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._save_cache">_save_cache() (scitex_scholar.metadata_engines.ScholarEngine method)</a>
 </li>
