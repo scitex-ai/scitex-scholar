@@ -778,6 +778,7 @@ def _do_pdf_highlight(
     labels_dump,
     labels_apply,
 ):
+    import glob as _glob
     from types import SimpleNamespace
 
     from scitex_logging import getLogger
@@ -786,11 +787,28 @@ def _do_pdf_highlight(
 
     logger = getLogger(__name__)
 
+    # Expand glob patterns ourselves. The shell normally expands `*.pdf`
+    # before we see it, but not always: a quoted pattern, a no-match
+    # passthrough, or a non-expanding caller (Windows tools, some IDEs)
+    # hands us a literal `*.pdf`. Treat any arg containing glob
+    # metacharacters that is not itself an existing file as a pattern.
+    expanded: list[str] = []
+    for p in pdf_paths:
+        s = str(p)
+        if any(ch in s for ch in "*?[") and not Path(s).exists():
+            matches = sorted(_glob.glob(s))
+            if not matches:
+                logger.fail(f"glob matched no files: {s}")
+                sys.exit(2)
+            expanded.extend(matches)
+        else:
+            expanded.append(s)
+
     # Skip already-highlighted outputs and de-dup (a glob commonly catches
     # both a file and the symlink pointing at it).
     seen: set[Path] = set()
     targets: list[Path] = []
-    for p in pdf_paths:
+    for p in expanded:
         rp = Path(p).resolve()
         if rp.name.endswith(".highlighted.pdf"):
             logger.info(f"skipping already-highlighted file: {p}")
