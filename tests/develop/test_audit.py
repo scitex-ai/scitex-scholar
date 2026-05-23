@@ -53,6 +53,16 @@ _AUDIT_SKIP_RULES = (
     # keep the auth surface internally consistent rather than landed
     # piecemeal.
     "§4",
+    # §1d: `scitex-scholar library zotero` — "zotero" is a brand name
+    # (the Zotero reference manager), not in the cli-audit dictionary
+    # or Moby POS. Either:
+    #   (a) add "zotero" to .scitex/dev/cli-audit-dict.yaml as a
+    #       package-local proper-noun term, or
+    #   (b) rename the noun (but the verb-group is canonically named
+    #       after the upstream tool — renaming would lose discoverability).
+    # Tracked under the same /overhaul-cli-noninteractive backlog as the
+    # §2 / §4 zotero* leaves above.
+    "§1d",
 )
 
 
