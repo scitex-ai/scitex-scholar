@@ -16,7 +16,6 @@ Mirrors `src/scitex_scholar/__main__.py`. Verifies:
 from __future__ import annotations
 
 import re
-from unittest.mock import patch
 
 import pytest
 from click.testing import CliRunner
@@ -719,33 +718,29 @@ def test_new_paper_fetch_does_not_warn():
 
 
 def test_new_library_db_audit_does_not_warn_result_exit_code_equals_n_0(tmp_path):
-    # Arrange
+    # Arrange — a real library_root with an empty MASTER subdir; the real
+    # auditor walks this and returns a clean (no-issues) report, exercising
+    # the live `library db audit --json` codepath end-to-end.
+    (tmp_path / "MASTER").mkdir()
     runner = CliRunner()
     # Act
-    with patch("scitex_scholar.storage._library_audit.audit") as a:
-        a.return_value.has_issues = False
-        a.return_value.to_dict.return_value = {}
-        result = runner.invoke(
-            cli,
-            ["library", "db", "audit", "--library-root", str(tmp_path), "--json"],
-        )
-    # Act
+    result = runner.invoke(
+        cli,
+        ["library", "db", "audit", "--library-root", str(tmp_path), "--json"],
+    )
     # Assert
     assert result.exit_code == 0
 
 
 def test_new_library_db_audit_does_not_warn_deprecationwarning_not_in_result_output(tmp_path):
     # Arrange
+    (tmp_path / "MASTER").mkdir()
     runner = CliRunner()
     # Act
-    with patch("scitex_scholar.storage._library_audit.audit") as a:
-        a.return_value.has_issues = False
-        a.return_value.to_dict.return_value = {}
-        result = runner.invoke(
-            cli,
-            ["library", "db", "audit", "--library-root", str(tmp_path), "--json"],
-        )
-    # Act
+    result = runner.invoke(
+        cli,
+        ["library", "db", "audit", "--library-root", str(tmp_path), "--json"],
+    )
     # Assert
     assert "DeprecationWarning" not in result.output
 
