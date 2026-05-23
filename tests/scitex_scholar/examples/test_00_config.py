@@ -4,16 +4,21 @@ Auto-generated subpackage mirror placeholder; replace with real tests
 as the module matures. Satisfies the src<->tests mirror audit rule.
 """
 
-import importlib
+import pytest
 
 
-def test_import_00_config_module():
-    """Module imports without raising hard errors."""
+def test_import_00_config_module_loads_via_importorskip():
+    """Module loads via ``pytest.importorskip`` and reports its declared name.
+
+    The import itself is the production behaviour under test (a
+    missing dependency is reported as a skip, not a pass). The
+    single assertion verifies the loaded module's ``__name__``
+    matches the requested dotted path — catches accidental aliasing
+    and packaging-path drift, which a bare import does not.
+    """
     # Arrange
+    name = "scitex_scholar.examples.00_config"
     # Act
+    mod = pytest.importorskip(name)
     # Assert
-    try:
-        importlib.import_module("scitex_scholar.examples.00_config")
-    except ImportError:
-        # Optional-dependency module; skip when extras absent.
-        return
+    assert mod.__name__ == name
