@@ -25,8 +25,8 @@ import asyncio
 from typing import Optional
 
 import scitex_logging as logging
+from scitex_session import INJECTED, session
 
-import scitex as stx
 from scitex_scholar.storage import PaperIO
 
 from ._single_steps import PipelineHelpersMixin, PipelineStepsMixin
@@ -49,6 +49,9 @@ class ScholarPipelineSingle(PipelineStepsMixin, PipelineHelpersMixin):
         doi_or_title: str,
         project: Optional[str] = None,
         force: bool = False,
+        pdf_path: Optional[str] = None,
+        pdf_supples: Optional[list] = None,
+        attachments: Optional[list] = None,
     ):
         """Process single paper from query (DOI or Title) to complete storage.
 
@@ -85,19 +88,32 @@ class ScholarPipelineSingle(PipelineStepsMixin, PipelineHelpersMixin):
             # Step 4: Metadata
             paper = await self._step_04_resolve_metadata(paper, io, force)
 
-            # Steps 5-7: Browser and PDF
-            browser_manager, context, auth_gateway = await self._step_05_setup_browser(
-                paper, io
-            )
-            if context:
-                await self._step_06_find_pdf_urls(
-                    paper, io, context, auth_gateway, force, browser_manager
+            # Steps 5-7: PDF acquisition. With --pdf-* flags, skip the
+            # browser download stack and copy the user-provided files.
+            if pdf_path or pdf_supples or attachments:
+                self._step_07_import_files(
+                    paper,
+                    io,
+                    pdf_main=pdf_path,
+                    pdf_supples=pdf_supples or [],
+                    attachments=attachments or [],
+                    force=force,
                 )
-                await self._step_07_download_pdf(
-                    paper, io, context, auth_gateway, force, browser_manager
-                )
-            if browser_manager:
-                await browser_manager.close()
+            else:
+                (
+                    browser_manager,
+                    context,
+                    auth_gateway,
+                ) = await self._step_05_setup_browser(paper, io)
+                if context:
+                    await self._step_06_find_pdf_urls(
+                        paper, io, context, auth_gateway, force, browser_manager
+                    )
+                    await self._step_07_download_pdf(
+                        paper, io, context, auth_gateway, force, browser_manager
+                    )
+                if browser_manager:
+                    await browser_manager.close()
 
             # Step 8: Content extraction
             self._step_08_extract_content(io, force)
@@ -109,15 +125,18 @@ class ScholarPipelineSingle(PipelineStepsMixin, PipelineHelpersMixin):
             return paper, symlink_path
 
 
-@stx.session
+@session
 def main(
     doi_or_title: str = None,
     project: str = None,
     browser_mode: str = "stealth",
     chrome_profile: str = "system",
     force: bool = False,
-    CONFIG=stx.INJECTED,
-    logger=stx.INJECTED,
+    CONFIG=INJECTED,
+    COLORS=INJECTED,
+    logger=INJECTED,
+    plt=INJECTED,
+    rngg=INJECTED,
 ) -> int:
     """Orchestrate full paper acquisition pipeline.
 

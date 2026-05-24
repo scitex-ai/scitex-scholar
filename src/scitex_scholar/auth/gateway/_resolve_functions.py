@@ -60,6 +60,8 @@ async def resolve_publisher_url_by_navigating_to_doi_page(
         logger.error(
             f"{func_name}: Publisher URL not resolved by navigating to {doi}: {e}"
         )
+        from scitex_browser.debugging import capture_debug_artifacts_async
+
         from scitex_scholar.config import ScholarConfig
 
         screenshot_dir = (
@@ -67,12 +69,15 @@ async def resolve_publisher_url_by_navigating_to_doi_page(
             / "workspace"
             / "screenshots"
         )
+        # Always-on capture: screenshot + HTML for post-mortem.
+        await capture_debug_artifacts_async(
+            page,
+            label=f"doi_navigate_error_{doi[:20]}",
+            base_dir=screenshot_dir,
+        )
         await browser_logger.info(
             page,
             f"{func_name}: {doi} - Publisher URL not resolved by navigating",
-            take_screenshot=True,
-            screenshot_category="Resolve",
-            screenshot_dir=screenshot_dir,
         )
         return None
 

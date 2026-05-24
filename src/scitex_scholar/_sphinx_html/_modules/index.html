@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Overview: module code &mdash; SciTeX Scholar v1.3.1</title>
+  <title>Overview: module code &mdash; SciTeX Scholar v1.4.0</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=bb516dca"></script>
+      <script src="../_static/documentation_options.js?v=9172181d"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -66,7 +66,13 @@
 <li class="toctree-l3"><a class="reference internal" href="../cli.html#bibtex">bibtex</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../cli.html#mcp">mcp</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../cli.html#pdf">pdf</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../cli.html#library">library</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#library">library</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../cli.html#daily">Daily</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cli.html#layout">Layout</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cli.html#share">Share</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cli.html#database-integrity">Database / integrity</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../cli.html#skills">skills</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../cli.html#python-api-introspection">Python API introspection</a></li>
 </ul>
@@ -133,12 +139,17 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../api/index.html#module-scitex_scholar.pdf_highlight._classifier">Classifier</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight._classifier._available_models"><code class="docutils literal notranslate"><span class="pre">_available_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight._classifier._model_not_found_error"><code class="docutils literal notranslate"><span class="pre">_model_not_found_error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight._classifier._retry_wait_seconds"><code class="docutils literal notranslate"><span class="pre">_retry_wait_seconds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight._classifier._classify_one_batch"><code class="docutils literal notranslate"><span class="pre">_classify_one_batch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight._classifier._apply_predictions"><code class="docutils literal notranslate"><span class="pre">_apply_predictions()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight._classifier.classify_llm"><code class="docutils literal notranslate"><span class="pre">classify_llm()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight._classifier.classify_stub"><code class="docutils literal notranslate"><span class="pre">classify_stub()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../api/index.html#module-scitex_scholar.pdf_highlight._annotator">Annotator</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight._annotator._line_quads_in_rect"><code class="docutils literal notranslate"><span class="pre">_line_quads_in_rect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight._annotator._chunk_quads_for_sentence"><code class="docutils literal notranslate"><span class="pre">_chunk_quads_for_sentence()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight._annotator._search_quads_for_sentence"><code class="docutils literal notranslate"><span class="pre">_search_quads_for_sentence()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight._annotator.apply_highlights"><code class="docutils literal notranslate"><span class="pre">apply_highlights()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/index.html#scitex_scholar.pdf_highlight._annotator._corner_rect"><code class="docutils literal notranslate"><span class="pre">_corner_rect()</span></code></a></li>

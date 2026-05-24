@@ -32,7 +32,7 @@ class BibTeXHandler:
 
     def _extract_primitive(self, value):
         """Extract primitive value from DotDict or nested structure."""
-        from scitex.dict import DotDict
+        from scitex_dict import DotDict
 
         if value is None:
             return None

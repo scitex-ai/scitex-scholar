@@ -77,6 +77,7 @@ class OpenAthensSSOAutomator(BaseSSOAutomator):
         """Perform OpenAthens email entry and institution selection."""
         try:
             self.logger.info(f"{self.name}: Starting OpenAthens page automation")
+            await self._take_debug_screenshot_async(page, label="openathens_entry")
 
             if not self.openathens_email:
                 self.logger.error(f"{self.name}: No OpenAthens email configured")
@@ -84,22 +85,31 @@ class OpenAthensSSOAutomator(BaseSSOAutomator):
 
             # Step 1: Enter institutional email
             success = await self._enter_institutional_email_async(page)
+            await self._take_debug_screenshot_async(
+                page, label=f"openathens_after_email_{success}"
+            )
             if not success:
                 return False
 
             # Step 2: Wait for institution selection to appear and select it
             success = await self._select_institution_async(page)
+            await self._take_debug_screenshot_async(
+                page, label=f"openathens_after_institution_{success}"
+            )
             if not success:
                 return False
 
             # Step 3: Wait for redirect to institution SSO
             success = await self._wait_for_institution_redirect_async(page)
+            await self._take_debug_screenshot_async(
+                page, label=f"openathens_after_redirect_{success}"
+            )
 
             return success
 
         except Exception as e:
             self.logger.error(f"{self.name}: OpenAthens page automation failed: {e}")
-            await self._take_debug_screenshot_async(page)
+            await self._take_debug_screenshot_async(page, label="openathens_exception")
             return False
 
     async def _enter_institutional_email_async(self, page) -> bool:
@@ -115,15 +125,24 @@ class OpenAthensSSOAutomator(BaseSSOAutomator):
             # Wait for and fill the email field
             try:
                 await page.wait_for_selector(email_selector, timeout=10000)
+                await self._take_debug_screenshot_async(
+                    page, label="openathens_before_fill_email"
+                )
                 await page.fill(email_selector, self.openathens_email)
                 self.logger.info(
                     f"{self.name}: Successfully filled OpenAthens email field"
+                )
+                await self._take_debug_screenshot_async(
+                    page, label="openathens_after_fill_email"
                 )
 
                 # Press Enter to trigger the search/autocomplete
                 await page.press(email_selector, "Enter")
                 self.logger.info(
                     f"{self.name}: Pressed Enter to trigger institution search"
+                )
+                await self._take_debug_screenshot_async(
+                    page, label="openathens_after_press_enter"
                 )
 
                 # Wait for institution dropdown to appear
@@ -132,10 +151,16 @@ class OpenAthensSSOAutomator(BaseSSOAutomator):
 
             except Exception as e:
                 self.logger.error(f"{self.name}: Failed to fill email field: {e}")
+                await self._take_debug_screenshot_async(
+                    page, label="openathens_fill_email_error"
+                )
                 return False
 
         except Exception as e:
             self.logger.error(f"{self.name}: Failed to enter email: {e}")
+            await self._take_debug_screenshot_async(
+                page, label="openathens_email_outer_error"
+            )
             return False
 
     async def _submit_email_form_async(self, page: Page) -> bool:
@@ -296,23 +321,27 @@ class OpenAthensSSOAutomator(BaseSSOAutomator):
             self.logger.error(f"{self.name}: Failed waiting for redirect: {e}")
             return False
 
-    async def _take_debug_screenshot_async(self, page: Page):
-        """Take debug screenshot."""
-        try:
-            import time
-            from pathlib import Path
+    async def _take_debug_screenshot_async(
+        self, page: Page, label: str = "openathens_debug"
+    ):
+        """Capture screenshot + page HTML via the shared helper.
 
-            screenshot_path = (
-                Path.home()
-                / ".scitex"
-                / "scholar"
-                / f"openathens_debug_{int(time.time())}.png"
-            )
-            screenshot_path.parent.mkdir(parents=True, exist_ok=True)
-            await page.screenshot(path=str(screenshot_path))
-            self.logger.debug(f"{self.name}: Debug screenshot: {screenshot_path}")
-        except Exception as e:
-            self.logger.debug(f"{self.name}: Screenshot failed: {e}")
+        See _skills/general/02_package_09_browser-automation-debugging.md.
+        """
+        from pathlib import Path
+
+        from scitex_browser.debugging import capture_debug_artifacts_async
+
+        await capture_debug_artifacts_async(
+            page,
+            label=label,
+            base_dir=Path.home()
+            / ".scitex"
+            / "scholar"
+            / "cache"
+            / "engine"
+            / "screenshots",
+        )
 
 
 if __name__ == "__main__":

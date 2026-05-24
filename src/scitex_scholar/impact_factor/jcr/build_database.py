@@ -40,12 +40,10 @@ from typing import Dict, Iterator, Optional
 import openpyxl
 import scitex_logging as logging
 
-try:
-    import scitex as stx
-except ImportError:
-    stx = None
-
 logger = logging.getLogger(__name__)
+
+# `import scitex as stx` is moved into the demo trailer (run_main) to
+# keep module-import umbrella-free per PA304.
 
 """Parameters"""
 # Data paths
@@ -233,11 +231,11 @@ def run_main() -> None:
     import sys
 
     import matplotlib.pyplot as plt
-
+    import scitex_session as session  # peer-standalone session lifecycle
 
     args = parse_args()
 
-    CONFIG, sys.stdout, sys.stderr, plt, CC, rng = stx.session.start(
+    CONFIG, sys.stdout, sys.stderr, plt, CC, rng = session.start(
         sys,
         plt,
         args=args,
@@ -249,7 +247,7 @@ def run_main() -> None:
 
     exit_status = main(args)
 
-    stx.session.close(
+    session.close(
         CONFIG,
         verbose=False,
         notify=False,

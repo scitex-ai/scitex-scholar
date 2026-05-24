@@ -441,7 +441,7 @@ async def show_stop_automation_button_async(
     """
     try:
         # Log that we're about to show the button
-        from scitex import logging
+        import scitex_logging as logging
 
         logger = logging.getLogger(__name__)
         logger.info(

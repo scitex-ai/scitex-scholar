@@ -120,6 +120,15 @@ async def find_pdf_urls_by_zotero_translators(
 
                 all_pdf_urls.extend(pdf_urls)
             else:
+                # Empty result — capture page state for post-mortem of
+                # the translator regression (e.g. publisher changed
+                # markup and the meta-tag selector now misses).
+                from scitex_browser.debugging import capture_debug_artifacts_async
+
+                safe_label = matching_translator.LABEL.lower().replace(" ", "_")
+                await capture_debug_artifacts_async(
+                    page, label=f"translator_empty_{safe_label}"
+                )
                 await browser_logger.warning(
                     page,
                     f"{func_name}: {matching_translator.LABEL} returned empty list - check if page loaded correctly",
@@ -128,6 +137,12 @@ async def find_pdf_urls_by_zotero_translators(
         except Exception as e:
             import traceback
 
+            from scitex_browser.debugging import capture_debug_artifacts_async
+
+            safe_label = matching_translator.LABEL.lower().replace(" ", "_")
+            await capture_debug_artifacts_async(
+                page, label=f"translator_error_{safe_label}"
+            )
             await browser_logger.error(
                 page,
                 f"{func_name}: {matching_translator.LABEL} extraction failed: {e}\nTraceback: {traceback.format_exc()}",

@@ -236,15 +236,17 @@ async def handle_project_operations(args, scholar):
         if extension in [".bib", ".bibtex"]:
             scholar.save_papers_as_bibtex(papers, output_path)
         elif extension == ".csv":
-            import scitex as stx
+            import scitex_io
+
             from scitex_scholar._utils.papers_utils import papers_to_dataframe
 
-            stx.io.save(papers_to_dataframe(papers), str(output_path))
+            scitex_io.save(papers_to_dataframe(papers), str(output_path))
         elif extension == ".json":
-            import scitex as stx
+            import scitex_io
+
             from scitex_scholar._utils.papers_utils import papers_to_dict
 
-            stx.io.save(papers_to_dict(papers), str(output_path))
+            scitex_io.save(papers_to_dict(papers), str(output_path))
         else:
             logger.error(f"Unsupported export format: {extension}")
             logger.info(

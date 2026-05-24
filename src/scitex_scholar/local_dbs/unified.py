@@ -42,30 +42,29 @@ __all__ = [
 ]
 
 # Import save from export module
+# Try to import both databases
+from scitex_dev import try_import_optional
+
 from .export import SUPPORTED_FORMATS, save
 
-# Try to import both databases
-_crossref_available = False
-_openalex_available = False
-
-try:
-    from crossref_local import Work as CRWork
-    from crossref_local import get as cr_get
-    from crossref_local import info as cr_info
-    from crossref_local import search as cr_search
-
-    _crossref_available = True
-except ImportError:
+_crossref_local = try_import_optional("crossref_local")
+_crossref_available = _crossref_local is not None
+if _crossref_available:
+    CRWork = _crossref_local.Work
+    cr_get = _crossref_local.get
+    cr_info = _crossref_local.info
+    cr_search = _crossref_local.search
+else:
     cr_search = cr_get = cr_info = CRWork = None
 
-try:
-    from openalex_local import Work as OAWork
-    from openalex_local import get as oa_get
-    from openalex_local import info as oa_info
-    from openalex_local import search as oa_search
-
-    _openalex_available = True
-except ImportError:
+_openalex_local = try_import_optional("openalex_local")
+_openalex_available = _openalex_local is not None
+if _openalex_available:
+    OAWork = _openalex_local.Work
+    oa_get = _openalex_local.get
+    oa_info = _openalex_local.info
+    oa_search = _openalex_local.search
+else:
     oa_search = oa_get = oa_info = OAWork = None
 
 

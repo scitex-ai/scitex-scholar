@@ -10,12 +10,31 @@ tags: [scitex-scholar-authentication, scitex-scholar]
 
 Scholar uses **OpenAthens** (and Shibboleth-compatible) SSO to access paywalled PDFs through your institution's subscription. Cookies are cached so subsequent runs don't re-prompt.
 
-## Quick check
+## CLI — `scitex-scholar auth {status, login, logout, refresh}`
 
 ```bash
-# Status only — no browser launch
-scitex scholar config            # Shows library + auth state
+# Read-only inspection (no browser launch). Exit 0 if any session valid.
+scitex-scholar auth status
+scitex-scholar auth status --json
+
+# Pre-warm the cached session (triggers SSO flow now — debug-friendly).
+scitex-scholar auth login
+scitex-scholar auth login --browser-mode interactive
+
+# Clear cached session(s). --yes/-y is REQUIRED (mutating, non-interactive).
+scitex-scholar auth logout -y
+scitex-scholar auth logout --provider openathens -y
+scitex-scholar auth logout --dry-run
+
+# Force re-login: logout --yes + login
+scitex-scholar auth refresh
 ```
+
+`auth login` runs the same flow `paper fetch` triggers lazily — useful
+when iterating on the SSO automator without needing a real DOI to
+fetch.
+
+## Python — `ScholarAuthManager`
 
 ```python
 from scitex_scholar.auth import ScholarAuthManager

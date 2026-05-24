@@ -1,0 +1,34 @@
+codecov:
+  require_ci_to_pass: false
+  # Treat develop as the de-facto default branch — main is a stable
+  # release mirror that only fast-forwards from develop, so develop
+  # is where coverage uploads land. This makes the unbranched badge
+  # endpoint (/graph/badge.svg) follow develop's value.
+  branch: develop
+
+coverage:
+  status:
+    project:
+      default:
+        # `auto` while the package is still ramping toward 90% — see
+        # general/05_development_08_coverage-push-playbook.md. Switch
+        # to `target: 90%` once the per-loader / per-translator test
+        # gap is closed.
+        target: auto
+        threshold: 1%
+    patch:
+      default:
+        target: 80%
+
+ignore:
+  - "src/scitex_scholar/_sphinx_html/**"
+  - "src/scitex_scholar/_skills/**"
+  - "src/scitex_scholar/_completion.py"
+  - "src/scitex_scholar/_cli/_completion.py"
+  # Thin bs4 wrappers; per-publisher translators are integration-tested
+  # via the URL finder fixtures, not unit-tested individually.
+  - "src/scitex_scholar/url_finder/translators/_individual/**"
+  - "tests/**"
+  - "examples/**"
+
+comment: false
