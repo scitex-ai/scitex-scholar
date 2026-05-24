@@ -20,11 +20,10 @@ import shutil
 
 import pytest
 
-
 _AUDIT_SKIP_RULES = (
     # MCP <-> Python-API parity gap: 12/12 APIs unmapped + 24 tools
-    # without API counterparts. Real surface mapping work tracked under
-    # /overhaul-scitex.
+    # without API counterparts. Real surface-mapping work tracked under
+    # /overhaul-scitex — a distinct, large backlog unrelated to this PR.
     "§6",
     # PA-305: every playwright-using module should call
     # `capture_debug_artifacts_async` for agent-readable failure
@@ -32,37 +31,20 @@ _AUDIT_SKIP_RULES = (
     # url_finder/translators/_individual files needs its own focused
     # session.
     "PA-305",
-    # §2: CLI non-interactivity. Three real architectural backlogs we
-    # are not landing here:
-    #   (a) `library export` + `library sync` mutating verbs missing
-    #       --yes/-y. Adding the safety flag means reworking each
-    #       handler's confirmation flow and updating every example /
-    #       skill that calls them.
-    #   (b) auth/providers/{Shibboleth,EZProxy}Authenticator.py fall
-    #       back to input() / getpass.getpass() when the caller didn't
-    #       pass username/password. Proper fix: raise ScholarError
-    #       pointing at $SCHOLAR_USERNAME / --username, but every
-    #       existing CLI surface and example currently relies on the
-    #       prompt path.
-    #   (c) two click.confirm() calls in _cli_main.py (around L1523 /
-    #       L1536) gating the destructive `library db reset` flow.
-    # Tracked under /overhaul-cli-noninteractive.
-    "§2",
-    # §4: `auth refresh` Click help missing concrete example block.
-    # One-line docstring fix; folded into the same CLI sweep as §2 to
-    # keep the auth surface internally consistent rather than landed
-    # piecemeal.
-    "§4",
-    # §1d: `scitex-scholar library zotero` — "zotero" is a brand name
-    # (the Zotero reference manager), not in the cli-audit dictionary
-    # or Moby POS. Either:
-    #   (a) add "zotero" to .scitex/dev/cli-audit-dict.yaml as a
-    #       package-local proper-noun term, or
-    #   (b) rename the noun (but the verb-group is canonically named
-    #       after the upstream tool — renaming would lose discoverability).
-    # Tracked under the same /overhaul-cli-noninteractive backlog as the
-    # §2 / §4 zotero* leaves above.
-    "§1d",
+    # §1d / §2 / §4 (CLI vocabulary, non-interactivity, missing help
+    # examples) were FIXED for real in this PR — no longer skipped:
+    #   §1d: "zotero" added to .scitex/dev/cli-audit-dict.yaml as a
+    #        package-local proper-noun (the upstream reference manager).
+    #   §2:  `library export` / `library sync` / `library zotero
+    #        import|export` now carry --yes/-y (+ --dry-run where it was
+    #        missing) and refuse a write without --yes; `library bind`'s
+    #        click.confirm() calls replaced with refuse-without-yes;
+    #        Shibboleth/EZProxy authenticators read credentials from
+    #        constructor args or SCITEX_SCHOLAR_<PROVIDER>_USERNAME /
+    #        _PASSWORD env vars and raise instead of prompting.
+    #   §4:  concrete `Examples:` blocks added to `auth refresh`,
+    #        `library audit-files`, and `library zotero import|export|
+    #        diff`.
 )
 
 

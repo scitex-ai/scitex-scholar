@@ -1249,16 +1249,36 @@ def library_zotero():
     help="Skip PDF copying (metadata only).",
 )
 @click.option("--limit", type=int, default=None, help="Max items to import.")
-@click.option("--dry-run", is_flag=True)
+@click.option(
+    "--dry-run", is_flag=True, help="Preview what would be imported; write nothing."
+)
+@click.option(
+    "--yes",
+    "-y",
+    is_flag=True,
+    help="Proceed without confirmation (required for a non-dry-run import).",
+)
 @click.option(
     "--db", default=None, help="Path to zotero.sqlite (auto-detect if omitted)."
 )
 def library_zotero_import(
-    project, collection, tags, match_all, include_pdfs, limit, dry_run, db
+    project, collection, tags, match_all, include_pdfs, limit, dry_run, yes, db
 ):
-    """Import from local Zotero database into the Scholar library."""
+    """Import from local Zotero database into the Scholar library.
+
+    \b
+    Examples:
+      $ scitex-scholar library zotero import --project neurovista --dry-run
+      $ scitex-scholar library zotero import --project neurovista --yes
+      $ scitex-scholar library zotero import --project neurovista --collection EEG --yes
+    """
     if not project:
         raise click.UsageError("--project is required for Zotero import.")
+    if not dry_run and not yes:
+        raise click.UsageError(
+            "library zotero import modifies the Scholar library. Re-run with "
+            "--dry-run to preview, or --yes/-y to proceed."
+        )
     from .integration.zotero import ZoteroLocalMigrator
 
     mig = ZoteroLocalMigrator(db_path=db, project=project)
@@ -1300,13 +1320,28 @@ def library_zotero_import(
     default=True,
     help="Skip bundling PDFs (BibTeX-only export).",
 )
-def library_zotero_export(project, output_dir, include_pdfs):
-    """Export Scholar papers as a Zotero-importable package (BibTeX + PDFs)."""
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Preview the output location; create nothing.",
+)
+@click.option(
+    "--yes",
+    "-y",
+    is_flag=True,
+    help="Proceed without confirmation (required to write the export).",
+)
+def library_zotero_export(project, output_dir, include_pdfs, dry_run, yes):
+    """Export Scholar papers as a Zotero-importable package (BibTeX + PDFs).
+
+    \b
+    Examples:
+      $ scitex-scholar library zotero export --project neurovista --dry-run
+      $ scitex-scholar library zotero export --project neurovista --yes
+      $ scitex-scholar library zotero export --project neurovista --output ~/zx --yes
+    """
     if not project:
         raise click.UsageError("--project is required for Zotero export.")
-    from .integration.zotero import ZoteroLocalMigrator
-
-    mig = ZoteroLocalMigrator(project=project)
 
     if output_dir is None:
         ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
@@ -1314,6 +1349,22 @@ def library_zotero_export(project, output_dir, include_pdfs):
             _default_library_root().parent / "exports" / f"zotero-{project}-{ts}"
         )
     output_dir = Path(output_dir)
+
+    if dry_run:
+        click.echo(
+            f"DRY RUN — would export project '{project}' "
+            f"({'with' if include_pdfs else 'without'} PDFs) -> {output_dir}"
+        )
+        return
+    if not yes:
+        raise click.UsageError(
+            "library zotero export writes files to disk. Re-run with "
+            "--dry-run to preview, or --yes/-y to proceed."
+        )
+
+    from .integration.zotero import ZoteroLocalMigrator
+
+    mig = ZoteroLocalMigrator(project=project)
     output_dir.mkdir(parents=True, exist_ok=True)
 
     pkg = mig.export_for_import(
@@ -1332,7 +1383,13 @@ def library_zotero_export(project, output_dir, include_pdfs):
 @click.option("--db", default=None, help="Path to zotero.sqlite (auto-detect).")
 @click.option("--json", "as_json", is_flag=True, help="JSON output.")
 def library_zotero_diff(project, db, as_json):
-    """Compare Zotero vs Scholar — show items present in one but not the other."""
+    """Compare Zotero vs Scholar — show items present in one but not the other.
+
+    \b
+    Examples:
+      $ scitex-scholar library zotero diff --project neurovista
+      $ scitex-scholar library zotero diff --project neurovista --json
+    """
     if not project:
         raise click.UsageError("--project is required.")
     from .integration.zotero import ZoteroLocalMigrator
@@ -1384,6 +1441,12 @@ def library_audit_files(library_root, project, rehash, as_json):
       • orphan        — file on disk with no record (role guessed from
                         prefix: 'supple-' / 'additional-' / main PDF)
       • hash_mismatch — name matches but content differs (file replaced)
+
+    \b
+    Examples:
+      $ scitex-scholar library audit-files
+      $ scitex-scholar library audit-files --project neurovista --no-rehash
+      $ scitex-scholar library audit-files --json
     """
     import hashlib
 
@@ -1886,7 +1949,13 @@ def _export_flat_pdfs(library_root: Path, project: str, out: Path) -> int:
     help="Library root (default: ~/.scitex/scholar/library).",
 )
 @click.option("--dry-run", is_flag=True, help="Preview only.")
-def library_export(project, fmt, output, library_root, dry_run):
+@click.option(
+    "--yes",
+    "-y",
+    is_flag=True,
+    help="Proceed without confirmation (required to write the export).",
+)
+def library_export(project, fmt, output, library_root, dry_run, yes):
     """Export PROJECT in a portable format.
 
     \b
@@ -1896,9 +1965,9 @@ def library_export(project, fmt, output, library_root, dry_run):
 
     \b
     Examples:
-      $ scitex-scholar library export neurovista
-      $ scitex-scholar library export neurovista --format bibtex
-      $ scitex-scholar library export neurovista --format flat-pdfs -o /tmp/x.tar.gz
+      $ scitex-scholar library export neurovista --dry-run
+      $ scitex-scholar library export neurovista --yes
+      $ scitex-scholar library export neurovista --format flat-pdfs -o /tmp/x.tar.gz --yes
     """
     from datetime import datetime, timezone
 
@@ -1923,6 +1992,11 @@ def library_export(project, fmt, output, library_root, dry_run):
     if dry_run:
         click.echo(f"DRY RUN — would export {fmt} -> {out_path}")
         return
+    if not yes:
+        raise click.UsageError(
+            f"library export writes {out_path}. Re-run with --dry-run to "
+            "preview, or --yes/-y to proceed."
+        )
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -1990,8 +2064,11 @@ def library_bind(project, project_dir, unbind, dry_run, yes):
         click.echo(f"          -> {home_proj}")
         if dry_run:
             return
-        if not yes and not click.confirm("Proceed?", default=True):
-            return
+        if not yes:
+            raise click.UsageError(
+                "library bind creates a symlink. Re-run with --dry-run to "
+                "preview, or --yes/-y to proceed."
+            )
         repo_lib_root.mkdir(parents=True, exist_ok=True)
         repo_link.symlink_to(home_proj.resolve())
         click.secho("Bound (one symlink, no data moved).", fg="green")
@@ -2003,8 +2080,11 @@ def library_bind(project, project_dir, unbind, dry_run, yes):
     click.echo(f"Will remove  {repo_link} (target stays: {repo_link.resolve()})")
     if dry_run:
         return
-    if not yes and not click.confirm("Proceed?", default=True):
-        return
+    if not yes:
+        raise click.UsageError(
+            "library bind --unbind removes a symlink. Re-run with --dry-run "
+            "to preview, or --yes/-y to proceed."
+        )
     repo_link.unlink()
     click.secho("Unbound.", fg="green")
 
@@ -2035,7 +2115,13 @@ def library_bind(project, project_dir, unbind, dry_run, yes):
     help="Remote path (relative to remote $HOME, or absolute starting with "
     "'/'). Default: '.scitex/scholar/library/[<project>/]'.",
 )
-def library_sync(host, project, pull, delete, dry_run, copy_links, remote_path):
+@click.option(
+    "--yes",
+    "-y",
+    is_flag=True,
+    help="Proceed without confirmation (required for a non-dry-run sync).",
+)
+def library_sync(host, project, pull, delete, dry_run, copy_links, remote_path, yes):
     """rsync the library to/from a remote HOST.
 
     \b
@@ -2101,6 +2187,11 @@ def library_sync(host, project, pull, delete, dry_run, copy_links, remote_path):
     click.echo("Running: " + " ".join(cmd))
     if dry_run:
         click.secho("(dry-run — no changes written)", fg="yellow")
+    elif not yes:
+        raise click.UsageError(
+            "library sync transfers files over rsync. Re-run with --dry-run "
+            "to preview, or --yes/-y to proceed."
+        )
     rc = subprocess.run(cmd).returncode
     if rc != 0:
         raise click.ClickException(f"rsync exited {rc}")
@@ -3140,7 +3231,13 @@ def auth_login(provider: str, browser_mode: str) -> int:
 @click.option("--provider", default=None, help="Specific provider (default: all).")
 @click.pass_context
 def auth_refresh(ctx: click.Context, provider: str | None) -> int:
-    """Force re-login: equivalent to `auth logout --yes` followed by `auth login`."""
+    """Force re-login: equivalent to `auth logout --yes` followed by `auth login`.
+
+    \b
+    Examples:
+      $ scitex-scholar auth refresh
+      $ scitex-scholar auth refresh --provider openathens
+    """
     rc = ctx.invoke(auth_logout, provider=provider, yes=True, dry_run=False)
     if rc != 0:
         return rc

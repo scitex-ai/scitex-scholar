@@ -237,13 +237,24 @@ class EZProxyAuthenticator(BaseAuthenticator):
                     )
 
                     if username_field and password_field:
-                        # Get credentials if not provided
+                        # Get credentials non-interactively: constructor args
+                        # first, then environment variables. CLIs/automation
+                        # must never block on a prompt — fail fast instead.
                         if not self.username:
-                            self.username = input("EZProxy username: ")
+                            self.username = os.environ.get(
+                                "SCITEX_SCHOLAR_EZPROXY_USERNAME"
+                            )
                         if not self.password:
-                            import getpass
-
-                            self.password = getpass.getpass("EZProxy password: ")
+                            self.password = os.environ.get(
+                                "SCITEX_SCHOLAR_EZPROXY_PASSWORD"
+                            )
+                        if not self.username or not self.password:
+                            raise EZProxyError(
+                                "EZProxy credentials missing. Pass "
+                                "username=/password= to EZProxyAuthenticator, "
+                                "or set SCITEX_SCHOLAR_EZPROXY_USERNAME and "
+                                "SCITEX_SCHOLAR_EZPROXY_PASSWORD."
+                            )
 
                         # Fill credentials
                         await username_field.fill(self.username)
