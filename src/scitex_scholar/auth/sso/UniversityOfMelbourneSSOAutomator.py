@@ -105,7 +105,7 @@ class UniversityOfMelbourneSSOAutomator(BaseSSOAutomator):
 
         except Exception as e:
             self.logger.error(f"UniMelb SSO login failed: {e}")
-            await self._take_debug_screenshot_async(page)
+            await self._save_debug_screenshot_async(page)
 
             # Send failure notification
             await self.notify_user_async("authentication_failed", error=str(e))
@@ -145,11 +145,15 @@ class UniversityOfMelbourneSSOAutomator(BaseSSOAutomator):
             return False
 
     async def _handle_password_step_async(self, page: Page) -> bool:
-        """Handle password entry using proven working selector."""
-        try:
-            # Use the proven working selector for password
-            password_selector = "input[name='credentials.passcode']"
+        """Handle password entry — Okta UI refresh 2026-05-06.
 
+        The Verify button is now a `<button type='submit'>` with text
+        'Verify' (was `<input type='submit' value='Verify'>` pre-2026-05).
+        Try the legacy selector first for backward compat, then fall
+        back to the new shape.
+        """
+        try:
+            password_selector = "input[name='credentials.passcode']"
             success = await fill_with_fallbacks_async(
                 page, password_selector, self.password
             )
@@ -159,23 +163,161 @@ class UniversityOfMelbourneSSOAutomator(BaseSSOAutomator):
 
             self.logger.info("Password filled successfully")
 
-            # Click Verify button using proven working selector and JavaScript click
-            verify_selector = "input[type='submit'][value='Verify']"
-            success = await click_with_fallbacks_async(page, verify_selector)
-            if not success:
-                self.logger.error("Failed to click Verify button")
-                return False
+            for verify_selector in (
+                "input[type='submit'][value='Verify']",
+                "button[type='submit']:has-text('Verify')",
+                "button.button-primary:has-text('Verify')",
+                "form button[type='submit']",
+            ):
+                if await click_with_fallbacks_async(page, verify_selector):
+                    self.logger.info(
+                        f"Verify button clicked successfully "
+                        f"(selector={verify_selector!r})"
+                    )
+                    # Okta sometimes shows a new MFA-method picker after
+                    # password. Handle if present.
+                    await page.wait_for_timeout(1500)
+                    await self._handle_mfa_select_step_async(page)
+                    return True
 
-            self.logger.info("Verify button clicked successfully")
-            return True
+            self.logger.error("Failed to click Verify button — all selectors failed")
+            return False
 
         except Exception as e:
             self.logger.error(f"Password step failed: {e}")
             return False
 
+    async def _save_debug_screenshot_async(self, page: Page, label: str) -> None:
+        """Capture screenshot + page HTML via the shared scitex-browser helper.
+
+        Writes both artifacts to
+        `~/.scitex/scholar/cache/engine/screenshots/sso_<label>_<ts>.{png,html}`.
+
+        Browser automation is fundamentally unreliable; HTML alongside
+        the screenshot is what makes "the locator picked the wrong row"
+        post-mortem actually possible.
+        """
+        from pathlib import Path
+
+        from scitex_browser.debugging import capture_debug_artifacts_async
+
+        await capture_debug_artifacts_async(
+            page,
+            label=f"sso_{label}",
+            base_dir=Path.home()
+            / ".scitex"
+            / "scholar"
+            / "cache"
+            / "engine"
+            / "screenshots",
+        )
+
+    async def _handle_mfa_select_step_async(self, page: Page) -> bool:
+        """Pick an MFA method on the post-password 'Verify it's you with a
+        security method' page (Okta UI refresh 2026-05-06).
+
+        Page typically shows two 'Select' buttons — one for Okta Verify
+        push notification, one for Okta Verify code entry. Push is the
+        cleanest hand-off (user just taps phone), so prefer that.
+
+        Implementation note: a CSS chain `div:has-text('X') >> button` is
+        ambiguous on Okta's layout — any ancestor container that *also*
+        contains the other row's text matches, and the first-DOM Select
+        (top row, 'Enter a code') gets clicked regardless of preference.
+        Use Playwright `Locator.filter(has_text=...)` to scope by ROW.
+
+        No-op if the page isn't a method picker.
+        """
+        try:
+            # Heuristic: only fire on the picker page.
+            heading = await page.query_selector(
+                "h2:has-text('security method'), h2:has-text('Verify it')"
+            )
+            if heading is None:
+                return False
+
+            await self._save_debug_screenshot_async(page, "mfa_picker_before")
+            self.logger.info("MFA method picker detected — preferring Okta Verify push")
+
+            # Use Playwright Locator API with row-scoped filtering AND
+            # negative filtering. `.filter(has_text='X')` alone matches
+            # any ancestor whose subtree contains 'X' — including the
+            # outer container that contains BOTH options. The first-DOM
+            # Select inside that container is 'Enter a code' (top row),
+            # so push always lost. Add `has_not_text` to exclude rows
+            # that *also* contain the other option's text — the leaf
+            # row passes (only its own text), the outer container fails
+            # (has both).
+            row_candidates = (
+                (
+                    "push",
+                    page.locator("li, div")
+                    .filter(has_text="Get a push notification")
+                    .filter(has_not_text="Enter a code")
+                    .get_by_text("Select", exact=True)
+                    .first,
+                ),
+                (
+                    "code",
+                    page.locator("li, div")
+                    .filter(has_text="Enter a code")
+                    .filter(has_not_text="Get a push notification")
+                    .get_by_text("Select", exact=True)
+                    .first,
+                ),
+            )
+
+            for kind, locator in row_candidates:
+                try:
+                    count = await locator.count()
+                except Exception:
+                    count = 0
+                if not count:
+                    self.logger.debug(f"No row-scoped Select for kind={kind}")
+                    continue
+                try:
+                    await locator.click(timeout=5000)
+                except Exception as e:
+                    self.logger.debug(f"Row-scoped click failed (kind={kind}): {e}")
+                    continue
+                await self._save_debug_screenshot_async(
+                    page, f"mfa_picker_after_{kind}"
+                )
+                self.logger.info(f"MFA Select clicked (kind={kind})")
+                if kind == "push":
+                    bar = "=" * 60
+                    self.logger.info(bar)
+                    self.logger.info(
+                        "  ACTION REQUIRED: tap the Okta Verify push "
+                        "notification on your phone now"
+                    )
+                    self.logger.info(
+                        "  (the 'Waiting for login...' polling below is "
+                        "expected — not a hang)"
+                    )
+                    self.logger.info(bar)
+                elif kind == "code":
+                    self.logger.info(
+                        "ACTION REQUIRED: open Okta Verify on your phone, "
+                        "read the 6-digit code, type it into the browser window"
+                    )
+                await page.wait_for_timeout(2000)
+                return True
+
+            self.logger.warning(
+                "MFA Select button not clicked — neither row matched. "
+                "Manual completion required (see screenshot)."
+            )
+            await self._save_debug_screenshot_async(page, "mfa_picker_no_match")
+            return False
+        except Exception as e:
+            self.logger.warning(f"MFA select step skipped: {e}")
+            return False
+
     async def _handle_generic_login_async(self, page: Page) -> bool:
         """Handle generic login form as fallback."""
         try:
+            await self._save_debug_screenshot_async(page, label="generic_login_entry")
             # Find any username/email input field
             username_elements = await page.query_selector_all(
                 'input[type="text"], input[type="email"], input[name*="user"], input[id*="user"]'
@@ -187,6 +329,9 @@ class UniversityOfMelbourneSSOAutomator(BaseSSOAutomator):
                     {"element": username_elements[0], "value": self.username},
                 )
                 self.logger.info("Filled generic username field")
+                await self._save_debug_screenshot_async(
+                    page, label="generic_login_after_username"
+                )
 
             # Find any password field
             password_elements = await page.query_selector_all('input[type="password"]')
@@ -196,6 +341,9 @@ class UniversityOfMelbourneSSOAutomator(BaseSSOAutomator):
                     {"element": password_elements[0], "value": self.password},
                 )
                 self.logger.info("Filled generic password field")
+                await self._save_debug_screenshot_async(
+                    page, label="generic_login_after_password"
+                )
 
             # Find and click submit button
             login_buttons = await page.query_selector_all(
@@ -203,14 +351,26 @@ class UniversityOfMelbourneSSOAutomator(BaseSSOAutomator):
             )
 
             if login_buttons:
+                await self._save_debug_screenshot_async(
+                    page, label="generic_login_before_submit"
+                )
                 await login_buttons[0].click()
                 self.logger.info("Generic login button clicked")
+                await self._save_debug_screenshot_async(
+                    page, label="generic_login_after_submit"
+                )
                 return True
 
+            await self._save_debug_screenshot_async(
+                page, label="generic_login_no_button"
+            )
             return False
 
         except Exception as e:
             self.logger.error(f"Generic login failed: {e}")
+            await self._save_debug_screenshot_async(
+                page, label="generic_login_exception"
+            )
             return False
 
     async def _handle_duo_authentication_async(self, page: Page) -> bool:

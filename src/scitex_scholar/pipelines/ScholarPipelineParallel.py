@@ -32,7 +32,7 @@ from typing import TYPE_CHECKING, List, Optional
 import scitex_logging as logging
 from scitex_browser.core import ChromeProfileManager
 
-import scitex as stx
+from scitex_session import INJECTED, session
 from scitex_scholar.auth import ScholarAuthManager
 from scitex_scholar.core import Paper
 
@@ -323,7 +323,7 @@ class ScholarPipelineParallel:
         )
 
 
-@stx.session
+@session
 def main(
     dois: str = None,
     titles: str = None,
@@ -331,8 +331,8 @@ def main(
     num_workers: int = 4,
     browser_mode: str = "stealth",
     chrome_profile: str = "system",
-    CONFIG=stx.INJECTED,
-    logger=stx.INJECTED,
+    CONFIG=INJECTED,
+    logger=INJECTED,
 ) -> int:
     """Orchestrate parallel paper acquisition pipeline.
 

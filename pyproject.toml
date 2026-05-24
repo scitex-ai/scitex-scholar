@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "scitex-scholar"
-version = "1.3.1"
+version = "1.4.0"
 description = "Scientific paper search, enrichment, download, and management for the SciTeX ecosystem"
 readme = "README.md"
 license = "AGPL-3.0-only"
@@ -38,10 +38,17 @@ classifiers = [
 dependencies = [
     "click>=8.0",
     "mcp",
-    # scitex[session] provides @stx.session decorator (+ matplotlib, PyYAML)
-    # used in pipelines/, metadata_engines/, impact_factor/jcr/.
-    # Using the [session] extra keeps the dep minimal vs. the full scitex.
-    "scitex[session]>=2.0.0",
+    # Peer standalones replacing the previous `scitex[session]` umbrella
+    # (PS-139). Imported directly from their peer module:
+    #   storage/PaperIO.py, pdf_download/_cli.py, impact_factor/jcr/*  →
+    #     `import scitex_session as session` for session.start/close
+    #   pipelines/_single_steps.py, cli/handlers/project_handler.py    →
+    #     `import scitex_io` for load/save
+    # matplotlib is explicit because scitex-session enters/exits the @session
+    # context with the user-supplied `plt` module; without it the demo
+    # trailers in storage/ + pdf_download/ would NameError.
+    "scitex-session>=0.1.5",
+    "matplotlib>=3.5.0",
     "scitex-io>=0.2.0",
     "scitex-browser>=0.1.6",
     "scitex-logging>=0.1.0",
@@ -93,7 +100,7 @@ watch = [
     "watchdog>=3.0.0",
 ]
 dev = [
-    "scitex-dev",
+    "scitex-dev>=0.11.7",
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
     "numpy>=1.21.0",
@@ -105,6 +112,12 @@ dev = [
     "aiohttp>=3.8.0",
     "flask>=2.3.0",
     "watchdog>=3.0.0",
+    # tests/integration/test_clew_integration.py — used (with importorskip)
+    # to exercise the optional scitex-clew provenance path in storage/PaperIO.
+    "scitex-clew>=0.1.0",
+    # `[pdf]` extra completeness; pdfplumber is the bundled PDF text-layer
+    # backend exercised by pdf_highlight/* code paths.
+    "pdfplumber>=0.9.0",
 ]
 docs = [
     "sphinx>=7.0",
@@ -148,6 +161,17 @@ python_files = ["test_*.py"]
 # two `test_base.py` files in different packages) without requiring
 # `__init__.py` files everywhere.
 addopts = "-v --tb=short --cov=scitex_scholar --cov-report=term-missing --import-mode=importlib"
+
+[tool.coverage.run]
+# Subprocess-coverage wiring (general/05_development_06_subprocess-coverage.md).
+# `parallel = true` lets every child Python interpreter (test_demos.py
+# `python -m`, `jupyter nbconvert --execute`, pytest-xdist) write its own
+# `.coverage.<host>.<pid>` shard; `pytest-cov` runs `coverage combine` at
+# session end. `concurrency = ["multiprocessing", "thread"]` covers both
+# subprocess.run and threaded test paths.
+parallel = true
+source = ["scitex_scholar"]
+concurrency = ["multiprocessing", "thread"]
 
 [tool.ruff]
 line-length = 88

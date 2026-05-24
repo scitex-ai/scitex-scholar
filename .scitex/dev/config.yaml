@@ -1,0 +1,17 @@
+# scitex-dev project-type config
+# Drives which rule families the auditor applies.
+# See: scitex-dev ecosystem audit-project --help
+
+project-type:
+  - pip
+
+audit:
+  # Root-whitelist for files that legitimately live at repo root and would
+  # otherwise trip PS-103 §1 top-level-junk-file. codecov.yml MUST be at
+  # repo root for Codecov to discover it (per
+  # general/02_package_11_ci-and-codecov.md).
+  root-whitelist:
+    files:
+      - codecov.yml
+#   skip:
+#     - PS-108

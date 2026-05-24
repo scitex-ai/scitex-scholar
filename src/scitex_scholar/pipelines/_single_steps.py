@@ -26,9 +26,38 @@ class PipelineStepsMixin:
     # Steps
     # ----------------------------------------
     def _step_01_normalize_as_doi(self, doi_or_title):
+        """Accept bare DOIs and DOI-bearing URLs.
+
+        Examples that all normalize to ``10.1002/epi.70076``:
+          • ``10.1002/epi.70076``
+          • ``doi:10.1002/epi.70076``
+          • ``https://doi.org/10.1002/epi.70076``
+          • ``http://dx.doi.org/10.1002/epi.70076``
+          • ``https://www.doi.org/10.1002/epi.70076``
+        Anything else returns ``None`` (treated as a title query).
+        """
         logger.info(f"{self.name}: Processing Query: {doi_or_title}")
-        is_doi = doi_or_title.strip().startswith("10.")
-        return doi_or_title.strip() if is_doi else None
+        s = (doi_or_title or "").strip()
+        if not s:
+            return None
+
+        if s.lower().startswith("doi:"):
+            s = s[4:].strip()
+
+        if s.lower().startswith(("http://", "https://")):
+            # Look for "doi.org/<DOI>" anywhere in the URL.
+            for marker in ("doi.org/", "dx.doi.org/"):
+                idx = s.lower().find(marker)
+                if idx >= 0:
+                    s = s[idx + len(marker) :]
+                    break
+            else:
+                # Not a DOI URL — treat as title.
+                return None
+            # Trim query/fragment.
+            s = s.split("?")[0].split("#")[0]
+
+        return s if s.startswith("10.") else None
 
     async def _step_02_create_paper(self, doi, doi_or_title):
         """Create Paper object and resolve DOI from title if needed."""
@@ -188,14 +217,189 @@ class PipelineStepsMixin:
         elif io.has_pdf():
             logger.info(f"{self.name}: PDF already exists, skipping download")
 
+    def _step_07_import_pdf(self, paper, io, pdf_path, force):
+        """Back-compat shim: single main-PDF import. Delegates to the
+        general :meth:`_step_07_import_files`.
+        """
+        self._step_07_import_files(
+            paper,
+            io,
+            pdf_main=pdf_path,
+            pdf_supples=(),
+            attachments=(),
+            force=force,
+        )
+
+    def _step_07_import_files(
+        self, paper, io, *, pdf_main, pdf_supples, attachments, force
+    ):
+        """Place user-provided files into MASTER and record them.
+
+        Roles and on-disk naming (flat layout, prefix-encoded):
+          * ``pdf_main``    → ``MASTER/<id>/<First>-<Year>-<Journal>.pdf``
+          * ``pdf_supples`` → ``MASTER/<id>/supple-<original_name>``
+          * ``attachments`` → ``MASTER/<id>/additional-<original_name>``
+
+        Each placement is recorded in ``metadata.path.files`` as a dict
+        with ``{role, name, sha256, size, added_at, source}`` so the role
+        survives later renames; legacy list-of-strings fields
+        (``metadata.path.pdfs`` / ``supplementary_files`` /
+        ``additional_files``) are kept in sync for back-compat readers.
+        """
+        from datetime import datetime, timezone
+
+        ts = datetime.now(timezone.utc).isoformat()
+
+        files_list = list(getattr(paper.metadata.path, "files", []) or [])
+
+        if pdf_main:
+            entry = self._import_one_file(io, pdf_main, role="main", force=force, ts=ts)
+            if entry:
+                files_list.append(entry)
+                paper.metadata.path.pdfs = [str(io.get_pdf_path())]
+                paper.metadata.path.pdfs_engines = ["manual_import"]
+                paper.metadata.access.pdf_download_attempted_at = ts
+                paper.metadata.access.pdf_download_status = "success"
+                paper.metadata.access.pdf_download_error = None
+                try:
+                    paper.container.pdf_size_bytes = io.get_pdf_path().stat().st_size
+                except OSError:
+                    pass
+                self._check_doi_sanity(paper, io.get_pdf_path())
+
+        supple_paths = []
+        for s in pdf_supples or ():
+            entry = self._import_one_file(
+                io, s, role="supplementary", force=force, ts=ts
+            )
+            if entry:
+                files_list.append(entry)
+                supple_paths.append(entry["name"])
+        if supple_paths:
+            existing = list(paper.metadata.path.supplementary_files or [])
+            paper.metadata.path.supplementary_files = existing + supple_paths
+
+        attach_paths = []
+        for a in attachments or ():
+            entry = self._import_one_file(io, a, role="additional", force=force, ts=ts)
+            if entry:
+                files_list.append(entry)
+                attach_paths.append(entry["name"])
+        if attach_paths:
+            existing = list(paper.metadata.path.additional_files or [])
+            paper.metadata.path.additional_files = existing + attach_paths
+
+        try:
+            paper.metadata.path.files = files_list
+        except Exception:
+            pass
+
+        io.save_metadata()
+        if pdf_main or pdf_supples or attachments:
+            logger.success(
+                f"{self.name}: imported "
+                f"main={'1' if pdf_main else '0'} "
+                f"supple={len(pdf_supples or ())} "
+                f"attachments={len(attachments or ())}"
+            )
+
+    def _import_one_file(self, io, src_path, *, role, force, ts):
+        """Copy one file into ``io.paper_dir`` under the role-prefixed name.
+
+        Returns the structured ``files`` entry dict on success, ``None`` on
+        skip/missing.
+        """
+        import hashlib
+        import shutil
+        from pathlib import Path as _Path
+
+        src = _Path(src_path).expanduser().resolve()
+        if not src.exists():
+            logger.fail(f"{self.name}: missing source: {src}")
+            return None
+
+        if role == "main":
+            dest = io.get_pdf_path()
+            display_name = dest.name
+        else:
+            prefix = "supple-" if role == "supplementary" else "additional-"
+            base = src.name
+            if not base.startswith(prefix):
+                base = f"{prefix}{base}"
+            dest = io.paper_dir / base
+            display_name = base
+
+        if dest.exists() and not force:
+            logger.info(
+                f"{self.name}: skip ({role}) — exists: {dest.name} "
+                "(--force to overwrite)"
+            )
+            return None
+
+        shutil.copy2(str(src), str(dest))
+        size = dest.stat().st_size
+        h = hashlib.sha256()
+        with open(dest, "rb") as fh:
+            for chunk in iter(lambda: fh.read(1 << 20), b""):
+                h.update(chunk)
+
+        # Zotero pattern: keep the canonical record-of-paper file
+        # immutable. Annotations live in separate files (notes-*.pdf,
+        # annotations/*.json). chmod 444 makes accidental "save" via a
+        # PDF reader fail loudly instead of silently drifting.
+        if role == "main":
+            try:
+                import os
+                import stat
+
+                os.chmod(dest, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
+            except OSError as exc:
+                logger.debug(f"{self.name}: could not chmod 444 {dest.name}: {exc}")
+
+        return {
+            "role": role,
+            "name": display_name,
+            "sha256": h.hexdigest(),
+            "size": size,
+            "added_at": ts,
+            "source": str(src),
+            "immutable": role == "main",
+        }
+
+    def _check_doi_sanity(self, paper, pdf_path):
+        """Warn if the main PDF's page-1 DOI disagrees with metadata.id.doi.
+
+        Cheap defense against the kind of swap we saw with Maturana/Karoly.
+        """
+        try:
+            import re
+
+            from pypdf import PdfReader
+
+            text = (PdfReader(str(pdf_path)).pages[0].extract_text()) or ""
+        except Exception:
+            return
+        m = re.search(r"10\.\d{4,}/\S+", text)
+        if not m:
+            return
+        pdf_doi = m.group().rstrip(".,;)").lower()
+        meta_doi = (paper.metadata.id.doi or "").lower()
+        if not meta_doi:
+            return
+        if meta_doi not in pdf_doi and pdf_doi not in meta_doi:
+            logger.warning(
+                f"{self.name}: DOI MISMATCH on {pdf_path.name}: "
+                f"metadata={meta_doi!r} vs PDF page-1={pdf_doi!r}"
+            )
+
     def _step_08_extract_content(self, io, force):
         if io.has_pdf() and (not io.has_content() or force):
             logger.info(f"{self.name}: Extracting content (text, tables, images)...")
-            import scitex
+            import scitex_io
 
             try:
                 pdf_path = io.get_pdf_path()
-                content = scitex.io.load(
+                content = scitex_io.load(
                     str(pdf_path),
                     ext="pdf",
                     mode="scientific",

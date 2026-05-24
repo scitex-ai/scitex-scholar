@@ -51,8 +51,19 @@ from scitex_scholar.core import Paper
 
 logger = logging.getLogger(__name__)
 
+# Sentinel for save_pdf's `clew_module` kwarg: distinguish "test wants the
+# default lazy import" (no kwarg passed) from "test wants to simulate clew
+# being absent" (kwarg explicitly set to None).
+_CLEW_UNSET = object()
 
-def _atomic_write_json(path: Path, data: Any) -> None:
+
+def _atomic_write_json(
+    path: Path,
+    data: Any,
+    *,
+    fsync=None,
+    replace=None,
+) -> None:
     """Write JSON to ``path`` atomically.
 
     Strategy: write the full payload to a sibling ``.tmp`` file, ``flush``
@@ -67,15 +78,24 @@ def _atomic_write_json(path: Path, data: Any) -> None:
     but before replace) may leave a ``.tmp`` behind; those are harmless
     — the next successful write overwrites them, and ``db audit`` does
     not look at ``.tmp`` files.
+
+    ``fsync`` / ``replace`` are injection points for tests that need to
+    observe or fault-inject the fsync/replace steps without using
+    `unittest.mock`. Production callers never pass them — they default
+    to `os.fsync` / `os.replace`.
     """
+    if fsync is None:
+        fsync = os.fsync
+    if replace is None:
+        replace = os.replace
     path = Path(path)
     tmp = path.with_suffix(path.suffix + ".tmp")
     try:
         with open(tmp, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
             f.flush()
-            os.fsync(f.fileno())
-        os.replace(tmp, path)
+            fsync(f.fileno())
+        replace(tmp, path)
     except Exception:
         try:
             tmp.unlink(missing_ok=True)
@@ -256,11 +276,15 @@ class PaperIO:
         logger.debug(f"{self.name}: Saved metadata: {path}")
         return path
 
-    def save_pdf(self, pdf_path: Path) -> Path:
+    def save_pdf(self, pdf_path: Path, *, clew_module=_CLEW_UNSET) -> Path:
         """Copy PDF to paper directory as main.pdf
 
         Args:
             pdf_path: Source PDF file path
+            clew_module: Test seam — pass an explicit scitex_clew-shaped
+                module (or ``None`` to simulate "clew not installed").
+                Production callers never pass this; the default lazily
+                imports the optional scitex_clew package.
 
         Returns
         -------
@@ -280,10 +304,13 @@ class PaperIO:
         # Optional scitex-clew provenance. Missing clew is silently fine
         # (it is an optional extra); but a hashing failure when clew IS
         # installed is a real problem and must be visible, not swallowed.
-        try:
-            import scitex_clew as _clew
-        except ImportError:
-            _clew = None
+        if clew_module is _CLEW_UNSET:
+            try:
+                import scitex_clew as _clew
+            except ImportError:
+                _clew = None
+        else:
+            _clew = clew_module
         if _clew is not None:
             try:
                 pdf_sha256 = _clew.hash_file(dest)
@@ -531,11 +558,11 @@ def run_main() -> None:
 
     import matplotlib.pyplot as plt
 
-    import scitex as stx
+    import scitex_session as session
 
     args = parse_args()
 
-    CONFIG, sys.stdout, sys.stderr, plt, CC, rng = stx.session.start(
+    CONFIG, sys.stdout, sys.stderr, plt, CC, rng = session.start(
         sys,
         plt,
         args=args,
@@ -547,7 +574,7 @@ def run_main() -> None:
 
     exit_status = main(args)
 
-    stx.session.close(
+    session.close(
         CONFIG,
         verbose=False,
         notify=False,

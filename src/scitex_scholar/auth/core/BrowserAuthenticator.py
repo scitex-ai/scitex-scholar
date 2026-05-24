@@ -410,6 +410,19 @@ class BrowserAuthenticator(BrowserMixin):
             with open(filepath, "wb") as f:
                 f.write(screenshot_bytes)
 
+            # Save page HTML alongside the screenshot — image alone shows
+            # the symptom, HTML shows the structure the locator was
+            # reasoning over. See _skills/general/02_package_09_browser-
+            # automation-debugging.md.
+            html_filepath = save_path / f"auth_{description}_{timestamp}.html"
+            try:
+                html_content = await page.content()
+                html_filepath.write_text(html_content, encoding="utf-8")
+                logger.info(f"{self.name}: HTML saved: {html_filepath}")
+            except Exception as e:
+                logger.debug(f"{self.name}: HTML capture failed: {e}")
+                html_filepath = None
+
             # Convert to base64 for email embedding
             b64_data = base64.b64encode(screenshot_bytes).decode("utf-8")
 
@@ -417,6 +430,7 @@ class BrowserAuthenticator(BrowserMixin):
 
             return {
                 "path": str(filepath),
+                "html_path": str(html_filepath) if html_filepath else None,
                 "base64": b64_data,
                 "url": page.url,
                 "timestamp": timestamp,

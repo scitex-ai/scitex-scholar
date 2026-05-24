@@ -47,12 +47,10 @@ import scitex_logging as logging
 from sql_manager import DynamicModel, Manager
 from sqlalchemy import Column, Float, String, func
 
-try:
-    import scitex as stx
-except ImportError:
-    stx = None
-
 logger = logging.getLogger(__name__)
+
+# `import scitex as stx` is moved into the demo trailer (run_main, ~L285)
+# to keep module-import umbrella-free per PA304.
 
 """Parameters"""
 # Use absolute path based on package location
@@ -127,7 +125,7 @@ class ImpactFactorJCREngine:
         -------
             List of matching journal records as dictionaries
         """
-        from scitex.context import suppress_output
+        from scitex_context import suppress_output
 
         default_keys = ["issn", "eissn", "nlm_id", "journal", "journal_abbr"]
         keys = [key] if key else default_keys
@@ -161,7 +159,7 @@ class ImpactFactorJCREngine:
         -------
             List of matching journal records
         """
-        from scitex.context import suppress_output
+        from scitex_context import suppress_output
 
         # Suppress SQLAlchemy echo output during queries
         with suppress_output():
@@ -279,10 +277,11 @@ def run_main() -> None:
     import sys
 
     import matplotlib.pyplot as plt
+    import scitex_session as session  # peer-standalone session lifecycle
 
     args = parse_args()
 
-    CONFIG, sys.stdout, sys.stderr, plt, CC, rng = stx.session.start(
+    CONFIG, sys.stdout, sys.stderr, plt, CC, rng = session.start(
         sys,
         plt,
         args=args,
@@ -294,7 +293,7 @@ def run_main() -> None:
 
     exit_status = main(args)
 
-    stx.session.close(
+    session.close(
         CONFIG,
         verbose=False,
         notify=False,

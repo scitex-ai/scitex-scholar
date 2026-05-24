@@ -484,6 +484,21 @@ class LibraryCacheManager:
 
             symlink_path.symlink_to(relative_path)
             logger.success(f"Created symlink:\n{symlink_path} -> {relative_path}")
+
+            # Sync container.projects in MASTER metadata so the field stays
+            # consistent with the filesystem symlink.
+            try:
+                from scitex_scholar.storage._project_reconcile import (
+                    add_project_to_master,
+                )
+
+                library_root = self.config.path_manager.get_library_master_dir().parent
+                add_project_to_master(library_root, paper_id, self.project)
+            except Exception as exc_meta:
+                logger.warning(
+                    f"Symlink created but failed to update container.projects: {exc_meta}"
+                )
+
             return True
 
         except Exception as exc_:

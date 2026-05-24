@@ -5,6 +5,121 @@ All notable changes to `scitex-scholar` are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-05-09
+
+### Added — Library workflow
+
+- **`library refresh [PROJECT] [--sync HOST]`** — one-button maintenance
+  umbrella: reconcile `container.projects` ↔ filesystem symlinks, then
+  regenerate every readable name (`PDF-NN_CC-..._IF-..._...`) via the
+  canonical `LibraryManager.update_symlink`, then optional rsync push
+  to one or more remote hosts. Each refresh + sync is recorded in
+  `library/<project>/info/project_metadata.json`. Subsumes the
+  previous `reconcile-projects` and `refresh-symlinks` standalone
+  commands (removed; helpers remain as Python API).
+
+- **`library list [PROJECT]`** — positional project arg auto-enables
+  per-paper detail (still configurable via `-v` / `-vv` / `-vvv`).
+
+- **`library bind PROJECT PROJECT-DIR`** — single-symlink view of the
+  home library inside a project repo
+  (`<project-dir>/.scitex/scholar/library/<project>` → `~/.scitex/scholar/library/<project>`).
+  No data movement, no MASTER passthrough. `--unbind` removes the
+  symlink. Verbless shorthand `library <project> <project-dir>`
+  triggers when `<project>` already exists in home.
+
+- **`library sync HOST [--remote-path PATH] [--pull] [--delete]`** —
+  rsync the library to/from a remote host. `--remote-path` overrides
+  the default `.scitex/scholar/library/[<project>/]`; `--copy-links`
+  (default) follows symlinks for self-contained remote dirs.
+
+- **`library export PROJECT --format <bibtex|tarball|flat-pdfs|zotero>`** —
+  portable export. Default location:
+  `~/.scitex/scholar/exports/<project>-<ts>.<ext>` (or under
+  `<project-dir>/.scitex/scholar/exports/` when bound).
+
+- **`library audit-files [--project P] [--no-rehash]`** — verify
+  recorded files against disk: missing / orphan / hash_mismatch.
+  Reads the new `metadata.path.files` registry (role + sha256 + size +
+  added_at + source) populated by `paper fetch --pdf-*`.
+
+- **`library zotero {import, export, diff}`** — bidirectional Zotero
+  migration scaffold (engine in `integration/zotero/local_migrator.py`
+  was already present; CLI verbs landed). **Marked as future work**
+  — verify on a real round-trip before relying on it; tracked in
+  `GITIGNORED/TODO.md`.
+
+- **Categorized `--help`** at top level (`[Workflow] / [Dev]`) and on
+  the `library` group (`[Daily] / [Layout] / [Share] / [Database]`),
+  via a private `_CategorizedGroup` Click subclass.
+
+### Added — Paper fetch (manual PDF import)
+
+- **`paper fetch --pdf-main <path>`** (back-compat alias `--pdf`) —
+  skip the browser/download stack and consume a user-provided main
+  PDF. Metadata enrichment from `--doi`/`--title` still runs.
+- **`paper fetch --pdf-supple <path>` (repeatable)** — supplementary
+  files placed at `MASTER/<id>/supple-<original_name>`.
+- **`paper fetch --attachment <path>` (repeatable)** — attachments
+  placed at `MASTER/<id>/additional-<original_name>`.
+- **`--doi` accepts URL form** — `https://doi.org/...`,
+  `http://dx.doi.org/...`, `doi:10.x/y` all normalize.
+- **DOI auto-extraction from PDF page-1** when `--pdf-main` is given
+  without `--doi`/`--title`.
+- **DOI mismatch warning** — after a `--pdf-main` import the page-1
+  DOI is checked against `metadata.id.doi`; mismatch is logged
+  loudly. Catches the kind of file-swap that crossed Maturana 2020 ↔
+  Karoly 2019 last session.
+- **Main PDF immutability** — `_step_07_import_files` `chmod 444`s
+  the main PDF on import (Zotero-style: canonical record-of-paper
+  stays read-only; annotated copies live alongside). Recorded as
+  `"immutable": true` in `metadata.path.files`.
+
+### Added — Browser-watch import (`library open-urls --watch`)
+
+(The browser-side improvements landed across this session — listed
+here for completeness; underlying engine already merged.)
+
+- Tab-origin matching: every tab's `paper_id` is cached so a download
+  from a known tab maps to the right paper without filename guessing.
+- Popup tab inheritance via `Page.opener()` (publisher download
+  buttons that spawn a new tab now carry the parent's paper_id).
+- Dual watch dirs: Playwright's intercepted dir
+  (`~/.scitex/scholar/cache/chrome/playwright_downloads/<session>/`)
+  AND `~/Downloads`, so WSL→Windows mounts that block inotify don't
+  prevent detection.
+- SSO cookie injection: `~/.scitex/scholar/cache/auth/<provider>.json`
+  is loaded and injected into the Playwright context before
+  navigation, so paywalled URLs hit the authenticated session.
+- Live event pump via `page.wait_for_timeout(1000)` (sync Playwright
+  needed an explicit pump; events were arriving only on browser
+  close).
+- Colored output via `scitex-logging`; debug log file at
+  `~/.scitex/scholar/cache/debug/watch_sessions/<session>/session.log`.
+- Human-readable labels (`Smith 2020 Scientific Reports`) instead of
+  paper-ids in user-facing log lines.
+
+### Fixed
+
+- **`.github/workflows/publish-pypi.yml`** — workflow YAML was
+  malformed (duplicate keys + `needs: build` referencing a
+  non-existent `build` job), so every push to `develop` triggered a
+  zero-second failed run. Restructured into three sequenced jobs
+  (`build` → `publish` → `release`) with consistent `inputs.version
+  || github.ref` resolution; `release` job tolerates re-runs via
+  `gh release create … || gh release upload --clobber`.
+- **`_step_01_normalize_as_doi`** — accept `doi:`/`https://doi.org/`/
+  `http://dx.doi.org/`/`https://www.doi.org/` URL forms; trim
+  query/fragment.
+
+### Internal
+
+- New `metadata.path.files` registry (list of
+  `{role, name, sha256, size, added_at, source, immutable}` entries)
+  is the source of truth for `library audit-files`. Legacy
+  `metadata.path.{pdfs, supplementary_files, additional_files}` are
+  kept in sync for back-compat readers.
+
 ## [1.3.1] - 2026-05-06
 
 ### Added

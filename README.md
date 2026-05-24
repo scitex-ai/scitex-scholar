@@ -9,17 +9,18 @@
 <p align="center"><b>Scientific paper search, enrichment, PDF download, and library management for reproducible research.</b></p>
 
 <p align="center">
-  <a href="https://scitex-scholar.readthedocs.io/">Full Documentation</a> · <code>pip install scitex-scholar</code>
+  <a href="https://scitex-scholar.readthedocs.io/">Full Documentation</a> · <code>uv pip install scitex-scholar[all]</code>
 </p>
 
 <!-- scitex-badges:start -->
 <p align="center">
-  <a href="https://pypi.org/project/scitex-scholar/"><img src="https://img.shields.io/pypi/v/scitex-scholar.svg" alt="PyPI"></a>
-  <a href="https://pypi.org/project/scitex-scholar/"><img src="https://img.shields.io/pypi/pyversions/scitex-scholar.svg" alt="Python"></a>
-  <a href="https://github.com/ywatanabe1989/scitex-scholar/actions/workflows/test.yml"><img src="https://github.com/ywatanabe1989/scitex-scholar/actions/workflows/test.yml/badge.svg" alt="Tests"></a>
-  <a href="https://github.com/ywatanabe1989/scitex-scholar/actions/workflows/install-test.yml"><img src="https://github.com/ywatanabe1989/scitex-scholar/actions/workflows/install-test.yml/badge.svg" alt="Install Test"></a>
-  <a href="https://codecov.io/gh/ywatanabe1989/scitex-scholar"><img src="https://codecov.io/gh/ywatanabe1989/scitex-scholar/graph/badge.svg" alt="Coverage"></a>
-  <a href="https://scitex-scholar.readthedocs.io/en/latest/"><img src="https://readthedocs.org/projects/scitex-scholar/badge/?version=latest" alt="Docs"></a>
+  <a href="https://pypi.org/project/scitex-scholar/"><img src="https://img.shields.io/pypi/v/scitex-scholar?label=pypi" alt="pypi"></a>
+  <a href="https://pypi.org/project/scitex-scholar/"><img src="https://img.shields.io/pypi/pyversions/scitex-scholar?label=python" alt="python"></a>
+  <a href="https://github.com/ywatanabe1989/scitex-scholar/actions/workflows/rtd-sphinx-build-on-ubuntu-latest.yml"><img src="https://img.shields.io/github/actions/workflow/status/ywatanabe1989/scitex-scholar/rtd-sphinx-build-on-ubuntu-latest.yml?branch=develop&label=docs" alt="docs"></a>
+</p>
+<p align="center">
+  <a href="https://github.com/ywatanabe1989/scitex-scholar/actions/workflows/pytest-matrix-on-ubuntu-py3-11-3-12-3-13.yml"><img src="https://img.shields.io/github/actions/workflow/status/ywatanabe1989/scitex-scholar/pytest-matrix-on-ubuntu-py3-11-3-12-3-13.yml?branch=develop&label=tests" alt="tests"></a>
+  <a href="https://codecov.io/gh/ywatanabe1989/scitex-scholar"><img src="https://img.shields.io/codecov/c/github/ywatanabe1989/scitex-scholar/develop?label=cov" alt="cov"></a>
   <a href="https://www.gnu.org/licenses/agpl-3.0"><img src="https://img.shields.io/badge/license-AGPL_v3-blue.svg" alt="License: AGPL v3"></a>
 </p>
 <!-- scitex-badges:end -->
@@ -46,7 +47,7 @@ Literature management spans many tools and APIs: searching databases, resolving 
 - **Search** across CrossRef, Semantic Scholar, PubMed, arXiv, and OpenAlex
 - **Resolve** DOIs from titles; enrich BibTeX with abstracts, citation counts, impact factors (JCR 2024), PMIDs, and arXiv IDs
 - **Download** PDFs through institutional access (OpenAthens / SSO) with Playwright browser automation
-- **Organize** papers in a MASTER-hash library with per-project symlinks at `~/.scitex/scholar/library/`
+- **Organize** papers in a MASTER-hash library with per-project symlinks at `~/.scitex/scholar/library/`. One-button maintenance via `library refresh` (reconcile → regenerate readable names → optional rsync to remote hosts)
 - **Highlight** each sentence of a PDF by rhetorical role — claim, method, limitation, supportive citation, contradicting citation — via Claude
 - **Automate** the same operations from the CLI, a Python API, or the SciTeX MCP server
 
@@ -104,19 +105,55 @@ scitex-scholar bibtex import --bibtex refs.bib --project demo --output refs.enri
 # PDF post-processing
 scitex-scholar pdf highlight paper.pdf
 
-# Library
-scitex-scholar library link-project-tree .
+# Library — daily workflow
+scitex-scholar library list                                   # all projects
+scitex-scholar library list neurovista                        # one project, per-paper
+scitex-scholar library open-urls neurovista --watch           # browser + auto-import
+scitex-scholar library refresh neurovista                     # one-button maintenance
+scitex-scholar library refresh neurovista --sync spartan      # +rsync push (repeatable)
+
+# Library — manual PDF import (when DBs haven't indexed yet, or no auto-download)
+scitex-scholar paper fetch --doi 10.1002/epi.70076 \
+    --pdf-main ~/Downloads/Liu_2026.pdf \
+    --pdf-supple ~/Downloads/MOESM1_ESM.pdf \
+    --attachment ~/Downloads/dataset.csv \
+    --project neurovista
+
+# Library — layout / share / integrity
+scitex-scholar library bind neurovista ~/proj/neurovista      # one symlink, no data move
+scitex-scholar library export neurovista --format bibtex
+scitex-scholar library audit-files --project neurovista
 scitex-scholar library db build --dry-run
 scitex-scholar library db audit --json
+
+# Auth (institutional SSO — OpenAthens / EZProxy / Shibboleth)
+scitex-scholar auth status              # exit 0 if any session valid, 1 otherwise
+scitex-scholar auth login               # trigger SSO flow now (debug-friendly)
+scitex-scholar auth logout -y           # clear cached cookies (--yes required)
+scitex-scholar auth refresh             # logout + login
 
 # MCP server
 scitex-scholar mcp start
 scitex-scholar mcp list-tools --json
 
+# Shell completion
+scitex-scholar install-shell-completion --shell bash
+scitex-scholar print-shell-completion --shell bash
+
 # Skills + Python API introspection
 scitex-scholar skills list
 scitex-scholar list-python-apis -v
 ```
+
+### Debugging the SSO automator
+
+Every browser-automation step writes a screenshot + HTML pair to
+`~/.scitex/scholar/cache/engine/screenshots/` and
+`~/.scitex/browser/cache/debug/`. When a selector breaks (e.g. an
+Okta UI refresh), `ls -lt` the artifact dirs to get a frame-by-frame
+storyboard — the screenshot shows what was rendered, the HTML
+shows what the locator was reasoning over. See
+`_skills/scitex-browser/11_debugging-visuals.md` for the full pattern.
 
 Mutating verbs accept `--dry-run` and `-y/--yes`. Read verbs support `--json`.
 Common paper/bibtex flags: `--browser-mode {stealth,interactive}`, `--chrome-profile NAME`, `--force`.
@@ -212,6 +249,47 @@ Also exposed as the `scholar_highlight_pdf` MCP tool (unified `scitex serve` ser
 ```
 
 Cache and auth state live under `~/.scitex/scholar/cache/` (URL resolver, Chrome profiles, OpenAthens cookies). Override with `SCITEX_DIR`.
+
+## Architecture
+
+```
+scitex_scholar/
+├── __init__.py            ← public API (Scholar, Paper, Papers, apply_filters, to_bibtex)
+├── _cli_main.py           ← `scitex-scholar` Click entry point (noun-verb groups)
+├── core/                  ← Scholar / Paper / Papers / ScholarConfig
+├── search_engines/        ← CrossRef, OpenAlex, Semantic Scholar, arXiv, PubMed federation
+├── metadata_engines/      ← DOI resolution, abstract / IF / citation enrichment
+├── auth/                  ← OpenAthens / EZProxy / Shibboleth / SSO automators
+├── browser/               ← persistent-profile Playwright manager (stealth + interactive)
+├── url_finder/            ← PDF URL discovery (translators + heuristic strategies)
+├── pdf_download/          ← `paper fetch` strategies (chrome viewer, direct, fallback)
+├── pdf_highlight/         ← claim/method/limitation overlay via Claude
+├── pipelines/             ← end-to-end @session-decorated workflows
+├── storage/               ← MASTER-hash library + per-project symlinks
+├── citation_graph/        ← optional citation network builder + plot
+├── integration/           ← Zotero / Mendeley / RefWorks / EndNote / Paperpile importers
+├── _mcp/                  ← MCP tool handlers (`scholar_*` tools for `scitex serve`)
+└── _skills/               ← agent-facing skill files (semantic-highlight, etc.)
+```
+
+The CLI is a thin layer over the Python API: every `scitex-scholar <noun> <verb>` command dispatches into one of `core/`, `pipelines/`, `storage/`, or `auth/`. The MCP server (`_mcp/`) exposes the same handlers as `scholar_*` tools consumed by the unified `scitex serve` server.
+
+## Demo
+
+```mermaid
+flowchart LR
+    Q["search query<br/>or .bib / DOI"] --> S["Scholar.search() /<br/>bibtex import"]
+    S --> E["metadata_engines<br/>(CrossRef · OpenAlex · arXiv ·<br/>PubMed · Semantic Scholar)"]
+    E --> P["Papers<br/>(deduped, enriched)"]
+    P --> U["url_finder<br/>(translators + heuristics)"]
+    U --> A["auth<br/>(OpenAthens / EZProxy /<br/>Shibboleth)"]
+    A --> D["pdf_download<br/>(Playwright strategies)"]
+    D --> L["~/.scitex/scholar/library/<br/>MASTER/&lt;HASH&gt;/"]
+    P -.-> H["pdf_highlight<br/>(claim / method / limitation)"]
+    L -.-> M["MCP: scholar_* tools<br/>(scitex serve)"]
+```
+
+`scitex-scholar paper fetch --doi 10.1038/...` exercises the full chain in one call: enrich → resolve URL → authenticate → download → store under `MASTER/<HASH>/` with metadata + PDF + per-project symlinks.
 
 ## License
 
