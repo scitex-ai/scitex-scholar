@@ -1,68 +1,82 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Time-stamp: "2025-05-22 15:40:00 (ywatanabe)"
-# File: tests/test_package_import.py
+# File: tests/integration/test_package_import.py
 
+"""Basic package import smokes.
+
+Rewritten from the legacy ``unittest.TestCase`` shape (which made
+``self.assertX`` invisible to STX-TQ001 and packed multiple assertions
+per method, violating STX-TQ007). One pytest test ↔ one bare ``assert``
+↔ one piece of behaviour now.
 """
-Test basic package import functionality.
 
-This test verifies that the SciTeX-Scholar package can be imported correctly
-and that basic package metadata is accessible.
-"""
+from __future__ import annotations
 
-import unittest
+import importlib
 
 
-class TestPackageImport(unittest.TestCase):
-    """Test suite for package import functionality."""
-
-    def test_package_import_smoke_case(self):
-        """Test that the scitex_scholar package can be imported."""
-        # Arrange
-        # Act
-        # Assert
-        try:
-            import sys
-
-            sys.path.insert(0, "./src")
-            import scitex_scholar  # noqa: F401  # import tests availability
-        except ImportError:
-            self.fail("Failed to import scitex_scholar package")
-
-    def test_package_version_calls_insert(self):
-        """Test that package version is accessible."""
-        # Arrange
-        # Act
-        # Assert
-        import sys
-
-        sys.path.insert(0, "./src")
-        import scitex_scholar
-
-        self.assertTrue(hasattr(scitex_scholar, "__version__"))
-        self.assertIsInstance(scitex_scholar.__version__, str)
-        self.assertGreater(len(scitex_scholar.__version__), 0)
-
-    def test_package_metadata_calls_insert(self):
-        """Test that package metadata is properly set."""
-        # Arrange
-        # Act
-        # Assert
-        import sys
-
-        sys.path.insert(0, "./src")
-        import scitex_scholar
-
-        # Test required metadata attributes (community project: no __email__)
-        self.assertTrue(hasattr(scitex_scholar, "__author__"))
-        self.assertEqual(scitex_scholar.__author__, "Yusuke Watanabe")
-        self.assertFalse(
-            hasattr(scitex_scholar, "__email__"),
-            "SciTeX community packages must not expose __email__ on the umbrella module",
-        )
+def test_scitex_scholar_package_imports_without_error():
+    # Arrange
+    name = "scitex_scholar"
+    # Act
+    mod = importlib.import_module(name)
+    # Assert
+    assert mod.__name__ == name
 
 
-if __name__ == "__main__":
-    unittest.main()
+def test_scitex_scholar_exposes_version_attribute():
+    # Arrange
+    # Act
+    import scitex_scholar
+
+    # Assert
+    assert hasattr(scitex_scholar, "__version__")
+
+
+def test_scitex_scholar_version_is_a_string():
+    # Arrange
+    # Act
+    import scitex_scholar
+
+    # Assert
+    assert isinstance(scitex_scholar.__version__, str)
+
+
+def test_scitex_scholar_version_is_non_empty():
+    # Arrange
+    # Act
+    import scitex_scholar
+
+    # Assert
+    assert len(scitex_scholar.__version__) > 0
+
+
+def test_scitex_scholar_exposes_author_attribute():
+    # Arrange
+    # Act
+    import scitex_scholar
+
+    # Assert
+    assert hasattr(scitex_scholar, "__author__")
+
+
+def test_scitex_scholar_author_is_yusuke_watanabe():
+    # Arrange
+    # Act
+    import scitex_scholar
+
+    # Assert
+    assert scitex_scholar.__author__ == "Yusuke Watanabe"
+
+
+def test_scitex_scholar_does_not_expose_email_on_umbrella():
+    """SciTeX community packages must not expose `__email__` on the umbrella."""
+    # Arrange
+    # Act
+    import scitex_scholar
+
+    # Assert
+    assert not hasattr(scitex_scholar, "__email__")
+
 
 # EOF

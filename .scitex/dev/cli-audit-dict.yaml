@@ -5,6 +5,10 @@
 nouns:
   - bibtex
   - pdf
+  # Zotero — the reference-manager application. Proper noun naming the
+  # upstream tool the `library zotero` command group integrates with;
+  # renaming would lose discoverability, so teach the audit the term.
+  - zotero
 
 # Transitive verbs (require an object — typically take a positional or `--key`).
 transitive_verbs:

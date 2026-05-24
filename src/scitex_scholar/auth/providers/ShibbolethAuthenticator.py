@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 import re
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -424,13 +425,19 @@ class ShibbolethAuthenticator(BaseAuthenticator):
         """Handle login at the Identity Provider."""
         logger.info(f"{self.name}: Handling IdP login page")
 
-        # Get credentials
+        # Get credentials non-interactively: constructor args first, then
+        # environment variables. CLIs/automation must never block on a
+        # prompt — fail fast with an actionable message instead.
         if not self.username:
-            self.username = input("Shibboleth username: ")
+            self.username = os.environ.get("SCITEX_SCHOLAR_SHIBBOLETH_USERNAME")
         if not self.password:
-            import getpass
-
-            self.password = getpass.getpass("Shibboleth password: ")
+            self.password = os.environ.get("SCITEX_SCHOLAR_SHIBBOLETH_PASSWORD")
+        if not self.username or not self.password:
+            raise ShibbolethError(
+                "Shibboleth credentials missing. Pass username=/password= to "
+                "ShibbolethAuthenticator, or set SCITEX_SCHOLAR_SHIBBOLETH_USERNAME "
+                "and SCITEX_SCHOLAR_SHIBBOLETH_PASSWORD."
+            )
 
         # Try each username field pattern
         username_filled = False
