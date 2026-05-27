@@ -10,9 +10,12 @@ This strategy combines:
 2. Dropdown/button detection
 """
 
-from typing import List
+from __future__ import annotations
 
-from playwright.async_api import Page
+from typing import TYPE_CHECKING, List
+
+if TYPE_CHECKING:
+    from playwright.async_api import Page
 from scitex_browser.debugging import browser_logger
 
 from scitex_scholar.config import PublisherRules, ScholarConfig

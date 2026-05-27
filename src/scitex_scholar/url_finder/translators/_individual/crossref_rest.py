@@ -15,12 +15,15 @@ Note: This is a search translator (translatorType 8) that doesn't match URLs
 but is called programmatically with DOI or query parameters.
 """
 
+from __future__ import annotations
+
 import html
 import re
-from typing import Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 from urllib.parse import quote
 
-from playwright.async_api import Page
+if TYPE_CHECKING:
+    from playwright.async_api import Page
 
 from .._core.base import BaseTranslator
 

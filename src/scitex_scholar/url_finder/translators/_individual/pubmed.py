@@ -320,6 +320,11 @@ async def main():
                 for url in pdf_urls[:3]:
                     print(f"  - {url}")
 
+            except Exception:
+                from scitex_browser.debugging import capture_debug_artifacts_async
+
+                await capture_debug_artifacts_async(page, label="demo_pubmed_error")
+                raise
             finally:
                 await browser.close()
     else:

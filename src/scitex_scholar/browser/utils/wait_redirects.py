@@ -23,11 +23,13 @@ Auth patterns are loaded from Scholar config (authentication.auth_endpoint_patte
 """
 
 import asyncio
-from typing import Dict, List
+from typing import TYPE_CHECKING, Dict, List
 from urllib.parse import urlparse
 
 import scitex_logging as logging
-from playwright.async_api import Page, Response
+
+if TYPE_CHECKING:
+    from playwright.async_api import Page, Response
 
 logger = logging.getLogger(__name__)
 

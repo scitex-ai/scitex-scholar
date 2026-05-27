@@ -241,45 +241,50 @@ if __name__ == "__main__":
             browser = await p.chromium.launch(headless=False)
             context = await browser.new_context()
             page = await context.new_page()
+            try:
+                print("Navigating to ORCID profile...")
+                await page.goto(test_url, timeout=60000)
+                await page.wait_for_load_state("domcontentloaded")
 
-            print("Navigating to ORCID profile...")
-            await page.goto(test_url, timeout=60000)
-            await page.wait_for_load_state("domcontentloaded")
+                # Detect if page has works
+                result = await ORCIDTranslator.detect_web(page)
+                print(f"Detection result: {result}")
 
-            # Detect if page has works
-            result = await ORCIDTranslator.detect_web(page)
-            print(f"Detection result: {result}")
+                # Extract ORCID
+                orcid = await ORCIDTranslator.extract_orcid_from_page(page)
+                print(f"ORCID: {orcid}\n")
 
-            # Extract ORCID
-            orcid = await ORCIDTranslator.extract_orcid_from_page(page)
-            print(f"ORCID: {orcid}\n")
+                if orcid:
+                    # Fetch works list
+                    print("Fetching works list...")
+                    works = await ORCIDTranslator.fetch_works_list(orcid)
+                    print(f"Found {len(works)} works:")
+                    for put_code, title in list(works.items())[:5]:
+                        print(f"  [{put_code}] {title}")
 
-            if orcid:
-                # Fetch works list
-                print("Fetching works list...")
-                works = await ORCIDTranslator.fetch_works_list(orcid)
-                print(f"Found {len(works)} works:")
-                for put_code, title in list(works.items())[:5]:
-                    print(f"  [{put_code}] {title}")
+                    if works:
+                        # Fetch metadata for first work
+                        first_code = list(works.keys())[0]
+                        print(f"\nFetching metadata for work {first_code}...")
+                        metadata = await ORCIDTranslator.fetch_work_metadata(
+                            orcid, first_code
+                        )
 
-                if works:
-                    # Fetch metadata for first work
-                    first_code = list(works.keys())[0]
-                    print(f"\nFetching metadata for work {first_code}...")
-                    metadata = await ORCIDTranslator.fetch_work_metadata(
-                        orcid, first_code
-                    )
+                        if metadata:
+                            print(f"Metadata keys: {list(metadata.keys())}")
+                            if "title" in metadata:
+                                print(f"Title: {metadata['title']}")
+                            if "author" in metadata:
+                                authors = metadata["author"]
+                                if isinstance(authors, list) and authors:
+                                    print(f"First author: {authors[0]}")
+            except Exception:
+                from scitex_browser.debugging import capture_debug_artifacts_async
 
-                    if metadata:
-                        print(f"Metadata keys: {list(metadata.keys())}")
-                        if "title" in metadata:
-                            print(f"Title: {metadata['title']}")
-                        if "author" in metadata:
-                            authors = metadata["author"]
-                            if isinstance(authors, list) and authors:
-                                print(f"First author: {authors[0]}")
-
-            await browser.close()
+                await capture_debug_artifacts_async(page, label="demo_orcid_error")
+                raise
+            finally:
+                await browser.close()
 
     asyncio.run(main())
 

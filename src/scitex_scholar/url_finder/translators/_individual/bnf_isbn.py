@@ -14,10 +14,13 @@ This is a search translator that looks up books by ISBN in the French National
 Library (Bibliothèque nationale de France) catalogue.
 """
 
-import re
-from typing import List, Optional
+from __future__ import annotations
 
-from playwright.async_api import Page
+import re
+from typing import TYPE_CHECKING, List, Optional
+
+if TYPE_CHECKING:
+    from playwright.async_api import Page
 
 from .._core.base import BaseTranslator
 

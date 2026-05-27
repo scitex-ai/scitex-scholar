@@ -26,9 +26,10 @@ Usage:
 """
 
 import logging
-from typing import List, Optional, Type
+from typing import TYPE_CHECKING, List, Optional, Type
 
-from playwright.async_api import Page
+if TYPE_CHECKING:
+    from playwright.async_api import Page
 
 from .base import BaseTranslator
 
