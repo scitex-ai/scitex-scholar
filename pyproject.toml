@@ -50,7 +50,7 @@ dependencies = [
     "scitex-session>=0.1.5",
     "matplotlib>=3.5.0",
     "scitex-io>=0.2.0",
-    "scitex-browser>=0.1.6",
+    "scitex-browser>=0.1.15",
     "scitex-logging>=0.1.0",
     # playwright is reached at top-level import (ScholarBrowserManager →
     # scitex_browser.debugging → playwright.async_api). Keep it as a core
