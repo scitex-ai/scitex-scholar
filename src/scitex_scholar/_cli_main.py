@@ -3070,10 +3070,12 @@ def auth() -> None:
 
 def _auth_cache_paths() -> list[Path]:
     """All cached auth session files."""
-    home = Path.home() / ".scitex" / "scholar" / "cache" / "auth"
-    if not home.exists():
+    from scitex_scholar.config import ScholarConfig
+
+    auth_dir = ScholarConfig().path_manager.get_cache_auth_dir()
+    if not auth_dir.exists():
         return []
-    return sorted(p for p in home.glob("*.json") if p.is_file())
+    return sorted(p for p in auth_dir.glob("*.json") if p.is_file())
 
 
 @auth.command("status", context_settings=CONTEXT_SETTINGS)
@@ -3189,7 +3191,9 @@ def auth_logout(provider: str | None, yes: bool, dry_run: bool) -> int:
         except OSError as e:
             click.echo(f"  failed:  {p}: {e}", err=True)
     # Also clear sso_sessions/ directory if present.
-    sso_dir = Path.home() / ".scitex" / "scholar" / "cache" / "auth" / "sso_sessions"
+    from scitex_scholar.config import ScholarConfig
+
+    sso_dir = ScholarConfig().path_manager.get_cache_auth_dir() / "sso_sessions"
     if sso_dir.exists() and (provider is None or provider == "sso_sessions"):
         try:
             import shutil

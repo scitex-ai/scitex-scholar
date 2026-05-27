@@ -1053,7 +1053,9 @@ async def logout_handler(
 
         # Clear cache files if requested
         if clear_cache:
-            cache_dir = _get_scholar_dir() / "cache" / method
+            from scitex_scholar.config import ScholarConfig
+
+            cache_dir = ScholarConfig().path_manager.cache_dir / method
             if cache_dir.exists():
                 import shutil
 

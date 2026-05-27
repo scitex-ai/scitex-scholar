@@ -197,18 +197,14 @@ class UniversityOfMelbourneSSOAutomator(BaseSSOAutomator):
         the screenshot is what makes "the locator picked the wrong row"
         post-mortem actually possible.
         """
-        from pathlib import Path
-
         from scitex_browser.debugging import capture_debug_artifacts_async
+
+        from scitex_scholar.config import ScholarConfig
 
         await capture_debug_artifacts_async(
             page,
             label=f"sso_{label}",
-            base_dir=Path.home()
-            / ".scitex"
-            / "scholar"
-            / "cache"
-            / "engine"
+            base_dir=ScholarConfig().path_manager.get_cache_engine_dir()
             / "screenshots",
         )
 
@@ -476,12 +472,10 @@ class UniversityOfMelbourneSSOAutomator(BaseSSOAutomator):
         """Take debug screenshot."""
         try:
             import time
-            from pathlib import Path
+            from scitex_scholar.config import ScholarConfig
 
             screenshot_path = (
-                Path.home()
-                / ".scitex"
-                / "scholar"
+                ScholarConfig().path_manager.get_workspace_screenshots_dir()
                 / f"unimelb_debug_{int(time.time())}.png"
             )
             screenshot_path.parent.mkdir(parents=True, exist_ok=True)

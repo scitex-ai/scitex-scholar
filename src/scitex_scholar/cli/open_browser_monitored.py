@@ -618,7 +618,11 @@ def _attach_overlay(page, watch_dir: str, paper: Optional[dict]) -> None:
 # ---------- Debug capture (mirrors scitex_browser.debugging.capture_debug_artifacts_async) ----------
 
 
-_DEBUG_BASE = Path.home() / ".scitex" / "scholar" / "cache" / "debug" / "watch_sessions"
+def _debug_base() -> Path:
+    """Get debug session capture dir via PathManager (runtime/cache/debug/watch_sessions)."""
+    from scitex_scholar.config import ScholarConfig
+
+    return ScholarConfig().path_manager.cache_dir / "debug" / "watch_sessions"
 
 
 def _safe_label(s: str) -> str:
@@ -849,7 +853,7 @@ def open_browser_with_monitoring(
     # Debug artifacts for this session — screenshots + HTML on every nav,
     # banner-missing event, and download. Mirrors the convention used by
     # paper-fetch's SSO automators.
-    session_debug_dir = _DEBUG_BASE / session_id
+    session_debug_dir = _debug_base() / session_id
     session_debug_dir.mkdir(parents=True, exist_ok=True)
     debug_log_path = session_debug_dir / "session.log"
 
