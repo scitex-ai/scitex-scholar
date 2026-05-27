@@ -18,10 +18,12 @@ Simple, focused responsibility: Given a page or URL, find PDF URLs.
 """
 
 from contextlib import asynccontextmanager
-from typing import Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Union
 
 import scitex_logging as logging
-from playwright.async_api import BrowserContext, Page
+
+if TYPE_CHECKING:
+    from playwright.async_api import BrowserContext, Page
 from scitex_browser.debugging import browser_logger
 
 from scitex_scholar.auth.gateway import OpenURLResolver

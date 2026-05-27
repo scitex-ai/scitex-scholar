@@ -15,7 +15,10 @@ import asyncio
 
 __FILE__ = __file__
 
-from playwright.async_api import BrowserContext
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from playwright.async_api import BrowserContext
 from scitex_browser.debugging import browser_logger
 
 

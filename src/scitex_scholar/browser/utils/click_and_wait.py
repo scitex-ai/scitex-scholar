@@ -13,10 +13,12 @@ __DIR__ = os.path.dirname(__FILE__)
 
 __FILE__ = __file__
 
-from typing import Dict, Optional
+from typing import TYPE_CHECKING, Dict, Optional
 
 import scitex_logging as logging
-from playwright.async_api import Locator
+
+if TYPE_CHECKING:
+    from playwright.async_api import Locator
 
 logger = logging.getLogger(__name__)
 

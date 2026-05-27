@@ -9,10 +9,12 @@ import asyncio
 import os
 import traceback
 from pathlib import Path
-from typing import Any, List, Optional, Union
+from typing import TYPE_CHECKING, Any, List, Optional, Union
 
 import scitex_logging as logging
-from playwright.async_api import BrowserContext
+
+if TYPE_CHECKING:
+    from playwright.async_api import BrowserContext
 
 from scitex_scholar.config import ScholarConfig
 from scitex_scholar.pdf_download.strategies import (

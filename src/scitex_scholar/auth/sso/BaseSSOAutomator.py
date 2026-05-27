@@ -15,9 +15,10 @@ __DIR__ = os.path.dirname(__FILE__)
 import json
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
-from playwright.async_api import BrowserContext, Page
+if TYPE_CHECKING:
+    from playwright.async_api import BrowserContext, Page
 from scitex_logging import getLogger
 
 from scitex_scholar.config import ScholarConfig

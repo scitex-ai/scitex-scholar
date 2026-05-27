@@ -13,11 +13,14 @@ Key features:
 - Detects authentication and access restrictions
 """
 
+from __future__ import annotations
+
 import re
 import urllib.parse
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
-from playwright.async_api import Page
+if TYPE_CHECKING:
+    from playwright.async_api import Page
 
 from .._core.base import BaseTranslator
 

@@ -2,10 +2,13 @@
 # -*- coding: utf-8 -*-
 """Base class for Python Zotero translator implementations."""
 
-from abc import ABC, abstractmethod
-from typing import List
+from __future__ import annotations
 
-from playwright.async_api import Page
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, List
+
+if TYPE_CHECKING:
+    from playwright.async_api import Page
 
 
 class BaseTranslator(ABC):

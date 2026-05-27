@@ -26,10 +26,12 @@ This keeps URL finders and PDF downloaders free of authentication logic.
 """
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional
+from typing import TYPE_CHECKING, Dict, List, Optional
 
 import scitex_logging as logging
-from playwright.async_api import BrowserContext
+
+if TYPE_CHECKING:
+    from playwright.async_api import BrowserContext
 
 from scitex_scholar.config import ScholarConfig
 

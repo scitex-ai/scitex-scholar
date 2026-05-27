@@ -6,10 +6,13 @@ Based on Cambridge Core.js translator from Zotero.
 Original JavaScript implementation by Sebastian Karcher.
 """
 
-import re
-from typing import List
+from __future__ import annotations
 
-from playwright.async_api import Page
+import re
+from typing import TYPE_CHECKING, List
+
+if TYPE_CHECKING:
+    from playwright.async_api import Page
 
 from .._core.base import BaseTranslator
 

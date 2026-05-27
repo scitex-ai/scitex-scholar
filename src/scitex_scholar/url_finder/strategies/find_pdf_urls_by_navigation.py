@@ -18,11 +18,13 @@ Handles publishers like ScienceDirect that require navigation
 through redirect chains to reach the actual PDF URL.
 """
 
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional
 from urllib.parse import urljoin
 
 import scitex_logging as _slog
-from playwright.async_api import Page
+
+if TYPE_CHECKING:
+    from playwright.async_api import Page
 from scitex_browser.debugging import browser_logger
 
 _logger = _slog.getLogger(__name__)

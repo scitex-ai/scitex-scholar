@@ -13,10 +13,12 @@ __DIR__ = os.path.dirname(__FILE__)
 
 __FILE__ = __file__
 
-from typing import Dict, List
+from typing import TYPE_CHECKING, Dict, List
 
 import scitex_logging as logging
-from playwright.async_api import Page
+
+if TYPE_CHECKING:
+    from playwright.async_api import Page
 from scitex_browser import browser_logger
 
 from scitex_scholar.config import ScholarConfig
