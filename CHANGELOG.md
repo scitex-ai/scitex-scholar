@@ -5,6 +5,22 @@ All notable changes to `scitex-scholar` are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.1] - 2026-05-27
+
+### Fixed
+- `scitex-dev ecosystem audit-all` is now fully clean (0 errors, 0 warnings).
+  - **MCP §6**: declared `[tool.scitex_dev] mcp_parity_exempt` — scitex-scholar
+    is a service/workflow package whose MCP tool surface intentionally differs
+    from its pure-function public API.
+  - **PA-305**: moved type-hint-only `playwright.async_api` imports (728
+    modules, incl. ~708 Zotero-style translators) under `if TYPE_CHECKING:`;
+    added `capture_debug_artifacts_async` to the 16 modules that genuinely
+    drive a browser (auth/browser infra + translator demos).
+
+### Changed
+- Require `scitex-browser>=0.1.15` (first release exporting
+  `capture_debug_artifacts_async`).
+
 ## [1.4.0] - 2026-05-09
 
 ### Added — Library workflow
