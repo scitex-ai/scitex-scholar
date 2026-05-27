@@ -29,9 +29,10 @@ OPENALEX_POLITE_EMAIL = "research@scitex.io"
 
 
 def _get_default_cache_dir() -> Path:
-    """Get default cache directory respecting SCITEX_DIR env var."""
-    scitex_dir = os.environ.get("SCITEX_DIR", "~/.scitex")
-    return Path(scitex_dir).expanduser() / "scholar" / "cache"
+    """Get default cache directory via PathManager (runtime/cache)."""
+    from scitex_scholar.config import ScholarConfig
+
+    return ScholarConfig().path_manager.cache_dir
 
 
 class OASourcesCache:
