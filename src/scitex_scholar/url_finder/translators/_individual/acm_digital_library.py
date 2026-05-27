@@ -19,11 +19,14 @@ Supports:
 ACM Digital Library is a major repository for computer science and IT publications.
 """
 
+from __future__ import annotations
+
 import re
-from typing import Dict, List, Optional
+from typing import TYPE_CHECKING, Dict, List, Optional
 from urllib.parse import quote
 
-from playwright.async_api import Page
+if TYPE_CHECKING:
+    from playwright.async_api import Page
 
 from .._core.base import BaseTranslator
 

@@ -2,11 +2,14 @@
 # -*- coding: utf-8 -*-
 """Pattern-based PDF extraction."""
 
+from __future__ import annotations
+
 import re
 from enum import Enum
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
-from playwright.async_api import Page
+if TYPE_CHECKING:
+    from playwright.async_api import Page
 
 
 class AccessPattern(Enum):

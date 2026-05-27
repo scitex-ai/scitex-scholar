@@ -13,9 +13,10 @@ __DIR__ = os.path.dirname(__FILE__)
 """SSRN translator."""
 
 import re
-from typing import List
+from typing import TYPE_CHECKING, List
 
-from playwright.async_api import Page
+if TYPE_CHECKING:
+    from playwright.async_api import Page
 
 from .._core.base import BaseTranslator
 

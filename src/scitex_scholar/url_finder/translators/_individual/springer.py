@@ -6,11 +6,14 @@ Based on Springer Link.js translator from Zotero.
 Original JavaScript implementation by Aurimas Vinckevicius.
 """
 
+from __future__ import annotations
+
 import re
-from typing import List
+from typing import TYPE_CHECKING, List
 from urllib.parse import quote
 
-from playwright.async_api import Page
+if TYPE_CHECKING:
+    from playwright.async_api import Page
 
 from .._core.base import BaseTranslator
 

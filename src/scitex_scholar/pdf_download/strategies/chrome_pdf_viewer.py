@@ -13,10 +13,12 @@ __DIR__ = os.path.dirname(__FILE__)
 """Chrome PDF Viewer Download Strategy"""
 
 from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 import scitex_logging as logging
-from playwright.async_api import BrowserContext
+
+if TYPE_CHECKING:
+    from playwright.async_api import BrowserContext
 from scitex_browser.stealth import HumanBehavior
 
 from scitex_scholar.browser import (

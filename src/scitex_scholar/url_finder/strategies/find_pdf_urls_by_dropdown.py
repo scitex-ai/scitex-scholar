@@ -4,10 +4,14 @@
 # ----------------------------------------
 """Find PDF URLs from dropdown/button elements."""
 
-from typing import List
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, List
 
 import scitex_logging as logging
-from playwright.async_api import Page
+
+if TYPE_CHECKING:
+    from playwright.async_api import Page
 
 from scitex_scholar.config import ScholarConfig
 

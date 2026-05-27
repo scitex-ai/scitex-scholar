@@ -23,9 +23,10 @@ import asyncio
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
-from playwright.async_api import Page
+if TYPE_CHECKING:
+    from playwright.async_api import Page
 from scitex_browser.debugging import browser_logger
 
 

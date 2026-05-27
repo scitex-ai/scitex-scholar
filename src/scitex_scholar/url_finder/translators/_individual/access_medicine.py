@@ -25,10 +25,13 @@ You should have received a copy of the GNU Affero General Public License
 along with Zotero. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import re
-from typing import Dict, List, Optional
+from __future__ import annotations
 
-from playwright.async_api import Page
+import re
+from typing import TYPE_CHECKING, Dict, List, Optional
+
+if TYPE_CHECKING:
+    from playwright.async_api import Page
 
 from .._core.base import BaseTranslator
 

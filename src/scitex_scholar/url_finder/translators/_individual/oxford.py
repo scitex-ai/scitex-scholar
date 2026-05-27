@@ -8,10 +8,13 @@ Handles book catalog pages from global.oup.com/academic/.
 Note: For Oxford academic journals (academic.oup.com), use the Silverchair translator.
 """
 
-import re
-from typing import List
+from __future__ import annotations
 
-from playwright.async_api import Page
+import re
+from typing import TYPE_CHECKING, List
+
+if TYPE_CHECKING:
+    from playwright.async_api import Page
 
 from .._core.base import BaseTranslator
 
