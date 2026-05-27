@@ -221,3 +221,14 @@ reportOptionalMemberAccess = "none"
 reportOptionalCall = "none"
 reportOptionalSubscript = "none"
 reportOptionalIterable = "none"
+
+[tool.scitex_dev]
+# §6 (MCP-parity) opt-out. scitex-scholar is a service/workflow package: its
+# real interface is the Scholar/Papers classes plus stateful MCP workflow
+# tools (authenticate, search_papers, download_pdf, jobs, ...). The public
+# Python functions in __all__ (to_bibtex, to_ris, apply_filters,
+# clean_abstract, citation-graph helpers) are auxiliary pure-data helpers,
+# not a flat operation set meant to mirror the tool surface 1:1. The two
+# surfaces are different *kinds* of thing by design, so the API<->MCP-tool
+# parity heuristic is a false positive here (same pattern as figrecipe).
+mcp_parity_exempt = true
