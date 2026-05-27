@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scitex_scholar.browser.ScholarBrowserManager &mdash; SciTeX Scholar v1.4.0</title>
+  <title>scitex_scholar.browser.ScholarBrowserManager &mdash; SciTeX Scholar v1.4.1</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=9172181d"></script>
+      <script src="../../../_static/documentation_options.js?v=350a9c04"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -805,19 +805,33 @@
                 <span class="o">**</span><span class="n">persistent_context_launch_options</span>
             <span class="p">)</span>
         <span class="p">)</span>
-        <span class="c1"># First cleanup run (immediate, non-continuous)</span>
-        <span class="k">await</span> <span class="n">close_unwanted_pages</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_persistent_context</span><span class="p">,</span> <span class="n">delay_sec</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">continuous</span><span class="o">=</span><span class="kc">False</span>
-        <span class="p">)</span>
-        <span class="c1"># Background continuous monitoring task</span>
-        <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span>
-            <span class="n">close_unwanted_pages</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_persistent_context</span><span class="p">,</span> <span class="n">delay_sec</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">continuous</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="p">)</span>
-        <span class="c1"># await self._close_unwanted_extension_pages_async()</span>
-        <span class="c1"># asyncio.create_task(self._close_unwanted_extension_pages_async())</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_stealth_scripts_to_persistent_context_async</span><span class="p">()</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_auth_cookies_to_persistent_context_async</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_persistent_browser</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_persistent_context</span><span class="o">.</span><span class="n">browser</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># First cleanup run (immediate, non-continuous)</span>
+            <span class="k">await</span> <span class="n">close_unwanted_pages</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_persistent_context</span><span class="p">,</span> <span class="n">delay_sec</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">continuous</span><span class="o">=</span><span class="kc">False</span>
+            <span class="p">)</span>
+            <span class="c1"># Background continuous monitoring task</span>
+            <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span>
+                <span class="n">close_unwanted_pages</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_persistent_context</span><span class="p">,</span> <span class="n">delay_sec</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">continuous</span><span class="o">=</span><span class="kc">True</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="c1"># await self._close_unwanted_extension_pages_async()</span>
+            <span class="c1"># asyncio.create_task(self._close_unwanted_extension_pages_async())</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_stealth_scripts_to_persistent_context_async</span><span class="p">()</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_auth_cookies_to_persistent_context_async</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_persistent_browser</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_persistent_context</span><span class="o">.</span><span class="n">browser</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="c1"># Post-mortem of persistent-context setup failure: capture the</span>
+            <span class="c1"># first open page&#39;s screenshot + HTML if one exists.</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">scitex_browser.debugging</span><span class="w"> </span><span class="kn">import</span> <span class="n">capture_debug_artifacts_async</span>
+
+            <span class="n">pages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_persistent_context</span><span class="o">.</span><span class="n">pages</span>
+            <span class="k">if</span> <span class="n">pages</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">capture_debug_artifacts_async</span><span class="p">(</span>
+                    <span class="n">pages</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;persistent_context_launch_error&quot;</span>
+                <span class="p">)</span>
+            <span class="k">raise</span>
 
 <div class="viewcode-block" id="ScholarBrowserManager._verify_xvfb_running">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.browser.ScholarBrowserManager._verify_xvfb_running">[docs]</a>
