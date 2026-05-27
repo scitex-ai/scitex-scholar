@@ -246,6 +246,9 @@ if __name__ == "__main__":
                         print(f"    - {url}")
 
                 except Exception as e:
+                    from scitex_browser.debugging import capture_debug_artifacts_async
+
+                    await capture_debug_artifacts_async(page, label="demo_atypon_error")
                     print(f"  Error: {e}")
                 finally:
                     await browser.close()

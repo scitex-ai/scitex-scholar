@@ -291,19 +291,33 @@ class ScholarBrowserManager(BrowserMixin):
                 **persistent_context_launch_options
             )
         )
-        # First cleanup run (immediate, non-continuous)
-        await close_unwanted_pages(
-            self._persistent_context, delay_sec=1, continuous=False
-        )
-        # Background continuous monitoring task
-        asyncio.create_task(
-            close_unwanted_pages(self._persistent_context, delay_sec=5, continuous=True)
-        )
-        # await self._close_unwanted_extension_pages_async()
-        # asyncio.create_task(self._close_unwanted_extension_pages_async())
-        await self._apply_stealth_scripts_to_persistent_context_async()
-        await self._load_auth_cookies_to_persistent_context_async()
-        self._persistent_browser = self._persistent_context.browser
+        try:
+            # First cleanup run (immediate, non-continuous)
+            await close_unwanted_pages(
+                self._persistent_context, delay_sec=1, continuous=False
+            )
+            # Background continuous monitoring task
+            asyncio.create_task(
+                close_unwanted_pages(
+                    self._persistent_context, delay_sec=5, continuous=True
+                )
+            )
+            # await self._close_unwanted_extension_pages_async()
+            # asyncio.create_task(self._close_unwanted_extension_pages_async())
+            await self._apply_stealth_scripts_to_persistent_context_async()
+            await self._load_auth_cookies_to_persistent_context_async()
+            self._persistent_browser = self._persistent_context.browser
+        except Exception:
+            # Post-mortem of persistent-context setup failure: capture the
+            # first open page's screenshot + HTML if one exists.
+            from scitex_browser.debugging import capture_debug_artifacts_async
+
+            pages = self._persistent_context.pages
+            if pages:
+                await capture_debug_artifacts_async(
+                    pages[0], label="persistent_context_launch_error"
+                )
+            raise
 
     def _verify_xvfb_running(self, _recursed=False):
         """Verify Xvfb virtual display is running; auto-start if absent."""

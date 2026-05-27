@@ -92,22 +92,27 @@ if __name__ == "__main__":
             browser = await p.chromium.launch(headless=True)
             context = await browser.new_context()
             page = await context.new_page()
+            try:
+                print("Navigating to GMS German Medical Science page...")
+                await page.goto(test_url, timeout=60000)
+                await page.wait_for_load_state("domcontentloaded")
 
-            print("Navigating to GMS German Medical Science page...")
-            await page.goto(test_url, timeout=60000)
-            await page.wait_for_load_state("domcontentloaded")
+                print("Extracting PDF URLs...")
+                pdf_urls = await GMSGermanMedicalScienceTranslator.extract_pdf_urls_async(
+                    page
+                )
 
-            print("Extracting PDF URLs...")
-            pdf_urls = await GMSGermanMedicalScienceTranslator.extract_pdf_urls_async(
-                page
-            )
+                print("\nResults:")
+                print(f"  Found {len(pdf_urls)} PDF URL(s)")
+                for url in pdf_urls:
+                    print(f"  - {url}")
+            except Exception:
+                from scitex_browser.debugging import capture_debug_artifacts_async
 
-            print("\nResults:")
-            print(f"  Found {len(pdf_urls)} PDF URL(s)")
-            for url in pdf_urls:
-                print(f"  - {url}")
-
-            await browser.close()
+                await capture_debug_artifacts_async(page, label="demo_gms_error")
+                raise
+            finally:
+                await browser.close()
 
     asyncio.run(main())
 

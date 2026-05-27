@@ -282,15 +282,23 @@ class BrowserAuthenticator(BrowserMixin):
 
                 page = await context.new_page()
 
-                # Navigate to verification URL
-                await page.goto(
-                    verification_url,
-                    wait_until="domcontentloaded",
-                    timeout=15000,
-                )
+                try:
+                    # Navigate to verification URL
+                    await page.goto(
+                        verification_url,
+                        wait_until="domcontentloaded",
+                        timeout=15000,
+                    )
 
-                current_url = page.url
-                is_authenticate_async = self._check_authenticate_async_page(current_url)
+                    current_url = page.url
+                    is_authenticate_async = self._check_authenticate_async_page(
+                        current_url
+                    )
+                except Exception:
+                    from scitex_browser.debugging import capture_debug_artifacts_async
+
+                    await capture_debug_artifacts_async(page, label="verify_auth_error")
+                    raise
 
                 await browser.close()
 

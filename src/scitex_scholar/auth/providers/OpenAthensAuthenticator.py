@@ -226,6 +226,11 @@ class OpenAthensAuthenticator(BaseAuthenticator):
                     timeout=self.timeout,
                     login_url=self.MYATHENS_URL,
                 )
+                from scitex_browser.debugging import capture_debug_artifacts_async
+
+                await capture_debug_artifacts_async(
+                    page, label="openathens_auth_failed"
+                )
                 await page.context.browser.close()
                 raise OpenAthensError("Authentication failed or timed out")
 

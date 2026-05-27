@@ -159,6 +159,11 @@ if __name__ == "__main__":
 
                     await page.wait_for_timeout(5000)
                 except Exception as e:
+                    from scitex_browser.debugging import (
+                        capture_debug_artifacts_async,
+                    )
+
+                    await capture_debug_artifacts_async(page, label="demo_sso_error")
                     print(f"Error: {e}")
                 finally:
                     await browser.close()
