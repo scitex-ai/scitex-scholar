@@ -1,10 +1,26 @@
 name: CLA Assistant
 
+# Two trigger paths:
+#   1. PRs from contributors           → CLAssistant action checks signature.
+#                                         allowlist already short-circuits to
+#                                         success for `bot*` and the repo
+#                                         owner, so owner PRs land instantly.
+#   2. Direct pushes / tag pushes      → owner-bypass job posts a synthetic
+#      by the repo owner                  `CLAssistant=success` status on the
+#                                         SHA so the release pipeline's
+#                                         sync-main step (a direct ref PATCH)
+#                                         doesn't get rejected by main's
+#                                         branch-protection rule that requires
+#                                         CLAssistant. Operator-direct: 2026-06-04.
+
 on:
   issue_comment:
     types: [created]
   pull_request_target:
     types: [opened, closed, synchronize]
+  push:
+    branches: [main, develop]
+    tags: ['v*']
 
 permissions:
   actions: write
@@ -13,7 +29,29 @@ permissions:
   statuses: write
 
 jobs:
+  owner-bypass:
+    # Fires only for direct pushes by the repo owner. PR events keep
+    # going through the full CLAssistant action below.
+    if: github.event_name == 'push' && github.actor == 'ywatanabe1989'
+    runs-on: ubuntu-latest
+    permissions:
+      statuses: write
+    steps:
+      - name: Mark CLAssistant=success on this SHA (owner-allowlisted direct push)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          gh api "repos/${REPO}/statuses/${SHA}" \
+            -f state=success \
+            -f context=CLAssistant \
+            -f description="Owner-triggered direct push (CLA bypass per repo allowlist)"
+
   CLAssistant:
+    # PR / comment path — unchanged from the pre-2026-06-04 workflow.
+    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     steps:
       - name: CLA Assistant

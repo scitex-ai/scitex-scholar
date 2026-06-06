@@ -328,18 +328,14 @@ class OpenAthensSSOAutomator(BaseSSOAutomator):
 
         See _skills/general/02_package_09_browser-automation-debugging.md.
         """
-        from pathlib import Path
-
         from scitex_browser.debugging import capture_debug_artifacts_async
+
+        from scitex_scholar.config import ScholarConfig
 
         await capture_debug_artifacts_async(
             page,
             label=label,
-            base_dir=Path.home()
-            / ".scitex"
-            / "scholar"
-            / "cache"
-            / "engine"
+            base_dir=ScholarConfig().path_manager.get_cache_engine_dir()
             / "screenshots",
         )
 
