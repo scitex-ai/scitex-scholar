@@ -232,3 +232,7 @@ reportOptionalIterable = "none"
 # surfaces are different *kinds* of thing by design, so the API<->MCP-tool
 # parity heuristic is a false positive here (same pattern as figrecipe).
 mcp_parity_exempt = true
+
+dependencies = [
+    "scitex-dev>=0.17.8",
+]
