@@ -41,20 +41,25 @@ from ._core import compute_exit_code, verify_cites
 @click.option("--min-confidence", type=float, default=0.8, show_default=True)
 @click.option(
     "--fail-on",
-    default="stub,hallucinated",
+    default="stub,hallucinated,unlinked",
     show_default=True,
     help="Comma list of statuses that make the command fail-loud.",
 )
 @click.option("--offline", is_flag=True, help="Cache-only; do not hit the network.")
+@click.option(
+    "--emit-clew",
+    is_flag=True,
+    help="Push each verdict into clew via add_citation (no-op if clew absent).",
+)
 @click.option("--json", "as_json", is_flag=True, help="Emit the sidecar to stdout.")
 def verify_cites_command(
-    manuscript_dir, bib, out, min_confidence, fail_on, offline, as_json
+    manuscript_dir, bib, out, min_confidence, fail_on, offline, emit_clew, as_json
 ):
     """Resolve every \\cite key to a real source and gate on the result.
 
     \b
     Example:
-      $ python -m scitex_scholar.verify_cites paper/ --fail-on stub,hallucinated
+      $ python -m scitex_scholar.verify_cites paper/ --fail-on stub,hallucinated,unlinked
     """
     fail_set = [s.strip() for s in str(fail_on).split(",") if s.strip()]
     try:
@@ -67,6 +72,12 @@ def verify_cites_command(
         )
     except FileNotFoundError as exc:
         raise click.ClickException(str(exc))
+
+    if emit_clew:
+        from ._core import push_to_clew
+
+        pushed = push_to_clew(report)
+        click.echo(f"clew: pushed {pushed} citation(s)")
 
     if as_json:
         click.echo(json.dumps(report.to_sidecar(), indent=2, ensure_ascii=False))

@@ -12,13 +12,14 @@ from typing import Dict, Iterable, List, Optional
 
 from ._classify import classify
 from ._model import (
-    EXIT_HALLUCINATED,
+    EXIT_CITATION_STUB,
+    EXIT_CITATION_UNLINKED,
+    EXIT_CITATION_UNRESOLVED,
     EXIT_NO_CITES,
     EXIT_OK,
-    EXIT_STUB,
-    EXIT_UNVERIFIED,
     HALLUCINATED,
     STUB,
+    UNLINKED,
     UNVERIFIED,
     CiteStatus,
 )
@@ -95,7 +96,7 @@ def verify_cites(
             statuses.append(
                 CiteStatus(
                     key=key,
-                    status=HALLUCINATED,
+                    status=UNLINKED,
                     provenance="cited but not present in the compiled bib (undefined citation)",
                 )
             )
@@ -123,17 +124,41 @@ def verify_cites(
 
 
 def compute_exit_code(report: VerifyReport, fail_on: Iterable[str]) -> int:
-    """Fail-loud exit code, precedence hallucinated > unverified > stub."""
+    """Fail-loud exit code in clew's CITATION namespace.
+
+    Precedence stub/hallucinated (14) > unresolved (15) > unlinked (16).
+    """
     if not report.statuses:
         return EXIT_NO_CITES
     fail_on = set(fail_on)
-    if HALLUCINATED in fail_on and report.by_status(HALLUCINATED):
-        return EXIT_HALLUCINATED
+    if fail_on & {STUB, HALLUCINATED} and (
+        report.by_status(STUB) or report.by_status(HALLUCINATED)
+    ):
+        return EXIT_CITATION_STUB
     if UNVERIFIED in fail_on and report.by_status(UNVERIFIED):
-        return EXIT_UNVERIFIED
-    if STUB in fail_on and report.by_status(STUB):
-        return EXIT_STUB
+        return EXIT_CITATION_UNRESOLVED
+    if UNLINKED in fail_on and report.by_status(UNLINKED):
+        return EXIT_CITATION_UNLINKED
     return EXIT_OK
+
+
+def push_to_clew(report: VerifyReport, clew=None) -> int:
+    """Register each cite verdict into clew via `add_citation` (upsert).
+
+    `clew` is injectable for testing; when omitted we lazy-import the real
+    module and no-op (returning 0) if it is unavailable. Returns the number of
+    citations pushed.
+    """
+    if clew is None:
+        try:
+            import scitex_clew as clew  # type: ignore
+        except Exception:
+            return 0
+    n = 0
+    for st in report.statuses:
+        clew.add_citation(**st.to_clew())
+        n += 1
+    return n
 
 
 # EOF

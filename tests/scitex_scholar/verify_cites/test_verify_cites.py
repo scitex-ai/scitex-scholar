@@ -17,12 +17,13 @@ from scitex_scholar.verify_cites._classify import (  # noqa: E402
     title_similarity,
 )
 from scitex_scholar.verify_cites._model import (  # noqa: E402
-    EXIT_HALLUCINATED,
+    EXIT_CITATION_STUB,
+    EXIT_CITATION_UNLINKED,
     EXIT_NO_CITES,
     EXIT_OK,
-    EXIT_STUB,
     HALLUCINATED,
     STUB,
+    UNLINKED,
     UNVERIFIED,
     VERIFIED,
     CiteStatus,
@@ -206,13 +207,13 @@ def test_classify_unverified_when_id_present_but_unresolved():
 # --------------------------------------------------------------------------- #
 # _model — clew boundary mapping
 # --------------------------------------------------------------------------- #
-def test_to_clew_maps_hallucinated_status_to_stub():
+def test_to_clew_emits_cite_key_kwarg():
     # Arrange
     st = CiteStatus(key="H", status=HALLUCINATED, doi=None)
     # Act
     payload = st.to_clew()
     # Assert
-    assert payload["status"] == "stub"
+    assert payload["cite_key"] == "H"
 
 
 def test_to_clew_hallucinated_sets_is_stub_true():
@@ -224,13 +225,40 @@ def test_to_clew_hallucinated_sets_is_stub_true():
     assert payload["is_stub"] is True
 
 
-def test_to_clew_verified_keeps_status_and_is_not_stub():
+def test_to_clew_hallucinated_is_not_resolved():
+    # Arrange
+    st = CiteStatus(key="H", status=HALLUCINATED, doi=None)
+    # Act
+    payload = st.to_clew()
+    # Assert
+    assert payload["resolved"] is False
+
+
+def test_to_clew_verified_is_resolved_and_not_stub():
     # Arrange
     st = CiteStatus(key="V", status=VERIFIED, doi="10.1/x")
     # Act
     payload = st.to_clew()
     # Assert
-    assert payload == {"key": "V", "status": "verified", "doi": "10.1/x", "is_stub": False}
+    assert (payload["resolved"], payload["is_stub"], payload["doi"]) == (True, False, "10.1/x")
+
+
+def test_to_clew_carries_local_status_in_metadata():
+    # Arrange
+    st = CiteStatus(key="U", status=UNVERIFIED, doi="10.1/x")
+    # Act
+    payload = st.to_clew()
+    # Assert
+    assert payload["metadata"]["local_status"] == UNVERIFIED
+
+
+def test_to_clew_has_no_status_kwarg():
+    # Arrange: clew.add_citation derives status; it must not receive status=.
+    st = CiteStatus(key="V", status=VERIFIED, doi="10.1/x")
+    # Act
+    payload = st.to_clew()
+    # Assert
+    assert "status" not in payload
 
 
 # --------------------------------------------------------------------------- #
@@ -304,13 +332,13 @@ def test_verify_cites_sidecar_records_status(e2e):
     assert data["Good2020"]["status"] == VERIFIED
 
 
-def test_verify_cites_gate_hallucinated_takes_precedence(e2e):
+def test_verify_cites_gate_stub_hallucinated_maps_to_14(e2e):
     # Arrange
     report, _ = e2e
     # Act
     rc = vc.compute_exit_code(report, ["stub", "hallucinated"])
     # Assert
-    assert rc == EXIT_HALLUCINATED
+    assert rc == EXIT_CITATION_STUB
 
 
 def test_verify_cites_all_verified_returns_ok(tmp_path):
@@ -326,16 +354,28 @@ def test_verify_cites_all_verified_returns_ok(tmp_path):
     assert rc == EXIT_OK
 
 
-def test_verify_cites_cited_but_absent_is_hallucinated(tmp_path):
+def test_verify_cites_cited_but_absent_is_unlinked(tmp_path):
     # Arrange
     report = vc.verify_cites(
         tmp_path, entries={}, cited_keys=["Missing2020"], resolver=_fake_resolver,
         out=tmp_path / "s.json",
     )
     # Act
-    halluc = report.by_status(HALLUCINATED)
+    unlinked = report.by_status(UNLINKED)
     # Assert
-    assert halluc == ["Missing2020"]
+    assert unlinked == ["Missing2020"]
+
+
+def test_verify_cites_unlinked_gate_maps_to_16(tmp_path):
+    # Arrange
+    report = vc.verify_cites(
+        tmp_path, entries={}, cited_keys=["Missing2020"], resolver=_fake_resolver,
+        out=tmp_path / "s.json",
+    )
+    # Act
+    rc = vc.compute_exit_code(report, ["unlinked"])
+    # Assert
+    assert rc == EXIT_CITATION_UNLINKED
 
 
 def test_verify_cites_no_cites_exit_code(tmp_path):
@@ -360,7 +400,43 @@ def test_verify_cites_stub_only_gate_exit_code(tmp_path):
     # Act
     rc = vc.compute_exit_code(report, ["stub"])
     # Assert
-    assert rc == EXIT_STUB
+    assert rc == EXIT_CITATION_STUB
+
+
+class _FakeClew:
+    def __init__(self):
+        self.calls = []
+
+    def add_citation(self, **kwargs):
+        self.calls.append(kwargs)
+
+
+def test_push_to_clew_calls_add_citation_per_cite(tmp_path):
+    # Arrange
+    entries = {"A": {"title": "Paper A", "doi": "10.1/a"}}
+    report = vc.verify_cites(
+        tmp_path, entries=entries, cited_keys=["A"], resolver=_fake_resolver,
+        out=tmp_path / "s.json", min_confidence=0.6,
+    )
+    fake = _FakeClew()
+    # Act
+    pushed = vc.push_to_clew(report, clew=fake)
+    # Assert
+    assert pushed == 1
+
+
+def test_push_to_clew_passes_cite_key_not_status(tmp_path):
+    # Arrange
+    entries = {"A": {"title": "Paper A", "doi": "10.1/a"}}
+    report = vc.verify_cites(
+        tmp_path, entries=entries, cited_keys=["A"], resolver=_fake_resolver,
+        out=tmp_path / "s.json", min_confidence=0.6,
+    )
+    fake = _FakeClew()
+    # Act
+    vc.push_to_clew(report, clew=fake)
+    # Assert
+    assert fake.calls[0]["cite_key"] == "A" and "status" not in fake.calls[0]
 
 
 # EOF

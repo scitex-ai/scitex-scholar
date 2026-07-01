@@ -2,35 +2,34 @@
 # -*- coding: utf-8 -*-
 # File: src/scitex_scholar/verify_cites/_model.py
 # ----------------------------------------
-"""Data model + status/exit-code constants for `verify-cites`."""
+"""Data model + status/exit-code constants for `verify-cites`.
+
+Exit codes and the clew push payload are aligned to clew's frozen contract
+(confirmed 2026-07-01): citation codes are DISTINCT from clew's value-claim
+codes (which own 10/11/12), and `clew.add_citation` DERIVES status from
+`resolved`/`is_stub`/`doi` — there is no `status=` kwarg.
+"""
 from __future__ import annotations
 
 import dataclasses
 from typing import Optional
 
-# Local verification statuses (richer than the clew-locked set).
+# Local (verify-time) statuses — richer than what clew stores. "unknown" and
+# "unlinked" are verify-time verdicts, not directly registerable in clew.
 VERIFIED = "verified"
 UNVERIFIED = "unverified"
 STUB = "stub"
 HALLUCINATED = "hallucinated"
+UNLINKED = "unlinked"  # cited but no entry in the compiled bib (undefined cite)
 
-LOCAL_STATUSES = (VERIFIED, UNVERIFIED, STUB, HALLUCINATED)
+LOCAL_STATUSES = (VERIFIED, UNVERIFIED, STUB, HALLUCINATED, UNLINKED)
 
-# clew locked its status set to {verified, stub, unverified, unknown}.
-# Map the richer local set onto it at the boundary; keep the nuance in the
-# sidecar. A hallucinated ref maps to stub (+is_stub) so the writer gate fires.
-_CLEW_MAP = {
-    VERIFIED: "verified",
-    UNVERIFIED: "unverified",
-    STUB: "stub",
-    HALLUCINATED: "stub",
-}
-
-# Exit codes mirror `clew verify`'s fail-loud contract.
+# Exit codes mirror clew's CITATION namespace (distinct from clew's value-claim
+# codes UNVERIFIED=10 / SOURCE_MISSING=11 / HASH_MISMATCH=12).
 EXIT_OK = 0
-EXIT_HALLUCINATED = 10
-EXIT_UNVERIFIED = 11
-EXIT_STUB = 12
+EXIT_CITATION_STUB = 14        # stub or hallucinated (placeholder / fabricated)
+EXIT_CITATION_UNRESOLVED = 15  # has an identifier but did not resolve
+EXIT_CITATION_UNLINKED = 16    # cited but absent from the compiled bib
 EXIT_NO_CITES = 20
 
 
@@ -53,12 +52,29 @@ class CiteStatus:
         return dataclasses.asdict(self)
 
     def to_clew(self) -> dict:
-        """Boundary payload for `clew.add_citation`."""
+        """kwargs for ``clew.add_citation`` (clew derives its own status).
+
+        Mapping (per clew's frozen API):
+          verified   -> resolved=True,  is_stub=False, doi set
+          unverified -> resolved=False, is_stub=False
+          stub/hallucinated -> is_stub=True
+          unlinked   -> resolved=False, is_stub=False (no entry to link)
+        The richer local status + provenance travel in ``metadata``.
+        """
+        is_stub = self.status in (STUB, HALLUCINATED)
         return {
-            "key": self.key,
-            "status": _CLEW_MAP[self.status],
+            "cite_key": self.key,
             "doi": self.doi,
-            "is_stub": self.status in (STUB, HALLUCINATED),
+            "url": None,
+            "source_id": self.scholar_id,
+            "is_stub": is_stub,
+            "resolved": self.status == VERIFIED,
+            "metadata": {
+                "local_status": self.status,
+                "resolver_source": self.resolver_source,
+                "match_confidence": self.match_confidence,
+                "provenance": self.provenance,
+            },
         }
 
 

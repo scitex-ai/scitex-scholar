@@ -13,11 +13,13 @@ from ._core import (
     DEFAULT_SIDECAR,
     VerifyReport,
     compute_exit_code,
+    push_to_clew,
     verify_cites,
 )
 from ._model import (
     HALLUCINATED,
     STUB,
+    UNLINKED,
     UNVERIFIED,
     VERIFIED,
     CiteStatus,
@@ -28,6 +30,7 @@ from ._tex import extract_cited_keys, resolve_compiled_bib
 __all__ = [
     "verify_cites",
     "compute_exit_code",
+    "push_to_clew",
     "VerifyReport",
     "CiteStatus",
     "ResolvedRef",
@@ -42,6 +45,7 @@ __all__ = [
     "UNVERIFIED",
     "STUB",
     "HALLUCINATED",
+    "UNLINKED",
 ]
 
 # EOF
