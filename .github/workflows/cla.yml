@@ -1,17 +1,11 @@
 name: CLA Assistant
 
-# Two trigger paths:
-#   1. PRs from contributors           → CLAssistant action checks signature.
-#                                         allowlist already short-circuits to
-#                                         success for `bot*` and the repo
-#                                         owner, so owner PRs land instantly.
-#   2. Direct pushes / tag pushes      → owner-bypass job posts a synthetic
-#      by the repo owner                  `CLAssistant=success` status on the
-#                                         SHA so the release pipeline's
-#                                         sync-main step (a direct ref PATCH)
-#                                         doesn't get rejected by main's
-#                                         branch-protection rule that requires
-#                                         CLAssistant. Operator-direct: 2026-06-04.
+# PILOT: org-level reusable-workflow caller (scitex-ai/.github, 2026-07-10).
+# Triggers/permissions preserved verbatim from the prior local file.
+# Reusable workflow defaults (owner_login=ywatanabe1989,
+# owner_allowlist="bot*,ywatanabe1989", default_branch=main) do NOT match
+# this repo's prior hardcoded allowlist (adds LLEmacs), so `owner_allowlist`
+# is overridden below.
 
 on:
   issue_comment:
@@ -29,43 +23,8 @@ permissions:
   statuses: write
 
 jobs:
-  owner-bypass:
-    # Fires only for direct pushes by the repo owner. PR events keep
-    # going through the full CLAssistant action below.
-    if: github.event_name == 'push' && github.actor == 'ywatanabe1989'
-    runs-on: ubuntu-latest
-    permissions:
-      statuses: write
-    steps:
-      - name: Mark CLAssistant=success on this SHA (owner-allowlisted direct push)
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
-          SHA: ${{ github.sha }}
-        run: |
-          set -euo pipefail
-          gh api "repos/${REPO}/statuses/${SHA}" \
-            -f state=success \
-            -f context=CLAssistant \
-            -f description="Owner-triggered direct push (CLA bypass per repo allowlist)"
-
-  CLAssistant:
-    # PR / comment path — unchanged from the pre-2026-06-04 workflow.
-    if: github.event_name != 'push'
-    runs-on: ubuntu-latest
-    steps:
-      - name: CLA Assistant
-        uses: contributor-assistant/github-action@v2.6.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PERSONAL_ACCESS_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
-        with:
-          path-to-signatures: "signatures/cla.json"
-          path-to-document: "https://github.com/ywatanabe1989/scitex-scholar/blob/main/CLA.md"
-          branch: "cla-signatures"
-          allowlist: bot*,ywatanabe1989,LLEmacs
-          custom-allsigned-prcomment: |
-            Thank you for signing the SciTeX CLA. Your contribution can now be reviewed.
-          custom-notsigned-prcomment: |
-            Please sign the [SciTeX CLA](https://github.com/ywatanabe1989/scitex-scholar/blob/main/CLA.md) before your contribution can be merged.
-            Comment `I have read and agree to the SciTeX CLA.` to sign.
+  call:
+    uses: scitex-ai/.github/.github/workflows/cla.yml@main
+    with:
+      owner_allowlist: "bot*,ywatanabe1989,LLEmacs"
+    secrets: inherit

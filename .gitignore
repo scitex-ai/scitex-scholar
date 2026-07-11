@@ -15,6 +15,7 @@ htmlcov/
 .venv
 venv/
 docs/sphinx/_build/
+.worktrees/
 
 ### Source: /home/ywatanabe/.git-templates/.gitignore-templates/Custom/Specific.gitignore ###
 # Force-track branding icons (overrides LargeFiles.gitignore **/*.png rule)

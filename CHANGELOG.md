@@ -5,6 +5,22 @@ All notable changes to `scitex-scholar` are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.4] - 2026-07-11
+
+### Fixed
+- `ensure_workspace` is now exported at the package top level
+  (`from scitex_scholar import ensure_workspace`). Previously missing from
+  `__all__`/the lazy-import map, so the name silently resolved to the
+  submodule instead of the function, breaking any caller expecting a
+  callable (scitex-hub prod incident: scitex-template's
+  `clone_scitex_minimal` -> `TypeError: 'module' object is not callable`).
+- Search result `title`/`abstract` fields are now sanitized of raw
+  JATS/HTML markup (`<jats:p>`, `<scp>...</scp>`, `<jats:title>`, ...) at
+  `standardize_metadata()`, the single choke point every metadata engine
+  (CrossRef, CrossRefLocal, OpenAlex, PubMed, Semantic Scholar, arXiv, ...)
+  funnels through. Previously these tags leaked into consumer UIs
+  (reported by the scitex-hub webapp).
+
 ## [1.4.1] - 2026-05-27
 
 ### Fixed
