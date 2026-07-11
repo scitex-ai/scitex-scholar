@@ -57,6 +57,7 @@ __all__ = [
     "to_connected_papers",
     "apply_filters",
     "clean_abstract",
+    "ensure_workspace",
     "SCHOLAR_AVAILABLE",
 ]
 
@@ -89,6 +90,7 @@ _LAZY: dict[str, tuple[str, str]] = {
     "from_connected_papers": (".migration", "from_connected_papers"),
     "to_connected_papers": (".migration", "to_connected_papers"),
     "apply_filters": (".filters", "apply_filters"),
+    "ensure_workspace": (".ensure_workspace", "ensure_workspace"),
 }
 
 
@@ -129,6 +131,7 @@ if TYPE_CHECKING:
     )
     from .config import ScholarConfig  # noqa: F401
     from .core.Paper import Paper  # noqa: F401
+    from .ensure_workspace import ensure_workspace  # noqa: F401
     from .core.Papers import Papers  # noqa: F401
     from .core.Scholar import Scholar  # noqa: F401
     from .filters import apply_filters  # noqa: F401
