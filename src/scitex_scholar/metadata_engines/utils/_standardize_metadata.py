@@ -163,6 +163,34 @@ BASE_STRUCTURE = OrderedDict(
 )
 
 
+def _sanitize_free_text_fields(complete_structure):
+    """Strip raw JATS/HTML markup from free-text metadata fields in place.
+
+    CrossRef (and similar) source data embeds JATS/HTML tags directly in
+    abstract/title text (e.g. ``<jats:p>``, ``<scp>CA1</scp>``,
+    ``<jats:title>``). Downstream consumers (e.g. the scitex-hub webapp)
+    render these fields as-is, so the raw markup must be stripped here —
+    the single choke point every metadata engine funnels through — rather
+    than in each individual display layer.
+
+    Only non-empty ``str`` values are touched; ``None``/other types (and
+    every other field — authors list, year int, doi, ...) pass through
+    untouched.
+    """
+    from scitex_scholar._utils.text import TextNormalizer
+
+    basic = complete_structure.get("basic")
+    if not isinstance(basic, dict):
+        return complete_structure
+
+    for field in ("title", "abstract"):
+        value = basic.get(field)
+        if isinstance(value, str) and value:
+            basic[field] = TextNormalizer.strip_html_tags(value)
+
+    return complete_structure
+
+
 def standardize_metadata(metadata):
     """Initialize all required fields with null values."""
     import copy
@@ -175,6 +203,8 @@ def standardize_metadata(metadata):
                 complete_structure[section_key].update(section_data)
             else:
                 complete_structure[section_key] = section_data
+
+    complete_structure = _sanitize_free_text_fields(complete_structure)
 
     return complete_structure
 
