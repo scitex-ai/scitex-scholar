@@ -5,6 +5,61 @@ All notable changes to `scitex-scholar` are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.1] - 2026-07-12
+
+### Fixed
+- `ArXivEngine._search_by_doi` queried arXiv's API with the wrong field
+  (`search_query=id:"..."`, a free-text search that silently returns
+  zero entries for exact-ID lookups) instead of `id_list` (arXiv's
+  documented direct-fetch parameter). Every DOI-form arXiv citation --
+  the single most common citation form in ML/CS manuscripts -- fell
+  through to the not-found fallback and could never classify VERIFIED
+  in `verify-cites`, independent of the 1.5.0 `_std()` fix. Live-verified:
+  a real arXiv DOI and a bare eprint id both now classify VERIFIED.
+- `scitex_scholar.gui.launch()` crashed on startup with
+  `KeyError: 'scholar_dir'` -- `PathManager.dirs` never had that key; the
+  scholar root is exposed as the direct attribute `path_manager.scholar_dir`.
+  The Scholar GUI (Flask app for browsing/managing the paper library) is
+  reachable again.
+
+## [1.5.0] - 2026-07-12
+
+### Added
+- `verify-cites`: resolve every `\cite` key in a manuscript to a real
+  source (CrossRef/OpenAlex/ArXiv/SemanticScholar) and gate on the
+  result. Classifies each citation as verified / unverified / stub /
+  hallucinated / unlinked. Available as
+  `from scitex_scholar.verify_cites import verify_cites, compute_exit_code`
+  and `python -m scitex_scholar.verify_cites <manuscript_dir> [options]`
+  (not yet wired into the `scitex-scholar` CLI group, pending a
+  `_cli_main.py` file-size-gate refactor).
+- `verify-cites --emit-clew` now saves a clew-ingestible
+  `citations/v1` sidecar (`{"schema": "scitex-clew/citations/v1", ...}`)
+  via `stx.io.save` instead of importing/calling `scitex_clew` directly,
+  keeping scholar clew-agnostic per the ecosystem's acyclic-deps
+  decision (2026-07-02).
+
+### Fixed
+- `verify-cites`'s resolver (`_std()`) read the wrong metadata dict
+  shape (flat `title`/`doi` instead of the real engines' nested
+  `basic.title`/`id.doi`), so it could never classify a citation as
+  VERIFIED via any online path -- every real, correctly-cited paper
+  silently degraded to UNVERIFIED. Fixed, with a guard so a
+  not-found title-search echo (CrossRef/OpenAlex/ArXiv's
+  `_create_minimal_metadata` fallback) cannot self-match into a false
+  VERIFIED. Live-verified against a real DOI (now resolves VERIFIED)
+  and a fabricated title (still resolves to no hit).
+- `ScholarAuthManager` no longer hard-fails with `AuthenticationError`
+  when no institutional auth provider is configured -- open-access
+  paper fetches (arXiv, etc.) now proceed anonymously instead of
+  blocking every browser-based download behind an OpenAthens/EZProxy/
+  Shibboleth login nobody set up.
+- Journal-name sanitization in `update_symlink()` no longer crashes
+  with `AttributeError` (`path_manager._sanitize_filename` was never a
+  real method) -- `paper fetch --project <name>` now actually creates
+  the project symlink for papers with a journal name, instead of
+  silently reporting success while skipping the link.
+
 ## [1.4.4] - 2026-07-11
 
 ### Fixed

@@ -25,7 +25,7 @@ def _find_crossref_db(db_path: Optional[str] = None) -> Optional[str]:
     from scitex_scholar.config import ScholarConfig
 
     candidates = [
-        ScholarConfig().path_manager.dirs["scholar_dir"] / "crossref.db",
+        ScholarConfig().path_manager.scholar_dir / "crossref.db",
         Path.home() / "proj" / "crossref_local" / "data" / "crossref.db",
         Path.home() / "proj" / "crossref-local" / "data" / "crossref.db",
         Path.home() / ".proj" / "crossref_local" / "data" / "crossref.db",

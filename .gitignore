@@ -12,6 +12,7 @@ htmlcov/
 .pytest_cache/
 *.so
 .env
+.envrc
 .venv
 venv/
 docs/sphinx/_build/
