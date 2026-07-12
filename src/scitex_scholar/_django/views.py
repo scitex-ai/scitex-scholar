@@ -20,7 +20,7 @@ import urllib.parse
 from typing import Dict, Optional
 
 from django.conf import settings as django_settings
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
 from django.views.decorators.http import require_GET
 
@@ -95,8 +95,6 @@ def index(request):
         },
         request=request,
     )
-    from django.http import HttpResponse
-
     return HttpResponse(html)
 
 
