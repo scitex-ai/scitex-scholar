@@ -39,8 +39,21 @@ def _authors_list(entry: dict) -> List[str]:
 def _std(meta: Optional[dict], source: str) -> Optional[ResolvedRef]:
     if not meta:
         return None
-    doi = meta.get("doi") or (meta.get("externalIds") or {}).get("DOI")
-    return ResolvedRef(title=meta.get("title"), doi=doi, source=source)
+    basic = meta.get("basic") or {}
+    id_ = meta.get("id") or {}
+    doi = id_.get("doi") or (meta.get("externalIds") or {}).get("DOI")
+    title = basic.get("title")
+    # CrossRef/OpenAlex/ArXiv's "not found" fallback (_create_minimal_metadata,
+    # see _BaseDOIEngine) echoes the query's own title/year/authors back into
+    # `basic.*` with no DOI -- structurally indistinguishable from a genuine
+    # match's extracted title. Without a DOI, a title from one of these three
+    # engines is more likely an echoed miss than a resolved hit, so require
+    # one. Semantic Scholar's CorpusId lookup is exempt: it returns bare None
+    # on a miss (never reaches this echo shape), so a title-without-DOI hit
+    # there is genuinely DOI-less-but-real, matching its search comment above.
+    if source in ("crossref", "openalex", "arxiv") and not doi:
+        return None
+    return ResolvedRef(title=title, doi=doi, source=source)
 
 
 def default_resolver(entry: dict, *, offline: bool = False) -> Optional[ResolvedRef]:
