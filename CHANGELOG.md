@@ -5,6 +5,19 @@ All notable changes to `scitex-scholar` are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-07-12
+
+### Changed
+- **GUI: migrated the standalone browser interface from Flask to Django**,
+  following `scitex-writer`'s reference pattern (`scitex_app.run_standalone`
+  for the standalone server, guarded optional `scitex_ui` import for the
+  shared favicon convention). The `scholar gui {open,serve,status,stop}`
+  CLI surface is unchanged; only the backend swapped. Port 31297 unchanged.
+  The Flask dependency is removed entirely (`django>=4.2` +
+  `scitex-app>=0.2.8` replace it in the `[server]` extra). This is a
+  standalone-only change -- it does not touch or replace scitex-hub's
+  separate, independently-versioned `scholar_app`.
+
 ## [1.5.2] - 2026-07-12
 
 ### Fixed
