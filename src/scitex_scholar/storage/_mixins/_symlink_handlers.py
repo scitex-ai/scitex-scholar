@@ -32,6 +32,8 @@ class SymlinkHandlersMixin:
         """Generate readable symlink name from metadata."""
         from scitex_dict import DotDict
 
+        from scitex_scholar.config.core._path_helpers import sanitize_filename
+
         # Extract author
         first_author = "Unknown"
         if authors and len(authors) > 0:
@@ -55,7 +57,9 @@ class SymlinkHandlersMixin:
         # Clean journal name
         journal_clean = "Unknown"
         if journal:
-            journal_clean = self.config.path_manager._sanitize_filename(journal)[:30]
+            journal_clean = sanitize_filename(
+                journal, self.config.path_manager.constraints
+            )[:30]
             if not journal_clean:
                 journal_clean = "Unknown"
 
