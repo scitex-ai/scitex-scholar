@@ -28,6 +28,14 @@ from ._tex import extract_cited_keys, resolve_compiled_bib
 
 DEFAULT_SIDECAR = Path(".scitex/scholar/citation_status.json")
 
+# Scholar->clew decoupled seam (operator's acyclic-deps decision, 2026-07-02):
+# scholar stays clew-agnostic and never imports scitex_clew. It saves this
+# artifact via ``stx.io.save``; clew's io-save observer recognizes it by the
+# "schema" marker and ingests it on its own. See scitex_clew._citation._ingest
+# for the authoritative contract this shape must match.
+CLEW_CITATIONS_SCHEMA = "scitex-clew/citations/v1"
+DEFAULT_CLEW_SIDECAR = Path(".scitex/scholar/citations_clew.json")
+
 
 @dataclasses.dataclass
 class VerifyReport:
@@ -142,23 +150,34 @@ def compute_exit_code(report: VerifyReport, fail_on: Iterable[str]) -> int:
     return EXIT_OK
 
 
-def push_to_clew(report: VerifyReport, clew=None) -> int:
-    """Register each cite verdict into clew via `add_citation` (upsert).
+def build_citations_artifact(report: VerifyReport) -> dict:
+    """Build the scholar->clew decoupled sidecar artifact (schema v1).
 
-    `clew` is injectable for testing; when omitted we lazy-import the real
-    module and no-op (returning 0) if it is unavailable. Returns the number of
-    citations pushed.
+    Each entry is exactly ``CiteStatus.to_clew()`` -- already shaped to match
+    clew's ingest contract per-entry; this just wraps them under the required
+    schema marker.
     """
-    if clew is None:
-        try:
-            import scitex_clew as clew  # type: ignore
-        except Exception:
-            return 0
-    n = 0
-    for st in report.statuses:
-        clew.add_citation(**st.to_clew())
-        n += 1
-    return n
+    return {
+        "schema": CLEW_CITATIONS_SCHEMA,
+        "citations": [st.to_clew() for st in report.statuses],
+    }
+
+
+def push_to_clew(report: VerifyReport, out: Optional[Path] = None) -> int:
+    """Save the citation ledger as a clew-ingestible sidecar artifact.
+
+    Writes via ``stx.io.save`` (scholar never imports scitex_clew directly --
+    the acyclic-deps seam). Returns the number of citation entries written;
+    0 if the report has no statuses.
+    """
+    artifact = build_citations_artifact(report)
+    if not artifact["citations"]:
+        return 0
+    import scitex_io
+
+    out_path = Path(out) if out else DEFAULT_CLEW_SIDECAR
+    scitex_io.save(artifact, str(out_path), verbose=False)
+    return len(artifact["citations"])
 
 
 # EOF

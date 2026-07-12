@@ -18,7 +18,7 @@ from pathlib import Path
 
 import click
 
-from ._core import compute_exit_code, verify_cites
+from ._core import DEFAULT_CLEW_SIDECAR, compute_exit_code, verify_cites
 
 
 @click.command("verify-cites")
@@ -49,7 +49,10 @@ from ._core import compute_exit_code, verify_cites
 @click.option(
     "--emit-clew",
     is_flag=True,
-    help="Push each verdict into clew via add_citation (no-op if clew absent).",
+    help=(
+        "Save each verdict as a clew-ingestible citations/v1 sidecar "
+        "(default: <dir>/.scitex/scholar/citations_clew.json)."
+    ),
 )
 @click.option("--json", "as_json", is_flag=True, help="Emit the sidecar to stdout.")
 def verify_cites_command(
@@ -76,8 +79,8 @@ def verify_cites_command(
     if emit_clew:
         from ._core import push_to_clew
 
-        pushed = push_to_clew(report)
-        click.echo(f"clew: pushed {pushed} citation(s)")
+        pushed = push_to_clew(report, out=Path(manuscript_dir) / DEFAULT_CLEW_SIDECAR)
+        click.echo(f"clew: wrote {pushed} citation(s) to sidecar")
 
     if as_json:
         click.echo(json.dumps(report.to_sidecar(), indent=2, ensure_ascii=False))

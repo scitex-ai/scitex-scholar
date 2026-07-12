@@ -48,4 +48,20 @@ def test_verify_cites_command_missing_bib_raises_click_exception(tmp_path):
     # Assert
     assert result.exit_code != 0
 
+
+def test_verify_cites_command_emit_clew_writes_sidecar_artifact(tmp_path):
+    # Arrange: one real cite so push_to_clew has something to write.
+    bib = tmp_path / "refs.bib"
+    bib.write_text('@article{Foo2020, title={t}, doi={10.1/x}}\n', encoding="utf-8")
+    (tmp_path / "main.tex").write_text(r"\cite{Foo2020}", encoding="utf-8")
+    out = tmp_path / "citation_status.json"
+    clew_out = tmp_path / ".scitex" / "scholar" / "citations_clew.json"
+    # Act
+    _run(
+        str(tmp_path), "--bib", str(bib), "--out", str(out), "--offline",
+        "--emit-clew", "--fail-on", "",
+    )
+    # Assert
+    assert clew_out.exists()
+
 # EOF
