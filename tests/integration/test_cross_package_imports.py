@@ -34,7 +34,6 @@ CROSS_PACKAGE_IMPORTS = [
     "scitex",
     "scitex.notify",
     "scitex.utils._email",
-    "scitex_app",
     "scitex_app._django",
     "scitex_app._standalone",
     "scitex_browser",
