@@ -84,12 +84,14 @@ class ArXivEngine(BaseDOIEngine):
         match = re.search(r"arxiv\.(\d+\.\d+)", doi, re.IGNORECASE)
         arxiv_id = match.group(1) if match else doi.split("arXiv.")[-1]
 
+        # `search_query=id:"..."` is NOT arXiv's exact-ID lookup -- it's a
+        # free-text search field that silently matches nothing for a bare
+        # ID (verified live: 0 entries), so every DOI-form arXiv citation
+        # fell through to the not-found fallback. `id_list` is arXiv's
+        # documented direct-fetch-by-ID parameter.
         params = {
-            "search_query": f'id:"{arxiv_id}"',
-            "start": 0,
+            "id_list": arxiv_id,
             "max_results": 1,
-            "sortBy": "relevance",
-            "sortOrder": "descending",
         }
 
         try:
