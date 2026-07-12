@@ -20,7 +20,7 @@ pip install scitex-scholar
 | `browser`  | playwright (OpenAthens / publisher PDF download) |
 | `pdf`      | pdfplumber (PDF text + figure extraction)        |
 | `mcp`      | fastmcp (expose tools to AI agents)              |
-| `server`   | aiohttp + flask (HTTP server mode)               |
+| `server`   | aiohttp + django (HTTP server mode / `gui` command) |
 | `export`   | openpyxl (XLSX export)                           |
 | `watch`    | watchdog (library watch mode)                    |
 | `clew`     | scitex-clew (provenance hashing)                 |

@@ -119,7 +119,7 @@ pip install "scitex-scholar[pdf]"        # pdfplumber for PDF text extraction
 pip install "scitex-scholar[mcp]"        # fastmcp MCP server deps
 pip install "scitex-scholar[browser]"    # Playwright browser automation
 pip install "scitex-scholar[export]"     # openpyxl (.xlsx export)
-pip install "scitex-scholar[server]"     # aiohttp/flask (HTTP adapters)
+pip install "scitex-scholar[server]"     # aiohttp/django (HTTP adapters + gui)
 pip install "scitex-scholar[watch]"      # watchdog (library watcher)
 pip install "scitex-scholar[all]"        # everything above + dev tooling
 ```

@@ -146,7 +146,7 @@ def gui_serve(port: int, host: str, db_path: Optional[str]) -> None:
     Example:
       $ scitex-scholar gui serve --port 31297
     """
-    from ..gui._app import create_app
+    from .._django import _server
 
     if _port_in_use(host, port):
         click.secho(
@@ -158,13 +158,18 @@ def gui_serve(port: int, host: str, db_path: Optional[str]) -> None:
         sys.exit(1)
 
     runtime = _runtime()
-    app = create_app(db_path=db_path)
     runtime.write_state(os.getpid(), port, host)
     click.echo(f"Scholar GUI serving at http://{host}:{port} (Ctrl-C to stop)")
     try:
-        app.run(host=host, port=port, debug=False, use_reloader=False, threaded=True)
-    except OSError as exc:
-        click.secho(f"Failed to bind {host}:{port}: {exc}", fg="red", err=True)
+        _server.run(port=port, host=host, db_path=db_path, open_browser=False)
+    except Exception as exc:
+        # Django's `runserver` management command does not reliably raise a
+        # bind-failure as a plain OSError (it may print its own error and
+        # sys.exit internally) -- the pre-flight `_port_in_use()` check above
+        # is the primary guard against double-binds; this broad handler is
+        # only a fallback safety net so an unexpected failure exits cleanly
+        # instead of leaving a stale state file behind.
+        click.secho(f"Scholar GUI server failed: {exc}", fg="red", err=True)
         sys.exit(1)
     finally:
         runtime.clear_state()

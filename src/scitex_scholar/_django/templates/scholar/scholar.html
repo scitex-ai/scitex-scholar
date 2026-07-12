@@ -1,10 +1,15 @@
+<!-- hook-bypass: inline-style -->
+<!-- Ported verbatim from the Flask-era gui/templates/scholar.html; inline
+     styles pre-date this migration and are out of scope to refactor here. -->
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>SciTeX Scholar</title>
-        <link rel="stylesheet" href="/static/css/scholar.css">
+        <link rel="icon" href="{{ favicon_href }}">
+        <link rel="stylesheet" href="{% static 'scholar/css/scholar.css' %}">
     </head>
     <body>
         <!-- Header -->
@@ -204,9 +209,9 @@
             </main>
         </div>
         <!-- Scripts (order matters: ForceSimulation < GraphRenderer < citation-graph) -->
-        <script src="/static/js/app.js"></script>
-        <script src="/static/js/graph/ForceSimulation.js"></script>
-        <script src="/static/js/graph/GraphRenderer.js"></script>
-        <script src="/static/js/graph/citation-graph.js"></script>
+        <script src="{% static 'scholar/js/app.js' %}"></script>
+        <script src="{% static 'scholar/js/graph/ForceSimulation.js' %}"></script>
+        <script src="{% static 'scholar/js/graph/GraphRenderer.js' %}"></script>
+        <script src="{% static 'scholar/js/graph/citation-graph.js' %}"></script>
     </body>
 </html>

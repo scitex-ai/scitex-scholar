@@ -94,18 +94,20 @@ pdf = [
 ]
 server = [
     "aiohttp>=3.8.0",
-    "flask>=2.3.0",
-    # gui_runtime (pid/port/host lifecycle bookkeeping for `scholar gui`) --
-    # loose floor since it must stay resolvable before scitex-dev cuts a
-    # release containing it (merged to develop as of 2026-07-12, not yet
-    # released); `scholar gui` gives a friendly upgrade message meanwhile.
-    "scitex-dev>=0.11.7",
+    "django>=4.2",
+    # scitex-app supplies the standalone Django launcher
+    # (run_standalone) + ScitexAppConfig base class the `gui` server
+    # builds on.
+    "scitex-app>=0.2.8",
+    # gui_runtime (pid/port/host lifecycle bookkeeping for `scholar gui`)
+    # shipped in scitex-dev 0.30.0 (2026-07-12).
+    "scitex-dev>=0.30.0",
 ]
 watch = [
     "watchdog>=3.0.0",
 ]
 dev = [
-    "scitex-dev>=0.11.7",
+    "scitex-dev>=0.30.0",
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
     "numpy>=1.21.0",
@@ -115,7 +117,8 @@ dev = [
     "openpyxl>=3.1.0",
     "fastmcp>=2.0.0",
     "aiohttp>=3.8.0",
-    "flask>=2.3.0",
+    "django>=4.2",
+    "scitex-app>=0.2.8",
     "watchdog>=3.0.0",
     # tests/integration/test_clew_integration.py — used (with importorskip)
     # to exercise the optional scitex-clew provenance path in storage/PaperIO.
