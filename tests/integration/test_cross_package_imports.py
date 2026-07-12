@@ -46,6 +46,7 @@ CROSS_PACKAGE_IMPORTS = [
     "scitex_context",
     "scitex_dev",
     "scitex_dev._cli._completion",
+    "scitex_dev.gui_runtime",
     "scitex_dict",
     "scitex_io",
     "scitex_logging",
