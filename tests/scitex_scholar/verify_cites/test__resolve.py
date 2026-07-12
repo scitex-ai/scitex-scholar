@@ -5,6 +5,8 @@
 """Unit tests for scitex_scholar.verify_cites._resolve."""
 from __future__ import annotations
 
+import os
+
 import pytest
 
 vc_resolve = pytest.importorskip("scitex_scholar.verify_cites._resolve")
@@ -13,6 +15,14 @@ from scitex_scholar.verify_cites._resolve import (  # noqa: E402
     _authors_list,
     _std,
     default_resolver,
+)
+
+_SKIP_NETWORK = os.getenv("SCITEX_SCHOLAR_SKIP_NETWORK_TESTS", "1") == "1"
+_NETWORK_SKIP_REASON = (
+    "live CrossRef network call -- run with SCITEX_SCHOLAR_SKIP_NETWORK_TESTS=0 "
+    "before any release; this is the end-to-end check that a real DOI actually "
+    "reaches VERIFIED and a fabricated title reaches no-hit, not just the "
+    "injected-resolver unit tests above (scitex-writer, 2026-07-12)"
 )
 
 
@@ -105,5 +115,39 @@ def test_default_resolver_offline_short_circuits_without_network():
     resolved = default_resolver(entry, offline=True)
     # Assert
     assert resolved is None
+
+
+@pytest.mark.skipif(_SKIP_NETWORK, reason=_NETWORK_SKIP_REASON)
+class TestDefaultResolverLiveNetwork:
+    """End-to-end pin against the real CrossRef/OpenAlex/ArXiv APIs -- the
+    injected-resolver tests above cannot catch a bug in _std()'s parsing of
+    the real engines' response shape (which is exactly how the never-VERIFIED
+    bug shipped in the first place). Skipped by default (network + external
+    service dependency); run explicitly before any release."""
+
+    def test_real_doi_resolves_and_classifies_verified(self):
+        # Arrange
+        from scitex_scholar.verify_cites._classify import classify
+
+        entry = {
+            "title": "CircStat: A MATLAB Toolbox for Circular Statistics",
+            "doi": "10.18637/jss.v031.i10",
+        }
+        # Act
+        resolved = default_resolver(entry)
+        status = classify("Berens2009", entry, resolved, min_confidence=0.6)
+        # Assert
+        assert status.status == "verified"
+
+    def test_fabricated_title_resolves_to_no_hit(self):
+        # Arrange
+        entry = {
+            "title": "A Totally Fabricated Paper About Nonexistent Neural Widgets 9876",
+            "author": "Nobody Fakename",
+        }
+        # Act
+        resolved = default_resolver(entry)
+        # Assert
+        assert resolved is None
 
 # EOF
