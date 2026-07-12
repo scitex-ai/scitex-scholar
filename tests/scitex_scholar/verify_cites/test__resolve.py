@@ -41,22 +41,61 @@ def test_std_returns_none_for_empty_metadata():
     assert resolved is None
 
 
-def test_std_prefers_top_level_doi():
-    # Arrange
-    meta = {"title": "T", "doi": "10.1/x"}
-    # Act
-    resolved = _std(meta, "crossref")
-    # Assert
-    assert resolved == ResolvedRef(title="T", doi="10.1/x", source="crossref")
+class TestStdReadsRealEngineNestedShape:
+    """Regression: metadata engines return {"id": {"doi": ...}, "basic":
+    {"title": ...}} (see _BaseDOIEngine._extract_metadata_from_item /
+    _create_minimal_metadata), NOT flat {"title": ..., "doi": ...}. _std()
+    reading the flat shape meant resolved.title was always None, so
+    classify() could never reach VERIFIED via any online engine (reported
+    by scitex-writer as a sim=0.0 "hit" on a fabricated citation)."""
+
+    def test_std_extracts_nested_basic_title_and_id_doi(self):
+        # Arrange
+        meta = {"id": {"doi": "10.1/x"}, "basic": {"title": "T"}}
+        # Act
+        resolved = _std(meta, "crossref")
+        # Assert
+        assert resolved == ResolvedRef(title="T", doi="10.1/x", source="crossref")
+
+    def test_std_falls_back_to_external_ids_doi(self):
+        # Arrange
+        meta = {"basic": {"title": "T"}, "externalIds": {"DOI": "10.1/y"}}
+        # Act
+        resolved = _std(meta, "crossref")
+        # Assert
+        assert resolved.doi == "10.1/y"
 
 
-def test_std_falls_back_to_external_ids_doi():
-    # Arrange
-    meta = {"title": "T", "externalIds": {"DOI": "10.1/y"}}
-    # Act
-    resolved = _std(meta, "semantic_scholar")
-    # Assert
-    assert resolved.doi == "10.1/y"
+class TestStdRejectsEchoedMissWithoutDoi:
+    """Regression: CrossRef/OpenAlex/ArXiv's not-found fallback echoes the
+    query's own title back into basic.title with no id.doi -- structurally
+    identical to a genuine hit unless a DOI is also required. This is the
+    exact shape scitex-writer's fabricated-citation report surfaced as a
+    sim=0.0 "hit"; without this guard, fixing the nested-key bug alone
+    would turn it into a false sim=1.0 self-match VERIFIED instead."""
+
+    @pytest.mark.parametrize("source", ["crossref", "openalex", "arxiv"])
+    def test_rejects_title_without_doi(self, source):
+        # Arrange
+        meta = {"id": {"doi": None}, "basic": {"title": "Echoed Query Title"}}
+        # Act
+        resolved = _std(meta, source)
+        # Assert
+        assert resolved is None
+
+    def test_semantic_scholar_corpus_id_accepts_doi_less_title(self):
+        """Semantic Scholar's CorpusId lookup returns bare None on a miss
+        (never reaches the echo shape), so a title without a DOI there is
+        genuinely DOI-less-but-real -- must not be rejected by the guard
+        above."""
+        # Arrange
+        meta = {"id": {"doi": None}, "basic": {"title": "Real DOI-less Paper"}}
+        # Act
+        resolved = _std(meta, "semantic_scholar")
+        # Assert
+        assert resolved == ResolvedRef(
+            title="Real DOI-less Paper", doi=None, source="semantic_scholar"
+        )
 
 
 def test_default_resolver_offline_short_circuits_without_network():
