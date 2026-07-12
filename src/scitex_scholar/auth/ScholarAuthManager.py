@@ -97,6 +97,17 @@ class ScholarAuthManager:
         if await self.is_authenticate_async(verify_live=verify_live):
             return True
 
+        if not self.providers:
+            # No provider was ever configured (no OpenAthens/EZProxy/Shibboleth
+            # email set) -- this is the expected shape for open-access-only
+            # usage, not a failure. Proceed anonymously rather than block
+            # every browser-based fetch behind institutional auth.
+            logger.info(
+                f"{self.name}: No authentication providers configured; "
+                "proceeding anonymously (open-access only)."
+            )
+            return False
+
         if await self.authenticate_async(provider_name=provider_name, **kwargs):
             return True
 
