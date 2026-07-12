@@ -150,4 +150,33 @@ class TestDefaultResolverLiveNetwork:
         # Assert
         assert resolved is None
 
+    def test_arxiv_doi_resolves_and_classifies_verified(self):
+        """Regression: ArXivEngine._search_by_doi used the wrong arXiv API
+        query field, so DOI-form arXiv citations -- the single most common
+        citation form in ML/CS manuscripts -- never verified (reported by
+        scitex-writer, 2026-07-12)."""
+        # Arrange
+        from scitex_scholar.verify_cites._classify import classify
+
+        entry = {
+            "title": "Attention Is All You Need",
+            "doi": "10.48550/arXiv.1706.03762",
+        }
+        # Act
+        resolved = default_resolver(entry)
+        status = classify("Vaswani2017", entry, resolved, min_confidence=0.6)
+        # Assert
+        assert status.status == "verified"
+
+    def test_bare_arxiv_eprint_resolves_and_classifies_verified(self):
+        # Arrange
+        from scitex_scholar.verify_cites._classify import classify
+
+        entry = {"title": "Attention Is All You Need", "eprint": "1706.03762"}
+        # Act
+        resolved = default_resolver(entry)
+        status = classify("Vaswani2017b", entry, resolved, min_confidence=0.6)
+        # Assert
+        assert status.status == "verified"
+
 # EOF
