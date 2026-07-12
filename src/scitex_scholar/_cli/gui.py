@@ -22,6 +22,7 @@ in the ecosystem's 3129X standalone-GUI port block).
 from __future__ import annotations
 
 import os
+import socket
 import subprocess
 import sys
 import time
@@ -33,6 +34,13 @@ from .._cli_main import CONTEXT_SETTINGS
 
 DEFAULT_PORT = 31297
 DEFAULT_HOST = "127.0.0.1"
+
+
+def _port_in_use(host: str, port: int) -> bool:
+    """True if something is already accepting connections on (host, port)."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.settimeout(0.5)
+        return s.connect_ex((host, port)) == 0
 
 
 def _runtime():
@@ -78,33 +86,53 @@ def gui_open(port: int, host: str, db_path: Optional[str]) -> None:
         webbrowser.open(current["url"])
         return
 
+    if _port_in_use(host, port):
+        click.secho(
+            f"Refusing to start: {host}:{port} is already answering, but not "
+            f"as a Scholar GUI we started (no matching state file). A "
+            f"different process is bound to this port -- free it, or pass "
+            f"--port to use a different one. Not opening the browser.",
+            fg="red",
+            err=True,
+        )
+        sys.exit(1)
+
     click.echo(f"Starting Scholar GUI server on {host}:{port}...")
+    log_path = runtime.path.with_name("gui-serve.log")
+    log_path.parent.mkdir(parents=True, exist_ok=True)
     cmd = [sys.executable, "-m", "scitex_scholar", "gui", "serve", "--port", str(port), "--host", host]
     if db_path:
         cmd += ["--db-path", db_path]
-    subprocess.Popen(
-        cmd,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-        stdin=subprocess.DEVNULL,
-        start_new_session=True,
-    )
+    with open(log_path, "wb") as log_file:
+        subprocess.Popen(
+            cmd,
+            stdout=log_file,
+            stderr=subprocess.STDOUT,
+            stdin=subprocess.DEVNULL,
+            start_new_session=True,
+        )
 
     url = f"http://{host}:{port}"
     deadline = time.monotonic() + 10.0
     while time.monotonic() < deadline:
         if runtime.status().get("running"):
-            break
+            webbrowser.open(url)
+            click.echo(f"Scholar GUI running at {url}")
+            return
         time.sleep(0.2)
-    else:
-        click.secho(
-            f"WARNING: server did not report running within 10s; "
-            f"opening {url} anyway.",
-            fg="yellow",
-            err=True,
-        )
-    webbrowser.open(url)
-    click.echo(f"Scholar GUI running at {url}")
+
+    click.secho(
+        f"Server did not come up within 10s -- not opening the browser. "
+        f"Last output from {log_path}:",
+        fg="red",
+        err=True,
+    )
+    try:
+        tail = log_path.read_text()[-2000:]
+        click.echo(tail, err=True)
+    except OSError:
+        pass
+    sys.exit(1)
 
 
 @gui.command("serve")
@@ -120,12 +148,24 @@ def gui_serve(port: int, host: str, db_path: Optional[str]) -> None:
     """
     from ..gui._app import create_app
 
+    if _port_in_use(host, port):
+        click.secho(
+            f"{host}:{port} is already in use by another process -- refusing "
+            f"to start (no autoscan). Free the port, or pass --port.",
+            fg="red",
+            err=True,
+        )
+        sys.exit(1)
+
     runtime = _runtime()
     app = create_app(db_path=db_path)
     runtime.write_state(os.getpid(), port, host)
     click.echo(f"Scholar GUI serving at http://{host}:{port} (Ctrl-C to stop)")
     try:
         app.run(host=host, port=port, debug=False, use_reloader=False, threaded=True)
+    except OSError as exc:
+        click.secho(f"Failed to bind {host}:{port}: {exc}", fg="red", err=True)
+        sys.exit(1)
     finally:
         runtime.clear_state()
 
