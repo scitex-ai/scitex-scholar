@@ -1,0 +1,28 @@
+{
+  "name": "scholar_app",
+  "slug": "scholar",
+  "label": "Scholar",
+  "version": "0.1.0",
+  "icon": "fas fa-graduation-cap",
+  "subtitle": "Citation-graph explorer and CrossRef paper browser",
+  "about": "Explore citation networks from a seed DOI (bibliographic coupling, co-citation, and direct citations), look up related papers, and browse paper summaries against a local CrossRef database. Library/Search/Enrichment tabs are planned future phases, not yet implemented.",
+  "description": "SciTeX Scholar is a browser-based citation-graph viewer for scitex-scholar. Given a DOI, it builds an interactive citation network against a local CrossRef SQLite database, surfaces related papers ranked by similarity, and renders paper summaries. A Zotero-style library browser, cross-source search (CrossRef/OpenAlex), and BibTeX metadata enrichment are planned for later phases.",
+  "author": "ywatanabe",
+  "license": "AGPL-3.0",
+  "capabilities": [
+    "Build interactive citation networks from a seed DOI",
+    "Related-papers lookup ranked by similarity score",
+    "Paper summary lookup",
+    "Local CrossRef SQLite database browsing"
+  ],
+  "allowed_extensions": [".bib", ".csv", ".yaml", ".yml", ".json"],
+  "wip": false,
+  "standalone": true,
+  "standalone_command": "scitex-scholar gui",
+  "standalone_port": 31297,
+  "frontend_type": "vanilla",
+  "embedded_package": true,
+  "dependencies": {
+    "python": ["scitex-scholar", "django"]
+  }
+}
