@@ -149,4 +149,47 @@ def test_classify_unverified_when_id_present_but_unresolved():
     # Assert
     assert st.status == UNVERIFIED
 
+
+def _title_only_resolved():
+    """A resolved title/author/year fuzzy match: identifier_based=False,
+    perfect title similarity. Shared arrange for the tests below."""
+    return {"title": "CircStat A MATLAB Toolbox"}, ResolvedRef(
+        title="CircStat A MATLAB Toolbox",
+        doi=None,
+        source="crossref",
+        identifier_based=False,
+    )
+
+
+def test_classify_caps_at_unverified_for_title_only_match_even_with_perfect_similarity():
+    """Regression: a resolved title/author/year fuzzy match (identifier_based
+    =False) must never reach VERIFIED, no matter how high sim is -- CrossRef/
+    OpenAlex's title index is not stable across identical queries, so a
+    title-only hit is not deterministic evidence (scitex-writer's "honest
+    failure over lucky pass" request, 2026-07-12)."""
+    # Arrange
+    entry, resolved = _title_only_resolved()
+    # Act
+    st = classify("Berens2009b", entry, resolved, min_confidence=0.6)
+    # Assert
+    assert st.status == UNVERIFIED
+
+
+def test_classify_title_only_match_still_records_similarity():
+    # Arrange
+    entry, resolved = _title_only_resolved()
+    # Act
+    st = classify("Berens2009c", entry, resolved, min_confidence=0.6)
+    # Assert
+    assert st.match_confidence == 1.0
+
+
+def test_classify_title_only_match_provenance_explains_the_cap():
+    # Arrange
+    entry, resolved = _title_only_resolved()
+    # Act
+    st = classify("Berens2009d", entry, resolved, min_confidence=0.6)
+    # Assert
+    assert "title-only match" in st.provenance
+
 # EOF

@@ -29,6 +29,12 @@ class ResolvedRef:
     title: Optional[str]
     doi: Optional[str]
     source: str  # crossref | openalex | arxiv | semantic_scholar | ...
+    # True for a doi/arxiv-id/corpus_id lookup (deterministic: the same query
+    # returns the same record). False for a title/author/year fuzzy search
+    # (CrossRef/OpenAlex's title index is not stable across calls -- see
+    # classify(), which caps this case at UNVERIFIED regardless of
+    # title_similarity; scitex-writer, 2026-07-12).
+    identifier_based: bool = True
 
 
 def _authors_list(entry: dict) -> List[str]:
@@ -36,7 +42,9 @@ def _authors_list(entry: dict) -> List[str]:
     return [a.strip() for a in re.split(r"\band\b", raw) if a.strip()]
 
 
-def _std(meta: Optional[dict], source: str) -> Optional[ResolvedRef]:
+def _std(
+    meta: Optional[dict], source: str, *, identifier_based: bool = True
+) -> Optional[ResolvedRef]:
     if not meta:
         return None
     basic = meta.get("basic") or {}
@@ -53,7 +61,9 @@ def _std(meta: Optional[dict], source: str) -> Optional[ResolvedRef]:
     # there is genuinely DOI-less-but-real, matching its search comment above.
     if source in ("crossref", "openalex", "arxiv") and not doi:
         return None
-    return ResolvedRef(title=title, doi=doi, source=source)
+    return ResolvedRef(
+        title=title, doi=doi, source=source, identifier_based=identifier_based
+    )
 
 
 def default_resolver(entry: dict, *, offline: bool = False) -> Optional[ResolvedRef]:
@@ -109,12 +119,16 @@ def default_resolver(entry: dict, *, offline: bool = False) -> Optional[Resolved
         if got:
             return got
 
-    # 4) title/author/year fuzzy search
+    # 4) title/author/year fuzzy search. Not identifier_based: CrossRef/
+    # OpenAlex's title index is not stable across calls for the identical
+    # query, so classify() must never treat a hit from this step as
+    # deterministic evidence -- caps at UNVERIFIED regardless of similarity.
     if title:
         for eng, name in ((CrossRefEngine, "crossref"), (OpenAlexEngine, "openalex")):
             got = _std(
                 eng().search(title=title, year=year, authors=authors, max_results=1),
                 name,
+                identifier_based=False,
             )
             if got:
                 return got

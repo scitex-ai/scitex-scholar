@@ -90,7 +90,26 @@ def classify(
 
     if resolved is not None:
         sim = title_similarity(bib_title, resolved.title)
-        status = VERIFIED if sim >= min_confidence else UNVERIFIED
+        if not resolved.identifier_based:
+            # Title/author/year fuzzy search only (no doi/arxiv/corpus_id).
+            # CrossRef/OpenAlex's title index is not stable across identical
+            # queries, so a match here is never sufficient evidence for
+            # VERIFIED no matter how high sim is -- caps at UNVERIFIED
+            # (scitex-writer's "honest failure over lucky pass" request,
+            # 2026-07-12).
+            status = UNVERIFIED
+            provenance = (
+                f"{resolved.source} title-only match (sim={sim}) -- capped at "
+                "unverified: no doi/arxiv/corpus_id identifier, title search "
+                "alone is non-deterministic"
+            )
+        else:
+            status = VERIFIED if sim >= min_confidence else UNVERIFIED
+            provenance = (
+                f"{resolved.source} match (title_sim={sim})"
+                if status == VERIFIED
+                else f"{resolved.source} hit but weak title match (sim={sim} < {min_confidence})"
+            )
         return CiteStatus(
             key=key,
             status=status,
@@ -100,11 +119,7 @@ def classify(
             title_bib=bib_title,
             title_resolver=resolved.title,
             resolved_at=_now(),
-            provenance=(
-                f"{resolved.source} match (title_sim={sim})"
-                if status == VERIFIED
-                else f"{resolved.source} hit but weak title match (sim={sim} < {min_confidence})"
-            ),
+            provenance=provenance,
         )
 
     # Not resolved. If the entry carried an identifier, it's unverified
