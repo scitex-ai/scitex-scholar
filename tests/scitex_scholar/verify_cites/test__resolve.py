@@ -189,4 +189,21 @@ class TestDefaultResolverLiveNetwork:
         # Assert
         assert resolved.source == "arxiv" and status.status == "verified"
 
+    def test_title_only_entry_caps_at_unverified_even_with_a_real_matchable_title(self):
+        """Regression: an identifier-less entry that reaches step 4 (title/
+        author/year fuzzy search) and genuinely matches must still cap at
+        UNVERIFIED, never VERIFIED -- CrossRef/OpenAlex's title index is not
+        guaranteed stable across identical queries, so this path is the one
+        scitex-writer flagged as reachable by ANY title-only citation and
+        asked to be treated as non-deterministic evidence (2026-07-12)."""
+        # Arrange
+        from scitex_scholar.verify_cites._classify import classify
+
+        entry = {"title": "CircStat: A MATLAB Toolbox for Circular Statistics"}
+        # Act
+        resolved = default_resolver(entry)
+        status = classify("Berens2009e", entry, resolved, min_confidence=0.6)
+        # Assert
+        assert status.status != "verified"
+
 # EOF
