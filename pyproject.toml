@@ -95,6 +95,11 @@ pdf = [
 server = [
     "aiohttp>=3.8.0",
     "flask>=2.3.0",
+    # gui_runtime (pid/port/host lifecycle bookkeeping for `scholar gui`) --
+    # loose floor since it must stay resolvable before scitex-dev cuts a
+    # release containing it (merged to develop as of 2026-07-12, not yet
+    # released); `scholar gui` gives a friendly upgrade message meanwhile.
+    "scitex-dev>=0.11.7",
 ]
 watch = [
     "watchdog>=3.0.0",
