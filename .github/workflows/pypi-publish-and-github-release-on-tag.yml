@@ -165,11 +165,24 @@ jobs:
           if [ ! -s release-notes.md ]; then
             echo "Release v${VERSION}. See CHANGELOG.md for details." > release-notes.md
           fi
+      # The `release` job runs on the self-hosted Spartan runner, where
+      # $HOME=/home/ywatanabe is shared with the operator's account. `gh` loads
+      # that account's machine-local config at startup, and there it ABORTS:
+      #   failed to create root command: failed to read configuration:
+      #   invalid config file /home/ywatanabe/.config/gh/config.yml: invalid yaml
+      # That happens during config-load, BEFORE gh ever reads GH_TOKEN -- which
+      # is why the token below (already the correct built-in one) never helped,
+      # and why no PAT would help either. The cure is to stop depending on the
+      # runner's `gh` at all: this JS action calls the GitHub Releases API
+      # directly with the built-in per-run ${{ github.token }} that Actions
+      # injects (the job already grants `permissions: contents: write`).
+      # Same fix as scitex-ui#68 / scitex-writer / scitex-todo / scitex-dev /
+      # scitex-agent-container (ci-gh-selfhosted-release-guard).
       - name: Create GitHub Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release create "${{ needs.build.outputs.version }}" \
-            --title "${{ needs.build.outputs.version }}" \
-            --notes-file release-notes.md \
-            dist/*
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.build.outputs.version }}
+          name: ${{ needs.build.outputs.version }}
+          body_path: release-notes.md
+          files: dist/*
+          fail_on_unmatched_files: true
