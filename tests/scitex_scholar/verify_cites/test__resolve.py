@@ -168,7 +168,17 @@ class TestDefaultResolverLiveNetwork:
         # Assert
         assert status.status == "verified"
 
-    def test_bare_arxiv_eprint_resolves_and_classifies_verified(self):
+    def test_bare_arxiv_eprint_resolves_deterministically_via_arxiv_engine(self):
+        """Regression: a bare `eprint` (no doi) used to be checked only as a
+        boolean gate, then thrown away -- ArXivEngine.search() was called
+        with doi=None, falling through to keyword-based title search. For a
+        short, common-word title ("Attention Is All You Need" -> just
+        "attention"/"need"), that search can legitimately miss the real
+        paper among its top-N results and fall through further to an
+        unreliable CrossRef title-search fallback (non-deterministic:
+        verified in one run, unverified in another -- reported by
+        scitex-writer, 2026-07-12). Canonicalizing eprint to an arXiv DOI
+        routes it through the deterministic id_list lookup instead."""
         # Arrange
         from scitex_scholar.verify_cites._classify import classify
 
@@ -177,6 +187,6 @@ class TestDefaultResolverLiveNetwork:
         resolved = default_resolver(entry)
         status = classify("Vaswani2017b", entry, resolved, min_confidence=0.6)
         # Assert
-        assert status.status == "verified"
+        assert resolved.source == "arxiv" and status.status == "verified"
 
 # EOF

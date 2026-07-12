@@ -77,9 +77,19 @@ def default_resolver(entry: dict, *, offline: bool = False) -> Optional[Resolved
     except Exception:
         return None
 
-    # 1) arXiv identifiers
-    if _ARXIV_DOI_RE.match(doi) or eprint:
-        got = _std(ArXivEngine().search(doi=doi or None, title=title), "arxiv")
+    # 1) arXiv identifiers. A bare `eprint` (BibTeX/BibLaTeX convention:
+    # eprint + archivePrefix={arXiv}, what arXiv's own "export citation"
+    # produces) IS the arXiv ID -- canonicalize it to an arXiv DOI so it
+    # goes through the deterministic id_list lookup below (_search_by_doi),
+    # not the keyword-based title search, which can miss a real, findable
+    # paper when its title reduces to a couple of generic keywords (e.g.
+    # "Attention Is All You Need" -> just "attention"/"need") and falls
+    # through to an unreliable CrossRef title-search fallback instead.
+    arxiv_doi = doi if _ARXIV_DOI_RE.match(doi) else (
+        f"10.48550/arxiv.{eprint}" if eprint else None
+    )
+    if arxiv_doi:
+        got = _std(ArXivEngine().search(doi=arxiv_doi, title=title), "arxiv")
         if got:
             return got
 
