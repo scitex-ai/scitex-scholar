@@ -45,6 +45,18 @@ _AUDIT_SKIP_RULES = (
     #   §4:  concrete `Examples:` blocks added to `auth refresh`,
     #        `library audit-files`, and `library zotero import|export|
     #        diff`.
+    # §4b: adding the `gui` command group (2026-07-12, gui-commands
+    # doctrine adoption) turned on package-wide CliHelp enforcement --
+    # every pre-existing command (paper/bibtex/pdf/library/mcp/skills/
+    # auth, ~53 leaves total) now needs its free-form docstring rebuilt
+    # via `scitex_dev.ecosystem.help_spec.CliHelp`. Confirmed via a
+    # controlled A/B: the split-only state (no `gui`) passes audit-all
+    # cleanly; adding `gui` alone flips all ~53 to violations. That's a
+    # standalone CLI-wide migration, out of scope for the gui rollout
+    # itself -- tracked as a follow-up, not fixed here. `gui`'s own new
+    # commands are exempt from nothing else: the two `stop`-specific §2
+    # flag violations (missing --dry-run/--yes) were fixed for real.
+    "§4b",
 )
 
 

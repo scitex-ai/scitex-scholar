@@ -9,6 +9,7 @@ Top-level groups:
 - ``bibtex``  {import}                                   — import a BibTeX file
 - ``pdf``     {highlight}                                — PDF post-processing
 - ``library`` {link-project-tree, materialize, dematerialize, db}
+- ``gui``     {open, serve, status, stop}                — browser-based paper library GUI
 - ``mcp``     {start, list-tools, doctor, install}       — MCP server commands
 - ``skills``  {list, get, install}                       — bundled skill leaves
 - ``list-python-apis``                                   — print public API names
@@ -75,6 +76,7 @@ class _CategorizedGroup(click.Group):
 class _RootGroup(_CategorizedGroup):
     SECTIONS = [
         ("Workflow", ["paper", "bibtex", "pdf", "library", "auth"]),
+        ("Service", ["gui"]),
         (
             "Dev",
             [
@@ -122,6 +124,7 @@ COMMAND_CATEGORIES = [
     ("PDF", ["pdf"]),
     ("Library", ["library"]),
     ("Auth", ["auth"]),
+    ("Service", ["gui"]),
     ("MCP", ["mcp"]),
     ("Skills", ["skills", "list-python-apis"]),
 ]
@@ -300,6 +303,15 @@ cli.add_command(alias_db_group)
 from ._cli.auth import auth  # noqa: E402
 
 cli.add_command(auth)
+
+
+# ---------------------------------------------------------------------------
+# Group: gui  (extracted -> ._cli.gui; see GITIGNORED/REFACTORING.md)
+# ---------------------------------------------------------------------------
+
+from ._cli.gui import gui  # noqa: E402
+
+cli.add_command(gui)
 
 
 # ---------------------------------------------------------------------------
