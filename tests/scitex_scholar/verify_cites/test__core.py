@@ -11,6 +11,7 @@ import pytest
 
 vc_core = pytest.importorskip("scitex_scholar.verify_cites._core")
 from scitex_scholar.verify_cites._core import (  # noqa: E402
+    build_citations_artifact,
     compute_exit_code,
     push_to_clew,
     verify_cites,
@@ -174,39 +175,71 @@ def test_verify_cites_stub_only_gate_exit_code(tmp_path):
     assert rc == EXIT_CITATION_STUB
 
 
-class _FakeClew:
-    def __init__(self):
-        self.calls = []
-
-    def add_citation(self, **kwargs):
-        self.calls.append(kwargs)
-
-
-def test_push_to_clew_calls_add_citation_per_cite(tmp_path):
+def test_build_citations_artifact_carries_schema_marker(tmp_path):
     # Arrange
     entries = {"A": {"title": "Paper A", "doi": "10.1/a"}}
     report = verify_cites(
         tmp_path, entries=entries, cited_keys=["A"], resolver=_fake_resolver,
         out=tmp_path / "s.json", min_confidence=0.6,
     )
-    fake = _FakeClew()
     # Act
-    pushed = push_to_clew(report, clew=fake)
+    artifact = build_citations_artifact(report)
+    # Assert
+    assert artifact["schema"] == "scitex-clew/citations/v1"
+
+
+def test_build_citations_artifact_entry_matches_to_clew_shape(tmp_path):
+    # Arrange
+    entries = {"A": {"title": "Paper A", "doi": "10.1/a"}}
+    report = verify_cites(
+        tmp_path, entries=entries, cited_keys=["A"], resolver=_fake_resolver,
+        out=tmp_path / "s.json", min_confidence=0.6,
+    )
+    # Act
+    artifact = build_citations_artifact(report)
+    # Assert
+    assert artifact["citations"][0]["cite_key"] == "A" and "status" not in artifact["citations"][0]
+
+
+def test_push_to_clew_writes_sidecar_with_entry_count(tmp_path):
+    # Arrange
+    entries = {"A": {"title": "Paper A", "doi": "10.1/a"}}
+    report = verify_cites(
+        tmp_path, entries=entries, cited_keys=["A"], resolver=_fake_resolver,
+        out=tmp_path / "s.json", min_confidence=0.6,
+    )
+    clew_out = tmp_path / "citations_clew.json"
+    # Act
+    pushed = push_to_clew(report, out=clew_out)
     # Assert
     assert pushed == 1
 
 
-def test_push_to_clew_passes_cite_key_not_status(tmp_path):
+def test_push_to_clew_sidecar_file_carries_schema_marker(tmp_path):
     # Arrange
     entries = {"A": {"title": "Paper A", "doi": "10.1/a"}}
     report = verify_cites(
         tmp_path, entries=entries, cited_keys=["A"], resolver=_fake_resolver,
         out=tmp_path / "s.json", min_confidence=0.6,
     )
-    fake = _FakeClew()
+    clew_out = tmp_path / "citations_clew.json"
+    push_to_clew(report, out=clew_out)
     # Act
-    push_to_clew(report, clew=fake)
+    data = json.loads(clew_out.read_text())
     # Assert
-    assert fake.calls[0]["cite_key"] == "A" and "status" not in fake.calls[0]
+    assert data["schema"] == "scitex-clew/citations/v1"
+
+
+def test_push_to_clew_returns_zero_for_empty_report(tmp_path):
+    # Arrange
+    report = verify_cites(
+        tmp_path, entries={}, cited_keys=[], resolver=_fake_resolver,
+        out=tmp_path / "s.json",
+    )
+    clew_out = tmp_path / "citations_clew.json"
+    # Act
+    pushed = push_to_clew(report, out=clew_out)
+    # Assert
+    assert pushed == 0
 
 # EOF
