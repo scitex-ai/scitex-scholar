@@ -5,6 +5,23 @@ All notable changes to `scitex-scholar` are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.1] - 2026-07-12
+
+### Fixed
+- `ArXivEngine._search_by_doi` queried arXiv's API with the wrong field
+  (`search_query=id:"..."`, a free-text search that silently returns
+  zero entries for exact-ID lookups) instead of `id_list` (arXiv's
+  documented direct-fetch parameter). Every DOI-form arXiv citation --
+  the single most common citation form in ML/CS manuscripts -- fell
+  through to the not-found fallback and could never classify VERIFIED
+  in `verify-cites`, independent of the 1.5.0 `_std()` fix. Live-verified:
+  a real arXiv DOI and a bare eprint id both now classify VERIFIED.
+- `scitex_scholar.gui.launch()` crashed on startup with
+  `KeyError: 'scholar_dir'` -- `PathManager.dirs` never had that key; the
+  scholar root is exposed as the direct attribute `path_manager.scholar_dir`.
+  The Scholar GUI (Flask app for browsing/managing the paper library) is
+  reachable again.
+
 ## [1.5.0] - 2026-07-12
 
 ### Added
