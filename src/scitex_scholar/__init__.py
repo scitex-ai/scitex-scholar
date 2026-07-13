@@ -58,6 +58,8 @@ __all__ = [
     "apply_filters",
     "clean_abstract",
     "ensure_workspace",
+    "ScholarSearchEngine",
+    "SearchQueryParser",
     "SCHOLAR_AVAILABLE",
 ]
 
@@ -91,6 +93,12 @@ _LAZY: dict[str, tuple[str, str]] = {
     "to_connected_papers": (".migration", "to_connected_papers"),
     "apply_filters": (".filters", "apply_filters"),
     "ensure_workspace": (".ensure_workspace", "ensure_workspace"),
+    # Stable facade over search internals that scitex-hub consumes (it
+    # currently deep-imports `.search_engines.ScholarSearchEngine` and
+    # `.pipelines.SearchQueryParser`). Exposing them top-level lets
+    # consumers migrate off the deep paths; the deep paths keep working.
+    "ScholarSearchEngine": (".search_engines.ScholarSearchEngine", "ScholarSearchEngine"),
+    "SearchQueryParser": (".pipelines.SearchQueryParser", "SearchQueryParser"),
 }
 
 
@@ -145,6 +153,8 @@ if TYPE_CHECKING:
         to_text_citation,
     )
     from .migration import from_connected_papers, to_connected_papers  # noqa: F401
+    from .pipelines.SearchQueryParser import SearchQueryParser  # noqa: F401
+    from .search_engines.ScholarSearchEngine import ScholarSearchEngine  # noqa: F401
     from .url_finder import ScholarURLFinder  # noqa: F401
 
 

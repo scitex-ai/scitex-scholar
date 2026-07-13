@@ -186,30 +186,34 @@ class SearchQueryParser:
         """Parse shell-style operators from a query string.
 
         Supports the following shell-style operators:
-          -t VALUE or --title VALUE : Title include filter
-          -t -VALUE                 : Title exclude filter (- prefix on value)
-          -a VALUE or --author VALUE: Author include filter
-          -a -VALUE                 : Author exclude filter
-          -j VALUE or --journal VALUE: Journal include filter
-          -j -VALUE                 : Journal exclude filter
-          -ymin YYYY or --year-min YYYY: Minimum year
-          -ymax YYYY or --year-max YYYY: Maximum year
-          -cmin N or --citations-min N : Minimum citations
-          -cmax N or --citations-max N : Maximum citations
-          -ifmin N or --if-min N   : Minimum impact factor
-          -ifmax N or --if-max N   : Maximum impact factor
+
+        .. code-block:: text
+
+            -t VALUE or --title VALUE      : Title include filter
+            -t -VALUE                      : Title exclude filter (- prefix on value)
+            -a VALUE or --author VALUE     : Author include filter
+            -a -VALUE                      : Author exclude filter
+            -j VALUE or --journal VALUE    : Journal include filter
+            -j -VALUE                      : Journal exclude filter
+            -ymin YYYY or --year-min YYYY  : Minimum year
+            -ymax YYYY or --year-max YYYY  : Maximum year
+            -cmin N or --citations-min N   : Minimum citations
+            -cmax N or --citations-max N   : Maximum citations
+            -ifmin N or --if-min N         : Minimum impact factor
+            -ifmax N or --if-max N         : Maximum impact factor
 
         Args:
             query: Query string with shell-style operators
 
-        Returns
-        -------
+        Returns:
             SearchQueryParser instance with parsed fields set
 
         Example:
-            parser = SearchQueryParser.from_shell_syntax(
-                "hippocampus -t theta -a -Smith -ymin 2020 -cmin 50"
-            )
+            .. code-block:: python
+
+                parser = SearchQueryParser.from_shell_syntax(
+                    "hippocampus -t theta -a -Smith -ymin 2020 -cmin 50"
+                )
         """
         # Create instance without running the standard _parse() on the raw query.
         # We do this by initialising with an empty string and then setting
