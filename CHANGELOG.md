@@ -5,6 +5,25 @@ All notable changes to `scitex-scholar` are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.1] - 2026-07-14
+
+### Fixed
+- **Generated BibTeX files could be unparseable when a header comment contained
+  a raw `@`.** BibTeX parsers locate entries by scanning for `@` and do not
+  treat `%` as a comment introducer, so an `@` in a generated header line (an
+  `@`-bearing source filename, an email address) was read as the start of a
+  malformed entry and aborted the parse of an otherwise valid file. All writers
+  now route their output through a single `sanitize_bibtex_comments()` choke
+  point, which neutralizes `@` inside `%` lines while leaving entries and field
+  values untouched.
+
+### Changed
+- `storage/BibTeXHandler.py` (previously 1155 lines) is split into mixins under
+  `storage/_bibtex/` — parsing, writing, merging and project bibliographies —
+  with `BibTeXHandler` as the thin composed class. Purely internal: the public
+  import (`from scitex_scholar.storage import BibTeXHandler`) and the full method
+  surface are unchanged.
+
 ## [1.7.0] - 2026-07-13
 
 ### Added
