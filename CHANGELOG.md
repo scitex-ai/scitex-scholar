@@ -5,6 +5,17 @@ All notable changes to `scitex-scholar` are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.1] - 2026-07-13
+
+### Fixed
+- **GUI: the Alt+I / Ctrl+I element inspector now loads.** The Django
+  migration installed `scitex_ui` as an optional app for the shared
+  workspace-shell assets but never wired its
+  `ElementInspectorMiddleware`, so the visual DOM-debugging overlay
+  silently did nothing. The middleware is now appended to `MIDDLEWARE`
+  whenever `scitex_ui` is importable, matching the existing guarded
+  `INSTALLED_APPS` append.
+
 ## [1.6.0] - 2026-07-12
 
 ### Changed
