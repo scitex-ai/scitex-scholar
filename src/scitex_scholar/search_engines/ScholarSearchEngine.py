@@ -110,24 +110,27 @@ class ScholarSearchEngine:
 
         Returns:
             Dict with:
-                - results: List of paper dictionaries
-                - metadata: Search metadata (query, filters, timing, etc.)
-                - stats: Search statistics
+
+            - results: List of paper dictionaries
+            - metadata: Search metadata (query, filters, timing, etc.)
+            - stats: Search statistics
 
         Examples:
-            # Simple query
-            results = await engine.search("hippocampus")
+            .. code-block:: python
 
-            # Advanced query with filters
-            results = await engine.search(
-                "hippocampus sharp wave -seizure year:2020-2024 if:>5"
-            )
+                # Simple query
+                results = await engine.search("hippocampus")
 
-            # Explicit filters (merged with parsed filters)
-            results = await engine.search(
-                "epilepsy",
-                filters={'year_start': 2020, 'open_access': True}
-            )
+                # Advanced query with filters
+                results = await engine.search(
+                    "hippocampus sharp wave -seizure year:2020-2024 if:>5"
+                )
+
+                # Explicit filters (merged with parsed filters)
+                results = await engine.search(
+                    "epilepsy",
+                    filters={'year_start': 2020, 'open_access': True}
+                )
         """
         start_time = datetime.now()
         self.stats["total_searches"] += 1
