@@ -55,6 +55,10 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
 ]
 
+# Alt+I / Ctrl+I visual debugging overlay (only if scitex-ui is installed).
+if "scitex_ui" in INSTALLED_APPS:
+    MIDDLEWARE.append("scitex_ui.middleware.ElementInspectorMiddleware")
+
 ROOT_URLCONF = "scitex_scholar._django._standalone_urls"
 
 TEMPLATES = [
