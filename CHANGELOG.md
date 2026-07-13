@@ -5,6 +5,21 @@ All notable changes to `scitex-scholar` are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2026-07-13
+
+### Added
+- **Top-level facade for the search internals that downstream consumers
+  depend on.** `ScholarSearchEngine` and `SearchQueryParser` are now
+  importable directly from the package root
+  (`from scitex_scholar import ScholarSearchEngine, SearchQueryParser`),
+  so consumers can migrate off deep-internal paths
+  (`scitex_scholar.search_engines.ScholarSearchEngine`,
+  `scitex_scholar.pipelines.SearchQueryParser`). The deep paths keep
+  working unchanged. A new import-contract regression test
+  (`tests/integration/test_hub_import_contract.py`) asserts both the deep
+  paths and the facade resolve, so any future relocation of these symbols
+  fails loudly in CI rather than silently degrading a downstream consumer.
+
 ## [1.6.1] - 2026-07-13
 
 ### Fixed
