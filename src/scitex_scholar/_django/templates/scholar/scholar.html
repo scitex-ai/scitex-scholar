@@ -188,12 +188,73 @@
                         </div>
                     </div>
                 </div>
-                <!-- Search Tab (placeholder) -->
+                <!-- Search Tab -->
                 <div id="tab-search" class="tab-panel">
-                    <div class="tab-placeholder">
-                        <div>
-                            <h3>Search</h3>
-                            <p>Search across CrossRef, OpenAlex, and your local library. Coming in Phase 3.</p>
+                    <div class="citation-graph-container">
+                        <!-- Input Form -->
+                        <div class="graph-card">
+                            <div class="graph-card__header">
+                                <span class="graph-card__title">Search Papers</span>
+                            </div>
+                            <div class="graph-card__body">
+                                <p class="graph-description">
+                                    Search the configured academic databases. Supports advanced syntax:
+                                    <code>-word</code> excludes a term, <code>year:2020-2024</code> bounds
+                                    the publication year, <code>if:&gt;5</code> filters by impact factor.
+                                </p>
+                                <form id="searchForm" class="graph-form">
+                                    <div class="form-row">
+                                        <div class="form-group--doi">
+                                            <label class="form-label" for="searchInput">Query</label>
+                                            <div class="input-wrapper">
+                                                <input type="text"
+                                                       id="searchInput"
+                                                       class="form-input"
+                                                       placeholder="e.g. hippocampus sharp wave -seizure year:2020-2024">
+                                                <button type="submit" class="btn-build">Search</button>
+                                            </div>
+                                        </div>
+                                        <div class="form-group--options">
+                                            <label class="form-label" for="searchMaxResults">Results</label>
+                                            <select id="searchMaxResults" class="form-select">
+                                                <option value="10">10</option>
+                                                <option value="20" selected>20</option>
+                                                <option value="50">50</option>
+                                                <option value="100">100</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <!-- Loading -->
+                        <div id="searchLoading" class="graph-loading hidden">
+                            <div class="loading-spinner">
+                                <div class="spinner-ring"></div>
+                                <div class="spinner-ring"></div>
+                                <div class="spinner-ring"></div>
+                            </div>
+                            <div class="loading-text">Searching databases... This may take a moment.</div>
+                        </div>
+                        <!-- Error -->
+                        <div id="searchError" class="graph-error hidden">
+                            <p id="searchErrorMessage">An error occurred</p>
+                            <button class="btn-build"
+                                    onclick="document.getElementById('searchError').classList.add('hidden')">
+                                Dismiss
+                            </button>
+                        </div>
+                        <!-- Results -->
+                        <div id="searchResults" class="hidden related-papers-section">
+                            <div class="graph-card">
+                                <div class="graph-card__header">
+                                    <span class="graph-card__title">
+                                        Results
+                                        <small id="searchStats" class="card-subtitle"></small>
+                                    </span>
+                                </div>
+                                <div class="graph-card__body" id="searchResultsContent"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -210,6 +271,7 @@
         </div>
         <!-- Scripts (order matters: ForceSimulation < GraphRenderer < citation-graph) -->
         <script src="{% static 'scholar/js/app.js' %}"></script>
+<script src="{% static 'scholar/js/search.js' %}"></script>
         <script src="{% static 'scholar/js/graph/ForceSimulation.js' %}"></script>
         <script src="{% static 'scholar/js/graph/GraphRenderer.js' %}"></script>
         <script src="{% static 'scholar/js/graph/citation-graph.js' %}"></script>

@@ -155,4 +155,66 @@ def test_graph_health_returns_503_with_no_db_configured():
     assert resp.status_code == 503
 
 
+def test_search_requires_q_param():
+    # Arrange
+    rf = RequestFactory()
+    request = rf.get("/api/search")
+    # Act
+    resp = views.search(request)
+    # Assert
+    assert resp.status_code == 400
+
+
+def test_search_rejects_blank_q_param():
+    # Arrange
+    rf = RequestFactory()
+    request = rf.get("/api/search?q=%20%20")
+    # Act
+    resp = views.search(request)
+    # Assert
+    assert resp.status_code == 400
+
+
+def test_search_rejects_non_integer_max_results():
+    # Arrange
+    rf = RequestFactory()
+    request = rf.get("/api/search?q=hippocampus&max_results=many")
+    # Act
+    resp = views.search(request)
+    # Assert
+    assert resp.status_code == 400
+
+
+def test_search_rejects_unknown_mode():
+    # Arrange
+    rf = RequestFactory()
+    request = rf.get("/api/search?q=hippocampus&mode=telepathy")
+    # Act
+    resp = views.search(request)
+    # Assert
+    assert resp.status_code == 400
+
+
+def test_search_serves_cached_result_without_calling_engine():
+    # Arrange -- prime the cache so the engine is never constructed
+    key = views._make_cache_key("search", "hippocampus", mode="parallel", max_results=20)
+    views._cache_set(key, {"results": [{"title": "Cached paper"}], "metadata": {}})
+    request = RequestFactory().get("/api/search?q=hippocampus")
+    # Act
+    resp = views.search(request)
+    # Assert
+    assert json.loads(resp.content)["results"][0]["title"] == "Cached paper"
+
+
+def test_search_marks_cached_results_as_cached():
+    # Arrange
+    key = views._make_cache_key("search", "sharp wave", mode="parallel", max_results=20)
+    views._cache_set(key, {"results": [], "metadata": {}})
+    request = RequestFactory().get("/api/search?q=sharp%20wave")
+    # Act
+    resp = views.search(request)
+    # Assert
+    assert json.loads(resp.content)["metadata"]["cached"] is True
+
+
 # EOF

@@ -1,0 +1,56 @@
+/**
+ * Scholar GUI - Tab content container and card chrome.
+ */
+
+/* ── Citation Graph Container ──────────────────────────────── */
+.citation-graph-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ── Cards ─────────────────────────────────────────────────── */
+.graph-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+}
+
+.graph-card--full {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 400px;
+}
+
+.graph-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-default);
+  background: var(--bg-tertiary);
+}
+
+.graph-card__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.graph-card__body {
+  padding: 16px;
+  flex: 1;
+  min-height: 0;
+}
+
+.card-subtitle {
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-left: 12px;
+}

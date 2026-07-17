@@ -1,0 +1,56 @@
+/**
+ * Scholar GUI - Sidebar sections and status indicators.
+ */
+
+/* ── Sidebar Sections ──────────────────────────────────────── */
+.sidebar-section {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+}
+
+.sidebar-section__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.sidebar-section__header:hover {
+  background: var(--bg-tertiary);
+}
+
+.sidebar-section__title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sidebar-section__content {
+  padding: 12px;
+  border-top: 1px solid var(--border-default);
+}
+
+/* ── Status Indicators ─────────────────────────────────────── */
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.status-healthy {
+  color: var(--accent);
+}
+.status-warning {
+  color: #f59e0b;
+}
+.status-error {
+  color: var(--status-error);
+}
+.status-detail {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
