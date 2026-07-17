@@ -9,10 +9,15 @@ param validation, same in-memory TTL cache, same HTTP status codes
 (400/404/500/503), same JSON response shapes. Only the framework
 plumbing changes: `request.args` -> `request.GET`, `jsonify` -> Django
 `JsonResponse`, `current_app.config` -> `django.conf.settings`.
+
+`search` has no Flask-era ancestor: it is a new adapter over the
+package's `ScholarSearchEngine` facade, which is the single source of
+truth for search. No search logic lives here.
 """
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import logging
 import time
@@ -70,6 +75,25 @@ def _get_builder():
     from scitex_scholar.citation_graph import CitationGraphBuilder
 
     return CitationGraphBuilder(db_path)
+
+
+_search_engine = None
+
+
+def _get_search_engine():
+    """Get the process-wide ScholarSearchEngine, constructing it on first use.
+
+    The engine owns pooled pipelines and an API cache, so it is built once
+    and reused rather than per request.
+    """
+    global _search_engine
+    if _search_engine is None:
+        from scitex_scholar import ScholarSearchEngine
+
+        _search_engine = ScholarSearchEngine(
+            email=getattr(django_settings, "SCHOLAR_EMAIL", None),
+        )
+    return _search_engine
 
 
 def _favicon_href() -> str:
@@ -259,6 +283,52 @@ def graph_health(request):
             },
             status=503,
         )
+
+
+@require_GET
+def search(request):
+    """Search academic databases through the package's ScholarSearchEngine.
+
+    Thin HTTP adapter: query parsing, engine selection and result
+    aggregation all belong to the package facade, so this view only
+    validates parameters, delegates, and caches.
+    """
+    query = request.GET.get("q", "").strip()
+    if not query:
+        return JsonResponse({"error": "q parameter required"}, status=400)
+
+    try:
+        max_results = int(request.GET.get("max_results", 20))
+        max_results = max(1, min(100, max_results))
+    except ValueError as e:
+        return JsonResponse({"error": f"Invalid parameter: {e}"}, status=400)
+
+    mode = request.GET.get("mode", "parallel")
+    if mode not in ("parallel", "single"):
+        return JsonResponse(
+            {"error": "mode must be 'parallel' or 'single'"}, status=400
+        )
+
+    use_cache = request.GET.get("no_cache", "false").lower() != "true"
+    cache_key = _make_cache_key("search", query, mode=mode, max_results=max_results)
+    if use_cache:
+        cached = _cache_get(cache_key)
+        if cached:
+            cached["metadata"]["cached"] = True
+            return JsonResponse(cached)
+
+    try:
+        engine = _get_search_engine()
+        result = asyncio.run(
+            engine.search(query=query, mode=mode, max_results=max_results)
+        )
+        result.setdefault("metadata", {})["cached"] = False
+        _cache_set(cache_key, result)
+        return JsonResponse(result)
+
+    except Exception as e:
+        logger.error(f"Search failed for {query!r}: {e}", exc_info=True)
+        return JsonResponse({"error": f"Search failed: {e}"}, status=500)
 
 
 # EOF

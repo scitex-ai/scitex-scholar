@@ -11,6 +11,7 @@ app_name = "scholar"
 urlpatterns = [
     path("", views.index, name="index"),
     path("api/health", views.health, name="health"),
+    path("api/search", views.search, name="search"),
     path("api/graph/network", views.graph_network, name="graph_network"),
     path("api/graph/related", views.graph_related, name="graph_related"),
     path("api/graph/paper", views.graph_paper, name="graph_paper"),
