@@ -39,13 +39,11 @@ class OASourcesCache:
     """
     Manages cached Open Access sources from OpenAlex.
 
-    Features:
-    - Lazy loading of the local cache on first lookup (never a network crawl)
-    - 1-day TTL that is ADVISORY: a stale cache is used as-is; refreshing is
-      an explicit, out-of-band call (``refresh_oa_cache``), never triggered
-      by a lookup
-    - Thread-safe singleton pattern
-    - Journal name / ISSN matching against the cached OpenAlex OA sources
+    A lookup loads the local cache lazily and never crawls the network. The
+    1-day TTL is advisory: a stale cache is used as-is, and refreshing it is
+    an explicit, out-of-band call (``refresh_oa_cache``), never triggered by
+    a lookup. Journal-name and ISSN matching run against the cached OpenAlex
+    OA sources; the instance is a thread-safe singleton.
     """
 
     _instance: Optional["OASourcesCache"] = None
