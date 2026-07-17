@@ -1,0 +1,44 @@
+/**
+ * Scholar GUI - Design tokens, reset and base element styles.
+ */
+
+/* ── CSS Variables ─────────────────────────────────────────── */
+:root {
+  --bg-primary: #0d0d0d;
+  --bg-secondary: #151515;
+  --bg-tertiary: #1a1a1a;
+  --bg-monaco: #1e1e1e;
+  --border-default: #3a3a3a;
+  --text-primary: #d4e1e8;
+  --text-secondary: #a0b3c0;
+  --text-muted: #6c8ba0;
+  --text-inverse: #fff;
+  --accent: #059669;
+  --accent-hover: #047857;
+  --status-error: #ef4444;
+  --edge-color: #3a3a3a;
+}
+
+/* ── Reset & Base ──────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+    sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
