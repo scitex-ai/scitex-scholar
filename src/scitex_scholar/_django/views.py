@@ -21,7 +21,6 @@ import asyncio
 import hashlib
 import logging
 import time
-import urllib.parse
 from typing import Dict, Optional
 
 from django.conf import settings as django_settings
@@ -96,26 +95,21 @@ def _get_search_engine():
     return _search_engine
 
 
-def _favicon_href() -> str:
-    """Inline navy SVG favicon `data:` URI -- no static asset file needed."""
-    svg = (
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">'
-        '<rect width="32" height="32" rx="6" fill="#0a1e3f"/>'
-        '<text x="16" y="22" font-size="16" font-family="sans-serif" '
-        'fill="#ffffff" text-anchor="middle">S</text></svg>'
-    )
-    return "data:image/svg+xml," + urllib.parse.quote(svg)
-
-
 def index(request):
-    """Serve the Scholar SPA shell page."""
+    """Serve the Scholar SPA shell page.
+
+    No `favicon_href` is supplied: the template includes scitex-ui's
+    branding partial, which ships the shared SciTeX mark. A locally
+    hand-rolled icon here would SHADOW that mark (the partial honours
+    favicon_href when given one) and drift from the rest of the fleet --
+    which is what the removed `_favicon_href()` did.
+    """
     resolved_db = _db_path()
     html = render_to_string(
         "scholar/scholar.html",
         {
             "db_available": resolved_db is not None,
             "db_path": resolved_db or "Not found",
-            "favicon_href": _favicon_href(),
         },
         request=request,
     )
