@@ -318,12 +318,18 @@ cli.add_command(gui)
 # Shell completion (§1a)
 # ---------------------------------------------------------------------------
 
+# Only the import is guarded: an ImportError raised INSIDE
+# `attach_shell_completion` is a real bug, not an absent optional dep, and
+# must not be swallowed. Staying SILENT here is deliberate (unlike the GUI
+# launcher, which prints a note) -- completion is cosmetic, and a message on
+# every CLI invocation would be noise on the most common code path.
 try:
     from scitex_dev._cli._completion import attach_shell_completion
-
-    attach_shell_completion(cli, prog_name="scitex-scholar")
 except ImportError:
-    pass
+    attach_shell_completion = None
+
+if attach_shell_completion is not None:
+    attach_shell_completion(cli, prog_name="scitex-scholar")
 
 
 # Legacy: `bibtex --bibtex …` (no subcommand) form. Click can't easily

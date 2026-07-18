@@ -51,17 +51,30 @@ def run(
     print(f"SciTeX Scholar GUI: http://{host}:{port}")
     print("Press Ctrl+C to stop")
 
+    # ONLY the import is guarded. Wrapping `django.setup()`, the migration,
+    # or the `run_standalone` CALL in this try would make a genuine
+    # ImportError from deep inside the app indistinguishable from "scitex-app
+    # is not installed" -- and would silently degrade a broken install to bare
+    # Django instead of reporting it.
     try:
-        import django
-
-        django.setup()
-
-        from django.core.management import call_command
-
-        call_command("migrate", "--run-syncdb", verbosity=0)
-
         from scitex_app._standalone import run_standalone
+    except ImportError:
+        run_standalone = None
+        print(
+            "Note: scitex-app is not installed, so the workspace shell is "
+            "unavailable; serving bare Django instead.\n"
+            "      Get it with: pip install 'scitex-scholar[server]'"
+        )
 
+    import django
+
+    django.setup()
+
+    from django.core.management import call_command
+
+    call_command("migrate", "--run-syncdb", verbosity=0)
+
+    if run_standalone is not None:
         run_standalone(
             app_module="scitex_scholar._django",
             port=port,
@@ -71,14 +84,8 @@ def run(
             desktop=desktop,
         )
         return
-    except ImportError:
-        pass
 
-    # Fallback: no scitex-app available, run bare Django
-    import django
-
-    django.setup()
-    from django.core.management import call_command
+    # Degraded path: bare Django, no workspace shell (reason printed above).
 
     if open_browser and not desktop:
         threading.Timer(1.0, webbrowser.open, args=[f"http://{host}:{port}"]).start()
