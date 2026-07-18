@@ -8,7 +8,15 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>SciTeX Scholar</title>
-        <link rel="icon" href="{{ favicon_href }}">
+        {% comment %}
+        Shared SciTeX mark, replacing a hand-rolled rel="icon" link that
+        interpolated a favicon_href context var. The partial ships the asset
+        and still honours favicon_href when a view supplies one.
+
+        Unconditional by design: scitex-ui ships in the same `server` extra
+        as django, so it is present wherever this template can render.
+        {% endcomment %}
+        {% include "scitex_ui/_branding_head.html" %}
         <link rel="stylesheet" href="{% static 'scholar/css/scholar.css' %}">
     </head>
     <body>

@@ -42,22 +42,23 @@ INSTALLED_APPS = [
     "scitex_scholar._django.apps.ScholarEditorConfig",
 ]
 
-# Optional: scitex-ui supplies the workspace shell (template + CSS/JS assets)
-try:
-    import scitex_ui  # noqa: F401
+# scitex-ui supplies the shared SciTeX branding partial that
+# `scholar.html` includes in its <head>. It is a REQUIRED member of the
+# `server` extra (alongside django itself), so this import is hard on
+# purpose: a `try/except ImportError` here would swallow a broken install
+# and resurface it later as a TemplateDoesNotExist pointing at scitex-ui's
+# template -- sending the reader to the wrong package. Fail at import time,
+# where the cause is legible.
+import scitex_ui  # noqa: F401
 
-    INSTALLED_APPS.append("scitex_ui")
-except ImportError:
-    pass
+INSTALLED_APPS.append("scitex_ui")
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.middleware.common.CommonMiddleware",
+    # Alt+I / Ctrl+I visual debugging overlay.
+    "scitex_ui.middleware.ElementInspectorMiddleware",
 ]
-
-# Alt+I / Ctrl+I visual debugging overlay (only if scitex-ui is installed).
-if "scitex_ui" in INSTALLED_APPS:
-    MIDDLEWARE.append("scitex_ui.middleware.ElementInspectorMiddleware")
 
 ROOT_URLCONF = "scitex_scholar._django._standalone_urls"
 

@@ -102,6 +102,11 @@ server = [
     # gui_runtime (pid/port/host lifecycle bookkeeping for `scholar gui`)
     # shipped in scitex-dev 0.30.0 (2026-07-12).
     "scitex-dev>=0.30.0",
+    # Shared SciTeX branding partial (`scitex_ui/_branding_head.html`),
+    # included by scholar.html's <head>. 0.7.1 is the first release where
+    # branding is usable WITHOUT adopting the workspace shell -- scholar
+    # owns its own layout and deliberately does not extend that shell.
+    "scitex-ui>=0.7.1",
 ]
 watch = [
     "watchdog>=3.0.0",

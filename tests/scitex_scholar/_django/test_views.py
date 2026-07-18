@@ -49,7 +49,7 @@ def test_index_body_contains_title():
     assert "<title>SciTeX Scholar</title>" in body
 
 
-def test_index_body_contains_favicon_link():
+def test_index_body_contains_shared_branding_favicon():
     # Arrange
     rf = RequestFactory()
     request = rf.get("/")
@@ -57,7 +57,24 @@ def test_index_body_contains_favicon_link():
     # Act
     body = resp.content.decode()
     # Assert
-    assert '<link rel="icon" href="data:image/svg+xml' in body
+    assert '<link rel="icon" href="/static/scitex_ui/img/scitex-favicon.svg"' in body
+
+
+def test_index_does_not_shadow_shared_favicon_with_inline_icon():
+    """Regression guard: a locally hand-rolled icon SHADOWS the shared mark.
+
+    scitex-ui's partial honours a `favicon_href` context var, so
+    reintroducing a `data:` URI here would silently win and drift scholar's
+    tab away from the rest of the fleet -- the exact bug this replaced.
+    """
+    # Arrange
+    rf = RequestFactory()
+    request = rf.get("/")
+    resp = views.index(request)
+    # Act
+    body = resp.content.decode()
+    # Assert
+    assert 'rel="icon" href="data:' not in body
 
 
 def test_health_returns_200():
