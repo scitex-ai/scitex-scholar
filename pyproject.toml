@@ -124,6 +124,11 @@ dev = [
     "aiohttp>=3.8.0",
     "django>=4.2",
     "scitex-app>=0.2.8",
+    # `_django/settings.py` imports scitex_ui unguarded (it is a hard
+    # member of `[server]`), so the Django tests cannot even import
+    # without it. NOT guarded with importorskip on purpose: a skip would
+    # hide a genuinely broken GUI install behind a green run.
+    "scitex-ui>=0.7.1",
     "watchdog>=3.0.0",
     # tests/integration/test_clew_integration.py — used (with importorskip)
     # to exercise the optional scitex-clew provenance path in storage/PaperIO.
