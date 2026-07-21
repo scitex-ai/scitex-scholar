@@ -144,9 +144,21 @@ docs = [
     "sphinx-copybutton>=0.5",
     "sphinx-autodoc-typehints>=1.25",
 ]
+# PS-221 §3: every PUBLIC extra (non-underscore, not `all`) must be a
+# SUBSET of `all`, so `pip install scitex-scholar[all]` is the single
+# "give me everything public" switch and can never silently
+# under-install. Keep this list closed over EVERY public extra above --
+# adding a new public extra without adding it here is the violation.
+# `[dev]` and `[docs]` are public here -- CI installs `.[all,dev]`
+# (.github/ci/run-in-sif.sh) and RTD installs `.[docs]`
+# (.github/workflows/rtd-sphinx-build-on-ubuntu-latest.yml) by those
+# exact names -- so they are listed too, matching how scitex-dev,
+# scitex-logging, and scitex-session close their own `all`.
 all = [
     "scitex-scholar[browser]",
     "scitex-scholar[clew]",
+    "scitex-scholar[dev]",
+    "scitex-scholar[docs]",
     "scitex-scholar[export]",
     "scitex-scholar[mcp]",
     "scitex-scholar[pdf]",
