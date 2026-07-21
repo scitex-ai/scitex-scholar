@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Read-only library auditor — reports anomalies without raising.
 
-Addresses https://github.com/ywatanabe1989/scitex-scholar/issues/12:
+Addresses https://github.com/scitex-ai/scitex-scholar/issues/12:
 `db build` raises on duplicate DOIs (correctly), but leaves the user
 with no visibility into *all* the problems. `audit()` walks MASTER and
 returns a structured report so the user can see everything to fix

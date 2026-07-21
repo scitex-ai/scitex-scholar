@@ -450,4 +450,4 @@ Old and new forms route to the same handler, so behaviour is identical.
 - Broken `impact_factor/estimation/` subtree — imported a non-existent `fetchers` module; `ImpactFactorCalculator` was unreachable in practice. The live `impact_factor/ImpactFactorEngine.py` and `impact_factor/jcr/` are unaffected.
 - Hidden `metadata_engines/.combined-SemanticScholarSource/` backup directory.
 
-[1.1.0]: https://github.com/ywatanabe1989/scitex-scholar/compare/v1.0.1...v1.1.0
+[1.1.0]: https://github.com/scitex-ai/scitex-scholar/compare/v1.0.1...v1.1.0
