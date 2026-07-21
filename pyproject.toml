@@ -158,10 +158,10 @@ all = [
 scitex-scholar = "scitex_scholar._cli_main:cli"
 
 [project.urls]
-Homepage = "https://github.com/ywatanabe1989/scitex-scholar"
+Homepage = "https://github.com/scitex-ai/scitex-scholar"
 Documentation = "https://scitex-scholar.readthedocs.io"
-Repository = "https://github.com/ywatanabe1989/scitex-scholar.git"
-Issues = "https://github.com/ywatanabe1989/scitex-scholar/issues"
+Repository = "https://github.com/scitex-ai/scitex-scholar.git"
+Issues = "https://github.com/scitex-ai/scitex-scholar/issues"
 
 [project.entry-points."scitex_dev.docs"]
 scitex-scholar = "scitex_scholar"

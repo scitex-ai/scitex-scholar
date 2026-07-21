@@ -18,6 +18,6 @@ Development
 
 .. code-block:: bash
 
-   git clone https://github.com/ywatanabe1989/scitex-scholar.git
+   git clone https://github.com/scitex-ai/scitex-scholar.git
    cd scitex-scholar
    pip install -e ".[all]"
