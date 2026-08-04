@@ -39,8 +39,6 @@ _SCITEX_APP_MISSING_MSG = "scitex-app is not installed"
 # __init__.py` imports nothing, so this path is order-independent.
 _GUI_SOURCE = (Path(_cli.__file__).parent / "gui.py").read_text()
 
-# Holds a port open without looking like scholar: argv is the bare
-# interpreter plus this inline script, so `argv_is_ours` must answer False.
 _HOLDER_SCRIPT = (
     "import socket,sys,time\n"
     "s=socket.socket()\n"
@@ -50,6 +48,16 @@ _HOLDER_SCRIPT = (
     "time.sleep(60)\n"
 )
 
+# Ownership is read from the holder's ARGV, and argv[0] is the interpreter
+# path -- which routinely contains the package name (a project-local venv,
+# or CI checking out to .../scitex-scholar/.venv/bin/python). Letting
+# `sys.executable` reach argv would make the "foreign" holder look like
+# ours and silently flip these tests onto the wrong branch. So argv[0] is
+# set explicitly via Popen's `executable=` seam: the process really is
+# `sys.executable`, but argv carries only what each case is about.
+_ARGV0_STRANGER = "port-holder-not-ours"
+_ARGV0_OURS = "scitex_scholar"
+
 
 def _free_port() -> int:
     with socket.socket() as s:
@@ -57,17 +65,24 @@ def _free_port() -> int:
         return s.getsockname()[1]
 
 
-def _hold_port(*extra_argv: str):
+def _hold_port(argv0: str, *, expect_ours: bool):
     """Start a real process LISTENing on a free port; return (port, proc).
 
-    `extra_argv` lands in the holder's argv, which is the only thing
-    ownership is proven from -- so passing the package token produces a
-    holder scitex-app identifies as OURS, and passing nothing produces a
-    stranger. Nothing is faked: both are live processes on live ports.
+    Asserts up front that scitex-app actually reads the holder's ownership
+    as `expect_ours`. Without that check a test can pass while exercising
+    the OPPOSITE branch -- which is exactly what happened on CI, where the
+    interpreter path contained the package name and turned the "stranger"
+    into an apparent orphan of ours. A precondition that fails loudly is
+    the difference between a guard and a decoration.
     """
+    embed = pytest.importorskip(
+        "scitex_app.embed",
+        reason="port-holder branching is scitex-app's answer to interpret",
+    )
     port = _free_port()
     proc = subprocess.Popen(
-        [sys.executable, "-c", _HOLDER_SCRIPT, str(port), *extra_argv],
+        [argv0, "-c", _HOLDER_SCRIPT, str(port)],
+        executable=sys.executable,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
         cwd="/",
@@ -77,6 +92,14 @@ def _hold_port(*extra_argv: str):
         with socket.socket() as probe:
             probe.settimeout(0.5)
             if probe.connect_ex(("127.0.0.1", port)) == 0:
+                holder = embed.gui_port_holder(port, "scitex-scholar")
+                if holder.ours is not expect_ours:
+                    proc.kill()
+                    pytest.fail(
+                        f"fixture did not build the case under test: wanted "
+                        f"ours={expect_ours}, scitex-app read ours="
+                        f"{holder.ours} from argv {holder.argv!r}"
+                    )
                 return port, proc
         time.sleep(0.1)
     proc.kill()
@@ -86,7 +109,7 @@ def _hold_port(*extra_argv: str):
 @pytest.fixture
 def foreign_port_holder():
     """Yield a port genuinely held by a process that is NOT a Scholar GUI."""
-    port, proc = _hold_port()
+    port, proc = _hold_port(_ARGV0_STRANGER, expect_ours=False)
     yield port
     proc.kill()
     proc.wait(timeout=10)
@@ -100,7 +123,7 @@ def orphaned_scholar_port_holder():
     in the state file) and that the old socket probe reported as a
     stranger.
     """
-    port, proc = _hold_port("scitex_scholar")
+    port, proc = _hold_port(_ARGV0_OURS, expect_ours=True)
     yield port
     proc.kill()
     proc.wait(timeout=10)
@@ -270,11 +293,10 @@ def test_gui_open_names_a_foreign_port_holder_as_a_different_process(
     runner = CliRunner()
     # Act
     result = runner.invoke(cli, ["gui", "open", "--port", str(foreign_port_holder)])
-    # Assert
-    assert (
-        "different process" in result.output
-        or _SCITEX_APP_MISSING_MSG in result.output
-    )
+    # Assert -- no `or scitex-app missing` escape hatch: the fixture has
+    # already proven scitex-app is present AND reads this holder as a
+    # stranger, so a disjunction here could only ever hide a real failure.
+    assert "different process" in result.output
 
 
 @pytest.mark.skipif(
