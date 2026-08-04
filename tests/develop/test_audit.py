@@ -17,8 +17,22 @@ remains in the body.
 from __future__ import annotations
 
 import shutil
+from pathlib import Path
 
 import pytest
+
+# The checkout this test file lives in: tests/develop/test_audit.py -> repo
+# root. Passed to `audit_all_for_package` so the gate grades THIS tree.
+#
+# Without it the auditor has no argument saying which tree was meant, and
+# falls back to guessing from cwd / import location. That guess is wrong in
+# exactly the place it matters: on 2026-08-04 the self-hosted runner's cwd
+# was /tmp/scitex-ci-runner-work/scitex-scholar/scitex-scholar/scitex-scholar
+# -- nested same-named directories, i.e. the sibling-checkout case the
+# auditor warns about. A gate that grades a different commit than the one
+# under test still reports a confident pass/fail, which is worse than no
+# gate: the config still lists it and everyone believes it works.
+_REPO_ROOT = Path(__file__).resolve().parents[2]
 
 _AUDIT_SKIP_RULES = (
     # MCP <-> Python-API parity gap: 12/12 APIs unmapped + 24 tools
@@ -73,7 +87,9 @@ def test_audit_all_for_scitex_scholar_runs_without_error():
 
     completed = False
     # Act
-    audit_all_for_package("scitex-scholar", skip_rules=_AUDIT_SKIP_RULES)
+    audit_all_for_package(
+        "scitex-scholar", path=_REPO_ROOT, skip_rules=_AUDIT_SKIP_RULES
+    )
     completed = True
     # Assert
     assert completed
