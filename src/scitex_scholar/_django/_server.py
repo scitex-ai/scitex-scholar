@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Standalone local-dev launcher for the Scholar GUI.
 
-Delegates to `scitex_app._standalone.run_standalone`, which pre-wires
+Delegates to `scitex_app.embed.run_standalone`, which pre-wires
 scitex-ui static assets + the workspace shell so the same local server
 looks like scitex.ai/apps/scholar.
 
@@ -21,9 +21,9 @@ import threading
 import webbrowser
 from typing import Optional
 
-# Scholar has no shared `_core` module for this constant (unlike writer's
-# `_core._gui_runtime.DEFAULT_PORT`); both `_cli/gui.py` and this module
-# just agree on the literal port 31297.
+# The single source of truth for scholar's GUI port; `_cli/gui.py` imports
+# it from here rather than restating the literal (they used to "just agree
+# on 31297", which is a coincidence maintained by hand, not a constant).
 DEFAULT_PORT = 31297
 
 
@@ -37,7 +37,7 @@ def run(
 ) -> None:
     """Launch the Django Scholar GUI server locally on exactly ``port``.
 
-    Tries `scitex_app._standalone.run_standalone` first (gets the full
+    Tries `scitex_app.embed.run_standalone` first (gets the full
     workspace shell from scitex-ui). Falls back to a bare runserver
     bootstrap if scitex-app is not installed.
 
@@ -57,7 +57,7 @@ def run(
     # is not installed" -- and would silently degrade a broken install to bare
     # Django instead of reporting it.
     try:
-        from scitex_app._standalone import run_standalone
+        from scitex_app.embed import run_standalone
     except ImportError:
         run_standalone = None
         print(
