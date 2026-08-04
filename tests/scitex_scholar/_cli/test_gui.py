@@ -51,12 +51,18 @@ _HOLDER_SCRIPT = (
 # Ownership is read from the holder's ARGV, and argv[0] is the interpreter
 # path -- which routinely contains the package name (a project-local venv,
 # or CI checking out to .../scitex-scholar/.venv/bin/python). Letting
-# `sys.executable` reach argv would make the "foreign" holder look like
-# ours and silently flip these tests onto the wrong branch. So argv[0] is
-# set explicitly via Popen's `executable=` seam: the process really is
-# `sys.executable`, but argv carries only what each case is about.
-_ARGV0_STRANGER = "port-holder-not-ours"
-_ARGV0_OURS = "scitex_scholar"
+# `sys.executable` reach argv unchanged would make the "foreign" holder
+# look like ours and silently flip these tests onto the wrong branch.
+#
+# So each case runs through a SYMLINK to the real interpreter, placed in a
+# neutral temp dir and named for the case. argv[0] is then a genuine
+# interpreter path (CPython resolves a symlinked interpreter -- that is how
+# venvs work), while the only package-name token in argv is the one the
+# case is about. A bare `executable=` with a non-path argv[0] does NOT work:
+# CPython derives its prefix from argv[0] and dies at startup before
+# binding, which surfaces only as "never bound the port".
+_LINKNAME_STRANGER = "port-holder-not-ours"
+_LINKNAME_OURS = "scitex_scholar-gui-holder"
 
 
 def _free_port() -> int:
@@ -65,7 +71,7 @@ def _free_port() -> int:
         return s.getsockname()[1]
 
 
-def _hold_port(argv0: str, *, expect_ours: bool):
+def _hold_port(tmp_path, linkname: str, *, expect_ours: bool):
     """Start a real process LISTENing on a free port; return (port, proc).
 
     Asserts up front that scitex-app actually reads the holder's ownership
@@ -74,21 +80,34 @@ def _hold_port(argv0: str, *, expect_ours: bool):
     interpreter path contained the package name and turned the "stranger"
     into an apparent orphan of ours. A precondition that fails loudly is
     the difference between a guard and a decoration.
+
+    The holder's stderr is CAPTURED, not discarded: the first attempt at
+    this sent it to DEVNULL, so an interpreter that died at startup was
+    indistinguishable from one that was merely slow, and the report said
+    "never bound the port" while the real cause sat in the suppressed
+    stream.
     """
     embed = pytest.importorskip(
         "scitex_app.embed",
         reason="port-holder branching is scitex-app's answer to interpret",
     )
+    interpreter = tmp_path / linkname
+    interpreter.symlink_to(sys.executable)
     port = _free_port()
     proc = subprocess.Popen(
-        [argv0, "-c", _HOLDER_SCRIPT, str(port)],
-        executable=sys.executable,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        [str(interpreter), "-c", _HOLDER_SCRIPT, str(port)],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
         cwd="/",
     )
     deadline = time.monotonic() + 10.0
     while time.monotonic() < deadline:
+        if proc.poll() is not None:
+            pytest.fail(
+                f"holder interpreter exited early (rc={proc.returncode}): "
+                f"{proc.communicate()[0][-2000:]}"
+            )
         with socket.socket() as probe:
             probe.settimeout(0.5)
             if probe.connect_ex(("127.0.0.1", port)) == 0:
@@ -107,23 +126,23 @@ def _hold_port(argv0: str, *, expect_ours: bool):
 
 
 @pytest.fixture
-def foreign_port_holder():
+def foreign_port_holder(tmp_path):
     """Yield a port genuinely held by a process that is NOT a Scholar GUI."""
-    port, proc = _hold_port(_ARGV0_STRANGER, expect_ours=False)
+    port, proc = _hold_port(tmp_path, _LINKNAME_STRANGER, expect_ours=False)
     yield port
     proc.kill()
     proc.wait(timeout=10)
 
 
 @pytest.fixture
-def orphaned_scholar_port_holder():
+def orphaned_scholar_port_holder(tmp_path):
     """Yield a port held by a process scitex-app identifies as OUR OWN.
 
     This is the case `gui status` structurally cannot see (no live entry
     in the state file) and that the old socket probe reported as a
     stranger.
     """
-    port, proc = _hold_port(_ARGV0_OURS, expect_ours=True)
+    port, proc = _hold_port(tmp_path, _LINKNAME_OURS, expect_ours=True)
     yield port
     proc.kill()
     proc.wait(timeout=10)
