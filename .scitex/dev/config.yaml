@@ -13,5 +13,38 @@ audit:
   root-whitelist:
     files:
       - codecov.yml
+
+  exemptions:
+    # PS-224 §1 flags a job whose `runs-on` label is absent from the
+    # destination registry (~/.scitex/dev/hosts.yaml), which currently
+    # registers spartan self-hosted labels ONLY.
+    #
+    # Both jobs below target `ubuntu-latest` deliberately. Constitution §4:
+    # "CI defaults to GitHub-hosted runners. Most of our repositories are
+    # public, so hosted minutes are free ... Prefer the boring, managed
+    # option first." A docs build is exactly that case -- short, no GPU, no
+    # large data -- so re-pointing them at spartan would be the wrong fix.
+    #
+    # So this is a REGISTRY GAP, not a repo defect: `ubuntu-latest` is a
+    # constitution-endorsed destination that no host file lists. The right
+    # fix is to register it once, centrally, not to repeat this exemption in
+    # every repo -- tracked as `scholar-ci-red-ps224-runner-destination`
+    # (raised with scitex-dev). DELETE BOTH ENTRIES once it is registered;
+    # they are scoped to these two jobs so nothing else in PS-224 is
+    # silenced, and the cla.yml finding from the same rule was FIXED rather
+    # than exempted.
+    PS-224:
+      - path: .github/workflows/newb-docs-quality-on-ubuntu-latest.yml::newb
+        line: 0
+        reason: >-
+          Docs-quality job; ubuntu-latest is the constitution §4 default for
+          public repos. Registry gap, not a misrouted job -- remove when
+          ubuntu-latest is in hosts.yaml.
+      - path: .github/workflows/rtd-sphinx-build-on-ubuntu-latest.yml::sphinx
+        line: 0
+        reason: >-
+          Read-the-Docs sphinx build; ubuntu-latest is the constitution §4
+          default for public repos. Registry gap, not a misrouted job --
+          remove when ubuntu-latest is in hosts.yaml.
 #   skip:
 #     - PS-108
