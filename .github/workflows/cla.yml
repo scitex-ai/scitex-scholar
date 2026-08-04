@@ -27,4 +27,18 @@ jobs:
     uses: scitex-ai/.github/.github/workflows/cla.yml@main
     with:
       owner_allowlist: "bot*,ywatanabe1989,LLEmacs"
-    secrets: inherit
+    # Pass the ONE secret the callee declares, never `secrets: inherit`.
+    #
+    # This job is startable by an outsider (`issue_comment`,
+    # `pull_request_target`), and the callee runs on a PERSISTENT SHARED
+    # self-hosted runner ([self-hosted, Linux, X64, spartan-cpu]). Under
+    # `secrets: inherit` every secret this repo holds -- including the
+    # fleet PAT, which has nothing to do with the CLA -- was forwarded
+    # into that job. Neither file showed it alone: the caller names no
+    # `runs-on`, so the destination lives in the callee.
+    #
+    # The callee has declared `GH_PERSONAL_ACCESS_TOKEN` as an explicit
+    # `workflow_call` secret precisely so callers can stop inheriting;
+    # scholar was simply an un-migrated caller. Flagged by PS-224 §1.
+    secrets:
+      GH_PERSONAL_ACCESS_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
