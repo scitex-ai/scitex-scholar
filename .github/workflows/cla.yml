@@ -27,4 +27,11 @@ jobs:
     uses: scitex-ai/.github/.github/workflows/cla.yml@main
     with:
       owner_allowlist: "bot*,ywatanabe1989,LLEmacs"
-    secrets: inherit
+    # NAMED SECRET, not `inherit`. This caller runs on `issue_comment` and
+    # `pull_request_target` -- both unauthenticated on a public repo -- and
+    # `secrets: inherit` forwards EVERY secret this repo holds into a job an
+    # outsider can start, on the shared self-hosted runner the callee targets.
+    # Neither file shows that on its own: the caller names no runs-on, so the
+    # destination lives in the callee. Pass only the secret the callee declares.
+    secrets:
+      GH_PERSONAL_ACCESS_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
