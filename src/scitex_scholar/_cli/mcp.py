@@ -20,7 +20,7 @@ from typing import Any
 
 import click
 
-from .._cli_main import CONTEXT_SETTINGS
+from ._scaffolding import CONTEXT_SETTINGS
 
 # ---------------------------------------------------------------------------
 # Group: mcp

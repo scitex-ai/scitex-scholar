@@ -24,7 +24,7 @@ from pathlib import Path
 
 import click
 
-from .._cli_main import CONTEXT_SETTINGS
+from ._scaffolding import CONTEXT_SETTINGS
 
 # ---------------------------------------------------------------------------
 # Group: skills
