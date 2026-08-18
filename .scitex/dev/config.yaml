@@ -33,6 +33,58 @@ audit:
     # they are scoped to these two jobs so nothing else in PS-224 is
     # silenced, and the cla.yml finding from the same rule was FIXED rather
     # than exempted.
+    # PS-231 §1 flags this workflow as re-implementing the org reusable
+    # `rtd-sphinx-build` instead of calling it. The finding is TRUE. The
+    # prescribed remedy is not yet available, and applying it today would
+    # introduce a WORSE, SILENT defect than the one being flagged.
+    #
+    # MEASURED (figrecipe, corroborated against scholar's own file):
+    # the org reusable is BUILD-ONLY; this leaf is BUILD + PUBLISH.
+    #   1. It refreshes the VENDORED docs bundle at src/scitex_scholar/
+    #      _sphinx_html/ and commits it back. That bundle is NOT a build
+    #      artifact -- hatch packages src/scitex_scholar wholesale, so
+    #      _sphinx_html/** SHIPS INSIDE THE WHEEL. The org workflow has no
+    #      contents:write, no vendor-dir, no commit-back and no artifact
+    #      output, so a bare `uses:` conversion would silently FREEZE the
+    #      in-wheel documentation at its current state: green CI, stale
+    #      docs reaching users, nothing anywhere saying so.
+    #   2. It runs `sphinx-build -W` on pull_request. The org build never
+    #      passes -W and exposes no fail_on_warning / sphinx_opts input, so
+    #      converting would silently WEAKEN the PR docs gate.
+    #   3. It builds on Python 3.11, matching .readthedocs.yaml's
+    #      build.tools.python. The org hardcodes 3.12, so after conversion
+    #      CI and RTD would no longer build on the same interpreter.
+    #
+    # THIS IS NOT A LEAF PECULIARITY, which is why the fix is not local:
+    # the same build+publish shape appears in ~30 scitex-ai repos, and ~16
+    # carry a _sphinx_html bundle. THREE ORG-SIDE INPUTS RETIRE ALL OF THEM
+    # AT ONCE: `fail_on_warning` (or `sphinx_opts`), `python_version`, and
+    # `upload_artifact` + an artifact-name output so each caller does its
+    # own vendor+commit in its own job with its own contents:write.
+    # Requested jointly with figrecipe as
+    # dev-corpus-release-turned-15-repos-red-and-notified-none-of-them-20260818.
+    #
+    # DELETE THIS ENTRY the moment those inputs exist and the workflow is
+    # converted -- exactly as the PS-224 entries below are to be deleted
+    # once ubuntu-latest is registered. Reviewed on the date in
+    # scholar-ps231-exemption-review; if the org inputs have not landed by
+    # then, the correct action is to push scitex-dev again, NOT to quietly
+    # extend this. A time-boxed exemption with no date is a permanent one
+    # with optimistic wording.
+    #
+    # Ruling: scitex-hub, 2026-08-18. Scoped to this ONE path, so every
+    # other PS-231 finding in this repo still fails the build.
+    PS-231:
+      - path: .github/workflows/rtd-sphinx-build-on-ubuntu-latest.yml
+        line: 0
+        reason: >-
+          Org reusable is build-only; this leaf also vendors and commits
+          back src/scitex_scholar/_sphinx_html/, which ships inside the
+          wheel. Converting today would silently freeze the in-wheel docs,
+          drop `sphinx-build -W`, and move CI off the Python 3.11 that
+          .readthedocs.yaml pins. Blocked on org-side fail_on_warning /
+          python_version / upload_artifact inputs -- remove when they land.
+
     PS-224:
       - path: .github/workflows/newb-docs-quality-on-ubuntu-latest.yml::newb
         line: 0
