@@ -26,6 +26,20 @@ from typing import Dict, Optional
 from django.conf import settings as django_settings
 from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
+
+# scitex-app >= 0.8.0. Scholar previously COPIED this derivation from
+# their 0.7.1 doc, with a comment claiming the copy kept the two from
+# drifting. Events disproved that: the published derivation was WRONG
+# for non-root views (request.path is the prefix PLUS the view's own
+# route, and only the view knows its route), and scholar inherited the
+# bug on copying it. A copy cannot drift from its source -- it also
+# cannot receive its source's FIXES.
+#
+# view_path defaults to "", which is correct because index is
+# registered at path("", ...). IF SCHOLAR EVER ADDS A NON-ROOT VIEW
+# THAT EMITS THE MARKER, pass that view's route here; the function
+# raises MountPrefixMismatch rather than guessing.
+from scitex_app.embed import mount_prefix
 from django.views.decorators.http import require_GET
 
 logger = logging.getLogger(__name__)
@@ -95,30 +109,6 @@ def _get_search_engine():
     return _search_engine
 
 
-def _mount_prefix(request) -> str:
-    """Return the URL prefix this app is mounted under, always slash-suffixed.
-
-    scitex-app's `stx-mount` contract (scitex-app >= 0.7.0,
-    `_skills/scitex-app/33_mount-prefix.md`) says the SERVER tells the browser
-    where the app is mounted, and the browser joins relative endpoint names
-    onto it. The SDK injects that marker only for shells served through
-    `scitex_editor_page`; scholar renders its own Django template, so nothing
-    would inject it here and the client would fall back to "/" -- correct
-    standalone, wrong under any prefix.
-
-    So scholar supplies the base itself. That is not a divergence from the
-    contract: the contract doc credits scitex-writer's `data-api-base` as the
-    pattern it standardises ("that pattern IS the contract"), and a
-    template-rendered app is exactly writer's case rather than the built-SPA
-    case `scitex_editor_page` exists for.
-
-    The derivation is copied verbatim from `scitex_app/_django.py` so the two
-    cannot drift apart. `index` is registered at `path("", ...)`, so its
-    request path IS the mount prefix -- exact, not inferred.
-    """
-    return request.path if request.path.endswith("/") else request.path + "/"
-
-
 def index(request):
     """Serve the Scholar SPA shell page.
 
@@ -134,7 +124,7 @@ def index(request):
         {
             "db_available": resolved_db is not None,
             "db_path": resolved_db or "Not found",
-            "stx_mount": _mount_prefix(request),
+            "stx_mount": mount_prefix(request),
         },
         request=request,
     )

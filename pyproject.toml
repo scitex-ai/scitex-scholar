@@ -103,7 +103,7 @@ server = [
     # reclaim under --force, and `gui_port_holder` gained the frozen
     # three-valued `PortHolder` whose `ours is None` the `gui open` code
     # branches on. Against 0.4.x those branches read a different shape.
-    "scitex-app>=0.5.0",
+    "scitex-app>=0.8.0",
     # gui_runtime (pid/port/host lifecycle bookkeeping for `scholar gui`)
     # shipped in scitex-dev 0.30.0 (2026-07-12).
     "scitex-dev>=0.30.0",
@@ -128,7 +128,7 @@ dev = [
     "fastmcp>=2.0.0",
     "aiohttp>=3.8.0",
     "django>=4.2",
-    "scitex-app>=0.5.0",
+    "scitex-app>=0.8.0",
     # `_django/settings.py` imports scitex_ui unguarded (it is a hard
     # member of `[server]`), so the Django tests cannot even import
     # without it. NOT guarded with importorskip on purpose: a skip would

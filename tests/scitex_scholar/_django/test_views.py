@@ -271,8 +271,13 @@ def test_index_emits_stx_mount_marker():
     assert marker is not None
 
 
-def test_stx_mount_is_root_when_served_at_root():
-    """Standalone: the app is at "/" and says so."""
+def test_stx_mount_is_empty_when_served_at_root():
+    """Standalone root is "" -- NOT "/".
+
+    This test previously asserted "/" and PASSED after the migration, because
+    the template carried `|default:'/'` and Django's default filter fires on
+    falsy. It was reporting the old value while the SDK returned the new one.
+    """
     # Arrange
     path = "/"
 
@@ -280,7 +285,7 @@ def test_stx_mount_is_root_when_served_at_root():
     marker = _marker_for(path)
 
     # Assert
-    assert marker == "/"
+    assert marker == ""
 
 
 def test_stx_mount_reports_the_prefix_it_is_served_under():
@@ -292,31 +297,36 @@ def test_stx_mount_reports_the_prefix_it_is_served_under():
     marker = _marker_for(path)
 
     # Assert
-    assert marker == "/apps/u/scholar/"
+    assert marker == "/apps/u/scholar"
 
 
-def test_stx_mount_always_ends_in_a_slash():
-    """The contract guarantees it, so leaf JS may join without normalising."""
+def test_stx_mount_never_ends_in_a_slash():
+    """Inverted from the old contract, and the inversion is the point.
+
+    The slash now lives on the ENDPOINT. A base ending in "/" plus an endpoint
+    starting with "/" yields "//api/x", which a browser reads as
+    protocol-relative and sends OFF-ORIGIN.
+    """
     # Arrange
-    path = "/apps/u/scholar"  # deliberately NO trailing slash
+    path = "/apps/u/scholar/"
 
     # Act
     marker = _marker_for(path)
 
     # Assert
-    assert marker.endswith("/")
+    assert not marker.endswith("/")
 
 
-def test_stx_mount_adds_the_missing_slash_rather_than_dropping_the_path():
+def test_stx_mount_strips_a_trailing_slash_without_losing_the_path():
     """Normalising must not lose the prefix -- that is the failure it prevents."""
     # Arrange
-    path = "/apps/u/scholar"
+    path = "/apps/u/scholar/"
 
     # Act
     marker = _marker_for(path)
 
     # Assert
-    assert marker == "/apps/u/scholar/"
+    assert marker == "/apps/u/scholar"
 
 
 # ---------------------------------------------------------------------------

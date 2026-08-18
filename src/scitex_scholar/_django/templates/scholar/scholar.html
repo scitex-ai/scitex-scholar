@@ -16,7 +16,13 @@
         which injects it automatically -- serves built SPA shells, and this is
         a Django-rendered template.
         {% endcomment %}
-        <meta name="stx-mount" content="{{ stx_mount|default:'/' }}">
+        {# NO |default FILTER. The root prefix is "" under scitex-app >= 0.8.0,
+           and Django's `default` fires on FALSY -- so `|default:'/'` silently
+           rewrote the correct "" back into the old "/", making every root
+           request build "//api/..." : protocol-relative, off-origin. That is
+           the exact failure the convention reversal exists to prevent, and it
+           passed a test asserting the OLD value. #}
+        <meta name="stx-mount" content="{{ stx_mount }}">
         {% comment %}
         Shared SciTeX mark, replacing a hand-rolled rel="icon" link that
         interpolated a favicon_href context var. The partial ships the asset
