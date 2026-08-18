@@ -348,9 +348,27 @@ SHADOWED_TOKENS = [
 ]
 
 
+TEMPLATE = (
+    Path(views.__file__).parent / "templates" / "scholar" / "scholar.html"
+)
+
+
 def _scholar_css() -> str:
-    """Every scholar stylesheet concatenated, as the browser would see them."""
-    return "\n".join(p.read_text() for p in sorted(CSS_DIR.rglob("*.css")))
+    """Everything that can reference a token, as the browser would see it.
+
+    INCLUDES THE TEMPLATE, and that is not incidental. scholar.html carries
+    inline styles (it is marked `hook-bypass: inline-style`) with 11
+    no-fallback `var()` uses. A scan of only *.css answers "do the STYLESHEETS
+    resolve" while claiming to answer "does the PAGE resolve" -- an instrument
+    reporting on something narrower than the question, which is the failure
+    this whole guard exists to prevent.
+
+    Found after scitex-hub hit the same shape: their CSS-import-graph check
+    could not see 24 stylesheets reaching scitex-ui through TypeScript.
+    """
+    parts = [p.read_text() for p in sorted(CSS_DIR.rglob("*.css"))]
+    parts.append(TEMPLATE.read_text())
+    return "\n".join(parts)
 
 
 def _theme_css() -> str:
@@ -383,6 +401,19 @@ def test_token_scan_actually_finds_references():
 
     # Assert
     assert referenced
+
+
+def test_token_scan_covers_the_template_too():
+    """Control for the template half -- a css-only scan would pass this file's
+    other tests while missing every inline `var()` in the rendered page."""
+    # Arrange
+    template_only = _referenced_without_fallback(TEMPLATE.read_text())
+
+    # Act
+    seen_by_scan = _referenced_without_fallback(_scholar_css())
+
+    # Assert
+    assert template_only <= seen_by_scan and template_only
 
 
 def test_every_referenced_token_resolves():
