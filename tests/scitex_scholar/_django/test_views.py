@@ -23,6 +23,9 @@ from __future__ import annotations
 
 import json
 import re
+from pathlib import Path
+
+import pytest
 
 from django.test import RequestFactory, override_settings
 
@@ -314,6 +317,130 @@ def test_stx_mount_adds_the_missing_slash_rather_than_dropping_the_path():
 
     # Assert
     assert marker == "/apps/u/scholar/"
+
+
+# ---------------------------------------------------------------------------
+# Design-token dependency on scitex-ui (shell/theme.css)
+#
+# scholar DELETED seven token declarations (--accent, --text-primary,
+# --text-secondary, --text-muted, --text-inverse, --border-default,
+# --status-error) and now consumes scitex-ui's. That makes them an EXTERNAL
+# dependency of scholar's stylesheet, and the failure mode is silent: an
+# undefined CSS custom property resolves to nothing rather than erroring, so
+# a missing token produces an unstyled page and a green test suite.
+#
+# Shape borrowed from scitex-ui via hub -- assert every REFERENCED property
+# resolves to a declaration. Critically it asserts on the NO-FALLBACK subset
+# only: `var(--x, fallback)` is a deliberate override hook, and flagging those
+# makes the guard noisy enough to be switched off.
+# ---------------------------------------------------------------------------
+
+CSS_DIR = Path(views.__file__).parent / "static" / "scholar" / "css"
+
+SHADOWED_TOKENS = [
+    "--accent",
+    "--text-primary",
+    "--text-secondary",
+    "--text-muted",
+    "--text-inverse",
+    "--border-default",
+    "--status-error",
+]
+
+
+def _scholar_css() -> str:
+    """Every scholar stylesheet concatenated, as the browser would see them."""
+    return "\n".join(p.read_text() for p in sorted(CSS_DIR.rglob("*.css")))
+
+
+def _theme_css() -> str:
+    """scitex-ui's shell/theme.css, read from the INSTALLED package."""
+    import scitex_ui
+
+    path = (
+        Path(scitex_ui.__file__).parent
+        / "static" / "scitex_ui" / "css" / "shell" / "theme.css"
+    )
+    return path.read_text()
+
+
+def _referenced_without_fallback(css: str) -> set:
+    """Tokens used as `var(--x)` with NO fallback -- the ones with no safety net."""
+    return set(re.findall(r"var\(\s*(--[a-zA-Z0-9-]+)\s*\)", css))
+
+
+def _declared(css: str) -> set:
+    return set(re.findall(r"(--[a-zA-Z0-9-]+)\s*:", css))
+
+
+def test_token_scan_actually_finds_references():
+    """Positive control: an absence assertion below is vacuous without this."""
+    # Arrange
+    css = _scholar_css()
+
+    # Act
+    referenced = _referenced_without_fallback(css)
+
+    # Assert
+    assert referenced
+
+
+def test_every_referenced_token_resolves():
+    """No token may reference into nothing -- that renders unstyled, silently."""
+    # Arrange
+    available = _declared(_scholar_css()) | _declared(_theme_css())
+
+    # Act
+    dangling = sorted(_referenced_without_fallback(_scholar_css()) - available)
+
+    # Assert
+    assert not dangling, (
+        f"referenced with no fallback and declared nowhere: {dangling}. "
+        f"Either scholar deleted a token it still uses, or scitex-ui dropped "
+        f"one scholar depends on."
+    )
+
+
+@pytest.mark.parametrize("token", SHADOWED_TOKENS)
+def test_shadowed_token_comes_from_scitex_ui(token):
+    """The seven deleted tokens must still be available -- from upstream."""
+    # Arrange
+    theme = _theme_css()
+
+    # Act
+    declared_upstream = token in _declared(theme)
+
+    # Assert
+    assert declared_upstream
+
+
+@pytest.mark.parametrize("token", SHADOWED_TOKENS)
+def test_scholar_does_not_redeclare_shadowed_token(token):
+    """Re-adding one silently restores the load-order-dependent collision."""
+    # Arrange
+    scholar_css = _scholar_css()
+
+    # Act
+    redeclared = token in _declared(scholar_css)
+
+    # Assert
+    assert not redeclared, (
+        f"{token} is declared in scholar's CSS again. It must come from "
+        f"scitex-ui's shell/theme.css; redeclaring it means whichever "
+        f"stylesheet loads last wins."
+    )
+
+
+def test_template_links_scitex_ui_theme():
+    """The tokens are only available if the page actually links the file."""
+    # Arrange
+    response = views.index(RequestFactory().get("/"))
+
+    # Act
+    html = response.content.decode()
+
+    # Assert
+    assert "scitex_ui/css/shell/theme.css" in html
 
 
 # EOF

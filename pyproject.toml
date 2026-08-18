@@ -111,7 +111,7 @@ server = [
     # included by scholar.html's <head>. 0.7.1 is the first release where
     # branding is usable WITHOUT adopting the workspace shell -- scholar
     # owns its own layout and deliberately does not extend that shell.
-    "scitex-ui>=0.7.1",
+    "scitex-ui>=0.16.0",
 ]
 watch = [
     "watchdog>=3.0.0",
@@ -133,7 +133,7 @@ dev = [
     # member of `[server]`), so the Django tests cannot even import
     # without it. NOT guarded with importorskip on purpose: a skip would
     # hide a genuinely broken GUI install behind a green run.
-    "scitex-ui>=0.7.1",
+    "scitex-ui>=0.16.0",
     "watchdog>=3.0.0",
     # tests/integration/test_clew_integration.py — used (with importorskip)
     # to exercise the optional scitex-clew provenance path in storage/PaperIO.

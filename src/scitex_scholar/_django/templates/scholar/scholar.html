@@ -26,6 +26,15 @@
         as django, so it is present wherever this template can render.
         {% endcomment %}
         {% include "scitex_ui/_branding_head.html" %}
+        {% comment %}
+        scitex-ui's shared design tokens. Linked BEFORE scholar.css so scholar
+        may still override non-token styling, and REQUIRED: scholar deleted its
+        own --accent/--text-*/--border-default/--status-error declarations in
+        favour of these. Needs scitex-ui>=0.16.0 — earlier wheels ship this
+        file WITHOUT the palette, which resolves those tokens to nothing with
+        no error. pyproject pins that floor.
+        {% endcomment %}
+        <link rel="stylesheet" href="{% static 'scitex_ui/css/shell/theme.css' %}">
         <link rel="stylesheet" href="{% static 'scholar/css/scholar.css' %}">
     </head>
     <body>
