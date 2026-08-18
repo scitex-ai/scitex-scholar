@@ -19,6 +19,7 @@ circular import)`. Post-fix: all nine import cleanly.
 
 from __future__ import annotations
 
+import ast
 import subprocess
 import sys
 from pathlib import Path
@@ -103,21 +104,59 @@ def test_group_module_imports_on_cold_interpreter(module_name):
     )
 
 
+def _scaffolding_imports() -> list[str]:
+    """Every module `_scaffolding` imports, at ANY nesting depth.
+
+    Parsed with `ast` rather than matched by line prefix. The first version of
+    this guard filtered on `line.startswith(("import ", "from "))`, which
+    silently skips INDENTED imports -- inside a function, a `try:`, or an
+    `if TYPE_CHECKING:` block. A deferred `from .._cli_main import ...` would
+    have restored the cycle with the test still green, which is the failure
+    shape this file exists to prevent, one level up.
+    """
+    tree = ast.parse(Path(_scaffolding.__file__).read_text())
+    modules: list[str] = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            modules.extend(alias.name for alias in node.names)
+        elif isinstance(node, ast.ImportFrom):
+            modules.append(node.module or "")
+    return modules
+
+
+def test_import_guard_can_actually_see_imports():
+    """Positive control, and it is the load-bearing half of the guard below.
+
+    "No import of _cli_main" is an ABSENCE assertion, so ANY failure of the
+    parser to see imports at all yields an empty list and PASSES -- two empty
+    sets are equal, and the check fails OPEN. This test asserts the parser
+    finds an import we know is there, so a broken scan goes red here instead
+    of masquerading as a clean result next door.
+    """
+    # Arrange
+    known_import = "click"
+
+    # Act
+    modules = _scaffolding_imports()
+
+    # Assert
+    assert known_import in modules
+
+
 def test_scaffolding_does_not_import_cli_main():
     """The one-way dependency is the fix; assert it on the import graph.
 
     Asserting on the source rather than on an outcome: a cold import that
     happens to succeed cannot distinguish a fixed tree from a lucky one.
+
+    Paired with the positive control above, which is what stops this from
+    passing vacuously.
     """
     # Arrange
-    source = Path(_scaffolding.__file__).read_text()
+    forbidden = "_cli_main"
 
     # Act
-    offenders = [
-        line
-        for line in source.splitlines()
-        if line.startswith(("import ", "from ")) and "_cli_main" in line
-    ]
+    offenders = [m for m in _scaffolding_imports() if forbidden in m]
 
     # Assert
     assert not offenders, (
