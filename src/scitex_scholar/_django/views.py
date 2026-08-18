@@ -95,6 +95,30 @@ def _get_search_engine():
     return _search_engine
 
 
+def _mount_prefix(request) -> str:
+    """Return the URL prefix this app is mounted under, always slash-suffixed.
+
+    scitex-app's `stx-mount` contract (scitex-app >= 0.7.0,
+    `_skills/scitex-app/33_mount-prefix.md`) says the SERVER tells the browser
+    where the app is mounted, and the browser joins relative endpoint names
+    onto it. The SDK injects that marker only for shells served through
+    `scitex_editor_page`; scholar renders its own Django template, so nothing
+    would inject it here and the client would fall back to "/" -- correct
+    standalone, wrong under any prefix.
+
+    So scholar supplies the base itself. That is not a divergence from the
+    contract: the contract doc credits scitex-writer's `data-api-base` as the
+    pattern it standardises ("that pattern IS the contract"), and a
+    template-rendered app is exactly writer's case rather than the built-SPA
+    case `scitex_editor_page` exists for.
+
+    The derivation is copied verbatim from `scitex_app/_django.py` so the two
+    cannot drift apart. `index` is registered at `path("", ...)`, so its
+    request path IS the mount prefix -- exact, not inferred.
+    """
+    return request.path if request.path.endswith("/") else request.path + "/"
+
+
 def index(request):
     """Serve the Scholar SPA shell page.
 
@@ -110,6 +134,7 @@ def index(request):
         {
             "db_available": resolved_db is not None,
             "db_path": resolved_db or "Not found",
+            "stx_mount": _mount_prefix(request),
         },
         request=request,
     )

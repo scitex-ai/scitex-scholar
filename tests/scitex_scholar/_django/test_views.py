@@ -22,6 +22,7 @@ bootstrap via conftest.py (bare `django.setup()`, no pytest-django dep).
 from __future__ import annotations
 
 import json
+import re
 
 from django.test import RequestFactory, override_settings
 
@@ -232,6 +233,87 @@ def test_search_marks_cached_results_as_cached():
     resp = views.search(request)
     # Assert
     assert json.loads(resp.content)["metadata"]["cached"] is True
+
+
+# ---------------------------------------------------------------------------
+# stx-mount marker (scitex-app >= 0.7.0 mount-prefix contract)
+#
+# The SDK injects this marker only for shells served through
+# `scitex_editor_page`. Scholar renders its own Django template, so nothing
+# would inject it here -- these tests are the guard that scholar keeps
+# supplying it itself. Without the marker the client falls back to "/", which
+# is correct standalone and WRONG under any mount prefix, and it fails
+# silently: the page renders, and only the API calls 404.
+# ---------------------------------------------------------------------------
+
+MOUNT_MARKER = re.compile(r'<meta name="stx-mount" content="([^"]*)"')
+
+
+def _marker_for(path: str):
+    """Render index at `path` and return the stx-mount value the browser sees."""
+    response = views.index(RequestFactory().get(path))
+    found = MOUNT_MARKER.search(response.content.decode())
+    return found.group(1) if found else None
+
+
+def test_index_emits_stx_mount_marker():
+    """The marker must be present -- its absence is a silent prefix failure."""
+    # Arrange
+    path = "/"
+
+    # Act
+    marker = _marker_for(path)
+
+    # Assert
+    assert marker is not None
+
+
+def test_stx_mount_is_root_when_served_at_root():
+    """Standalone: the app is at "/" and says so."""
+    # Arrange
+    path = "/"
+
+    # Act
+    marker = _marker_for(path)
+
+    # Assert
+    assert marker == "/"
+
+
+def test_stx_mount_reports_the_prefix_it_is_served_under():
+    """Embedded: the marker is the real mount, not a guess or a default."""
+    # Arrange
+    path = "/apps/u/scholar/"
+
+    # Act
+    marker = _marker_for(path)
+
+    # Assert
+    assert marker == "/apps/u/scholar/"
+
+
+def test_stx_mount_always_ends_in_a_slash():
+    """The contract guarantees it, so leaf JS may join without normalising."""
+    # Arrange
+    path = "/apps/u/scholar"  # deliberately NO trailing slash
+
+    # Act
+    marker = _marker_for(path)
+
+    # Assert
+    assert marker.endswith("/")
+
+
+def test_stx_mount_adds_the_missing_slash_rather_than_dropping_the_path():
+    """Normalising must not lose the prefix -- that is the failure it prevents."""
+    # Arrange
+    path = "/apps/u/scholar"
+
+    # Act
+    marker = _marker_for(path)
+
+    # Assert
+    assert marker == "/apps/u/scholar/"
 
 
 # EOF
