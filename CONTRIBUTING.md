@@ -16,7 +16,7 @@ See [CLA.md](CLA.md) for full details.
 
 ## Reporting Issues
 
-- Search [existing issues](https://github.com/ywatanabe1989/scitex-scholar/issues)
+- Search [existing issues](https://github.com/scitex-ai/scitex-scholar/issues)
   before opening a new one.
 - Include a minimal reproducible example when reporting bugs.
 - Specify your Python version, OS, and `scitex` version.
@@ -24,7 +24,7 @@ See [CLA.md](CLA.md) for full details.
 ## Development Setup
 
 ```bash
-git clone git@github.com:ywatanabe1989/scitex-scholar.git
+git clone git@github.com:scitex-ai/scitex-scholar.git
 cd scitex-scholar
 pip install -e ".[dev]"
 ```
