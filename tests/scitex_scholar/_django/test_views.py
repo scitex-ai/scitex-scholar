@@ -353,22 +353,46 @@ TEMPLATE = (
 )
 
 
+CSS_ENTRY = CSS_DIR / "scholar.css"
+
+_IMPORT_RE = re.compile(r"""@import\s+url\(\s*['"]?([^'")]+)['"]?\s*\)""")
+
+
+def _resolve_css(entry: Path, _seen: set | None = None) -> str:
+    """Read `entry` and every stylesheet it @imports, transitively.
+
+    READS WHAT THE BROWSER READS, which is not the same question as "every
+    .css file in the directory". scholar.css is a BARREL -- nine @imports and
+    no rules of its own -- so a directory glob happened to agree with the
+    import graph. Happened to: a partial moved out of this tree, or one left
+    behind and no longer imported, makes them diverge, and the glob is wrong
+    in both directions (missing a file the page loads, or counting one it
+    does not).
+
+    scitex-ui hit the missing-file half for real: 0.16.0 split colors.css
+    into a barrel, and every single-file read of it silently went empty.
+    """
+    seen = _seen if _seen is not None else set()
+    entry = entry.resolve()
+    if entry in seen or not entry.exists():
+        return ""
+    seen.add(entry)
+    text = entry.read_text()
+    parts = [text]
+    for href in _IMPORT_RE.findall(text):
+        parts.append(_resolve_css(entry.parent / href, seen))
+    return "\n".join(parts)
+
+
 def _scholar_css() -> str:
     """Everything that can reference a token, as the browser would see it.
 
     INCLUDES THE TEMPLATE, and that is not incidental. scholar.html carries
     inline styles (it is marked `hook-bypass: inline-style`) with 11
-    no-fallback `var()` uses. A scan of only *.css answers "do the STYLESHEETS
-    resolve" while claiming to answer "does the PAGE resolve" -- an instrument
-    reporting on something narrower than the question, which is the failure
-    this whole guard exists to prevent.
-
-    Found after scitex-hub hit the same shape: their CSS-import-graph check
-    could not see 24 stylesheets reaching scitex-ui through TypeScript.
+    no-fallback `var()` uses. A scan of only stylesheets answers "do the
+    STYLESHEETS resolve" while claiming to answer "does the PAGE resolve".
     """
-    parts = [p.read_text() for p in sorted(CSS_DIR.rglob("*.css"))]
-    parts.append(TEMPLATE.read_text())
-    return "\n".join(parts)
+    return _resolve_css(CSS_ENTRY) + "\n" + TEMPLATE.read_text()
 
 
 def _theme_css() -> str:
@@ -379,7 +403,11 @@ def _theme_css() -> str:
         Path(scitex_ui.__file__).parent
         / "static" / "scitex_ui" / "css" / "shell" / "theme.css"
     )
-    return path.read_text()
+    # Resolved, not read: theme.css is a leaf TODAY. colors.css was a leaf
+    # too until 0.16.0 split it into a barrel, at which point every
+    # single-file read of it returned almost nothing and looked like a lost
+    # token. One release away, for any file.
+    return _resolve_css(path)
 
 
 def _referenced_without_fallback(css: str) -> set:
@@ -472,6 +500,77 @@ def test_template_links_scitex_ui_theme():
 
     # Assert
     assert "scitex_ui/css/shell/theme.css" in html
+
+
+# ---------------------------------------------------------------------------
+# @import resolution
+#
+# theme.css is a LEAF today, so the real files cannot demonstrate that the
+# resolver follows anything -- a check that cannot exercise its own mechanism
+# proves nothing about it. These use a synthetic barrel for the mechanism and
+# the real scholar.css for the integration.
+# ---------------------------------------------------------------------------
+
+
+def test_resolver_follows_an_import(tmp_path):
+    """The mechanism, on a fixture, because no shipped file exercises it."""
+    # Arrange
+    (tmp_path / "child.css").write_text(":root { --from-child: #123456; }")
+    barrel = tmp_path / "barrel.css"
+    barrel.write_text('@import url("child.css");')
+
+    # Act
+    resolved = _resolve_css(barrel)
+
+    # Assert
+    assert "--from-child" in resolved
+
+
+def test_resolver_follows_imports_transitively(tmp_path):
+    """A barrel of barrels -- 0.16.0's colors.css shape is one level; assume more."""
+    # Arrange
+    (tmp_path / "leaf.css").write_text(":root { --deep: #abcdef; }")
+    (tmp_path / "mid.css").write_text('@import url("leaf.css");')
+    root = tmp_path / "root.css"
+    root.write_text('@import url("mid.css");')
+
+    # Act
+    resolved = _resolve_css(root)
+
+    # Assert
+    assert "--deep" in resolved
+
+
+def test_resolver_survives_an_import_cycle(tmp_path):
+    """A cycle must terminate rather than recurse until the stack dies."""
+    # Arrange
+    a = tmp_path / "a.css"
+    b = tmp_path / "b.css"
+    a.write_text('@import url("b.css");:root{--from-a:#111;}')
+    b.write_text('@import url("a.css");:root{--from-b:#222;}')
+
+    # Act
+    resolved = _resolve_css(a)
+
+    # Assert
+    assert "--from-b" in resolved
+
+
+def test_scholar_entry_point_reaches_a_partial_only_token():
+    """Integration: scholar.css is a barrel, so this fails if following breaks.
+
+    --bg-monaco is declared ONLY in _partials/_base.css and nowhere in
+    scholar.css itself, so its presence proves the entry point was followed
+    rather than merely read.
+    """
+    # Arrange
+    entry_text = CSS_ENTRY.read_text()
+
+    # Act
+    resolved = _resolve_css(CSS_ENTRY)
+
+    # Assert
+    assert "--bg-monaco" in resolved and "--bg-monaco" not in entry_text
 
 
 # EOF
