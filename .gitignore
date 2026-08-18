@@ -699,3 +699,19 @@ src/*/_docs/
 .scitex/*/runtime/*
 !.scitex/*/runtime/.gitkeep
 !.scitex/*/runtime/README.md
+
+# Repair the over-broad trash-bin rule above.
+# `*old*` / `**/*old*` are meant for ".old/" trash-bin DIRECTORIES (see that
+# block's own comment), but as written they match any path whose NAME merely
+# CONTAINS "old" -- scaffolding, threshold, golden, folder, holder.
+# Measured 2026-08-18: they silently swallowed
+# src/scitex_scholar/_cli/_scaffolding.py and its test, and `git add -A` then
+# skipped both without a word -- a file that looks committed and is not.
+# Re-include the source and test trees only. Real trash bins stay ignored by
+# the `.old` / `**/.old` rules, and git cannot re-include files inside an
+# already-excluded directory, so this cannot resurrect one.
+# Root cause is upstream, in the shared template
+# ~/.git-templates/.gitignore-templates/Custom/Development.gitignore --
+# tracked separately as gitignore-old-substring-too-broad (dotfiles).
+!src/**/*old*
+!tests/**/*old*

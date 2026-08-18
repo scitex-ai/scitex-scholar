@@ -37,7 +37,7 @@ from typing import Optional
 
 import click
 
-from .._cli_main import CONTEXT_SETTINGS
+from ._scaffolding import CONTEXT_SETTINGS
 from .._django._server import DEFAULT_PORT
 
 DEFAULT_HOST = "127.0.0.1"
