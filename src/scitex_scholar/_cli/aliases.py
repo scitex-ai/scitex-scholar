@@ -18,7 +18,7 @@ from pathlib import Path
 
 import click
 
-from .._cli_main import CONTEXT_SETTINGS, _warn_deprecated
+from ._scaffolding import CONTEXT_SETTINGS, _warn_deprecated
 from .library import (
     _do_dematerialize,
     _do_link_project_tree,

@@ -32,42 +32,17 @@ import sys
 
 import click
 
-
-# TODO(scitex-dev): import scitex_dev.click_helpers.CategorizedGroup once
-# available; currently scitex-dev does not export it, so we fall back to
-# plain click.Group.
-class _CategorizedGroup(click.Group):
-    """Click Group that renders ``--help`` commands grouped by section.
-
-    Subclass and set ``SECTIONS`` to ``[("Section name", ["cmd1", ...]), ...]``.
-    Commands not listed in any section land under ``[Other]``.
-    """
-
-    SECTIONS: list = []
-
-    def format_commands(self, ctx, formatter):
-        commands = {
-            n: c for n, c in self.commands.items() if not getattr(c, "hidden", False)
-        }
-        seen: set = set()
-        with formatter.section("Commands"):
-            for label, names in self.SECTIONS:
-                rows = []
-                for name in names:
-                    cmd = commands.get(name)
-                    if cmd is None:
-                        continue
-                    rows.append((name, cmd.get_short_help_str()))
-                    seen.add(name)
-                if rows:
-                    formatter.write(f"\n  [{label}]\n")
-                    for n, s in rows:
-                        formatter.write(f"    {n:<26}{s}\n")
-            other = sorted(n for n in commands if n not in seen)
-            if other:
-                formatter.write("\n  [Other]\n")
-                for n in other:
-                    formatter.write(f"    {n:<26}{commands[n].get_short_help_str()}\n")
+# Shared Click scaffolding lives one level down, in ``_cli._scaffolding``,
+# so the group modules can reach it without importing this module back
+# (that cycle made a cold ``import scitex_scholar._cli.<group>`` fail).
+# Re-exported here for back-compat with the old import site.
+from ._cli._scaffolding import (  # noqa: F401
+    CONTEXT_SETTINGS,
+    _CategorizedGroup,
+    _INT_OR_HELP,
+    _IntOrHelp,
+    _warn_deprecated,
+)
 
 
 # Top-level cli: same renderer with workflow/dev split. Replaces the
@@ -93,31 +68,6 @@ class _RootGroup(_CategorizedGroup):
 CategorizedGroup = _RootGroup  # used by @click.group(cls=...)
 
 
-CONTEXT_SETTINGS = {"help_option_names": ["-h", "--help"]}
-
-
-class _IntOrHelp(click.ParamType):
-    """An integer option type that treats ``-h``/``--help`` as a help request.
-
-    Click consumes the token after a value-taking option as that option's
-    value, so ``--batch-size -h`` would otherwise fail with "not a valid
-    integer". Here we detect a help token and print the command help instead.
-    """
-
-    name = "integer"
-
-    def convert(self, value, param, ctx):
-        if isinstance(value, str) and value in ("-h", "--help"):
-            click.echo(ctx.get_help())
-            ctx.exit()
-        try:
-            return int(value)
-        except (TypeError, ValueError):
-            self.fail(f"{value!r} is not a valid integer", param, ctx)
-
-
-_INT_OR_HELP = _IntOrHelp()
-
 COMMAND_CATEGORIES = [
     ("Paper", ["paper"]),
     ("Bibtex", ["bibtex"]),
@@ -133,16 +83,6 @@ COMMAND_CATEGORIES = [
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
-
-
-def _warn_deprecated(old_form: str, new_form: str) -> None:
-    """Emit a one-line yellow deprecation warning to stderr."""
-    click.secho(
-        f"DeprecationWarning: 'scitex-scholar {old_form}' is deprecated; "
-        f"use 'scitex-scholar {new_form}' (will be removed in 1.4.0).",
-        fg="yellow",
-        err=True,
-    )
 
 
 def _print_command_help(

@@ -26,6 +26,20 @@ from typing import Dict, Optional
 from django.conf import settings as django_settings
 from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
+
+# scitex-app >= 0.8.0. Scholar previously COPIED this derivation from
+# their 0.7.1 doc, with a comment claiming the copy kept the two from
+# drifting. Events disproved that: the published derivation was WRONG
+# for non-root views (request.path is the prefix PLUS the view's own
+# route, and only the view knows its route), and scholar inherited the
+# bug on copying it. A copy cannot drift from its source -- it also
+# cannot receive its source's FIXES.
+#
+# view_path defaults to "", which is correct because index is
+# registered at path("", ...). IF SCHOLAR EVER ADDS A NON-ROOT VIEW
+# THAT EMITS THE MARKER, pass that view's route here; the function
+# raises MountPrefixMismatch rather than guessing.
+from scitex_app.embed import mount_prefix
 from django.views.decorators.http import require_GET
 
 logger = logging.getLogger(__name__)
@@ -110,6 +124,7 @@ def index(request):
         {
             "db_available": resolved_db is not None,
             "db_path": resolved_db or "Not found",
+            "stx_mount": mount_prefix(request),
         },
         request=request,
     )

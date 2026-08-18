@@ -22,6 +22,7 @@ import scitex_logging as logging
 
 from ..utils import standardize_metadata
 from ._BaseDOIEngine import BaseDOIEngine
+from ..._utils._env import resolve_env
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +32,10 @@ class URLDOIEngine(BaseDOIEngine):
 
     def __init__(self, email: str = "research@example.com"):
         super().__init__(email)
-        self.api_key = os.getenv("SEMANTIC_SCHOLAR_API_KEY")
+        self.api_key = resolve_env(
+            "SCITEX_SCHOLAR_SEMANTIC_SCHOLAR_API_KEY",
+            legacy="SEMANTIC_SCHOLAR_API_KEY",
+        )
 
         self.ieee_patterns = [
             r"ieeexplore\.ieee\.org/document/(\d+)",

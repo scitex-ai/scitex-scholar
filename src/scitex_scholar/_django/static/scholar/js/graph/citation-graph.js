@@ -48,7 +48,7 @@ class CitationGraphManager {
     if (!el) return;
 
     try {
-      const resp = await fetch("/api/graph/health");
+      const resp = await fetch(STX_MOUNT + "/api/graph/health");
       const data = await resp.json();
       if (data.status === "healthy") {
         el.innerHTML =
@@ -82,7 +82,7 @@ class CitationGraphManager {
     this.hideError();
 
     try {
-      const url = `/api/graph/network?doi=${encodeURIComponent(doi)}&top_n=${topN}`;
+      const url = `${STX_MOUNT}/api/graph/network?doi=${encodeURIComponent(doi)}&top_n=${topN}`;
       const resp = await fetch(url);
       if (!resp.ok) {
         const err = await resp.json();
@@ -270,7 +270,7 @@ class CitationGraphManager {
     if (!container || !content) return;
 
     try {
-      const url = `/api/graph/related?doi=${encodeURIComponent(doi)}&limit=${limit}`;
+      const url = `${STX_MOUNT}/api/graph/related?doi=${encodeURIComponent(doi)}&limit=${limit}`;
       const resp = await fetch(url);
       if (!resp.ok) throw new Error("Failed");
 

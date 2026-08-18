@@ -20,7 +20,7 @@ from pathlib import Path
 
 import click
 
-from .._cli_main import CONTEXT_SETTINGS, _INT_OR_HELP
+from ._scaffolding import CONTEXT_SETTINGS, _INT_OR_HELP
 
 # ---------------------------------------------------------------------------
 # Group: pdf
