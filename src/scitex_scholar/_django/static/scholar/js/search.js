@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
         q: query,
         max_results: maxResults.value,
       });
-      const response = await fetch(`api/search?${params}`);
+      const response = await fetch(`${STX_MOUNT}api/search?${params}`);
       const data = await response.json();
 
       if (!response.ok) {

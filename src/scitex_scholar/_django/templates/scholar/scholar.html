@@ -9,6 +9,15 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>SciTeX Scholar</title>
         {% comment %}
+        scitex-app's `stx-mount` contract: the server declares where this app
+        is mounted so client code never has to guess. Always ends in "/", so
+        JS joins endpoint names WITHOUT a leading slash and never normalises.
+        Emitted here rather than by the SDK because `scitex_editor_page` --
+        which injects it automatically -- serves built SPA shells, and this is
+        a Django-rendered template.
+        {% endcomment %}
+        <meta name="stx-mount" content="{{ stx_mount|default:'/' }}">
+        {% comment %}
         Shared SciTeX mark, replacing a hand-rolled rel="icon" link that
         interpolated a favicon_href context var. The partial ships the asset
         and still honours favicon_href when a view supplies one.
@@ -278,6 +287,8 @@
             </main>
         </div>
         <!-- Scripts (order matters: ForceSimulation < GraphRenderer < citation-graph) -->
+        <!-- Must load FIRST: declares STX_MOUNT, which every other script uses. -->
+        <script src="{% static 'scholar/js/stx-mount.js' %}"></script>
         <script src="{% static 'scholar/js/app.js' %}"></script>
 <script src="{% static 'scholar/js/search.js' %}"></script>
         <script src="{% static 'scholar/js/graph/ForceSimulation.js' %}"></script>
