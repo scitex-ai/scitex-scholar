@@ -61,7 +61,12 @@ audit:
     # AT ONCE: `fail_on_warning` (or `sphinx_opts`), `python_version`, and
     # `upload_artifact` + an artifact-name output so each caller does its
     # own vendor+commit in its own job with its own contents:write.
-    # Requested jointly with figrecipe as
+    # THE RETIREMENT CONDITION IS A PR NUMBER, NOT A WISH: scitex-ai/.github#41,
+    # opened by figrecipe, adds exactly those inputs. An exemption whose reason
+    # names a needed CHANGE is waiting on a wish; one that names a PR NUMBER is
+    # waiting on a review, and only the second converges. So the review below
+    # asks one answerable question -- did #41 merge? -- rather than "has anyone
+    # thought about it yet". Filed alongside
     # dev-corpus-release-turned-15-repos-red-and-notified-none-of-them-20260818.
     #
     # DELETE THIS ENTRY the moment those inputs exist and the workflow is
@@ -85,6 +90,27 @@ audit:
           .readthedocs.yaml pins. Blocked on org-side fail_on_warning /
           python_version / upload_artifact inputs -- remove when they land.
 
+    #
+    # WHICH ARM OF PS-224 THESE ARE, verified 2026-08-18 by reading the rule
+    # SOURCE rather than its message. PS-224 has two arms and they are not
+    # equally safe to exempt:
+    #   arm 1  `runs-on` names a destination absent from the hosts registry
+    #   arm 2  a `uses:` caller that is attacker-triggerable AND passes
+    #          `secrets: inherit`, where the runner choice lives in the callee
+    #          -- a real credential exposure
+    # scitex-app measured that the finding TEXT describes arm 1 while arm 2 is
+    # what fires, so the message prescribes a fix that cannot be written (a
+    # `uses:` job may not declare `runs-on`) and then offers an exemption two
+    # sentences later -- steering a conscientious reader into exempting an
+    # exposure. Both entries below were checked against that:
+    #   newb   : own `steps:`, not a `uses:` caller; schedule + workflow_dispatch
+    #            (not attacker-triggerable); no `secrets:` key at all
+    #   sphinx : own `steps:`, not a `uses:` caller; push + pull_request
+    #            (NOT pull_request_target, so no elevated token on fork PRs);
+    #            no `secrets:` key at all
+    # Both are arm 1. Neither masks an exposure. THE DISCRIMINATOR IS CHEAP --
+    # does the exempted job have its own `steps:`, or is it a `uses:` caller
+    # with `secrets: inherit`? Re-run that check before trusting these entries.
     PS-224:
       - path: .github/workflows/newb-docs-quality-on-ubuntu-latest.yml::newb
         line: 0
