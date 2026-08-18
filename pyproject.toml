@@ -267,3 +267,53 @@ reportOptionalIterable = "none"
 # surfaces are different *kinds* of thing by design, so the API<->MCP-tool
 # parity heuristic is a false positive here (same pattern as figrecipe).
 mcp_parity_exempt = true
+
+# §6a env-var allowlist. EXACT names only -- deliberately not the `ZOTERO_`
+# and `MENDELEY_` prefixes, so a NEW unprefixed variable in either
+# integration still gets flagged. Each entry below is a name the VENDOR
+# publishes and users already have exported; prefixing it to
+# SCITEX_SCHOLAR_ZOTERO_API_KEY would break every working install to satisfy
+# a linter, and would make the name LESS true rather than more: a Zotero API
+# key is a Zotero API key, and the constitution's rule is that a vendor token
+# in a name is correct when the thing really is vendor-specific.
+#
+# Scholar's OWN variables are NOT allowlisted -- they were renamed to
+# SCITEX_SCHOLAR_* in this same change, with the pre-convention spellings
+# still honoured behind a loud deprecation warning
+# (src/scitex_scholar/_utils/_env.py).
+env_allowlist = [
+  # --- Vendor-published names. PERMANENT. -------------------------------
+  "ZOTERO_API_KEY",
+  "ZOTERO_LIBRARY_ID",
+  "MENDELEY_APP_ID",
+  "MENDELEY_APP_SECRET",
+  "MENDELEY_ACCESS_TOKEN",
+
+  # --- Deprecation window. TEMPORARY -- DELETE WITH THE FALLBACKS. ------
+  # These five are scholar's OWN variables and they have ALREADY been
+  # renamed to SCITEX_SCHOLAR_*. They appear here only because the old
+  # spelling survives as a `legacy=` argument in the source, so §6a still
+  # sees the string. Removing these entries without removing the matching
+  # `legacy=` arguments in _utils/_env.py's callers would silently drop
+  # back-compat, so the two must go together.
+  #
+  # Why a window at all, rather than a hard rename:
+  #   SEMANTIC_SCHOLAR_API_KEY  users who read the CODE set this; the docs
+  #                             always said the prefixed name, so this is
+  #                             the spelling that actually worked
+  #   CROSSREF_DB_PATH          same shape; docs said SCITEX_SCHOLAR_CROSSREF_DB
+  #   CROSSREF_LOCAL_API_URL    was undocumented entirely until this change
+  #   UNIMELB_SSO_USERNAME      institutional login credentials that are
+  #   UNIMELB_SSO_PASSWORD      plausibly already exported in an operator
+  #                             shell profile -- breaking these silently
+  #                             would break a human's login, not a test
+  #
+  # Removal is tracked as scholar-env-legacy-fallback-removal. Until then
+  # the fallback is LOUD: using a legacy name logs a warning naming both
+  # spellings, so nobody is relying on it unknowingly.
+  "SEMANTIC_SCHOLAR_API_KEY",
+  "CROSSREF_DB_PATH",
+  "CROSSREF_LOCAL_API_URL",
+  "UNIMELB_SSO_USERNAME",
+  "UNIMELB_SSO_PASSWORD",
+]

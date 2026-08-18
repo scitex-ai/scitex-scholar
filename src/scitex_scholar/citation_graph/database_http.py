@@ -7,6 +7,7 @@ Implements the same interface as CitationDatabase for drop-in replacement.
 
 from collections import Counter
 from typing import Dict, List, Optional, Tuple
+from .._utils._env import resolve_env
 
 
 class CitationDatabaseHTTP:
@@ -38,7 +39,11 @@ class CitationDatabaseHTTP:
 
             from crossref_local._core.config import DEFAULT_API_URL
 
-            api_url = os.environ.get("CROSSREF_LOCAL_API_URL", DEFAULT_API_URL)
+            api_url = resolve_env(
+                "SCITEX_SCHOLAR_CROSSREF_LOCAL_API_URL",
+                legacy="CROSSREF_LOCAL_API_URL",
+                default=DEFAULT_API_URL,
+            )
 
         self.api_url = api_url
         self.client = RemoteClient(api_url)

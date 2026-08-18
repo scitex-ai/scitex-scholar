@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Optional
 
 import scitex_logging as _slog
+from .._utils._env import resolve_env
 
 _logger = _slog.getLogger(__name__)
 
@@ -25,7 +26,7 @@ def find_crossref_db(db_path: Optional[str] = None) -> Optional[str]:
         return db_path
 
     # Check environment variable (Docker / explicit config)
-    env_path = os.environ.get("CROSSREF_DB_PATH")
+    env_path = resolve_env("SCITEX_SCHOLAR_CROSSREF_DB", legacy="CROSSREF_DB_PATH")
     if env_path and Path(env_path).exists():
         return env_path
 

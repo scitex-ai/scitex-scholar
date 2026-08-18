@@ -26,6 +26,7 @@ from tenacity import (
 from ..utils import standardize_metadata
 from ._BaseDOIEngine import BaseDOIEngine
 from ._s2_batch import S2BatchMixin
+from ..._utils._env import resolve_env
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +36,10 @@ class SemanticScholarEngine(S2BatchMixin, BaseDOIEngine):
 
     def __init__(self, email: str = "research@example.com", api_key: str = None):
         super().__init__(email)
-        self.api_key = api_key or os.getenv("SEMANTIC_SCHOLAR_API_KEY")
+        self.api_key = api_key or resolve_env(
+            "SCITEX_SCHOLAR_SEMANTIC_SCHOLAR_API_KEY",
+            legacy="SEMANTIC_SCHOLAR_API_KEY",
+        )
         self.base_url = "https://api.semanticscholar.org/graph/v1"
         self._rate_limit_delay = 0.5 if self.api_key else 1.2
 

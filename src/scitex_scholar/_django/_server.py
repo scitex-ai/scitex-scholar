@@ -45,7 +45,8 @@ def run(
     server fails instead of drifting to the next free port.
     """
     if db_path:
-        os.environ["CROSSREF_DB_PATH"] = db_path
+        # Write the canonical name; resolve_env reads this one first.
+        os.environ["SCITEX_SCHOLAR_CROSSREF_DB"] = db_path
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "scitex_scholar._django.settings")
 
     print(f"SciTeX Scholar GUI: http://{host}:{port}")
