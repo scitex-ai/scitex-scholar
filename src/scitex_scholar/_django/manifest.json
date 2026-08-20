@@ -2,7 +2,7 @@
   "name": "scholar_editor",
   "slug": "scholar",
   "label": "Scholar",
-  "version": "0.1.0",
+  "pip_package": "scitex-scholar",
   "icon": "fas fa-graduation-cap",
   "subtitle": "Citation-graph explorer and CrossRef paper browser",
   "about": "Explore citation networks from a seed DOI (bibliographic coupling, co-citation, and direct citations), look up related papers, and browse paper summaries against a local CrossRef database. Library/Search/Enrichment tabs are planned future phases, not yet implemented.",
