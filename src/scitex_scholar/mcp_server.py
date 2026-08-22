@@ -63,7 +63,7 @@ def get_scholar_dir() -> Path:
     """Get the scholar data directory."""
     from scitex_scholar.config import ScholarConfig
 
-    path = ScholarConfig().path_manager.dirs["scholar_dir"]
+    path = ScholarConfig().path_manager.scholar_dir
     path.mkdir(parents=True, exist_ok=True)
     return path
 
