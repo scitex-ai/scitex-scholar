@@ -53,6 +53,46 @@ def test_index_body_contains_title():
     assert "<title>SciTeX Scholar</title>" in body
 
 
+def test_index_body_leaks_no_django_template_comment_markers():
+    """No `{#` / `#}` reaches the browser.
+
+    REGRESSION. Django strips `{# ... #}` ONLY when it sits on ONE LINE. A
+    multi-line one is emitted verbatim, and this template had a six-line
+    explanatory `{# ... #}` above the stx-mount marker -- so a paragraph of
+    internal commentary rendered as visible text across the top of the UI.
+
+    The operator found it by looking at the running page. No test caught it,
+    because the guards here assert that the RIGHT things are present (the
+    marker, the tokens, the title) and nothing asserted the absence of
+    WRONG things. Presence-only suites are blind to leakage by construction.
+    """
+    # Arrange
+    rf = RequestFactory()
+    request = rf.get("/")
+    # Act
+    body = views.index(request).content.decode()
+    # Assert
+    assert "{#" not in body and "#}" not in body
+
+
+def test_index_body_leaks_no_unrendered_template_tags():
+    """POSITIVE CONTROL for the test above.
+
+    `{#` absence alone would also be satisfied by a template that failed to
+    render at all, or by one whose comment syntax someone changed to `{%
+    comment %}` while leaving other tags unrendered. Pin that the OTHER
+    delimiter never survives either, so the pair fails on any raw template
+    syntax reaching the page rather than on one spelling of it.
+    """
+    # Arrange
+    rf = RequestFactory()
+    request = rf.get("/")
+    # Act
+    body = views.index(request).content.decode()
+    # Assert
+    assert "{% comment %}" not in body
+
+
 def test_index_body_contains_shared_branding_favicon():
     # Arrange
     rf = RequestFactory()
