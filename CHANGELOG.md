@@ -5,6 +5,45 @@ All notable changes to `scitex-scholar` are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2026-08-23
+
+### Added
+- **`SCITEX_SCHOLAR_ALLOWED_HOSTS`** (comma-separated) for deployments the bind
+  address alone does not cover -- a reverse proxy passing a DNS name, a MagicDNS
+  name, several addresses at once.
+
+### Changed
+- **The Django UI renders inside scitex-ui's shared workspace shell.** scholar was
+  the only leaf shipping its own `<html>` document; it now extends
+  `scitex_ui/standalone_shell.html` like scitex-storage, scitex-writer and
+  figrecipe, so it picks up the shared frame and theme. Block names were verified
+  against the installed scitex-ui, not the source tree.
+- The page title comes from `app_label`, which reads `SCITEX_APP_MODE`, so the
+  browser tab alone distinguishes a hub-embedded instance from a standalone one.
+
+### Fixed
+- **Serving on any non-loopback address answered 400 to every request.**
+  `ALLOWED_HOSTS` was a hardcoded loopback-only list with no way to extend it, so
+  `gui serve --host <addr>` started cleanly, printed a correct-looking URL, and
+  then rejected every caller with nothing in the banner to suggest why.
+  `--host` now contributes its own address, and `ALLOWED_HOSTS` switches on
+  `DEBUG` (operator ruling): `["*"]` in development, loopback plus the explicit
+  list otherwise. ANY DEPLOYMENT MUST SET `DJANGO_DEBUG=false` -- the permissive
+  branch is the default branch and this app has no authentication of its own.
+- **A template comment rendered as visible text across the top of the UI.**
+  Django strips `{# ... #}` only on a SINGLE line; a multi-line one is emitted
+  verbatim, and this template had a six-line explanatory comment above the
+  stx-mount marker. Now `{% comment %}`. Found by the operator looking at the
+  running page -- no test caught it, because the suite asserted that the right
+  things were PRESENT and nothing asserted that wrong things were ABSENT.
+- The GitHub Release step of the release pipeline no longer depends on the
+  self-hosted runner's `gh` CLI, which aborts on a machine-local config before it
+  ever reads its token.
+
+### Internal
+- Two regression tests pin that no raw template syntax reaches the browser, the
+  second acting as a control so the pair cannot pass by rendering nothing.
+
 ## [1.8.0] - 2026-08-23
 
 ### Added
