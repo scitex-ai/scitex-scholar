@@ -28,26 +28,36 @@ BASE_DIR = Path(__file__).resolve().parent
 # Fleet env-var convention is SCITEX_SCHOLAR_<X>.
 SECRET_KEY = os.environ.get("SCITEX_SCHOLAR_DJANGO_SECRET") or secrets.token_urlsafe(32)
 DEBUG = os.environ.get("DJANGO_DEBUG", "true").lower() == "true"
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "0.0.0.0", "testserver"]
-
-# Serving on anything but loopback needs the bind address here too, or Django
-# answers 400 Bad Request to every request -- with no hint that ALLOWED_HOSTS is
-# the reason. The list above is loopback-only, so `gui serve --host <addr>` was
-# unreachable by construction: the server started, printed its URL, and then
-# rejected every caller.
+# ALLOWED_HOSTS SWITCHES ON DEBUG (operator ruling, 2026-08-23).
 #
-# `--host` therefore contributes its own address (see _server.py), and this
-# variable exists for the deployment cases that is not enough for: a reverse
-# proxy passing a DNS name, a tailnet MagicDNS name, or several addresses at
-# once. Comma-separated; the SCITEX_SCHOLAR_ prefix is the fleet convention
-# (#109).
+# THE BUG THIS REPLACES: the list used to be the hardcoded loopback-only
+# ["127.0.0.1", "localhost", "0.0.0.0", "testserver"] with no way to extend it,
+# so `gui serve --host <addr>` was unreachable by construction -- the server
+# started, printed its URL, and answered 400 Bad Request to every caller with
+# nothing in the banner to suggest ALLOWED_HOSTS was the reason. All four leaves
+# (storage / writer / figrecipe / scholar) carried the same copied list.
 #
-# NOT defaulted to "*". This app has NO authentication of its own -- there is no
-# actor/identity API in the SDK yet -- so every reachable address is an
-# unauthenticated reader. Widening the bind address is a deliberate act and
-# should read like one.
-_extra_hosts = os.environ.get("SCITEX_SCHOLAR_ALLOWED_HOSTS", "")
-ALLOWED_HOSTS += [h.strip() for h in _extra_hosts.split(",") if h.strip()]
+# DEBUG=True  -> "*". Development: reachable wherever you bind it.
+# DEBUG=False -> loopback + whatever is declared explicitly.
+#
+# READ THIS BEFORE DEPLOYING. DJANGO_DEBUG defaults to "true" here, so the
+# permissive branch is the DEFAULT branch. That is fine on a workstation and
+# wrong anywhere else, because this app has NO authentication of its own --
+# there is no actor/identity API in the SDK yet -- so "*" plus no auth means any
+# reachable address is an unauthenticated reader. ANY DEPLOYMENT MUST SET
+# DJANGO_DEBUG=false. The default is not changed here because DEBUG=False also
+# stops `runserver` serving static files, which would break the GUI in a second,
+# less obvious way; flipping it needs the static-files question answered first.
+if DEBUG:
+    ALLOWED_HOSTS = ["*"]
+else:
+    ALLOWED_HOSTS = ["127.0.0.1", "localhost", "0.0.0.0", "testserver"]
+    # Deployment cases the bind address alone does not cover: a reverse proxy
+    # passing a DNS name, a tailnet MagicDNS name, several addresses at once.
+    # Comma-separated; SCITEX_SCHOLAR_ is the fleet prefix convention (#109).
+    # `--host` also contributes its own address here (see _server.py).
+    _extra_hosts = os.environ.get("SCITEX_SCHOLAR_ALLOWED_HOSTS", "")
+    ALLOWED_HOSTS += [h.strip() for h in _extra_hosts.split(",") if h.strip()]
 
 # "hub" | "standalone" -- the browser tab alone must distinguish the two
 # (fleet convention; scitex-hub reads the same setting and defaults to
