@@ -27,12 +27,19 @@ KEPT deliberately: the stx-mount marker below. The shell does NOT emit it
         which injects it automatically -- serves built SPA shells, and this is
         a Django-rendered template.
         {% endcomment %}
-        {# NO |default FILTER. The root prefix is "" under scitex-app >= 0.8.0,
-           and Django's `default` fires on FALSY -- so `|default:'/'` silently
-           rewrote the correct "" back into the old "/", making every root
-           request build "//api/..." : protocol-relative, off-origin. That is
-           the exact failure the convention reversal exists to prevent, and it
-           passed a test asserting the OLD value. #}
+        {% comment %}
+        NO |default FILTER. The root prefix is "" under scitex-app >= 0.8.0,
+        and Django's `default` fires on FALSY -- so `|default:'/'` silently
+        rewrote the correct "" back into the old "/", making every root
+        request build "//api/..." : protocol-relative, off-origin. That is
+        the exact failure the convention reversal exists to prevent, and it
+        passed a test asserting the OLD value.
+
+        This block used to be `{# ... #}`, which DJANGO ONLY STRIPS ON A
+        SINGLE LINE -- a multi-line `{# #}` is emitted verbatim into the
+        page. It was rendering as visible text at the top of the UI; the
+        operator saw it in the browser before any test did.
+        {% endcomment %}
     <meta name="stx-mount" content="{{ stx_mount }}">
     <link rel="stylesheet" href="{% static 'scholar/css/scholar.css' %}">
 {% endblock %}
