@@ -22,7 +22,7 @@ from pathlib import Path
 
 import click
 
-from .._cli_main import CONTEXT_SETTINGS, _CategorizedGroup
+from ._scaffolding import CONTEXT_SETTINGS, _CategorizedGroup
 
 # ---------------------------------------------------------------------------
 # Group: library

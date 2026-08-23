@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "scitex-scholar"
-version = "1.5.1"
+version = "1.7.1"
 description = "Scientific paper search, enrichment, download, and management for the SciTeX ecosystem"
 readme = "README.md"
 license = "AGPL-3.0-only"
@@ -94,13 +94,30 @@ pdf = [
 ]
 server = [
     "aiohttp>=3.8.0",
-    "flask>=2.3.0",
+    "django>=4.2",
+    # scitex-app supplies the standalone Django launcher (run_standalone),
+    # the ScitexAppConfig base class the `gui` server builds on, and the
+    # guarded GUI lifecycle (`embed.serve_gui` / `gui_status` / `gui_stop`
+    # / `gui_port_holder`) that `_cli/gui.py` delegates to.
+    # 0.5.0 is the floor, not a preference: `serve_gui` gained orphan
+    # reclaim under --force, and `gui_port_holder` gained the frozen
+    # three-valued `PortHolder` whose `ours is None` the `gui open` code
+    # branches on. Against 0.4.x those branches read a different shape.
+    "scitex-app>=0.8.0",
+    # gui_runtime (pid/port/host lifecycle bookkeeping for `scholar gui`)
+    # shipped in scitex-dev 0.30.0 (2026-07-12).
+    "scitex-dev>=0.30.0",
+    # Shared SciTeX branding partial (`scitex_ui/_branding_head.html`),
+    # included by scholar.html's <head>. 0.7.1 is the first release where
+    # branding is usable WITHOUT adopting the workspace shell -- scholar
+    # owns its own layout and deliberately does not extend that shell.
+    "scitex-ui>=0.16.0",
 ]
 watch = [
     "watchdog>=3.0.0",
 ]
 dev = [
-    "scitex-dev>=0.11.7",
+    "scitex-dev>=0.30.0",
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
     "numpy>=1.21.0",
@@ -110,7 +127,13 @@ dev = [
     "openpyxl>=3.1.0",
     "fastmcp>=2.0.0",
     "aiohttp>=3.8.0",
-    "flask>=2.3.0",
+    "django>=4.2",
+    "scitex-app>=0.8.0",
+    # `_django/settings.py` imports scitex_ui unguarded (it is a hard
+    # member of `[server]`), so the Django tests cannot even import
+    # without it. NOT guarded with importorskip on purpose: a skip would
+    # hide a genuinely broken GUI install behind a green run.
+    "scitex-ui>=0.16.0",
     "watchdog>=3.0.0",
     # tests/integration/test_clew_integration.py — used (with importorskip)
     # to exercise the optional scitex-clew provenance path in storage/PaperIO.
@@ -126,9 +149,21 @@ docs = [
     "sphinx-copybutton>=0.5",
     "sphinx-autodoc-typehints>=1.25",
 ]
+# PS-221 §3: every PUBLIC extra (non-underscore, not `all`) must be a
+# SUBSET of `all`, so `pip install scitex-scholar[all]` is the single
+# "give me everything public" switch and can never silently
+# under-install. Keep this list closed over EVERY public extra above --
+# adding a new public extra without adding it here is the violation.
+# `[dev]` and `[docs]` are public here -- CI installs `.[all,dev]`
+# (.github/ci/run-in-sif.sh) and RTD installs `.[docs]`
+# (.github/workflows/rtd-sphinx-build-on-ubuntu-latest.yml) by those
+# exact names -- so they are listed too, matching how scitex-dev,
+# scitex-logging, and scitex-session close their own `all`.
 all = [
     "scitex-scholar[browser]",
     "scitex-scholar[clew]",
+    "scitex-scholar[dev]",
+    "scitex-scholar[docs]",
     "scitex-scholar[export]",
     "scitex-scholar[mcp]",
     "scitex-scholar[pdf]",
@@ -140,10 +175,10 @@ all = [
 scitex-scholar = "scitex_scholar._cli_main:cli"
 
 [project.urls]
-Homepage = "https://github.com/ywatanabe1989/scitex-scholar"
+Homepage = "https://github.com/scitex-ai/scitex-scholar"
 Documentation = "https://scitex-scholar.readthedocs.io"
-Repository = "https://github.com/ywatanabe1989/scitex-scholar.git"
-Issues = "https://github.com/ywatanabe1989/scitex-scholar/issues"
+Repository = "https://github.com/scitex-ai/scitex-scholar.git"
+Issues = "https://github.com/scitex-ai/scitex-scholar/issues"
 
 [project.entry-points."scitex_dev.docs"]
 scitex-scholar = "scitex_scholar"
@@ -232,3 +267,53 @@ reportOptionalIterable = "none"
 # surfaces are different *kinds* of thing by design, so the API<->MCP-tool
 # parity heuristic is a false positive here (same pattern as figrecipe).
 mcp_parity_exempt = true
+
+# §6a env-var allowlist. EXACT names only -- deliberately not the `ZOTERO_`
+# and `MENDELEY_` prefixes, so a NEW unprefixed variable in either
+# integration still gets flagged. Each entry below is a name the VENDOR
+# publishes and users already have exported; prefixing it to
+# SCITEX_SCHOLAR_ZOTERO_API_KEY would break every working install to satisfy
+# a linter, and would make the name LESS true rather than more: a Zotero API
+# key is a Zotero API key, and the constitution's rule is that a vendor token
+# in a name is correct when the thing really is vendor-specific.
+#
+# Scholar's OWN variables are NOT allowlisted -- they were renamed to
+# SCITEX_SCHOLAR_* in this same change, with the pre-convention spellings
+# still honoured behind a loud deprecation warning
+# (src/scitex_scholar/_utils/_env.py).
+env_allowlist = [
+  # --- Vendor-published names. PERMANENT. -------------------------------
+  "ZOTERO_API_KEY",
+  "ZOTERO_LIBRARY_ID",
+  "MENDELEY_APP_ID",
+  "MENDELEY_APP_SECRET",
+  "MENDELEY_ACCESS_TOKEN",
+
+  # --- Deprecation window. TEMPORARY -- DELETE WITH THE FALLBACKS. ------
+  # These five are scholar's OWN variables and they have ALREADY been
+  # renamed to SCITEX_SCHOLAR_*. They appear here only because the old
+  # spelling survives as a `legacy=` argument in the source, so §6a still
+  # sees the string. Removing these entries without removing the matching
+  # `legacy=` arguments in _utils/_env.py's callers would silently drop
+  # back-compat, so the two must go together.
+  #
+  # Why a window at all, rather than a hard rename:
+  #   SEMANTIC_SCHOLAR_API_KEY  users who read the CODE set this; the docs
+  #                             always said the prefixed name, so this is
+  #                             the spelling that actually worked
+  #   CROSSREF_DB_PATH          same shape; docs said SCITEX_SCHOLAR_CROSSREF_DB
+  #   CROSSREF_LOCAL_API_URL    was undocumented entirely until this change
+  #   UNIMELB_SSO_USERNAME      institutional login credentials that are
+  #   UNIMELB_SSO_PASSWORD      plausibly already exported in an operator
+  #                             shell profile -- breaking these silently
+  #                             would break a human's login, not a test
+  #
+  # Removal is tracked as scholar-env-legacy-fallback-removal. Until then
+  # the fallback is LOUD: using a legacy name logs a warning naming both
+  # spellings, so nobody is relying on it unknowingly.
+  "SEMANTIC_SCHOLAR_API_KEY",
+  "CROSSREF_DB_PATH",
+  "CROSSREF_LOCAL_API_URL",
+  "UNIMELB_SSO_USERNAME",
+  "UNIMELB_SSO_PASSWORD",
+]

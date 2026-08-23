@@ -5,6 +5,84 @@ All notable changes to `scitex-scholar` are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.1] - 2026-07-14
+
+### Fixed
+- **Generated BibTeX files could be unparseable when a header comment contained
+  a raw `@`.** BibTeX parsers locate entries by scanning for `@` and do not
+  treat `%` as a comment introducer, so an `@` in a generated header line (an
+  `@`-bearing source filename, an email address) was read as the start of a
+  malformed entry and aborted the parse of an otherwise valid file. All writers
+  now route their output through a single `sanitize_bibtex_comments()` choke
+  point, which neutralizes `@` inside `%` lines while leaving entries and field
+  values untouched.
+
+### Changed
+- `storage/BibTeXHandler.py` (previously 1155 lines) is split into mixins under
+  `storage/_bibtex/` — parsing, writing, merging and project bibliographies —
+  with `BibTeXHandler` as the thin composed class. Purely internal: the public
+  import (`from scitex_scholar.storage import BibTeXHandler`) and the full method
+  surface are unchanged.
+
+## [1.7.0] - 2026-07-13
+
+### Added
+- **Top-level facade for the search internals that downstream consumers
+  depend on.** `ScholarSearchEngine` and `SearchQueryParser` are now
+  importable directly from the package root
+  (`from scitex_scholar import ScholarSearchEngine, SearchQueryParser`),
+  so consumers can migrate off deep-internal paths
+  (`scitex_scholar.search_engines.ScholarSearchEngine`,
+  `scitex_scholar.pipelines.SearchQueryParser`). The deep paths keep
+  working unchanged. A new import-contract regression test
+  (`tests/integration/test_hub_import_contract.py`) asserts both the deep
+  paths and the facade resolve, so any future relocation of these symbols
+  fails loudly in CI rather than silently degrading a downstream consumer
+  (e.g. scitex-hub's scholar_app, which deep-imports these).
+
+## [1.6.1] - 2026-07-13
+
+### Fixed
+- **GUI: the Alt+I / Ctrl+I element inspector now loads.** The Django
+  migration installed `scitex_ui` as an optional app for the shared
+  workspace-shell assets but never wired its
+  `ElementInspectorMiddleware`, so the visual DOM-debugging overlay
+  silently did nothing. The middleware is now appended to `MIDDLEWARE`
+  whenever `scitex_ui` is importable, matching the existing guarded
+  `INSTALLED_APPS` append.
+
+## [1.6.0] - 2026-07-12
+
+### Changed
+- **GUI: migrated the standalone browser interface from Flask to Django**,
+  following `scitex-writer`'s reference pattern (`scitex_app.run_standalone`
+  for the standalone server, guarded optional `scitex_ui` import for the
+  shared favicon convention). The `scholar gui {open,serve,status,stop}`
+  CLI surface is unchanged; only the backend swapped. Port 31297 unchanged.
+  The Flask dependency is removed entirely (`django>=4.2` +
+  `scitex-app>=0.2.8` replace it in the `[server]` extra). This is a
+  standalone-only change -- it does not touch or replace scitex-hub's
+  separate, independently-versioned `scholar_app`.
+
+## [1.5.2] - 2026-07-12
+
+### Fixed
+- `verify-cites`: a bare `eprint` (no `doi`) BibTeX/BibLaTeX field --
+  what arXiv's own "export citation" produces -- was checked only as a
+  boolean gate, then discarded, falling through to a keyword-based
+  title search that could non-deterministically miss the real paper
+  and cascade to an unreliable CrossRef title-search fallback (verified
+  in one run, unverified in another). `eprint` is now canonicalized to
+  an arXiv DOI and routed through the deterministic `id_list` lookup.
+- `verify-cites`: `VERIFIED` now requires the resolution to have gone
+  through a real identifier (doi/arxiv-id/corpus_id), never a bare
+  title match, no matter how high the title-similarity score.
+  CrossRef/OpenAlex's title index is not guaranteed stable across
+  identical queries, so a title/author/year fuzzy match (reachable by
+  any identifier-less citation) is not deterministic evidence.
+  `ResolvedRef` gained `identifier_based: bool`; a title-only match now
+  caps at `UNVERIFIED` with a provenance note explaining why.
+
 ## [1.5.1] - 2026-07-12
 
 ### Fixed
@@ -372,4 +450,4 @@ Old and new forms route to the same handler, so behaviour is identical.
 - Broken `impact_factor/estimation/` subtree — imported a non-existent `fetchers` module; `ImpactFactorCalculator` was unreachable in practice. The live `impact_factor/ImpactFactorEngine.py` and `impact_factor/jcr/` are unaffected.
 - Hidden `metadata_engines/.combined-SemanticScholarSource/` backup directory.
 
-[1.1.0]: https://github.com/ywatanabe1989/scitex-scholar/compare/v1.0.1...v1.1.0
+[1.1.0]: https://github.com/scitex-ai/scitex-scholar/compare/v1.0.1...v1.1.0

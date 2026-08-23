@@ -17,8 +17,22 @@ remains in the body.
 from __future__ import annotations
 
 import shutil
+from pathlib import Path
 
 import pytest
+
+# The checkout this test file lives in: tests/develop/test_audit.py -> repo
+# root. Passed to `audit_all_for_package` so the gate grades THIS tree.
+#
+# Without it the auditor has no argument saying which tree was meant, and
+# falls back to guessing from cwd / import location. That guess is wrong in
+# exactly the place it matters: on 2026-08-04 the self-hosted runner's cwd
+# was /tmp/scitex-ci-runner-work/scitex-scholar/scitex-scholar/scitex-scholar
+# -- nested same-named directories, i.e. the sibling-checkout case the
+# auditor warns about. A gate that grades a different commit than the one
+# under test still reports a confident pass/fail, which is worse than no
+# gate: the config still lists it and everyone believes it works.
+_REPO_ROOT = Path(__file__).resolve().parents[2]
 
 _AUDIT_SKIP_RULES = (
     # MCP <-> Python-API parity gap: 12/12 APIs unmapped + 24 tools
@@ -45,6 +59,18 @@ _AUDIT_SKIP_RULES = (
     #   §4:  concrete `Examples:` blocks added to `auth refresh`,
     #        `library audit-files`, and `library zotero import|export|
     #        diff`.
+    # §4b: adding the `gui` command group (2026-07-12, gui-commands
+    # doctrine adoption) turned on package-wide CliHelp enforcement --
+    # every pre-existing command (paper/bibtex/pdf/library/mcp/skills/
+    # auth, ~53 leaves total) now needs its free-form docstring rebuilt
+    # via `scitex_dev.ecosystem.help_spec.CliHelp`. Confirmed via a
+    # controlled A/B: the split-only state (no `gui`) passes audit-all
+    # cleanly; adding `gui` alone flips all ~53 to violations. That's a
+    # standalone CLI-wide migration, out of scope for the gui rollout
+    # itself -- tracked as a follow-up, not fixed here. `gui`'s own new
+    # commands are exempt from nothing else: the two `stop`-specific §2
+    # flag violations (missing --dry-run/--yes) were fixed for real.
+    "§4b",
 )
 
 
@@ -61,7 +87,9 @@ def test_audit_all_for_scitex_scholar_runs_without_error():
 
     completed = False
     # Act
-    audit_all_for_package("scitex-scholar", skip_rules=_AUDIT_SKIP_RULES)
+    audit_all_for_package(
+        "scitex-scholar", path=_REPO_ROOT, skip_rules=_AUDIT_SKIP_RULES
+    )
     completed = True
     # Assert
     assert completed

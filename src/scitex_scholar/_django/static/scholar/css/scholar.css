@@ -1,0 +1,17 @@
+/**
+ * Scholar GUI - Stylesheet entry point.
+ *
+ * This file is the single stylesheet the template links. It holds no rules
+ * of its own: each concern lives in a partial under `_partials/`, imported
+ * here in cascade order (tokens first, visibility helpers last).
+ */
+
+@import url("_partials/_base.css");
+@import url("_partials/_layout.css");
+@import url("_partials/_sidebar.css");
+@import url("_partials/_cards.css");
+@import url("_partials/_forms.css");
+@import url("_partials/_graph.css");
+@import url("_partials/_papers.css");
+@import url("_partials/_search.css");
+@import url("_partials/_states.css");

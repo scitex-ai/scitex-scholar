@@ -15,6 +15,7 @@ from datetime import datetime
 from pathlib import Path
 
 import scitex_logging as _slog
+from .._utils._env import resolve_env
 
 _logger = _slog.getLogger(__name__)
 
@@ -43,7 +44,7 @@ def _get_scholar_dir() -> Path:
     """Get the scholar data directory (honours SCITEX_DIR via ScholarConfig)."""
     from scitex_scholar.config import ScholarConfig
 
-    scholar_dir = ScholarConfig().path_manager.dirs["scholar_dir"]
+    scholar_dir = ScholarConfig().path_manager.scholar_dir
     scholar_dir.mkdir(parents=True, exist_ok=True)
     return scholar_dir
 
@@ -862,8 +863,18 @@ async def authenticate_handler(
             "email_configured": bool(email),
             "email_var": email_var,
             "email": email if email else None,
-            "sso_username_set": bool(os.getenv("UNIMELB_SSO_USERNAME")),
-            "sso_password_set": bool(os.getenv("UNIMELB_SSO_PASSWORD")),
+            "sso_username_set": bool(
+                resolve_env(
+                    "SCITEX_SCHOLAR_UNIMELB_SSO_USERNAME",
+                    legacy="UNIMELB_SSO_USERNAME",
+                )
+            ),
+            "sso_password_set": bool(
+                resolve_env(
+                    "SCITEX_SCHOLAR_UNIMELB_SSO_PASSWORD",
+                    legacy="UNIMELB_SSO_PASSWORD",
+                )
+            ),
         }
 
         # If confirm=False, return requirements check (don't start login yet)

@@ -39,13 +39,11 @@ class OASourcesCache:
     """
     Manages cached Open Access sources from OpenAlex.
 
-    Features:
-    - Lazy loading on first access
-    - 1-day TTL with automatic refresh
-    - Thread-safe singleton pattern
-    - Fallback to config YAML if API fails
-    - Journal name normalization via ISSN-L
-    - Handles abbreviations, variants, and historical names
+    A lookup loads the local cache lazily and never crawls the network. The
+    1-day TTL is advisory: a stale cache is used as-is, and refreshing it is
+    an explicit, out-of-band call (``refresh_oa_cache``), never triggered by
+    a lookup. Journal-name and ISSN matching run against the cached OpenAlex
+    OA sources; the instance is a thread-safe singleton.
     """
 
     _instance: Optional["OASourcesCache"] = None
@@ -62,6 +60,7 @@ class OASourcesCache:
         self._issn_l_to_canonical: Dict[str, str] = {}  # ISSN-L → canonical name
         self._last_updated: float = 0
         self._loaded = False
+        self._cold_warning_emitted = False
 
     @classmethod
     def get_instance(cls, cache_dir: Optional[Path] = None) -> "OASourcesCache":
@@ -197,32 +196,103 @@ class OASourcesCache:
             logger.info(f"Fetched {len(source_names)} OA sources from OpenAlex")
 
     def _fetch_oa_sources_sync(self, max_pages: int = 100) -> None:
-        """Synchronous wrapper for fetching OA sources."""
-        try:
-            loop = asyncio.get_event_loop()
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
+        """Blocking wrapper around the OA-sources crawl.
 
-        loop.run_until_complete(self._fetch_oa_sources_async(max_pages))
+        Runs the coroutine on its own loop. If a loop is ALREADY running in
+        this thread (an explicit refresh triggered from async code), the
+        crawl runs on a dedicated thread instead of calling
+        run_until_complete on the live loop -- which raises "This event loop
+        is already running" (reproduced). Either way this blocks for the
+        full crawl (minutes): there is no honest bound to advertise, and the
+        crawl is kept OFF the lookup hot path so a request never waits on it.
+        """
+        coro = self._fetch_oa_sources_async(max_pages)
+
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            # No running loop: safe to drive the coroutine directly.
+            asyncio.run(coro)
+            return
+
+        # Already inside an event loop: run on its own loop in a thread.
+        import threading
+
+        error: Dict[str, BaseException] = {}
+
+        def _runner() -> None:
+            try:
+                asyncio.run(coro)
+            except BaseException as e:  # surfaced to the caller below
+                error["err"] = e
+
+        thread = threading.Thread(target=_runner, name="oa-sources-refresh")
+        thread.start()
+        thread.join()
+
+        if "err" in error:
+            raise error["err"]
+
+    def _ensure_indexes(self) -> None:
+        """Make cached data available to a lookup. NEVER touches the network.
+
+        Every public lookup goes through here. A stale cache is used as-is;
+        with no cache at all, lookups answer "not known" (is_oa_source ->
+        False), which is already the documented contract for an unrecognised
+        journal. That degraded state is reported ONCE, loudly, with the
+        command that fixes it -- it is not a silent fallback, and it is not a
+        multi-minute corpus crawl inside somebody's request.
+        """
+        if self._loaded:
+            return
+
+        if self._load_from_cache():
+            if not self._is_cache_valid():
+                logger.warning(
+                    "OA sources cache is stale and in use as-is. Refresh out "
+                    "of band with `python -c 'from scitex_scholar.core.oa_cache "
+                    "import refresh_oa_cache; refresh_oa_cache()'`."
+                )
+            return
+
+        # No cache on disk. Degrade loudly rather than crawl on the hot path.
+        self._loaded = True
+        if not self._cold_warning_emitted:
+            self._cold_warning_emitted = True
+            logger.warning(
+                f"No OA sources cache at {self._cache_file}: open-access "
+                f"detection via this tier is DEGRADED (every source reads as "
+                f"'not known'). This does NOT auto-fetch, because the corpus "
+                f"crawl takes minutes and must not run inside a request. "
+                f"Populate it with `python -c 'from scitex_scholar.core.oa_cache "
+                f"import refresh_oa_cache; refresh_oa_cache()'`."
+            )
+
+    def refresh(self, max_pages: int = 100) -> None:
+        """Crawl OpenAlex and rebuild the cache. Takes MINUTES; blocks.
+
+        The only path that hits the network. Call it out of band (CLI or a
+        scheduled job), never from inside a user request.
+        """
+        logger.info("Refreshing OA sources cache from OpenAlex...")
+        self._fetch_oa_sources_sync(max_pages)
 
     def ensure_loaded(self, force_refresh: bool = False) -> None:
         """
-        Ensure cache is loaded, fetching from API if needed.
+        Ensure cache is available.
 
         Args:
-            force_refresh: Force refresh even if cache is valid
+            force_refresh: Crawl OpenAlex and rebuild the cache (minutes).
+
+        Without ``force_refresh`` this only reads the local cache; it will
+        NOT silently escalate to a network crawl. That escalation was the
+        defect: it hung every cold-cache lookup for minutes on the sync path
+        and raised "event loop is already running" on the async path.
         """
-        if self._loaded and not force_refresh and self._is_cache_valid():
+        if force_refresh:
+            self.refresh()
             return
-
-        # Try loading from cache first
-        if not force_refresh and self._load_from_cache() and self._is_cache_valid():
-            return
-
-        # Fetch from API
-        logger.info("Refreshing OA sources cache from OpenAlex...")
-        self._fetch_oa_sources_sync()
+        self._ensure_indexes()
 
     def is_oa_source(self, source_name: str) -> bool:
         """
@@ -234,7 +304,7 @@ class OASourcesCache:
         Returns:
             True if source is known to be Open Access
         """
-        self.ensure_loaded()
+        self._ensure_indexes()
         if not source_name:
             return False
         return source_name.lower() in self._oa_source_names
@@ -249,7 +319,7 @@ class OASourcesCache:
         Returns:
             True if ISSN belongs to an OA journal
         """
-        self.ensure_loaded()
+        self._ensure_indexes()
         if not issn:
             return False
         # Normalize ISSN format
@@ -259,7 +329,7 @@ class OASourcesCache:
     @property
     def source_count(self) -> int:
         """Get number of cached OA sources."""
-        self.ensure_loaded()
+        self._ensure_indexes()
         return len(self._oa_source_names)
 
     @property

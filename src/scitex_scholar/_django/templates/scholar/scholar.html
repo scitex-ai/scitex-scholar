@@ -1,0 +1,313 @@
+<!-- hook-bypass: inline-style -->
+<!-- Ported verbatim from the Flask-era gui/templates/scholar.html; inline
+     styles pre-date this migration and are out of scope to refactor here. -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>SciTeX Scholar</title>
+        {% comment %}
+        scitex-app's `stx-mount` contract: the server declares where this app
+        is mounted so client code never has to guess. Always ends in "/", so
+        JS joins endpoint names WITHOUT a leading slash and never normalises.
+        Emitted here rather than by the SDK because `scitex_editor_page` --
+        which injects it automatically -- serves built SPA shells, and this is
+        a Django-rendered template.
+        {% endcomment %}
+        {# NO |default FILTER. The root prefix is "" under scitex-app >= 0.8.0,
+           and Django's `default` fires on FALSY -- so `|default:'/'` silently
+           rewrote the correct "" back into the old "/", making every root
+           request build "//api/..." : protocol-relative, off-origin. That is
+           the exact failure the convention reversal exists to prevent, and it
+           passed a test asserting the OLD value. #}
+        <meta name="stx-mount" content="{{ stx_mount }}">
+        {% comment %}
+        Shared SciTeX mark, replacing a hand-rolled rel="icon" link that
+        interpolated a favicon_href context var. The partial ships the asset
+        and still honours favicon_href when a view supplies one.
+
+        Unconditional by design: scitex-ui ships in the same `server` extra
+        as django, so it is present wherever this template can render.
+        {% endcomment %}
+        {% include "scitex_ui/_branding_head.html" %}
+        {% comment %}
+        scitex-ui's shared design tokens. Linked BEFORE scholar.css so scholar
+        may still override non-token styling, and REQUIRED: scholar deleted its
+        own --accent/--text-*/--border-default/--status-error declarations in
+        favour of these. Needs scitex-ui>=0.16.0 — earlier wheels ship this
+        file WITHOUT the palette, which resolves those tokens to nothing with
+        no error. pyproject pins that floor.
+        {% endcomment %}
+        <link rel="stylesheet" href="{% static 'scitex_ui/css/shell/theme.css' %}">
+        <link rel="stylesheet" href="{% static 'scholar/css/scholar.css' %}">
+    </head>
+    <body>
+        <!-- Header -->
+        <header class="app-header">
+            <h1>SciTeX Scholar</h1>
+            <span class="subtitle">Scientific Literature Management</span>
+        </header>
+        <div class="app-container">
+            <!-- Sidebar -->
+            <aside class="app-sidebar">
+                <!-- Service Status -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section__header">
+                        <span class="sidebar-section__title">Service Status</span>
+                    </div>
+                    <div class="sidebar-section__content">
+                        <div id="serviceStatus">
+                            <span class="status-indicator status-checking">&#9679; Checking...</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Controls -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section__header">
+                        <span class="sidebar-section__title">Controls</span>
+                    </div>
+                    <div class="sidebar-section__content"
+                         style="font-size: 11px;
+                                color: var(--text-muted)">
+                        <div style="margin-bottom: 6px;">
+                            <kbd style="background: var(--bg-tertiary);
+                                        border: 1px solid var(--border-default);
+                                        padding: 1px 4px;
+                                        font-size: 10px">Scroll</kbd> Zoom
+                        </div>
+                        <div style="margin-bottom: 6px;">
+                            <kbd style="background: var(--bg-tertiary);
+                                        border: 1px solid var(--border-default);
+                                        padding: 1px 4px;
+                                        font-size: 10px">Drag</kbd> Pan
+                        </div>
+                        <div>
+                            <kbd style="background: var(--bg-tertiary);
+                                        border: 1px solid var(--border-default);
+                                        padding: 1px 4px;
+                                        font-size: 10px">Click</kbd> Select node
+                        </div>
+                    </div>
+                </div>
+                <!-- DB Info -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section__header">
+                        <span class="sidebar-section__title">Database</span>
+                    </div>
+                    <div class="sidebar-section__content"
+                         style="font-size: 11px;
+                                color: var(--text-muted);
+                                word-break: break-all">
+                        {% if db_available %}
+                            <span style="color: var(--accent);">&#9679;</span> Connected
+                            <br>
+                            <small>{{ db_path }}</small>
+                        {% else %}
+                            <span style="color: var(--status-error);">&#9679;</span> Not found
+                            <br>
+                            <small>No CrossRef DB detected</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </aside>
+            <!-- Main Content -->
+            <main class="app-main">
+                <!-- Tab Navigation -->
+                <nav class="tab-nav">
+                    <button class="tab-btn active" data-tab="graph">Citation Graph</button>
+                    <button class="tab-btn" data-tab="library">Library</button>
+                    <button class="tab-btn" data-tab="search">Search</button>
+                    <button class="tab-btn" data-tab="enrichment">Enrichment</button>
+                </nav>
+                <!-- Citation Graph Tab -->
+                <div id="tab-graph" class="tab-panel active">
+                    <div class="citation-graph-container">
+                        <!-- Input Form -->
+                        <div class="graph-card">
+                            <div class="graph-card__header">
+                                <span class="graph-card__title">Build Citation Network</span>
+                            </div>
+                            <div class="graph-card__body">
+                                <p class="graph-description">
+                                    Enter a DOI to build an interactive citation network. The graph shows
+                                    related papers based on bibliographic coupling, co-citation, and direct citations.
+                                </p>
+                                <form id="graphForm" class="graph-form">
+                                    <div class="form-row">
+                                        <div class="form-group--doi">
+                                            <label class="form-label" for="doiInput">DOI</label>
+                                            <div class="input-wrapper">
+                                                <input type="text"
+                                                       id="doiInput"
+                                                       class="form-input"
+                                                       placeholder="e.g. 10.1038/s41586-020-2008-3"
+                                                       value="10.1038/s41586-020-2008-3">
+                                                <button type="submit" class="btn-build">Build Graph</button>
+                                            </div>
+                                        </div>
+                                        <div class="form-group--options">
+                                            <label class="form-label" for="topN">Papers</label>
+                                            <select id="topN" class="form-select">
+                                                <option value="10">10</option>
+                                                <option value="20" selected>20</option>
+                                                <option value="30">30</option>
+                                                <option value="50">50</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <!-- Loading -->
+                        <div id="graphLoading" class="graph-loading hidden">
+                            <div class="loading-spinner">
+                                <div class="spinner-ring"></div>
+                                <div class="spinner-ring"></div>
+                                <div class="spinner-ring"></div>
+                            </div>
+                            <div class="loading-text">Building citation network... This may take a moment.</div>
+                        </div>
+                        <!-- Error -->
+                        <div id="graphError" class="graph-error hidden">
+                            <p id="graphErrorMessage">An error occurred</p>
+                            <button class="btn-build"
+                                    onclick="document.getElementById('graphError').classList.add('hidden')">
+                                Dismiss
+                            </button>
+                        </div>
+                        <!-- Visualization -->
+                        <div id="graphVisualization" class="hidden">
+                            <div class="graph-card graph-card--full">
+                                <div class="graph-card__header">
+                                    <span class="graph-card__title">
+                                        <span id="graphTitle">Citation Network</span>
+                                        <small id="graphStats"
+                                               style="font-weight: 400;
+                                                      color: var(--text-muted);
+                                                      margin-left: 12px"></small>
+                                    </span>
+                                    <div class="graph-controls">
+                                        <button id="fitViewBtn" class="btn-control" title="Fit to view">&#8689;</button>
+                                        <button id="resetZoomBtn" class="btn-control" title="Reset zoom">&#8634;</button>
+                                        <button id="downloadSvgBtn" class="btn-control" title="Download SVG">&#8681;</button>
+                                    </div>
+                                </div>
+                                <div class="graph-card__body" style="padding: 0; position: relative;">
+                                    <div id="graphCanvas" class="graph-canvas-wrapper"></div>
+                                    <div id="nodeDetailsPanel" class="node-details-panel hidden"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Related Papers -->
+                        <div id="relatedPapersList" class="hidden related-papers-section">
+                            <div class="graph-card">
+                                <div class="graph-card__header">
+                                    <span class="graph-card__title">Related Papers</span>
+                                </div>
+                                <div class="graph-card__body" id="relatedPapersContent"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Library Tab (placeholder) -->
+                <div id="tab-library" class="tab-panel">
+                    <div class="tab-placeholder">
+                        <div>
+                            <h3>Library</h3>
+                            <p>Zotero-style paper management. Coming in Phase 2.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Search Tab -->
+                <div id="tab-search" class="tab-panel">
+                    <div class="citation-graph-container">
+                        <!-- Input Form -->
+                        <div class="graph-card">
+                            <div class="graph-card__header">
+                                <span class="graph-card__title">Search Papers</span>
+                            </div>
+                            <div class="graph-card__body">
+                                <p class="graph-description">
+                                    Search the configured academic databases. Supports advanced syntax:
+                                    <code>-word</code> excludes a term, <code>year:2020-2024</code> bounds
+                                    the publication year, <code>if:&gt;5</code> filters by impact factor.
+                                </p>
+                                <form id="searchForm" class="graph-form">
+                                    <div class="form-row">
+                                        <div class="form-group--doi">
+                                            <label class="form-label" for="searchInput">Query</label>
+                                            <div class="input-wrapper">
+                                                <input type="text"
+                                                       id="searchInput"
+                                                       class="form-input"
+                                                       placeholder="e.g. hippocampus sharp wave -seizure year:2020-2024">
+                                                <button type="submit" class="btn-build">Search</button>
+                                            </div>
+                                        </div>
+                                        <div class="form-group--options">
+                                            <label class="form-label" for="searchMaxResults">Results</label>
+                                            <select id="searchMaxResults" class="form-select">
+                                                <option value="10">10</option>
+                                                <option value="20" selected>20</option>
+                                                <option value="50">50</option>
+                                                <option value="100">100</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <!-- Loading -->
+                        <div id="searchLoading" class="graph-loading hidden">
+                            <div class="loading-spinner">
+                                <div class="spinner-ring"></div>
+                                <div class="spinner-ring"></div>
+                                <div class="spinner-ring"></div>
+                            </div>
+                            <div class="loading-text">Searching databases... This may take a moment.</div>
+                        </div>
+                        <!-- Error -->
+                        <div id="searchError" class="graph-error hidden">
+                            <p id="searchErrorMessage">An error occurred</p>
+                            <button class="btn-build"
+                                    onclick="document.getElementById('searchError').classList.add('hidden')">
+                                Dismiss
+                            </button>
+                        </div>
+                        <!-- Results -->
+                        <div id="searchResults" class="hidden related-papers-section">
+                            <div class="graph-card">
+                                <div class="graph-card__header">
+                                    <span class="graph-card__title">
+                                        Results
+                                        <small id="searchStats" class="card-subtitle"></small>
+                                    </span>
+                                </div>
+                                <div class="graph-card__body" id="searchResultsContent"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Enrichment Tab (placeholder) -->
+                <div id="tab-enrichment" class="tab-panel">
+                    <div class="tab-placeholder">
+                        <div>
+                            <h3>Metadata Enrichment</h3>
+                            <p>Enrich BibTeX with abstracts, citations, and impact factors. Coming in Phase 4.</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+        <!-- Scripts (order matters: ForceSimulation < GraphRenderer < citation-graph) -->
+        <!-- Must load FIRST: declares STX_MOUNT, which every other script uses. -->
+        <script src="{% static 'scholar/js/stx-mount.js' %}"></script>
+        <script src="{% static 'scholar/js/app.js' %}"></script>
+<script src="{% static 'scholar/js/search.js' %}"></script>
+        <script src="{% static 'scholar/js/graph/ForceSimulation.js' %}"></script>
+        <script src="{% static 'scholar/js/graph/GraphRenderer.js' %}"></script>
+        <script src="{% static 'scholar/js/graph/citation-graph.js' %}"></script>
+    </body>
+</html>

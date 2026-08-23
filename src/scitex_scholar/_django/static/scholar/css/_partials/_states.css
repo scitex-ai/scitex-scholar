@@ -1,0 +1,103 @@
+/**
+ * Scholar GUI - Loading, error, placeholder and visibility states.
+ */
+
+/* ── Loading & Error States ────────────────────────────────── */
+.graph-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+}
+
+.loading-spinner {
+  position: relative;
+  width: 60px;
+  height: 60px;
+}
+
+.spinner-ring {
+  position: absolute;
+  inset: 0;
+  border: 2px solid transparent;
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1.2s linear infinite;
+}
+
+.spinner-ring:nth-child(2) {
+  inset: 6px;
+  animation-delay: 0.15s;
+  border-top-color: rgba(5, 150, 105, 0.6);
+}
+.spinner-ring:nth-child(3) {
+  inset: 12px;
+  animation-delay: 0.3s;
+  border-top-color: rgba(5, 150, 105, 0.3);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.graph-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px;
+  text-align: center;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+}
+
+.graph-error p {
+  font-size: 14px;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.empty-message,
+.error-message {
+  padding: 24px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.error-message {
+  color: var(--status-error);
+}
+
+/* ── Placeholder Tabs ──────────────────────────────────────── */
+.tab-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 40px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.tab-placeholder h3 {
+  font-size: 18px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+.tab-placeholder p {
+  font-size: 14px;
+}
+
+/* ── Hidden ────────────────────────────────────────────────── */
+.hidden {
+  display: none !important;
+}

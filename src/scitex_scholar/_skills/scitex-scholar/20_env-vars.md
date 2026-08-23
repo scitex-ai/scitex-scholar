@@ -30,6 +30,7 @@ owning packages and only consumed read-only here.
 | `SCITEX_SCHOLAR_NOTIFICATION_EMAIL` | Destination for scholar notifications. | `—` | string |
 | `SCITEX_SCHOLAR_ALERT_BACKENDS` | Comma-separated list of alert backends. | `email` | string (CSV) |
 | `SCITEX_SCHOLAR_SSO_EMAIL` / `_USERNAME` / `_PASSWORD` | Generic SSO credentials. | `—` | string |
+| `SCITEX_SCHOLAR_UNIMELB_SSO_USERNAME` / `_PASSWORD` | University of Melbourne SSO credentials. | `—` | string |
 | `SCITEX_SCHOLAR_SHIBBOLETH_EMAIL` | Shibboleth login email. | `—` | string |
 
 ## Paywall / OpenAthens
@@ -62,6 +63,7 @@ owning packages and only consumed read-only here.
 | `SCITEX_SCHOLAR_CROSSREF_API_URL` | CrossRef endpoint override. | api.crossref.org | URL |
 | `SCITEX_SCHOLAR_CROSSREF_EMAIL` | Mailto for CrossRef polite pool. | `—` | string |
 | `SCITEX_SCHOLAR_CROSSREF_DB` | Local crossref-local DB path. | `~/.scitex/scholar/crossref/works.db` | path |
+| `SCITEX_SCHOLAR_CROSSREF_LOCAL_API_URL` | crossref-local HTTP endpoint (citation graph). | http://localhost:8765 | URL |
 | `SCITEX_SCHOLAR_OPENALEX_API_URL` | OpenAlex endpoint override. | api.openalex.org | URL |
 | `SCITEX_SCHOLAR_PUBMED_API_KEY` | PubMed API key. | `—` | string |
 | `SCITEX_SCHOLAR_PUBMED_EMAIL` | PubMed mailto. | `—` | string |
