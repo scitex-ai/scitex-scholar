@@ -156,11 +156,34 @@ def index(request):
 
 @require_GET
 def health(request):
-    """Health check for the Scholar GUI service."""
+    """Health check for the Scholar GUI service.
+
+    Reports ``version`` so "is this deployment running what we shipped?" is
+    answerable FROM OUTSIDE, over HTTP, without shell access to the host.
+
+    That question was previously unanswerable by inspection, and the reason is
+    worth recording: nothing scholar serves carried a version at all. Looking for
+    one in the rendered page on 2026-08-23 produced a FALSE POSITIVE instead --
+    the page matched "1.9.0", which turned out to be the substring inside a CDN
+    url for ``highlight.js/11.9.0``. A substring search for a version number will
+    find one on almost any page; it just will not be yours.
+
+    KNOWN LIMITATION, stated because a version that lies is worse than none.
+    ``__version__`` derives from ``importlib.metadata``, whose metadata is
+    written at INSTALL time. For an EDITABLE checkout it therefore reports
+    whatever ``pip install -e`` last recorded, not the code being served -- this
+    repo's own .venv reports 1.5.1 while importing 1.9.0 source. So this field is
+    trustworthy for a DEPLOYED (non-editable) install, which is the case it
+    exists to serve, and must not be trusted in a dev checkout. Verify a dev tree
+    by its import path, never by this number.
+    """
+    from scitex_scholar import __version__
+
     resolved_db = _db_path()
     return JsonResponse(
         {
             "status": "ok",
+            "version": __version__,
             "db_available": resolved_db is not None,
             "db_path": resolved_db,
         }
