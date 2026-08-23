@@ -192,6 +192,20 @@ packages = ["src/scitex_scholar"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
+# THE PACKAGE UNDER TEST IS THIS CHECKOUT, NOT WHATEVER IS INSTALLED.
+#
+# `scitex_scholar` lives under src/, and pytest prepends only the ROOTDIR --
+# which holds no importable package. Without this line a bare `pytest` fell
+# through to the ambient interpreter's copy; in the agent container that is a
+# REAL, non-editable wheel in /opt/venv-sac/lib/python3.12/site-packages, and
+# it was TWO MINORS STALE (1.7.1 vs the tree's 1.9.0, 6 routes vs 7).
+#
+# Mine surfaced only because the stale copy made tests go RED. Equal-or-newer
+# goes GREEN against code the branch does not contain, and an edit-only change
+# leaves no tell whatsoever. CI cannot catch it -- CI installs the branch, so
+# it always resolves the right code. tests/conftest.py enforces the same thing
+# at session start, comparing module PATH rather than __version__.
+pythonpath = ["src"]
 # importlib mode avoids module-name collisions across test subdirs (e.g.
 # two `test_base.py` files in different packages) without requiring
 # `__init__.py` files everywhere.
