@@ -5,6 +5,54 @@ All notable changes to `scitex-scholar` are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2026-08-23
+
+### Added
+- **The Django UI can be mounted under a path prefix.** Previously the app
+  only worked at the site root: client code built root-absolute URLs
+  (`/api/graph/...`) that 404 under any mount, and one call was
+  prefix-*lucky* -- `fetch('api/search')` resolved correctly at `/scholar/`
+  and broke at `/scholar`. The server now declares its mount point via
+  scitex-app's `stx-mount` contract (`<meta name="stx-mount">`, fed by
+  `mount_prefix(request)`), and every request joins it explicitly. Verified
+  by booting the app at `/scholar/`, not by inspection (#113, #118).
+- **Package search in the standalone GUI's Search tab** (#95).
+
+### Changed
+- **Design tokens come from scitex-ui instead of being shadowed locally.**
+  Seven token definitions that silently overrode the shared theme were
+  removed, so the app follows the ecosystem's light/dark palette (#115).
+- The GUI adopts scitex-app's shared guarded launcher (#102), and the
+  scitex-app dependency is now hard rather than silently optional (#111).
+
+### Fixed
+- **Every on-disk MCP handler raised `KeyError: 'scholar_dir'`.** Both
+  scholar-directory helpers read `path_manager.dirs["scholar_dir"]`, a key
+  that does not exist -- only the `.scholar_dir` attribute does. Nine call
+  sites in `_mcp/handlers.py` and four in `mcp_server.py` failed before
+  doing any work (#120).
+- **An API key set exactly as the documentation instructs was ignored.**
+  Scholar's own environment variables are now read under the documented
+  `SCITEX_SCHOLAR_` prefix, with a deprecation warning on the legacy names
+  (#109).
+- **The app tile advertised version 0.1.0 while the package shipped 1.7.1.**
+  The manifest declared a hand-written `version` that had drifted; it now
+  derives from the installed distribution (#119).
+- Importing a `_cli/*` group module first crashed on a cold interpreter --
+  a `_cli/* <-> _cli_main` import cycle (#108).
+- OA detection and journal normalization no longer crawl OpenAlex on the
+  request hot path (#96, #97).
+- `verify-cites` now requires a real identifier before classifying a
+  citation VERIFIED; a title match alone was not enough (#81).
+- The AGPL-3.0 "How to Apply" template text says **only**, matching the
+  project's declared `AGPL-3.0-only` license (#66).
+
+### Internal
+- Test guards that were passing without testing anything: the import-graph
+  guard parsed with `ast` instead of failing open (#114), and the design
+  token guard now scans the template (where 11 tokens are used) and
+  resolves `@import` instead of globbing a directory (#116, #117).
+
 ## [1.7.1] - 2026-07-14
 
 ### Fixed
