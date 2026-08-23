@@ -30,6 +30,25 @@ SECRET_KEY = os.environ.get("SCITEX_SCHOLAR_DJANGO_SECRET") or secrets.token_url
 DEBUG = os.environ.get("DJANGO_DEBUG", "true").lower() == "true"
 ALLOWED_HOSTS = ["127.0.0.1", "localhost", "0.0.0.0", "testserver"]
 
+# Serving on anything but loopback needs the bind address here too, or Django
+# answers 400 Bad Request to every request -- with no hint that ALLOWED_HOSTS is
+# the reason. The list above is loopback-only, so `gui serve --host <addr>` was
+# unreachable by construction: the server started, printed its URL, and then
+# rejected every caller.
+#
+# `--host` therefore contributes its own address (see _server.py), and this
+# variable exists for the deployment cases that is not enough for: a reverse
+# proxy passing a DNS name, a tailnet MagicDNS name, or several addresses at
+# once. Comma-separated; the SCITEX_SCHOLAR_ prefix is the fleet convention
+# (#109).
+#
+# NOT defaulted to "*". This app has NO authentication of its own -- there is no
+# actor/identity API in the SDK yet -- so every reachable address is an
+# unauthenticated reader. Widening the bind address is a deliberate act and
+# should read like one.
+_extra_hosts = os.environ.get("SCITEX_SCHOLAR_ALLOWED_HOSTS", "")
+ALLOWED_HOSTS += [h.strip() for h in _extra_hosts.split(",") if h.strip()]
+
 # "hub" | "standalone" -- the browser tab alone must distinguish the two
 # (fleet convention; scitex-hub reads the same setting and defaults to
 # "hub"). These settings only boot the STANDALONE server
