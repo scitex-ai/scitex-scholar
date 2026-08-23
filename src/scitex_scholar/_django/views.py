@@ -109,6 +109,28 @@ def _get_search_engine():
     return _search_engine
 
 
+def _app_label(base: str) -> str:
+    """Tab title per the fleet ``SCITEX_APP_MODE`` convention.
+
+    Mirrors scitex-storage's and scitex-writer's helper of the same name:
+    the browser tab alone must distinguish a hub-embedded instance from a
+    standalone one. Reads the Django setting that ``settings.py`` /
+    ``_server.py`` configure, defaulting to "standalone"; hub's mount
+    overrides it to "hub".
+
+    This is also what supplies the page title at all. scitex-ui's shell
+    renders ``<title>{{ app_label|default:"SciTeX App" }}</title>``, so an
+    app that passes no ``app_label`` silently inherits the generic
+    "SciTeX App" -- which is exactly what happened here when the local
+    ``<title>`` was dropped in favour of the shell, and what
+    ``test_index_body_contains_title`` caught.
+    """
+    from django.conf import settings
+
+    mode = getattr(settings, "SCITEX_APP_MODE", "standalone")
+    return f"{base} (hub)" if mode == "hub" else base
+
+
 def index(request):
     """Serve the Scholar SPA shell page.
 
@@ -125,6 +147,7 @@ def index(request):
             "db_available": resolved_db is not None,
             "db_path": resolved_db or "Not found",
             "stx_mount": mount_prefix(request),
+            "app_label": _app_label("SciTeX Scholar"),
         },
         request=request,
     )
