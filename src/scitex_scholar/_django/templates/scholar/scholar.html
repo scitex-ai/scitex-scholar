@@ -1,13 +1,24 @@
-<!-- hook-bypass: inline-style -->
-<!-- Ported verbatim from the Flask-era gui/templates/scholar.html; inline
-     styles pre-date this migration and are out of scope to refactor here. -->
+{% extends "scitex_ui/standalone_shell.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>SciTeX Scholar</title>
+{% comment %}
+Extends scitex-ui's shared workspace shell, so scholar renders inside the same
+frame as every other leaf (scitex-storage, scitex-writer, figrecipe) instead of
+shipping its own <html> document.
+
+Block names verified against the INSTALLED scitex_ui 0.17.0 -- extra_css /
+app_content / extra_js all present in
+site-packages/scitex_ui/templates/scitex_ui/standalone_shell.html -- not read
+off the source tree and not guessed.
+
+DROPPED deliberately, because the shell already provides them: <!DOCTYPE>,
+<html>, <head>, charset, viewport, <title>, and scitex-ui's own theme.css. Any
+of those repeated here would either duplicate or fight the shell.
+
+KEPT deliberately: the stx-mount marker below. The shell does NOT emit it
+(checked), so the mount contract remains scholar's to declare.
+{% endcomment %}
+
+{% block extra_css %}
         {% comment %}
         scitex-app's `stx-mount` contract: the server declares where this app
         is mounted so client code never has to guess. Always ends in "/", so
@@ -22,28 +33,11 @@
            request build "//api/..." : protocol-relative, off-origin. That is
            the exact failure the convention reversal exists to prevent, and it
            passed a test asserting the OLD value. #}
-        <meta name="stx-mount" content="{{ stx_mount }}">
-        {% comment %}
-        Shared SciTeX mark, replacing a hand-rolled rel="icon" link that
-        interpolated a favicon_href context var. The partial ships the asset
-        and still honours favicon_href when a view supplies one.
+    <meta name="stx-mount" content="{{ stx_mount }}">
+    <link rel="stylesheet" href="{% static 'scholar/css/scholar.css' %}">
+{% endblock %}
 
-        Unconditional by design: scitex-ui ships in the same `server` extra
-        as django, so it is present wherever this template can render.
-        {% endcomment %}
-        {% include "scitex_ui/_branding_head.html" %}
-        {% comment %}
-        scitex-ui's shared design tokens. Linked BEFORE scholar.css so scholar
-        may still override non-token styling, and REQUIRED: scholar deleted its
-        own --accent/--text-*/--border-default/--status-error declarations in
-        favour of these. Needs scitex-ui>=0.16.0 — earlier wheels ship this
-        file WITHOUT the palette, which resolves those tokens to nothing with
-        no error. pyproject pins that floor.
-        {% endcomment %}
-        <link rel="stylesheet" href="{% static 'scitex_ui/css/shell/theme.css' %}">
-        <link rel="stylesheet" href="{% static 'scholar/css/scholar.css' %}">
-    </head>
-    <body>
+{% block app_content %}
         <!-- Header -->
         <header class="app-header">
             <h1>SciTeX Scholar</h1>
@@ -302,6 +296,9 @@
             </main>
         </div>
         <!-- Scripts (order matters: ForceSimulation < GraphRenderer < citation-graph) -->
+{% endblock %}
+
+{% block extra_js %}
         <!-- Must load FIRST: declares STX_MOUNT, which every other script uses. -->
         <script src="{% static 'scholar/js/stx-mount.js' %}"></script>
         <script src="{% static 'scholar/js/app.js' %}"></script>
@@ -309,5 +306,4 @@
         <script src="{% static 'scholar/js/graph/ForceSimulation.js' %}"></script>
         <script src="{% static 'scholar/js/graph/GraphRenderer.js' %}"></script>
         <script src="{% static 'scholar/js/graph/citation-graph.js' %}"></script>
-    </body>
-</html>
+{% endblock %}
