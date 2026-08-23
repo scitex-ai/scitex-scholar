@@ -5,10 +5,19 @@ Extends scitex-ui's shared workspace shell, so scholar renders inside the same
 frame as every other leaf (scitex-storage, scitex-writer, figrecipe) instead of
 shipping its own <html> document.
 
-Block names verified against the INSTALLED scitex_ui 0.17.0 -- extra_css /
-app_content / extra_js all present in
-site-packages/scitex_ui/templates/scitex_ui/standalone_shell.html -- not read
-off the source tree and not guessed.
+Block names -- extra_css / app_content / extra_js -- were verified against the
+INSTALLED scitex_ui in site-packages, not read off a source tree and not
+guessed.
+
+NO VERSION NUMBER HERE ON PURPOSE. This comment used to say "verified against
+the INSTALLED scitex_ui 0.17.0". The installed version moved to 0.18.0 and the
+sentence did not, so it became a confident false claim that nothing could
+fail on -- and it did mislead: on 2026-08-23 I quoted that 0.17.0 to another
+package as a MEASUREMENT of what was installed here, when the real answer was
+0.18.0 and I had read a comment instead of running `md.version("scitex-ui")`.
+A pinned version in prose is a fact with no owner and no test. The floor lives
+in pyproject.toml, where a resolver reads it; ask the interpreter for what is
+installed.
 
 DROPPED deliberately, because the shell already provides them: <!DOCTYPE>,
 <html>, <head>, charset, viewport, <title>, and scitex-ui's own theme.css. Any

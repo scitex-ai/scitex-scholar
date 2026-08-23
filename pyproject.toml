@@ -107,11 +107,28 @@ server = [
     # gui_runtime (pid/port/host lifecycle bookkeeping for `scholar gui`)
     # shipped in scitex-dev 0.30.0 (2026-07-12).
     "scitex-dev>=0.30.0",
-    # Shared SciTeX branding partial (`scitex_ui/_branding_head.html`),
-    # included by scholar.html's <head>. 0.7.1 is the first release where
-    # branding is usable WITHOUT adopting the workspace shell -- scholar
-    # owns its own layout and deliberately does not extend that shell.
-    "scitex-ui>=0.16.0",
+    # scholar.html EXTENDS `scitex_ui/standalone_shell.html` (since 1.9.0), so
+    # the shell supplies our whole <html> document, not just a branding partial.
+    #
+    # >=0.19.0 because BELOW it that shell hardcodes `<html lang="en">` while the
+    # theme attribute beside it is already `{{ }}`-driven. That matters more than
+    # a wrong metadata field: `lang` is where a screen reader takes its
+    # PRONUNCIATION rules, so a non-English page served as lang="en" is read with
+    # English phonetics.
+    #
+    # Scholar does NOT call `shell_context()` -- views.py builds its own context
+    # and calls render_to_string directly -- so we depend specifically on the
+    # TEMPLATE-level `{{ shell_lang|default:'en' }}`, not on the function's
+    # default. Verified on a real HTTP response from the PUBLISHED wheels
+    # (scitex-scholar 1.9.0 + scitex-ui 0.19.0, isolated venv):
+    #     <html lang="en" data-theme-default="dark">
+    # i.e. present and correct rather than the empty lang a function-only default
+    # would have produced here.
+    #
+    # THE PREVIOUS COMMENT HERE WAS FALSE and worth naming: it said scholar
+    # "owns its own layout and deliberately does not extend that shell". True
+    # before 1.9.0, wrong after, and nothing failed when it went stale.
+    "scitex-ui>=0.19.0",
 ]
 watch = [
     "watchdog>=3.0.0",
@@ -133,7 +150,7 @@ dev = [
     # member of `[server]`), so the Django tests cannot even import
     # without it. NOT guarded with importorskip on purpose: a skip would
     # hide a genuinely broken GUI install behind a green run.
-    "scitex-ui>=0.16.0",
+    "scitex-ui>=0.19.0",
     "watchdog>=3.0.0",
     # tests/integration/test_clew_integration.py — used (with importorskip)
     # to exercise the optional scitex-clew provenance path in storage/PaperIO.
