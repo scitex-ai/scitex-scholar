@@ -47,6 +47,22 @@ def run(
     if db_path:
         # Write the canonical name; resolve_env reads this one first.
         os.environ["SCITEX_SCHOLAR_CROSSREF_DB"] = db_path
+
+    # Serving on a non-loopback address requires that address in ALLOWED_HOSTS,
+    # or Django answers 400 to every request while the startup banner still
+    # prints a URL that looks fine. Binding to an address IS the statement that
+    # you intend to be reached on it, so contribute it rather than making the
+    # caller set an env var to permit what they already asked for.
+    #
+    # settings.py reads this variable and APPENDS, so an explicitly configured
+    # list (proxy DNS name, MagicDNS name) survives alongside the bind address.
+    if host not in ("127.0.0.1", "localhost", "0.0.0.0"):
+        _configured = os.environ.get("SCITEX_SCHOLAR_ALLOWED_HOSTS", "")
+        _hosts = [h.strip() for h in _configured.split(",") if h.strip()]
+        if host not in _hosts:
+            _hosts.append(host)
+        os.environ["SCITEX_SCHOLAR_ALLOWED_HOSTS"] = ",".join(_hosts)
+
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "scitex_scholar._django.settings")
 
     print(f"SciTeX Scholar GUI: http://{host}:{port}")
