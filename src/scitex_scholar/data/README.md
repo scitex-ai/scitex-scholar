@@ -7,10 +7,12 @@ User-provided data files. This directory is gitignored.
 ```
 data/
 └── impact_factor/
-    ├── JCR_IF_2024.xlsx         # JCR Excel file (user-provided)
-    ├── JCR_IF_2024.db           # SQLite database (generated)
-    └── impact_factor.db -> JCR_IF_2024.db (symlink to active DB)
+    └── JCR_IF_2024.xlsx         # JCR Excel file (user-provided)
 ```
+
+Only the source export lives here. The parsed journal metrics are loaded
+into the shared store (`scholar_impact_factor`), not written back as a file
+beside the spreadsheet.
 
 ## Important
 
@@ -20,19 +22,20 @@ data/
 
 ## Adding JCR Data
 
-1. Obtain JCR Excel file from Clarivate or authorized source
-2. Place in `src/scitex/scholar/data/impact_factor/JCR_IF_YYYY.xlsx`
-3. Build database (optional - will auto-build if needed):
-   ```python
-   from scitex.scholar.impact_factor.jcr import build_database
-   build_database("JCR_IF_2024.xlsx")
+1. Obtain a JCR Excel file from Clarivate or an authorized source
+2. Place it in `src/scitex_scholar/data/impact_factor/JCR_IF_YYYY.xlsx`
+3. Load it:
+   ```bash
+   python -m scitex_scholar.impact_factor.jcr.build_database \
+       --excel src/scitex_scholar/data/impact_factor/JCR_IF_2024.xlsx
    ```
 
 ## File Naming Convention
 
 - Excel: `JCR_IF_YYYY.xlsx` (e.g., JCR_IF_2024.xlsx)
-- Database: `JCR_IF_YYYY.db` (e.g., JCR_IF_2024.db)
-- Symlink: `impact_factor.db` → points to current year DB
+
+The year in the filename becomes each row's `jcr_year` unless `--jcr-year`
+says otherwise.
 
 ## Legal Notice
 

@@ -1,60 +1,49 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""CrossRef DB path resolution -- ported verbatim from the Flask-era
-`scitex_scholar.gui._app._find_crossref_db`.
+"""Where the GUI reaches the CrossRef corpus.
 
-Resolution order: explicit arg, then `CROSSREF_DB_PATH` env var, then a
-few candidate filesystem paths, then an optional `crossref_local` module
-probe.
+Scholar does not open crossref-local's data files. It asks crossref-local's
+HTTP API, which is the package that owns that corpus. This module resolves
+the endpoint ONCE (settings-load time) so `views.py` reads a plain setting
+instead of re-probing on every request.
+
+Resolution order: explicit arg, then `SCITEX_SCHOLAR_CROSSREF_LOCAL_API_URL`
+(legacy `CROSSREF_LOCAL_API_URL`), then crossref-local's own default
+endpoint. Returns None when crossref-local is not installed and no endpoint
+was configured -- the GUI then reports the citation-graph routes as
+unavailable rather than failing a request at a time.
 """
 
 from __future__ import annotations
 
-import os
-from pathlib import Path
 from typing import Optional
 
 import scitex_logging as _slog
+
 from .._utils._env import resolve_env
 
 _logger = _slog.getLogger(__name__)
 
 
-def find_crossref_db(db_path: Optional[str] = None) -> Optional[str]:
-    """Auto-detect CrossRef database path."""
-    if db_path and Path(db_path).exists():
-        return db_path
+def find_crossref_api_url(api_url: Optional[str] = None) -> Optional[str]:
+    """Resolve the crossref-local HTTP endpoint the GUI should query."""
+    if api_url:
+        return api_url
 
-    # Check environment variable (Docker / explicit config)
-    env_path = resolve_env("SCITEX_SCHOLAR_CROSSREF_DB", legacy="CROSSREF_DB_PATH")
-    if env_path and Path(env_path).exists():
-        return env_path
+    env_url = resolve_env(
+        "SCITEX_SCHOLAR_CROSSREF_LOCAL_API_URL", legacy="CROSSREF_LOCAL_API_URL"
+    )
+    if env_url:
+        return env_url
 
-    # Candidates: first the config-resolved location (honours SCITEX_DIR),
-    # then common dev-local checkout paths as fallback.
-    from scitex_scholar.config import ScholarConfig
-
-    candidates = [
-        ScholarConfig().path_manager.scholar_dir / "crossref.db",
-        Path.home() / "proj" / "crossref_local" / "data" / "crossref.db",
-        Path.home() / "proj" / "crossref-local" / "data" / "crossref.db",
-        Path.home() / ".proj" / "crossref_local" / "data" / "crossref.db",
-    ]
-    for p in candidates:
-        if p.exists():
-            return str(p)
-
-    # Try crossref_local module info as last resort
     try:
-        import crossref_local
+        from crossref_local._core.config import DEFAULT_API_URL
 
-        info = crossref_local.info()
-        p = info.get("db_path")
-        if p and Path(p).exists():
-            return str(p)
+        return DEFAULT_API_URL
     except Exception as exc:
         _logger.debug(
-            f"crossref_local.info() probe failed ({type(exc).__name__}: {exc})"
+            f"crossref_local default endpoint unavailable "
+            f"({type(exc).__name__}: {exc})"
         )
 
     return None

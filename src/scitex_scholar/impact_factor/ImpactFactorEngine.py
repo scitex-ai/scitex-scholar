@@ -36,6 +36,7 @@ from typing import Dict, Optional
 
 from scitex_logging import getLogger
 
+from .jcr.ImpactFactorJCREngine import TABLE as JCR_TABLE
 from .jcr.ImpactFactorJCREngine import ImpactFactorJCREngine
 
 logger = getLogger(__name__)
@@ -47,9 +48,10 @@ logger = getLogger(__name__)
 
 class ImpactFactorEngine:
     """
-    Impact factor service - finds journal metrics from JCR database.
+    Impact factor service - finds journal metrics from the JCR table.
 
-    Uses JCR database lookup with caching for performance.
+    Reads the JCR rows through :class:`ImpactFactorJCREngine`, with an LRU
+    cache in front so repeated lookups of the same journal are free.
     """
 
     def __init__(self, cache_size: int = 1000):
@@ -59,36 +61,17 @@ class ImpactFactorEngine:
         self.get_metrics = lru_cache(maxsize=cache_size)(self._get_metrics_uncached)
 
     def _get_jcr_year(self) -> str:
-        """Extract JCR year from database or package metadata.
+        """Which JCR edition the numbers came from.
 
-        Returns "Source Unknown" if the year can't be determined. Any
-        underlying error is logged at debug level so callers can distinguish
-        a truly unknown year from a misconfigured DB.
+        The edition is stamped on every row when the export is loaded, so
+        it is read rather than inferred. Returns "Source Unknown" when no
+        row carries one -- rows loaded before the field existed, or an
+        empty table.
         """
         try:
-            import sqlite3
-
-            with sqlite3.connect(self.jcr_engine.dbfile) as conn:
-                cursor = conn.cursor()
-
-                cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
-                tables = [row[0] for row in cursor.fetchall()]
-
-                if "metadata" in tables:
-                    cursor.execute(
-                        "SELECT value FROM metadata WHERE key='year' OR key='jcr_year'"
-                    )
-                    year_result = cursor.fetchone()
-                    if year_result:
-                        return f"JCR {year_result[0]}"
-
-                import re
-
-                db_path = str(self.jcr_engine.dbfile)
-                year_match = re.search(r"20\d{2}", db_path)
-                if year_match:
-                    return f"JCR {year_match.group()}"
-
+            year = self.jcr_engine.jcr_year
+            if year:
+                return f"JCR {year}"
         except Exception as exc:
             logger.debug(
                 f"ImpactFactorEngine: JCR year lookup failed "
@@ -107,51 +90,41 @@ class ImpactFactorEngine:
             if results:
                 result = results[0]
                 return {
-                    "impact_factor": float(result.get("factor", 0)),
+                    "impact_factor": float(result.get("factor") or 0),
                     "quartile": result.get("jcr", "Unknown"),
                     "source": self._get_jcr_year(),
                 }
-        except Exception:
-            pass
+        except Exception as exc:
+            # Logged, not swallowed: "no metrics for this journal" and "the
+            # table could not be read at all" are different answers, and the
+            # bare `pass` that used to be here made an unreachable store look
+            # exactly like an unlisted journal.
+            logger.debug(
+                f"ImpactFactorEngine: lookup for {journal_name!r} failed "
+                f"({type(exc).__name__}: {exc})"
+            )
 
         return None
 
     def get_database_info(self) -> Dict:
-        """Get information about the impact factor database."""
+        """Describe where the impact-factor rows live and what is in them."""
         if not self.jcr_engine:
-            return {"error": "Database not available"}
+            return {"error": "JCR engine not available"}
 
-        import sqlite3
+        try:
+            records = self.jcr_engine.records
+        except Exception as exc:
+            return {"error": f"{type(exc).__name__}: {exc}"}
 
-        db_path = self.jcr_engine.dbfile
-
-        with sqlite3.connect(db_path) as conn:
-            cursor = conn.cursor()
-
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
-            tables = [row[0] for row in cursor.fetchall()]
-
-            info = {
-                "database_path": str(db_path),
-                "tables": tables,
-                "total_journals": 0,
-                "data_year": self._get_jcr_year(),
-            }
-
-            if tables:
-                main_table = tables[0]
-                cursor.execute(f"SELECT COUNT(*) FROM {main_table}")
-                info["total_journals"] = cursor.fetchone()[0]
-
-                cursor.execute(f"PRAGMA table_info({main_table})")
-                columns = [row[1] for row in cursor.fetchall()]
-                info["columns"] = columns
-
-                cursor.execute(f"SELECT * FROM {main_table} LIMIT 3")
-                sample_data = cursor.fetchall()
-                info["sample_data"] = sample_data
-
-            return info
+        info = {
+            "store": self.jcr_engine.store,
+            "table": JCR_TABLE,
+            "total_journals": len(records),
+            "data_year": self._get_jcr_year(),
+            "columns": sorted(records[0]) if records else [],
+            "sample_data": records[:3],
+        }
+        return info
 
 
 def get_journal_metrics(journal_name: str) -> Optional[Dict]:
@@ -183,8 +156,8 @@ if __name__ == "__main__":
         """Demonstrate journal metrics lookup."""
         metrics_instance = ImpactFactorEngine()
 
-        # Show database info
-        print("Database Information")
+        # Show where the rows come from
+        print("Impact-factor table")
         print("=" * 50)
         db_info = metrics_instance.get_database_info()
         for key, value in db_info.items():

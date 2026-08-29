@@ -188,7 +188,6 @@ from ._cli.library import (  # noqa: E402  (after `cli` is defined above)
     library_db_build,
     library_db_list,
     library_db_lookup,
-    library_db_migrate,
 )
 
 cli.add_command(library)

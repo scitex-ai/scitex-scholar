@@ -1,111 +1,150 @@
 #!/usr/bin/env python3
-"""Zotero-style SQLite index for the scholar library.
+"""Zotero-style index of the scholar library, kept in the shared store.
 
-Location: ``<library_root>/index.db``.
+The index is a DERIVED CACHE of ``MASTER/<paper_id>/metadata.json``. The
+filesystem stays authoritative: ``build()`` re-creates every row from it,
+so the index can be rebuilt at any time without loss.
 
-Maintained as a derived cache of ``MASTER/<paper_id>/metadata.json``.
-Safe to delete at any time — ``build()`` re-creates it from the
-authoritative filesystem state.
+WHERE THE ROWS LIVE
+-------------------
+:mod:`scitex_dev.store` — the fleet's shared storage primitive, resolved by
+``host_store()`` to this host's PostgreSQL. This module declares a
+:class:`~scitex_dev.store.Schema` and calls the primitive directly; it opens
+no path and derives no filesystem location, because a private local file is
+a write that reaches nobody.
 
-Schema v1 (additive-only; bump ``SCHEMA_VERSION`` and add a migration
-step before altering existing columns):
+``library_root`` is part of the record IDENTITY, not an ambient parameter.
+One store serves every library on the host, so two roots holding the same
+``paper_id`` are two distinct rows rather than a silent overwrite.
 
-    papers(
-        paper_id       TEXT PRIMARY KEY,
-        doi            TEXT,
-        arxiv_id       TEXT,
-        pmid           TEXT,
-        title          TEXT,
-        year           INTEGER,
-        venue          TEXT,
-        is_oa          INTEGER,
-        authors_json   TEXT,            -- JSON array of author name strings
-        abstract       TEXT,
-        citation_count INTEGER,
-        updated_at     REAL             -- metadata.json mtime at index time
-    )
+Fields (additive-only; adding one is a schema edit, never a data migration):
 
-Indexes: unique on (doi) where doi not null; b-tree on arxiv_id, pmid,
-year.
+    library_root   TEXT     resolved absolute path of the library
+    paper_id       TEXT     MASTER/<paper_id>
+    doi            TEXT
+    arxiv_id       TEXT
+    pmid           TEXT
+    title          TEXT
+    year           INTEGER
+    venue          TEXT
+    is_oa          INTEGER  1 / 0 / None ("unknown")
+    authors_json   TEXT     JSON array of author name strings
+    abstract       TEXT
+    citation_count INTEGER
+    updated_at     REAL     metadata.json mtime at index time
 
-Consumers (e.g. scitex-writer's scholar bridge) read this DB directly
-with sqlite3 — no Python dependency on scitex-scholar required.
+Rows for papers that disappear from MASTER are HIDDEN, never deleted: the
+store has no delete verb, and a hidden row still carries the history that a
+later ``build()`` can un-hide.
 """
 
 from __future__ import annotations
 
 import json
-import os
-import sqlite3
-from contextlib import closing, contextmanager
+import socket
 from pathlib import Path
-from typing import Iterator, Optional
+from typing import Any, Iterator, Optional
 
 import scitex_logging as logging
 
 logger = logging.getLogger(__name__)
 
-SCHEMA_VERSION = 1
-DB_FILENAME = "index.db"
+STORE_NAME = "library_index"
+TABLE = "scholar_library_index"
+
+_FIELDS = (
+    "library_root",
+    "paper_id",
+    "doi",
+    "arxiv_id",
+    "pmid",
+    "title",
+    "year",
+    "venue",
+    "is_oa",
+    "authors_json",
+    "abstract",
+    "citation_count",
+    "updated_at",
+)
 
 
-_SCHEMA_SQL_V1 = """
-CREATE TABLE IF NOT EXISTS meta (
-    key   TEXT PRIMARY KEY,
-    value TEXT
-);
+def schema():
+    """Build this index's :class:`~scitex_dev.store.Schema`.
 
-CREATE TABLE IF NOT EXISTS papers (
-    paper_id       TEXT PRIMARY KEY,
-    doi            TEXT,
-    arxiv_id       TEXT,
-    pmid           TEXT,
-    title          TEXT,
-    year           INTEGER,
-    venue          TEXT,
-    is_oa          INTEGER,
-    authors_json   TEXT,
-    abstract       TEXT,
-    citation_count INTEGER,
-    updated_at     REAL
-);
+    Built on call rather than at import so that importing the storage
+    package does not drag the store machinery in for callers that never
+    touch the index.
+    """
+    from scitex_dev.store import FieldKind, FieldPolicy, FieldRole, MergeRule, Schema
 
-CREATE UNIQUE INDEX IF NOT EXISTS idx_papers_doi
-    ON papers(doi) WHERE doi IS NOT NULL;
-CREATE INDEX IF NOT EXISTS idx_papers_arxiv  ON papers(arxiv_id);
-CREATE INDEX IF NOT EXISTS idx_papers_pmid   ON papers(pmid);
-CREATE INDEX IF NOT EXISTS idx_papers_year   ON papers(year);
-"""
+    def ident(kind):
+        return FieldPolicy(
+            kind=kind,
+            role=FieldRole.IDENTITY,
+            required=True,
+            merge=MergeRule.IMMUTABLE,
+            indexed=False,
+        )
 
+    def data(kind, *, indexed: bool = False):
+        return FieldPolicy(
+            kind=kind,
+            role=FieldRole.DATA,
+            required=False,
+            merge=MergeRule.LAST_WRITER_WINS,
+            indexed=indexed,
+        )
 
-def db_path(library_root: Path) -> Path:
-    return Path(library_root) / DB_FILENAME
+    text = FieldKind.TEXT
+    integer = FieldKind.INTEGER
+    real = FieldKind.REAL
 
-
-@contextmanager
-def connect(
-    library_root: Path, read_only: bool = False
-) -> Iterator[sqlite3.Connection]:
-    p = db_path(library_root)
-    if read_only:
-        uri = f"file:{p}?mode=ro"
-        conn = sqlite3.connect(uri, uri=True)
-    else:
-        conn = sqlite3.connect(p)
-    conn.row_factory = sqlite3.Row
-    try:
-        yield conn
-    finally:
-        conn.close()
-
-
-def _apply_schema(conn: sqlite3.Connection) -> None:
-    conn.executescript(_SCHEMA_SQL_V1)
-    conn.execute(
-        "INSERT OR REPLACE INTO meta(key, value) VALUES ('schema_version', ?)",
-        (str(SCHEMA_VERSION),),
+    return Schema.build(
+        TABLE,
+        {
+            "library_root": ident(text),
+            "paper_id": ident(text),
+            "doi": data(text, indexed=True),
+            "arxiv_id": data(text, indexed=True),
+            "pmid": data(text, indexed=True),
+            "title": data(text),
+            "year": data(integer, indexed=True),
+            "venue": data(text),
+            "is_oa": data(integer),
+            "authors_json": data(text),
+            "abstract": data(text),
+            "citation_count": data(integer),
+            "updated_at": data(real),
+        },
     )
-    conn.commit()
+
+
+def store_target():
+    """Resolve WHERE the index lives. Pure — does not connect."""
+    from scitex_dev.store import host_store
+
+    return host_store(pkg="scitex_scholar", name=STORE_NAME)
+
+
+def _open_store():
+    """Open the index store. Raises naming the target if it is unreachable."""
+    from scitex_dev.store import Store, WriterPolicy
+
+    return Store(
+        store_target(),
+        schema(),
+        node=socket.gethostname(),
+        writer_policy=WriterPolicy.MULTI_WRITER,
+        actor="scitex_scholar.library_index",
+    )
+
+
+def _root_key(library_root: Path | str) -> str:
+    return str(Path(library_root).expanduser().resolve())
+
+
+# ----- pure derivation (no store, no I/O beyond reading metadata.json) -----
 
 
 def _is_oa_int(access: dict) -> Optional[int]:
@@ -117,9 +156,9 @@ def _is_oa_int(access: dict) -> Optional[int]:
 def _normalize_id(value: Optional[str]) -> Optional[str]:
     """Treat empty / whitespace-only strings as absent.
 
-    The `UNIQUE(doi) WHERE doi IS NOT NULL` index treats NULL as distinct
-    but `""` as a real value, so multiple empty-string DOIs collide.
-    Normalizing empty → NULL matches the semantic intent ("no DOI").
+    An identifier column distinguishes "no DOI" from a DOI that happens to
+    be the empty string; several library entries legitimately have no DOI,
+    and letting `""` through makes them look like one paper repeated.
     Applied to arxiv_id and pmid too for consistency.
     """
     if value is None:
@@ -128,7 +167,9 @@ def _normalize_id(value: Optional[str]) -> Optional[str]:
     return s or None
 
 
-def _row_from_metadata(paper_id: str, meta_path: Path) -> Optional[tuple]:
+def _row_from_metadata(
+    library_root_key: str, paper_id: str, meta_path: Path
+) -> Optional[dict]:
     try:
         md = json.loads(meta_path.read_text())
     except (OSError, json.JSONDecodeError):
@@ -141,45 +182,48 @@ def _row_from_metadata(paper_id: str, meta_path: Path) -> Optional[tuple]:
     citation = m.get("citation", {}) or {}
     authors = basic.get("authors")
     authors_json = json.dumps(authors) if isinstance(authors, list) else None
-    return (
-        paper_id,
-        _normalize_id(id_.get("doi")),
-        _normalize_id(id_.get("arxiv_id")),
-        _normalize_id(id_.get("pmid")),
-        basic.get("title"),
-        basic.get("year"),
-        pub.get("short_journal") or pub.get("journal"),
-        _is_oa_int(access),
-        authors_json,
-        basic.get("abstract"),
-        citation.get("count"),
-        meta_path.stat().st_mtime,
-    )
+    return {
+        "library_root": library_root_key,
+        "paper_id": paper_id,
+        "doi": _normalize_id(id_.get("doi")),
+        "arxiv_id": _normalize_id(id_.get("arxiv_id")),
+        "pmid": _normalize_id(id_.get("pmid")),
+        "title": basic.get("title"),
+        "year": basic.get("year"),
+        "venue": pub.get("short_journal") or pub.get("journal"),
+        "is_oa": _is_oa_int(access),
+        "authors_json": authors_json,
+        "abstract": basic.get("abstract"),
+        "citation_count": citation.get("count"),
+        "updated_at": meta_path.stat().st_mtime,
+    }
 
 
-def build(library_root: Path, verbose: bool = False) -> int:
-    """(Re)build the index from MASTER metadata. Returns row count.
+def collect_rows(library_root: Path | str, verbose: bool = False) -> list[dict]:
+    """Derive every index row from MASTER metadata. No store involved.
 
-    Raises ``ValueError`` if two paper folders share the same DOI — this
-    indicates library corruption, not a benign duplicate.
+    Raises ``FileNotFoundError`` when MASTER is missing and ``ValueError``
+    when two paper folders claim the same DOI — that is library corruption,
+    not a benign duplicate, and it is detected BEFORE anything is written so
+    a corrupt library cannot damage the rows already indexed.
     """
-    library_root = Path(library_root).resolve()
-    master = library_root / "MASTER"
+    root_key = _root_key(library_root)
+    master = Path(root_key) / "MASTER"
     if not master.is_dir():
         raise FileNotFoundError(master)
 
-    rows: list[tuple] = []
+    rows: list[dict] = []
     doi_to_paper: dict[str, str] = {}
     dupes: dict[str, list[str]] = {}
     for meta_file in master.glob("*/metadata.json"):
         paper_id = meta_file.parent.name
-        row = _row_from_metadata(paper_id, meta_file)
+        row = _row_from_metadata(root_key, paper_id, meta_file)
         if row is None:
             if verbose:
                 logger.warning(f"Skipped unreadable {meta_file}")
             continue
         rows.append(row)
-        doi = row[1]
+        doi = row["doi"]
         if doi:
             key = doi.lower()
             if key in doi_to_paper and doi_to_paper[key] != paper_id:
@@ -192,71 +236,97 @@ def build(library_root: Path, verbose: bool = False) -> int:
         raise ValueError(
             "Duplicate DOIs found in MASTER (library corrupted):\n" + "\n".join(lines)
         )
+    return rows
 
-    target = db_path(library_root)
-    tmp = target.with_suffix(target.suffix + ".tmp")
-    if tmp.exists():
-        tmp.unlink()
-    with closing(sqlite3.connect(tmp)) as conn:
-        _apply_schema(conn)
-        conn.executemany(
-            "INSERT INTO papers(paper_id, doi, arxiv_id, pmid, title, year, venue, "
-            "is_oa, authors_json, abstract, citation_count, updated_at) "
-            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
-            rows,
-        )
-        conn.commit()
 
-    os.replace(tmp, target)
+def sort_key(row: dict) -> tuple:
+    """Ordering for ``list_all``: newest year first, then title.
 
-    logger.success(f"Indexed {len(rows)} papers at {target}")
+    Papers with no year sort LAST rather than as year 0 — an unknown year
+    is not an ancient one, and burying them under every dated paper is the
+    less misleading of the two.
+    """
+    year = row.get("year")
+    return (year is None, -(year or 0), row.get("title") or "")
+
+
+# ----- store-backed operations --------------------------------------------
+
+
+def _rows_for(store, root_key: str) -> Iterator[dict]:
+    for row in store.rows():
+        values = row.values
+        if values.get("library_root") == root_key:
+            yield dict(values)
+
+
+def build(library_root: Path | str, verbose: bool = False) -> int:
+    """(Re)build the index from MASTER metadata. Returns row count."""
+    from scitex_dev.store import ANY_REVISION
+
+    root_key = _root_key(library_root)
+    rows = collect_rows(root_key, verbose=verbose)
+    present = {r["paper_id"] for r in rows}
+
+    store = _open_store()
+    try:
+        stale = [
+            r["paper_id"]
+            for r in _rows_for(store, root_key)
+            if r["paper_id"] not in present
+        ]
+        with store.batch():
+            for row in rows:
+                key = {"library_root": root_key, "paper_id": row["paper_id"]}
+                if store.is_hidden(key):
+                    store.unhide(key, expected_revision=ANY_REVISION)
+                store.put(row, expected_revision=ANY_REVISION)
+            for paper_id in stale:
+                store.hide(
+                    {"library_root": root_key, "paper_id": paper_id},
+                    expected_revision=ANY_REVISION,
+                )
+    finally:
+        store.close()
+
+    logger.success(f"Indexed {len(rows)} papers for {root_key}")
     return len(rows)
 
 
-def migrate(library_root: Path) -> int:
-    """Apply pending migrations. Returns new schema version."""
-    with connect(library_root) as conn:
-        has_meta = conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='meta'"
-        ).fetchone()
-        if not has_meta:
-            current = 0
-        else:
-            cur = conn.execute(
-                "SELECT value FROM meta WHERE key='schema_version'"
-            ).fetchone()
-            current = int(cur["value"]) if cur else 0
-        if current == SCHEMA_VERSION:
-            return current
-        if current == 0:
-            _apply_schema(conn)
-            return SCHEMA_VERSION
-        # Future: chain migrations here (v1→v2, v2→v3, ...).
-        raise RuntimeError(
-            f"No migration path from schema v{current} to v{SCHEMA_VERSION}"
-        )
+def lookup_by_doi(library_root: Path | str, doi: str) -> Optional[dict]:
+    root_key = _root_key(library_root)
+    wanted = (doi or "").lower()
+    store = _open_store()
+    try:
+        for row in _rows_for(store, root_key):
+            row_doi = row.get("doi")
+            if row_doi and row_doi.lower() == wanted:
+                return row
+    finally:
+        store.close()
+    return None
 
 
-def lookup_by_doi(library_root: Path, doi: str) -> Optional[dict]:
-    with connect(library_root, read_only=True) as conn:
-        row = conn.execute(
-            "SELECT * FROM papers WHERE doi = ? COLLATE NOCASE", (doi,)
-        ).fetchone()
-        return dict(row) if row else None
+def lookup_by_paper_id(library_root: Path | str, paper_id: str) -> Optional[dict]:
+    root_key = _root_key(library_root)
+    store = _open_store()
+    try:
+        row = store.get({"library_root": root_key, "paper_id": paper_id})
+        return dict(row.values) if row else None
+    finally:
+        store.close()
 
 
-def lookup_by_paper_id(library_root: Path, paper_id: str) -> Optional[dict]:
-    with connect(library_root, read_only=True) as conn:
-        row = conn.execute(
-            "SELECT * FROM papers WHERE paper_id = ?", (paper_id,)
-        ).fetchone()
-        return dict(row) if row else None
+def list_all(
+    library_root: Path | str, limit: int = 100, offset: int = 0
+) -> list[dict[str, Any]]:
+    root_key = _root_key(library_root)
+    store = _open_store()
+    try:
+        rows = sorted(_rows_for(store, root_key), key=sort_key)
+    finally:
+        store.close()
+    return rows[offset : offset + limit]
 
 
-def list_all(library_root: Path, limit: int = 100, offset: int = 0) -> list[dict]:
-    with connect(library_root, read_only=True) as conn:
-        rows = conn.execute(
-            "SELECT * FROM papers ORDER BY year DESC, title LIMIT ? OFFSET ?",
-            (limit, offset),
-        ).fetchall()
-        return [dict(r) for r in rows]
+# EOF

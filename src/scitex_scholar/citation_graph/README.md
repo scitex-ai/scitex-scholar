@@ -12,10 +12,11 @@ Build and analyze citation networks for academic papers using CrossRef data.
 ## Quick Start
 
 ```python
-from scitex.scholar.citation_graph import CitationGraphBuilder
+from scitex_scholar.citation_graph import CitationGraphBuilder
 
-# Initialize with CrossRef database
-builder = CitationGraphBuilder("/path/to/crossref.db")
+# Endpoint resolved from SCITEX_SCHOLAR_CROSSREF_LOCAL_API_URL, or pass
+# api_url="http://localhost:31291" explicitly.
+builder = CitationGraphBuilder()
 
 # Build citation network for a paper
 graph = builder.build("10.1038/s41586-020-2008-3", top_n=20)
@@ -69,11 +70,18 @@ Based on experiments with 47M+ citations:
 | Bibliographic coupling | 25s | ⚠️ Needs optimization |
 | **Full network build** | **~30s** | ✓ Acceptable |
 
-## Database Schema
+## Backend
 
-Requires CrossRef database with:
-- `works` table: Paper metadata
-- `citations` table: Citation relationships (citing_doi, cited_doi, citing_year)
+Requires a running [crossref-local](https://github.com/scitex-ai/crossref-local)
+server. Scholar reaches it over HTTP and never opens its data files: the
+package that owns the corpus is the one that reads it.
+
+Two behavioural notes that follow from the HTTP boundary:
+
+- `get_citations` returns year `0` for every citing DOI — the API does not
+  return years alongside citing DOIs.
+- Co-citation and bibliographic coupling are computed client-side from
+  citation lists, with a fan-out cap, rather than as one server-side join.
 
 ## Example Output
 

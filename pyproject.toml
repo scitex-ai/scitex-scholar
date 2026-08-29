@@ -70,8 +70,13 @@ dependencies = [
     "pydantic>=2.0.0",
     "pyyaml>=6.0.0",
     "requests>=2.28.0",
-    "sql-manager>=1.0.0",
-    "sqlalchemy>=2.0.0",
+    # `scitex_dev.store` is the storage primitive for scholar's own derived
+    # state (the library index and the JCR journal table). It is a CORE
+    # dependency, not an extra: `storage/_library_index.py` and
+    # `impact_factor/jcr/*` import it on the path a plain `pip install
+    # scitex-scholar` exercises. `sql-manager` + `sqlalchemy` were the
+    # previous JCR backend and are gone with it.
+    "scitex-dev>=0.30.0",
     "tenacity>=8.0.0",
     "tqdm>=4.64.0",
 ]

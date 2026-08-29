@@ -30,7 +30,7 @@ DEFAULT_PORT = 31297
 def run(
     port: int = DEFAULT_PORT,
     host: str = "127.0.0.1",
-    db_path: Optional[str] = None,
+    api_url: Optional[str] = None,
     open_browser: bool = True,
     desktop: bool = False,
     hot_reload: bool = False,
@@ -44,9 +44,9 @@ def run(
     The requested port is bound as given: when it is already in use the
     server fails instead of drifting to the next free port.
     """
-    if db_path:
+    if api_url:
         # Write the canonical name; resolve_env reads this one first.
-        os.environ["SCITEX_SCHOLAR_CROSSREF_DB"] = db_path
+        os.environ["SCITEX_SCHOLAR_CROSSREF_LOCAL_API_URL"] = api_url
 
     # Serving on a non-loopback address requires that address in ALLOWED_HOSTS,
     # or Django answers 400 to every request while the startup banner still

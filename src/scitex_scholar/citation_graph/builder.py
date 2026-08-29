@@ -8,7 +8,6 @@ import json
 from pathlib import Path
 from typing import List, Optional
 
-from .database import CitationDatabase
 from .models import CitationEdge, CitationGraph, PaperNode
 
 
@@ -16,58 +15,32 @@ class CitationGraphBuilder:
     """
     Build citation network graphs for academic papers.
 
-    Auto-detects backend via crossref_local.Config (DB → HTTP).
+    Citation data is served by crossref-local over HTTP. Scholar does not
+    open crossref-local's data files itself: the package that owns that
+    corpus is the one that reads it, and Scholar asks it questions.
 
-    Example (auto-detect):
+    Example (auto-detect the endpoint):
         >>> builder = CitationGraphBuilder()
         >>> graph = builder.build("10.1038/s41586-020-2008-3", top_n=20)
 
-    Example (explicit SQLite):
-        >>> builder = CitationGraphBuilder(db_path="/path/to/crossref.db")
-
-    Example (explicit HTTP):
+    Example (explicit endpoint):
         >>> builder = CitationGraphBuilder(api_url="http://localhost:31291")
     """
 
-    def __init__(self, db_path: str = None, api_url: str = None):
+    def __init__(self, api_url: str = None):
         """
-        Initialize builder with database path, HTTP API URL, or auto-detect.
-
-        When no args given, delegates to crossref_local.Config for auto-detection:
-        1. CROSSREF_LOCAL_MODE env var (explicit "db" or "http")
-        2. CROSSREF_LOCAL_API_URL env var → HTTP mode
-        3. Local DB file existence → DB mode
-        4. Fallback to HTTP mode
+        Initialize builder against a crossref-local HTTP endpoint.
 
         Args:
-            db_path: Path to CrossRef SQLite database (local mode)
-            api_url: URL of crossref-local HTTP API (HTTP mode)
+            api_url: URL of the crossref-local HTTP API. When None, resolved
+                from ``SCITEX_SCHOLAR_CROSSREF_LOCAL_API_URL`` (legacy
+                ``CROSSREF_LOCAL_API_URL``), falling back to crossref-local's
+                own default endpoint.
         """
-        if api_url:
-            from .database_http import CitationDatabaseHTTP
+        from .database_http import CitationDatabaseHTTP
 
-            self.db_path = None
-            self.db = CitationDatabaseHTTP(api_url)
-        elif db_path:
-            self.db_path = db_path
-            self.db = CitationDatabase(db_path)
-        else:
-            self._auto_detect()
-
-    def _auto_detect(self):
-        """Auto-detect backend via crossref_local.Config."""
-        from crossref_local._core.config import Config
-
-        mode = Config.get_mode()
-
-        if mode == "db":
-            self.db_path = str(Config.get_db_path())
-            self.db = CitationDatabase(self.db_path)
-        else:
-            from .database_http import CitationDatabaseHTTP
-
-            self.db_path = None
-            self.db = CitationDatabaseHTTP(Config.get_api_url())
+        self.db = CitationDatabaseHTTP(api_url)
+        self.api_url = self.db.api_url
 
     def build(
         self,

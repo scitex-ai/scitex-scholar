@@ -5,6 +5,49 @@ All notable changes to `scitex-scholar` are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- **Scholar's own state moved off local database files and onto the shared
+  store (`scitex_dev.store`).** Fleet ruling, 2026-08-29: storage is the
+  per-host PostgreSQL, reached through the shared primitive.
+  - The **library index** (`library db build/lookup/list`) no longer writes
+    `<library_root>/index.db`. Rows live in the `scholar_library_index` table,
+    keyed by `(library_root, paper_id)` so one store can serve every library on
+    the host. Papers that disappear from `MASTER/` are HIDDEN rather than
+    deleted, and a later rebuild un-hides them.
+  - The **JCR impact-factor table** moved to `scholar_impact_factor`. This also
+    fixes the lookup outright: `DEFAULT_DB` resolved to a path OUTSIDE the
+    repository after the monorepo split, so every impact-factor lookup had been
+    failing silently. `build_database.py` now loads a JCR Excel export into the
+    store and stamps each row with the JCR edition it came from, instead of
+    re-deriving the year from a filename at read time.
+  - The **Django ORM** points at `scitex-primary:55432/scitex`, overridable per
+    field via `SCITEX_SCHOLAR_DB_*`.
+- **The citation graph talks to crossref-local over HTTP only.** Scholar no
+  longer opens crossref-local's data files itself; the package that owns that
+  corpus is the one that reads it. `CitationGraphBuilder(db_path=...)` is gone
+  — pass `api_url=`, or leave it unset and let the endpoint be resolved from
+  `SCITEX_SCHOLAR_CROSSREF_LOCAL_API_URL`. The GUI's `--db-path` option is now
+  `--api-url`, and `/api/health` reports `api_available` / `api_url` in place
+  of `db_available` / `db_path`.
+
+### Removed
+- **`library db migrate`.** It managed a schema version inside an index file.
+  The store owns schema declaration, so there is nothing left for it to do.
+- **`citation_graph/database.py`** and the local-file citation-graph mode.
+- **`cli/_library_index.py`** — an orphaned second implementation of the `db`
+  subcommands whose `register_subparser` was never called from anywhere.
+- **`sql-manager` and `sqlalchemy` dependencies**, which existed only for the
+  previous JCR backend. `scitex-dev` becomes a core dependency in their place.
+
+### Fixed
+- **`Scholar.enrich_papers()`'s impact-factor path was dead code.** It called
+  `ImpactFactorEngine.enrich_papers()`, a method that has never existed; the
+  resulting `AttributeError` was caught and logged as "JCR engine unavailable
+  ... falling back to calculation method" — a fallback that does not exist
+  either. It now enriches papers, mirroring the pipeline's implementation.
+
 ## [1.9.0] - 2026-08-23
 
 ### Added
@@ -487,7 +530,7 @@ Old and new forms route to the same handler, so behaviour is identical.
 
 ### Fixed
 
-- **`db build` no longer raises `sqlite3.IntegrityError: UNIQUE constraint failed: papers.doi` when multiple MASTER entries have `doi=""` (empty string).** The `UNIQUE(doi) WHERE doi IS NOT NULL` index treats NULL as distinct per row, but empty string is a real value and multiple of them collided. `_row_from_metadata` now normalizes empty and whitespace-only DOI / arxiv_id / pmid to `None` before insert, matching the semantic intent ("no ID"). Regression test added.
+- **`db build` no longer fails with a uniqueness violation on `papers.doi` when multiple MASTER entries have `doi=""` (empty string).** The unique-DOI constraint treated an absent DOI as distinct per row, but empty string is a real value and multiple of them collided. `_row_from_metadata` now normalizes empty and whitespace-only DOI / arxiv_id / pmid to `None` before insert, matching the semantic intent ("no ID"). Regression test added.
 
 ## [1.2.0] - 2026-04-21
 
@@ -514,7 +557,7 @@ Old and new forms route to the same handler, so behaviour is identical.
 - **CLI `link-project-tree <dir>`** — creates `<dir>/.scitex/scholar/library → ~/.scitex/scholar/library/` as an idempotent absolute symlink. `--force` replaces a differing target. See [ADR-100](docs/architecture/ADR-100-project-tree-link.md). (PR #4)
 - **CLI `materialize <link_path> --bib <bib>`** — replaces a library-symlink with a real directory containing only the `MASTER/<paper_id>/` subtrees for DOIs cited in `<bib>`. Useful for tarball handoff. (PR #5)
 - **CLI `dematerialize <path> [--target <dir>]`** — inverse of `materialize`: deletes the real directory and replaces it with a symlink to `~/.scitex/scholar/library` (or `--target`). (PR #5)
-- **CLI `db {build, migrate, lookup, list}`** — Zotero-style SQLite index at `<library_root>/index.db` for fast paper lookup. Schema v1 exposes `paper_id, doi, arxiv_id, pmid, title, year, venue, is_oa, authors_json, abstract, citation_count, updated_at`. Consumers read the DB directly with sqlite3 — no Python dependency on `scitex-scholar`. (PR #6)
+- **CLI `db {build, migrate, lookup, list}`** — Zotero-style index at `<library_root>/index.db` for fast paper lookup. Schema v1 exposes `paper_id, doi, arxiv_id, pmid, title, year, venue, is_oa, authors_json, abstract, citation_count, updated_at`. Consumers read the index file directly — no Python dependency on `scitex-scholar`. (PR #6)
 - **ADR-100** documenting the project-tree link + materialize lifecycle (filesystem-as-API contract, additive-only `metadata.json` schema, `MASTER/<paper_id>/` layout). (PR #4)
 - `[tool.pyright]` configuration in `pyproject.toml` with `typeCheckingMode = basic`, targeted excludes, and justified rule suppressions for the false-alert-dominated categories on this codebase. (PR #8)
 - `Part of SciTeX` / Four Freedoms footer to README.

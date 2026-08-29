@@ -1,8 +1,8 @@
 """
-HTTP-based database access layer for citation graph queries.
+HTTP access layer for citation graph queries.
 
-Uses crossref-local HTTP API instead of direct SQLite access.
-Implements the same interface as CitationDatabase for drop-in replacement.
+Every citation query Scholar makes goes through the crossref-local HTTP
+API. Scholar does not open crossref-local's data files itself.
 """
 
 from collections import Counter
@@ -14,8 +14,8 @@ class CitationDatabaseHTTP:
     """
     HTTP interface for citation graph operations via crossref-local API.
 
-    Drop-in replacement for CitationDatabase that uses the crossref-local
-    HTTP server instead of direct SQLite database access.
+    Every citation query the builder makes goes through here. Scholar does
+    not open crossref-local's data files.
 
     Example:
         >>> db = CitationDatabaseHTTP()  # auto-detects from env/config
@@ -198,7 +198,7 @@ class CitationDatabaseHTTP:
         """
         Calculate combined similarity scores using multiple metrics.
 
-        Same algorithm as CitationDatabase but using HTTP API.
+        Combines the three metrics client-side over HTTP results.
 
         Args:
             seed_doi: DOI of the seed paper

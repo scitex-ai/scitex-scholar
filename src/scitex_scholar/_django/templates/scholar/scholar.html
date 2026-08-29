@@ -104,20 +104,20 @@ KEPT deliberately: the stx-mount marker below. The shell does NOT emit it
                 <!-- DB Info -->
                 <div class="sidebar-section">
                     <div class="sidebar-section__header">
-                        <span class="sidebar-section__title">Database</span>
+                        <span class="sidebar-section__title">CrossRef API</span>
                     </div>
                     <div class="sidebar-section__content"
                          style="font-size: 11px;
                                 color: var(--text-muted);
                                 word-break: break-all">
-                        {% if db_available %}
-                            <span style="color: var(--accent);">&#9679;</span> Connected
+                        {% if api_available %}
+                            <span style="color: var(--accent);">&#9679;</span> Configured
                             <br>
-                            <small>{{ db_path }}</small>
+                            <small>{{ api_url }}</small>
                         {% else %}
-                            <span style="color: var(--status-error);">&#9679;</span> Not found
+                            <span style="color: var(--status-error);">&#9679;</span> Not configured
                             <br>
-                            <small>No CrossRef DB detected</small>
+                            <small>No crossref-local endpoint detected</small>
                         {% endif %}
                     </div>
                 </div>
