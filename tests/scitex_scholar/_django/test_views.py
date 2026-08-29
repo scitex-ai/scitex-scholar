@@ -7,12 +7,12 @@ existed under tests/scitex_scholar/gui/ beyond a smoke-import mirror, so
 this is new coverage written directly against the ported views):
 
   GET /               -> 200, title + favicon link present
-  GET /api/health      -> JSON {"status": "ok", "version", "db_available",
-                                "db_path"}
-  GET /api/graph/network   -> 400 without ?doi=, 503 with no DB configured
-  GET /api/graph/related   -> 503 with no DB configured
-  GET /api/graph/paper     -> 503 with no DB configured
-  GET /api/graph/health    -> 503 with no DB configured
+  GET /api/health      -> JSON {"status": "ok", "version", "api_available",
+                                "api_url"}
+  GET /api/graph/network   -> 400 without ?doi=, 503 with no API configured
+  GET /api/graph/related   -> 503 with no API configured
+  GET /api/graph/paper     -> 503 with no API configured
+  GET /api/graph/health    -> 503 with no API configured
 
 Uses Django's `RequestFactory` directly against the view functions
 (bypasses URL routing, same approach as scitex-writer's precedent at
@@ -144,7 +144,7 @@ def test_health_response_shape():
     # accidentally-added field fails here rather than reaching callers. It did
     # its job on 2026-08-23 -- adding "version" broke this test before it broke
     # anyone else, which is the whole point of asserting equality.
-    assert set(data.keys()) == {"status", "version", "db_available", "db_path"}
+    assert set(data.keys()) == {"status", "version", "api_available", "api_url"}
 
 
 def test_graph_network_requires_doi_param():
@@ -157,8 +157,8 @@ def test_graph_network_requires_doi_param():
     assert resp.status_code == 400
 
 
-@override_settings(CROSSREF_DB_PATH=None)
-def test_graph_network_returns_503_with_no_db_configured():
+@override_settings(CROSSREF_API_URL=None)
+def test_graph_network_returns_503_with_no_api_configured():
     # Arrange
     rf = RequestFactory()
     request = rf.get("/api/graph/network?doi=10.1038/s41586-020-2008-3")
@@ -178,8 +178,8 @@ def test_graph_related_requires_doi_param():
     assert resp.status_code == 400
 
 
-@override_settings(CROSSREF_DB_PATH=None)
-def test_graph_related_returns_503_with_no_db_configured():
+@override_settings(CROSSREF_API_URL=None)
+def test_graph_related_returns_503_with_no_api_configured():
     # Arrange
     rf = RequestFactory()
     request = rf.get("/api/graph/related?doi=10.1038/s41586-020-2008-3")
@@ -199,8 +199,8 @@ def test_graph_paper_requires_doi_param():
     assert resp.status_code == 400
 
 
-@override_settings(CROSSREF_DB_PATH=None)
-def test_graph_paper_returns_503_with_no_db_configured():
+@override_settings(CROSSREF_API_URL=None)
+def test_graph_paper_returns_503_with_no_api_configured():
     # Arrange
     rf = RequestFactory()
     request = rf.get("/api/graph/paper?doi=10.1038/s41586-020-2008-3")
@@ -210,8 +210,8 @@ def test_graph_paper_returns_503_with_no_db_configured():
     assert resp.status_code == 503
 
 
-@override_settings(CROSSREF_DB_PATH=None)
-def test_graph_health_returns_503_with_no_db_configured():
+@override_settings(CROSSREF_API_URL=None)
+def test_graph_health_returns_503_with_no_api_configured():
     # Arrange
     rf = RequestFactory()
     request = rf.get("/api/graph/health")

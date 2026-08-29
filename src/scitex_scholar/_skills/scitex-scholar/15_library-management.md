@@ -103,7 +103,7 @@ scitex-scholar library export PROJECT --format bibtex|tarball|flat-pdfs
 scitex-scholar library zotero {import,export,diff}
 
 # Database / integrity
-scitex-scholar library db {build,migrate,lookup,list,audit}
+scitex-scholar library db {build,lookup,list,audit}
 scitex-scholar library audit-files [--project P]
 ```
 

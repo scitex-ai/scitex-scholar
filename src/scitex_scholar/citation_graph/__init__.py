@@ -9,12 +9,14 @@ This module provides tools to:
 - Build citation network graphs
 - Export for visualization (D3.js, vis.js, Cytoscape)
 
-Example (local SQLite):
+Citation data is served by crossref-local over HTTP.
+
+Example (auto-detected endpoint):
     >>> from scitex_scholar.citation_graph import CitationGraphBuilder
-    >>> builder = CitationGraphBuilder(db_path="/path/to/crossref.db")
+    >>> builder = CitationGraphBuilder()
     >>> graph = builder.build("10.1038/s41586-020-2008-3", top_n=20)
 
-Example (HTTP via crossref-local):
+Example (explicit endpoint):
     >>> builder = CitationGraphBuilder(api_url="http://localhost:31291")
     >>> graph = builder.build("10.1038/s41586-020-2008-3", top_n=20)
 """

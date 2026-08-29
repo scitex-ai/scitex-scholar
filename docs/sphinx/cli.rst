@@ -183,7 +183,7 @@ Share
    scitex-scholar library export neurovista --format bibtex
    scitex-scholar library export neurovista --format flat-pdfs
 
-   # Bidirectional Zotero migration (local SQLite, no API key).
+   # Bidirectional Zotero migration (reads the local Zotero library, no API key).
    # Engine wired; verify on a real round-trip before relying on it.
    scitex-scholar library zotero import --project demo --collection demo
    scitex-scholar library zotero export --project demo
@@ -194,10 +194,9 @@ Database / integrity
 
 .. code-block:: bash
 
-   # SQLite index.
+   # Library index (derived from MASTER metadata; kept in the shared store).
    scitex-scholar library db build --dry-run
    scitex-scholar library db build
-   scitex-scholar library db migrate
    scitex-scholar library db lookup --doi 10.1/x --json
    scitex-scholar library db list --limit 20 --json
    scitex-scholar library db audit --json

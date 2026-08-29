@@ -30,7 +30,6 @@ from .library import (
     library_db_build,
     library_db_list,
     library_db_lookup,
-    library_db_migrate,
 )
 from .paper import (
     _do_paper_fetch,
@@ -193,16 +192,6 @@ def alias_db_build(ctx, library_root, verbose, dry_run, yes, as_json):
         yes=yes,
         as_json=as_json,
     )
-
-
-@alias_db_group.command("migrate")
-@click.option("--library-root", default=None, type=click.Path(path_type=Path))
-@click.option("--dry-run", is_flag=True)
-@click.option("--yes", "-y", is_flag=True)
-@click.pass_context
-def alias_db_migrate(ctx, library_root, dry_run, yes):
-    _alias_db_warn()
-    ctx.invoke(library_db_migrate, library_root=library_root, dry_run=dry_run, yes=yes)
 
 
 @alias_db_group.command("lookup")

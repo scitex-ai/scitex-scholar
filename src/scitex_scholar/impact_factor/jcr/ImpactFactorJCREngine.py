@@ -1,185 +1,235 @@
 #!/usr/bin/env python3
-# Timestamp: "2025-10-13 11:08:24 (ywatanabe)"
-# File: /home/ywatanabe/proj/scitex_repo/src/scitex/scholar/impact_factor/jcr/ImpactFactorJCREngine.py
+# File: src/scitex_scholar/impact_factor/jcr/ImpactFactorJCREngine.py
 # ----------------------------------------
 from __future__ import annotations
 
 import os
 
-__FILE__ = "./src/scitex/scholar/impact_factor/jcr/ImpactFactorJCREngine.py"
+__FILE__ = __file__
 __DIR__ = os.path.dirname(__FILE__)
 # ----------------------------------------
 
 """
 Functionalities:
-  - Query JCR database for journal impact factors
-  - Fast SQLite-based lookup
+  - Query the JCR journal table for impact factors
   - Returns impact factor, quartile, ISSN information
   - Handles missing data gracefully
 
-Dependencies:
-  - packages:
-    - sqlalchemy
-    - sql_manager
-
 IO:
-  - input-files:
-    - ../../data/impact_factor/impact_factor.db (SQLite database)
-  - output-files:
-    - None (read-only queries)
+  - input: the ``scholar_impact_factor`` table in the shared store
+    (:mod:`scitex_dev.store`), populated by ``build_database.py``
+  - output: none (read-only queries)
+
+WHY THE ROWS LIVE IN THE STORE
+------------------------------
+The JCR table is DERIVED STATE that scholar owns: a user's JCR Excel export
+turned into rows. It used to live in a file whose location three modules
+described three different ways, and whose default resolved OUTSIDE the
+repository after the monorepo split -- so every lookup failed, silently,
+for anyone who did not pass a path by hand. There is no path here any more:
+``host_store()`` resolves WHERE, and a store that cannot be reached raises
+naming the target instead of quietly answering "journal not found".
 """
 
 """Imports"""
 import argparse
-import functools
-
-# Suppress SQLAlchemy engine logs BEFORE importing sql_manager/sqlalchemy
-import logging as stdlib_logging
-from pathlib import Path
+import socket
 from typing import Dict, List, Optional
 
-stdlib_logging.getLogger("sqlalchemy").setLevel(stdlib_logging.WARNING)
-stdlib_logging.getLogger("sqlalchemy.engine").setLevel(stdlib_logging.WARNING)
-stdlib_logging.getLogger("sqlalchemy.engine.Engine").setLevel(stdlib_logging.WARNING)
-stdlib_logging.getLogger("sqlalchemy.pool").setLevel(stdlib_logging.WARNING)
-
 import scitex_logging as logging
-from sql_manager import DynamicModel, Manager
-from sqlalchemy import Column, Float, String, func
 
 logger = logging.getLogger(__name__)
 
-# `import scitex as stx` is moved into the demo trailer (run_main, ~L285)
-# to keep module-import umbrella-free per PA304.
-
 """Parameters"""
-# Use absolute path based on package location
-# __file__ is in: src/scitex/scholar/impact_factor/jcr/ImpactFactorJCREngine.py
-# We need: data/scholar/impact_factor/JCR_IF_2024.db (sibling to src/)
-_PACKAGE_DIR = Path(__file__).resolve().parent.parent.parent.parent.parent.parent
-DEFAULT_DB = _PACKAGE_DIR / "data" / "scholar" / "impact_factor" / "JCR_IF_2024.db"
+STORE_NAME = "impact_factor"
+TABLE = "scholar_impact_factor"
+
+SEARCH_KEYS = ["issn", "eissn", "nlm_id", "journal", "journal_abbr"]
 
 """Functions & Classes"""
-# Database model
-columns = {
-    "nlm_id": Column(String, comment="the unique ID of NLM", default="."),
-    "factor": Column(Float(3), comment="the IF of journal"),
-    "jcr": Column(String, comment="the partition of JCR", default="."),
-    "journal": Column(String, comment="the title of journal", primary_key=True),
-    "journal_abbr": Column(String, comment="the abbreviation of journal", default="."),
-    "issn": Column(String, comment="the ISSN of journal", default="."),
-    "eissn": Column(String, comment="the eISSN of journal", default="."),
-}
-
-FactorData = DynamicModel("Factor", columns, "factor")
-FactorManager = functools.partial(Manager, FactorData)
 
 
-# Utility functions
-def record_to_dict(record) -> Dict:
-    """Convert SQLAlchemy record to dictionary."""
+def schema():
+    """Build the JCR table's :class:`~scitex_dev.store.Schema`.
+
+    ``journal`` is the identity because JCR keys its export by journal
+    title, and ``IMMUTABLE`` because renaming a journal produces a new row
+    rather than silently rewriting the old one's history.
+    """
+    from scitex_dev.store import FieldKind, FieldPolicy, FieldRole, MergeRule, Schema
+
+    def ident(kind):
+        return FieldPolicy(
+            kind=kind,
+            role=FieldRole.IDENTITY,
+            required=True,
+            merge=MergeRule.IMMUTABLE,
+            indexed=False,
+        )
+
+    def data(kind, *, indexed: bool = False):
+        return FieldPolicy(
+            kind=kind,
+            role=FieldRole.DATA,
+            required=False,
+            merge=MergeRule.LAST_WRITER_WINS,
+            indexed=indexed,
+        )
+
+    text = FieldKind.TEXT
+    real = FieldKind.REAL
+
+    return Schema.build(
+        TABLE,
+        {
+            "journal": ident(text),
+            "journal_abbr": data(text, indexed=True),
+            "issn": data(text, indexed=True),
+            "eissn": data(text, indexed=True),
+            "nlm_id": data(text, indexed=True),
+            "factor": data(real),
+            "jcr": data(text),
+            "jcr_year": data(text),
+        },
+    )
+
+
+def store_target():
+    """Resolve WHERE the JCR rows live. Pure -- does not connect."""
+    from scitex_dev.store import host_store
+
+    return host_store(pkg="scitex_scholar", name=STORE_NAME)
+
+
+def open_store():
+    """Open the JCR store. Raises naming the target if it is unreachable."""
+    from scitex_dev.store import Store, WriterPolicy
+
+    return Store(
+        store_target(),
+        schema(),
+        node=socket.gethostname(),
+        writer_policy=WriterPolicy.MULTI_WRITER,
+        actor="scitex_scholar.impact_factor",
+    )
+
+
+def record_to_dict(values) -> Dict:
+    """Normalise one stored row into the shape every caller expects."""
     return {
-        "journal": record.journal,
-        "journal_abbr": record.journal_abbr,
-        "issn": record.issn,
-        "eissn": record.eissn,
-        "factor": record.factor,
-        "jcr": record.jcr,
-        "nlm_id": record.nlm_id,
+        "journal": values.get("journal"),
+        "journal_abbr": values.get("journal_abbr"),
+        "issn": values.get("issn"),
+        "eissn": values.get("eissn"),
+        "factor": values.get("factor"),
+        "jcr": values.get("jcr"),
+        "nlm_id": values.get("nlm_id"),
+        "jcr_year": values.get("jcr_year"),
     }
 
 
 class ImpactFactorJCREngine:
-    """
-    JCR database engine for impact factor lookup.
+    """JCR journal-metrics lookup over the shared store.
 
-    Fast SQLite-based queries for journal metrics.
+    Rows are read ONCE, on first query, and held in memory for the life of
+    the engine. That is deliberate: the store exposes lookup by identity and
+    a full scan, and four of the five searchable fields are not the identity,
+    so a per-query scan would re-read the whole table five times per paper.
+    The table is a JCR annual export -- tens of thousands of rows, static
+    between releases -- so one read is the right shape.
     """
 
     def __init__(self, dbfile=None):
-        """
-        Initialize JCR engine.
+        """Initialize the engine.
 
-        Args:
-            dbfile: Path to SQLite database (uses DEFAULT_DB if None)
+        ``dbfile`` is accepted and IGNORED. It named a file, and there is no
+        file; it stays in the signature only so existing call sites keep
+        working across this change, and should be dropped in a follow-up.
         """
-        self.dbfile = dbfile or DEFAULT_DB
-        # Disable SQL echo to reduce log verbosity
-        # Pass a WARNING-level logger to suppress sql_manager's verbose output
-        from simple_loggers import SimpleLogger
+        self._records: Optional[List[Dict]] = None
 
-        quiet_logger = SimpleLogger("Manager")
-        quiet_logger.setLevel(stdlib_logging.WARNING)
-        self.manager = FactorManager(self.dbfile, echo=False, logger=quiet_logger)
-        self.query = self.manager.session.query(FactorData)
+    @property
+    def store(self) -> str:
+        """Human-readable name of where the rows are read from."""
+        return str(store_target().locator)
+
+    @property
+    def records(self) -> List[Dict]:
+        """Every JCR row, read once and cached on the instance."""
+        if self._records is None:
+            store = open_store()
+            try:
+                self._records = [record_to_dict(row.values) for row in store.rows()]
+            finally:
+                store.close()
+        return self._records
+
+    @property
+    def jcr_year(self) -> Optional[str]:
+        """The JCR edition these rows came from, or None if unrecorded."""
+        for record in self.records:
+            if record.get("jcr_year"):
+                return str(record["jcr_year"])
+        return None
 
     def search(self, value: str, key: Optional[str] = None) -> List[Dict]:
-        """
-        Search for journal in database.
+        """Search for a journal.
 
         Args:
-            value: Search value (journal name, ISSN, etc.)
-            key: Specific field to search (None for all fields)
+            value: Search value (journal name, ISSN, ...). A ``%`` anywhere
+                in the value makes it a wildcard pattern.
+            key: Specific field to search (None tries every field in turn).
 
         Returns
         -------
-            List of matching journal records as dictionaries
+            List of matching journal records as dictionaries.
         """
-        from scitex_context import suppress_output
+        if not value:
+            return []
+        keys = [key] if key else SEARCH_KEYS
 
-        default_keys = ["issn", "eissn", "nlm_id", "journal", "journal_abbr"]
-        keys = [key] if key else default_keys
+        if "%" in value:
+            import fnmatch
 
-        # Suppress SQLAlchemy echo output during queries
-        with suppress_output():
-            for field in keys:
-                if "%" in value:
-                    result = self.query.filter(FactorData.__dict__[field].like(value))
-                else:
-                    result = self.query.filter(
-                        func.lower(FactorData.__dict__[field]) == func.lower(value)
-                    )
+            pattern = value.replace("%", "*").lower()
 
-                if result.count():
-                    data = [record_to_dict(record) for record in result]
-                    return data
+            def matches(field_value) -> bool:
+                return field_value is not None and fnmatch.fnmatch(
+                    str(field_value).lower(), pattern
+                )
 
+        else:
+            wanted = value.lower()
+
+            def matches(field_value) -> bool:
+                return field_value is not None and str(field_value).lower() == wanted
+
+        for field in keys:
+            hits = [r for r in self.records if matches(r.get(field))]
+            if hits:
+                return hits
         return []
 
-    def filter(self, min_value=None, max_value=None, limit=None):
-        """
-        Filter journals by impact factor range.
-
-        Args:
-            min_value: Minimum impact factor
-            max_value: Maximum impact factor
-            limit: Maximum number of results
-
-        Returns
-        -------
-            List of matching journal records
-        """
-        from scitex_context import suppress_output
-
-        # Suppress SQLAlchemy echo output during queries
-        with suppress_output():
-            query = self.query
-
-            if min_value is not None:
-                query = query.filter(FactorData.factor >= min_value)
-
-            if max_value is not None:
-                query = query.filter(FactorData.factor <= max_value)
-
-            if limit and query.count() > limit:
-                query = query.limit(limit)
-
-            return [record_to_dict(record) for record in query]
+    def filter(self, min_value=None, max_value=None, limit=None) -> List[Dict]:
+        """Filter journals by impact factor range."""
+        hits = []
+        for record in self.records:
+            factor = record.get("factor")
+            if factor is None:
+                continue
+            if min_value is not None and factor < min_value:
+                continue
+            if max_value is not None and factor > max_value:
+                continue
+            hits.append(record)
+        if limit:
+            return hits[:limit]
+        return hits
 
 
 def main(args):
     """Main function for CLI usage."""
-    engine = ImpactFactorJCREngine(args.database)
+    engine = ImpactFactorJCREngine()
 
     if args.search:
         results = engine.search(args.search, args.key)
@@ -216,14 +266,7 @@ def main(args):
 def parse_args() -> argparse.Namespace:
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(
-        description="Query JCR database for journal impact factors"
-    )
-    parser.add_argument(
-        "--database",
-        "-d",
-        type=str,
-        default=None,
-        help=f"Path to JCR database (default: {DEFAULT_DB})",
+        description="Query JCR journal metrics for impact factors"
     )
     parser.add_argument(
         "--search",
@@ -237,7 +280,7 @@ def parse_args() -> argparse.Namespace:
         "-k",
         type=str,
         default=None,
-        choices=["issn", "eissn", "nlm_id", "journal", "journal_abbr"],
+        choices=SEARCH_KEYS,
         help="Specific field to search (default: all fields)",
     )
     parser.add_argument(

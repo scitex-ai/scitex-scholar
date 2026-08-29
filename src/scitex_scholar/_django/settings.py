@@ -7,21 +7,20 @@ module and mount `scitex_scholar._django.urls` under their own prefix.
 
 Mirrors the `scitex_writer._django.settings` pattern: bare-minimum
 installed apps, optional `scitex_ui` for the shared workspace shell, and
-a SQLite database so any future models work out of the box.
+the fleet PostgreSQL so any future models work out of the box.
 
-`CROSSREF_DB_PATH` is resolved ONCE here at settings-load time (mirroring
-how the Flask `create_app()` resolved it once too) so `views.py` reads a
-plain setting instead of re-probing the filesystem on every request.
+`CROSSREF_API_URL` is resolved ONCE here at settings-load time (mirroring
+how the Flask `create_app()` resolved its backend once too) so `views.py`
+reads a plain setting instead of re-probing on every request.
 """
 
 from __future__ import annotations
 
 import os
 import secrets
-import tempfile
 from pathlib import Path
 
-from ._db import find_crossref_db
+from ._db import find_crossref_api_url
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -104,13 +103,29 @@ TEMPLATES = [
     },
 ]
 
-# SQLite lives in the temp dir so local runs don't pollute the project
-_DB_DIR = Path(tempfile.gettempdir()) / "scitex_scholar"
-_DB_DIR.mkdir(parents=True, exist_ok=True)
+# DJANGO'S ORM POINTS AT THE FLEET POSTGRESQL.
+#
+# This app declares no models of its own today, so nothing here opens a
+# connection during a normal request -- but the setting still has to name a
+# real, WRITABLE cluster, because the first model that appears would
+# otherwise inherit whatever the default was.
+#
+# `scitex-primary:55432` is the writable primary. Every per-host loopback on
+# 55432 is a READ-ONLY REPLICA of the same cluster and refuses writes, so
+# `127.0.0.1` must never be the default here: it would work for reads and
+# fail only on the first write, which is the worst possible time to find out.
+#
+# USER/PASSWORD default to empty, which makes libpq connect as the OS user
+# and consult ~/.pgpass -- the fleet's normal path. Override any field with
+# the matching SCITEX_SCHOLAR_DB_* environment variable.
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": str(_DB_DIR / "db.sqlite3"),
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("SCITEX_SCHOLAR_DB_NAME", "scitex"),
+        "HOST": os.environ.get("SCITEX_SCHOLAR_DB_HOST", "scitex-primary"),
+        "PORT": os.environ.get("SCITEX_SCHOLAR_DB_PORT", "55432"),
+        "USER": os.environ.get("SCITEX_SCHOLAR_DB_USER", ""),
+        "PASSWORD": os.environ.get("SCITEX_SCHOLAR_DB_PASSWORD", ""),
     }
 }
 
@@ -120,6 +135,6 @@ USE_TZ = True
 
 # Resolved once here (mirrors the Flask create_app() resolve-once
 # behaviour); views.py reads this setting rather than re-probing.
-CROSSREF_DB_PATH = find_crossref_db()
+CROSSREF_API_URL = find_crossref_api_url()
 
 # EOF
