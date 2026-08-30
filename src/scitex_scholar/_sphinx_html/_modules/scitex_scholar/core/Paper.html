@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scitex_scholar.core.Paper &mdash; SciTeX Scholar v1.4.1</title>
+  <title>scitex_scholar.core.Paper &mdash; SciTeX Scholar v1.9.0</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=350a9c04"></script>
+      <script src="../../../_static/documentation_options.js?v=c4cb232b"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -238,6 +238,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._save_to_cache"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._save_to_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_async"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_async()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_sync"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.refresh"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.ensure_loaded()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_source"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_source()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_issn"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_issn()</span></code></a></li>
@@ -251,13 +253,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.__init__"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.__init__()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_instance"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_instance()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._is_cache_valid"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._is_cache_valid()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._load_from_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._load_from_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._save_to_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._save_to_cache()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_async"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_async()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_sync"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.refresh"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.ensure_loaded()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_issn_l"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_issn_l()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.normalize"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.normalize()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_abbreviation"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_abbreviation()</span></code></a></li>
@@ -377,7 +378,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../api/citation_graph.html">scitex_scholar.citation_graph</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.__init__"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._auto_detect"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._auto_detect()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.build"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.build()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._create_paper_node"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._create_paper_node()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._build_citation_edges"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._build_citation_edges()</span></code></a></li>
@@ -502,26 +502,26 @@
              
   <h1>Source code for scitex_scholar.core.Paper</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
-<span class="c1"># Timestamp: &quot;2025-10-07 10:47:02 (ywatanabe)&quot;</span>
+<span class="c1"># Timestamp: "2025-10-07 10:47:02 (ywatanabe)"</span>
 <span class="c1"># File: /home/ywatanabe/proj/scitex_repo/src/scitex/scholar/core/Paper.py</span>
 <span class="c1"># ----------------------------------------</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
-<span class="n">__FILE__</span> <span class="o">=</span> <span class="s2">&quot;./src/scitex/scholar/core/Paper.py&quot;</span>
+<span class="n">__FILE__</span> <span class="o">=</span> <span class="s2">"./src/scitex/scholar/core/Paper.py"</span>
 <span class="n">__DIR__</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__FILE__</span><span class="p">)</span>
 <span class="c1"># ----------------------------------------</span>
 
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 <span class="sd">Type-safe metadata structures for Scholar papers with runtime validation.</span>
 
 <span class="sd">This module uses Pydantic for:</span>
 <span class="sd">- Runtime type validation</span>
 <span class="sd">- Automatic type coercion</span>
-<span class="sd">- JSON key aliasing (e.g., &quot;2025&quot; -&gt; y2025)</span>
+<span class="sd">- JSON key aliasing (e.g., "2025" -&gt; y2025)</span>
 <span class="sd">- Clean serialization/deserialization</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
@@ -532,7 +532,7 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">IDMetadata</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Identification metadata with source tracking.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Identification metadata with source tracking."""</span>
 
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">populate_by_name</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">validate_assignment</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -559,7 +559,7 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">BasicMetadata</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Basic bibliographic metadata with source tracking.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Basic bibliographic metadata with source tracking."""</span>
 
     <span class="n">title</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">title_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
@@ -579,90 +579,90 @@
     <span class="nb">type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># article, conference, preprint, etc.</span>
     <span class="n">type_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
 
-    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;year&quot;</span><span class="p">)</span>
+    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">"year"</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">validate_year</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate year is reasonable.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Validate year is reasonable."""</span>
         <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">v</span> <span class="o">&lt;</span> <span class="mi">1900</span> <span class="ow">or</span> <span class="n">v</span> <span class="o">&gt;</span> <span class="mi">2100</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Year </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2"> is outside reasonable range (1900-2100)&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Year </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2"> is outside reasonable range (1900-2100)"</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">v</span>
 
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">populate_by_name</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">validate_assignment</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">CitationCountMetadata</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Citation count metadata with yearly breakdown and source tracking.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Citation count metadata with yearly breakdown and source tracking."""</span>
 
     <span class="n">total</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">total_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
 
-    <span class="c1"># Yearly counts - use Field(alias=...) to map JSON &quot;2025&quot; to Python y2025</span>
-    <span class="n">y2025</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;2025&quot;</span><span class="p">)</span>
-    <span class="n">y2025_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;2025_engines&quot;</span><span class="p">)</span>
+    <span class="c1"># Yearly counts - use Field(alias=...) to map JSON "2025" to Python y2025</span>
+    <span class="n">y2025</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">"2025"</span><span class="p">)</span>
+    <span class="n">y2025_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">"2025_engines"</span><span class="p">)</span>
 
-    <span class="n">y2024</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;2024&quot;</span><span class="p">)</span>
-    <span class="n">y2024_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;2024_engines&quot;</span><span class="p">)</span>
+    <span class="n">y2024</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">"2024"</span><span class="p">)</span>
+    <span class="n">y2024_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">"2024_engines"</span><span class="p">)</span>
 
-    <span class="n">y2023</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;2023&quot;</span><span class="p">)</span>
-    <span class="n">y2023_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;2023_engines&quot;</span><span class="p">)</span>
+    <span class="n">y2023</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">"2023"</span><span class="p">)</span>
+    <span class="n">y2023_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">"2023_engines"</span><span class="p">)</span>
 
-    <span class="n">y2022</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;2022&quot;</span><span class="p">)</span>
-    <span class="n">y2022_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;2022_engines&quot;</span><span class="p">)</span>
+    <span class="n">y2022</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">"2022"</span><span class="p">)</span>
+    <span class="n">y2022_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">"2022_engines"</span><span class="p">)</span>
 
-    <span class="n">y2021</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;2021&quot;</span><span class="p">)</span>
-    <span class="n">y2021_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;2021_engines&quot;</span><span class="p">)</span>
+    <span class="n">y2021</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">"2021"</span><span class="p">)</span>
+    <span class="n">y2021_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">"2021_engines"</span><span class="p">)</span>
 
-    <span class="n">y2020</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;2020&quot;</span><span class="p">)</span>
-    <span class="n">y2020_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;2020_engines&quot;</span><span class="p">)</span>
+    <span class="n">y2020</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">"2020"</span><span class="p">)</span>
+    <span class="n">y2020_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">"2020_engines"</span><span class="p">)</span>
 
-    <span class="n">y2019</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;2019&quot;</span><span class="p">)</span>
-    <span class="n">y2019_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;2019_engines&quot;</span><span class="p">)</span>
+    <span class="n">y2019</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">"2019"</span><span class="p">)</span>
+    <span class="n">y2019_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">"2019_engines"</span><span class="p">)</span>
 
-    <span class="n">y2018</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;2018&quot;</span><span class="p">)</span>
-    <span class="n">y2018_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;2018_engines&quot;</span><span class="p">)</span>
+    <span class="n">y2018</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">"2018"</span><span class="p">)</span>
+    <span class="n">y2018_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">"2018_engines"</span><span class="p">)</span>
 
-    <span class="n">y2017</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;2017&quot;</span><span class="p">)</span>
-    <span class="n">y2017_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;2017_engines&quot;</span><span class="p">)</span>
+    <span class="n">y2017</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">"2017"</span><span class="p">)</span>
+    <span class="n">y2017_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">"2017_engines"</span><span class="p">)</span>
 
-    <span class="n">y2016</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;2016&quot;</span><span class="p">)</span>
-    <span class="n">y2016_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;2016_engines&quot;</span><span class="p">)</span>
+    <span class="n">y2016</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">"2016"</span><span class="p">)</span>
+    <span class="n">y2016_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">"2016_engines"</span><span class="p">)</span>
 
-    <span class="n">y2015</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;2015&quot;</span><span class="p">)</span>
-    <span class="n">y2015_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;2015_engines&quot;</span><span class="p">)</span>
+    <span class="n">y2015</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">"2015"</span><span class="p">)</span>
+    <span class="n">y2015_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">"2015_engines"</span><span class="p">)</span>
 
     <span class="nd">@field_validator</span><span class="p">(</span>
-        <span class="s2">&quot;total&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;y2025&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;y2024&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;y2023&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;y2022&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;y2021&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;y2020&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;y2019&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;y2018&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;y2017&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;y2016&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;y2015&quot;</span><span class="p">,</span>
+        <span class="s2">"total"</span><span class="p">,</span>
+        <span class="s2">"y2025"</span><span class="p">,</span>
+        <span class="s2">"y2024"</span><span class="p">,</span>
+        <span class="s2">"y2023"</span><span class="p">,</span>
+        <span class="s2">"y2022"</span><span class="p">,</span>
+        <span class="s2">"y2021"</span><span class="p">,</span>
+        <span class="s2">"y2020"</span><span class="p">,</span>
+        <span class="s2">"y2019"</span><span class="p">,</span>
+        <span class="s2">"y2018"</span><span class="p">,</span>
+        <span class="s2">"y2017"</span><span class="p">,</span>
+        <span class="s2">"y2016"</span><span class="p">,</span>
+        <span class="s2">"y2015"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">validate_citation_counts</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate citation counts are non-negative.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Validate citation counts are non-negative."""</span>
         <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">v</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Citation count cannot be negative: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Citation count cannot be negative: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">v</span>
 
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">populate_by_name</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">validate_assignment</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">model_dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Custom serialization to use aliases in output.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Custom serialization to use aliases in output."""</span>
         <span class="c1"># Remove by_alias from kwargs if present to avoid duplicate</span>
-        <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;by_alias&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"by_alias"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">data</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">PublicationMetadata</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Publication venue metadata with source tracking.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Publication venue metadata with source tracking."""</span>
 
     <span class="n">journal</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">journal_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
@@ -694,19 +694,19 @@
     <span class="n">publisher</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">publisher_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
 
-    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;impact_factor&quot;</span><span class="p">)</span>
+    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">"impact_factor"</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">validate_impact_factor</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate impact factor is non-negative.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Validate impact factor is non-negative."""</span>
         <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">v</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Impact factor cannot be negative: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Impact factor cannot be negative: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">v</span>
 
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">populate_by_name</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">validate_assignment</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">URLMetadata</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;URL metadata with source tracking.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""URL metadata with source tracking."""</span>
 
     <span class="n">doi</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">doi_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
@@ -739,7 +739,7 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">PathMetadata</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Local file path metadata with source tracking.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Local file path metadata with source tracking."""</span>
 
     <span class="n">pdfs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
     <span class="n">pdfs_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
@@ -754,11 +754,11 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">AccessMetadata</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Open access and licensing metadata with source tracking.</span>
+<span class="w">    </span><span class="sd">"""Open access and licensing metadata with source tracking.</span>
 
 <span class="sd">    Tracks whether a paper is open access and provides URLs for OA versions.</span>
 <span class="sd">    Also includes license information when available.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">is_open_access</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">is_open_access_engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
@@ -788,7 +788,7 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">SystemMetadata</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;System tracking metadata (which engines were used to search).&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""System tracking metadata (which engines were used to search)."""</span>
 
     <span class="n">searched_by_arXiv</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">searched_by_CrossRef</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -802,7 +802,7 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">PaperMetadataStructure</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Complete paper metadata structure with nested typed sections.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Complete paper metadata structure with nested typed sections."""</span>
 
     <span class="nb">id</span><span class="p">:</span> <span class="n">IDMetadata</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">IDMetadata</span><span class="p">)</span>
     <span class="n">basic</span><span class="p">:</span> <span class="n">BasicMetadata</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">BasicMetadata</span><span class="p">)</span>
@@ -815,150 +815,150 @@
 
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">populate_by_name</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">validate_assignment</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"after"</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">sync_ids_and_urls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Automatically sync ID and URL fields with source tracking.</span>
+<span class="w">        </span><span class="sd">"""Automatically sync ID and URL fields with source tracking.</span>
 
 <span class="sd">        Generates URLs from IDs and vice versa for:</span>
 <span class="sd">        - DOI ↔ url.doi</span>
 <span class="sd">        - arXiv ID ↔ url.arxiv</span>
 <span class="sd">        - Corpus ID ↔ url.corpus_id</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># DOI sync</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">doi</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://doi.org/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">doi</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"https://doi.org/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">doi</span><span class="si">}</span><span class="s2">"</span>
             <span class="k">if</span> <span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">doi_engines</span>
-                <span class="ow">and</span> <span class="s2">&quot;PaperMetadataStructure&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi_engines</span>
+                <span class="ow">and</span> <span class="s2">"PaperMetadataStructure"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi_engines</span>
             <span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi_engines</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">doi_engines</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">doi_engines</span> <span class="k">else</span> <span class="p">[]</span>
                 <span class="p">)</span>
-                <span class="k">if</span> <span class="s2">&quot;PaperMetadataStructure&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi_engines</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi_engines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;PaperMetadataStructure&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s2">"PaperMetadataStructure"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi_engines</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi_engines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"PaperMetadataStructure"</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">doi</span><span class="p">:</span>
             <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi</span>
-            <span class="k">if</span> <span class="s2">&quot;doi.org/&quot;</span> <span class="ow">in</span> <span class="n">url</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">doi</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;doi.org/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">"doi.org/"</span> <span class="ow">in</span> <span class="n">url</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">doi</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"doi.org/"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
                 <span class="k">if</span> <span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi_engines</span>
-                    <span class="ow">and</span> <span class="s2">&quot;PaperMetadataStructure&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">doi_engines</span>
+                    <span class="ow">and</span> <span class="s2">"PaperMetadataStructure"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">doi_engines</span>
                 <span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">doi_engines</span> <span class="o">=</span> <span class="p">(</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi_engines</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi_engines</span> <span class="k">else</span> <span class="p">[]</span>
                     <span class="p">)</span>
-                    <span class="k">if</span> <span class="s2">&quot;PaperMetadataStructure&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">doi_engines</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">doi_engines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;PaperMetadataStructure&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="s2">"PaperMetadataStructure"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">doi_engines</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">doi_engines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"PaperMetadataStructure"</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">doi</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;https://&quot;</span><span class="p">):</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;http://&quot;</span><span class="p">):</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi</span> <span class="o">=</span> <span class="s2">&quot;https://&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi</span><span class="p">[</span><span class="mi">7</span><span class="p">:]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"https://"</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"http://"</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi</span> <span class="o">=</span> <span class="s2">"https://"</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi</span><span class="p">[</span><span class="mi">7</span><span class="p">:]</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://doi.org/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">doi</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"https://doi.org/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">doi</span><span class="si">}</span><span class="s2">"</span>
 
         <span class="c1"># arXiv sync</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">arxiv_id</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">arxiv</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">arxiv</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://arxiv.org/abs/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">arxiv_id</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">arxiv</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"https://arxiv.org/abs/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">arxiv_id</span><span class="si">}</span><span class="s2">"</span>
             <span class="k">if</span> <span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">arxiv_id_engines</span>
-                <span class="ow">and</span> <span class="s2">&quot;PaperMetadataStructure&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">arxiv_engines</span>
+                <span class="ow">and</span> <span class="s2">"PaperMetadataStructure"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">arxiv_engines</span>
             <span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">arxiv_engines</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">arxiv_id_engines</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">arxiv_id_engines</span> <span class="k">else</span> <span class="p">[]</span>
                 <span class="p">)</span>
-                <span class="k">if</span> <span class="s2">&quot;PaperMetadataStructure&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">arxiv_engines</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">arxiv_engines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;PaperMetadataStructure&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s2">"PaperMetadataStructure"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">arxiv_engines</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">arxiv_engines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"PaperMetadataStructure"</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">arxiv</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">arxiv_id</span><span class="p">:</span>
             <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">arxiv</span>
-            <span class="k">if</span> <span class="s2">&quot;arxiv.org/abs/&quot;</span> <span class="ow">in</span> <span class="n">url</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">"arxiv.org/abs/"</span> <span class="ow">in</span> <span class="n">url</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">arxiv_id</span> <span class="o">=</span> <span class="p">(</span>
-                    <span class="n">url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;arxiv.org/abs/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"arxiv.org/abs/"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"?"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"#"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="p">)</span>
                 <span class="k">if</span> <span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">arxiv_engines</span>
-                    <span class="ow">and</span> <span class="s2">&quot;PaperMetadataStructure&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">arxiv_id_engines</span>
+                    <span class="ow">and</span> <span class="s2">"PaperMetadataStructure"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">arxiv_id_engines</span>
                 <span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">arxiv_id_engines</span> <span class="o">=</span> <span class="p">(</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">arxiv_engines</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">arxiv_engines</span> <span class="k">else</span> <span class="p">[]</span>
                     <span class="p">)</span>
-                    <span class="k">if</span> <span class="s2">&quot;PaperMetadataStructure&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">arxiv_id_engines</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">arxiv_id_engines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;PaperMetadataStructure&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="s2">"PaperMetadataStructure"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">arxiv_id_engines</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">arxiv_id_engines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"PaperMetadataStructure"</span><span class="p">)</span>
 
         <span class="c1"># Corpus ID sync</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">corpus_id</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">corpus_id</span><span class="p">:</span>
-            <span class="n">corpus_id_clean</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">corpus_id</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;CorpusId:&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">corpus_id_clean</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">corpus_id</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"CorpusId:"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">corpus_id</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;https://www.semanticscholar.org/paper/</span><span class="si">{</span><span class="n">corpus_id_clean</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"https://www.semanticscholar.org/paper/</span><span class="si">{</span><span class="n">corpus_id_clean</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">corpus_id_engines</span>
-                <span class="ow">and</span> <span class="s2">&quot;PaperMetadataStructure&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">corpus_id_engines</span>
+                <span class="ow">and</span> <span class="s2">"PaperMetadataStructure"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">corpus_id_engines</span>
             <span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">corpus_id_engines</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">corpus_id_engines</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
                     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">corpus_id_engines</span>
                     <span class="k">else</span> <span class="p">[]</span>
                 <span class="p">)</span>
-                <span class="k">if</span> <span class="s2">&quot;PaperMetadataStructure&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">corpus_id_engines</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">corpus_id_engines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;PaperMetadataStructure&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s2">"PaperMetadataStructure"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">corpus_id_engines</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">corpus_id_engines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"PaperMetadataStructure"</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">corpus_id</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">corpus_id</span><span class="p">:</span>
             <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">corpus_id</span>
-            <span class="k">if</span> <span class="s2">&quot;semanticscholar.org/paper/&quot;</span> <span class="ow">in</span> <span class="n">url</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">"semanticscholar.org/paper/"</span> <span class="ow">in</span> <span class="n">url</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">corpus_id</span> <span class="o">=</span> <span class="p">(</span>
-                    <span class="n">url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;semanticscholar.org/paper/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-                    <span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"semanticscholar.org/paper/"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"?"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"#"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="p">)</span>
                 <span class="k">if</span> <span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">corpus_id_engines</span>
-                    <span class="ow">and</span> <span class="s2">&quot;PaperMetadataStructure&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">corpus_id_engines</span>
+                    <span class="ow">and</span> <span class="s2">"PaperMetadataStructure"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">corpus_id_engines</span>
                 <span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">corpus_id_engines</span> <span class="o">=</span> <span class="p">(</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">corpus_id_engines</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
                         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">corpus_id_engines</span>
                         <span class="k">else</span> <span class="p">[]</span>
                     <span class="p">)</span>
-                    <span class="k">if</span> <span class="s2">&quot;PaperMetadataStructure&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">corpus_id_engines</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">corpus_id_engines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;PaperMetadataStructure&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="s2">"PaperMetadataStructure"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">corpus_id_engines</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">corpus_id_engines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"PaperMetadataStructure"</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">set_doi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doi</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set DOI and automatically sync URL.</span>
+<span class="w">        </span><span class="sd">"""Set DOI and automatically sync URL.</span>
 
 <span class="sd">        Use this method instead of direct assignment for automatic sync.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">doi</span> <span class="o">=</span> <span class="n">doi</span>
         <span class="k">if</span> <span class="n">doi</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://doi.org/</span><span class="si">{</span><span class="n">doi</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"https://doi.org/</span><span class="si">{</span><span class="n">doi</span><span class="si">}</span><span class="s2">"</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">set_doi_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set DOI URL and automatically extract/sync DOI.</span>
+<span class="w">        </span><span class="sd">"""Set DOI URL and automatically extract/sync DOI.</span>
 
 <span class="sd">        Use this method instead of direct assignment for automatic sync.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi</span> <span class="o">=</span> <span class="n">url</span>
-        <span class="k">if</span> <span class="n">url</span> <span class="ow">and</span> <span class="s2">&quot;doi.org/&quot;</span> <span class="ow">in</span> <span class="n">url</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">doi</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;doi.org/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">url</span> <span class="ow">and</span> <span class="s2">"doi.org/"</span> <span class="ow">in</span> <span class="n">url</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">doi</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"doi.org/"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">model_dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Custom serialization to ensure nested models use aliases.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Custom serialization to ensure nested models use aliases."""</span>
         <span class="c1"># Remove by_alias from kwargs if present to avoid duplicate</span>
-        <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;by_alias&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"by_alias"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
-            <span class="s2">&quot;basic&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
-            <span class="s2">&quot;citation_count&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">citation_count</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
-            <span class="s2">&quot;publication&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">publication</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
-            <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
-            <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
-            <span class="s2">&quot;access&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
-            <span class="s2">&quot;system&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
+            <span class="s2">"id"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
+            <span class="s2">"basic"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
+            <span class="s2">"citation_count"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">citation_count</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
+            <span class="s2">"publication"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">publication</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
+            <span class="s2">"url"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
+            <span class="s2">"path"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
+            <span class="s2">"access"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
+            <span class="s2">"system"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
         <span class="p">}</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">ContainerMetadata</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Container metadata for system tracking.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Container metadata for system tracking."""</span>
 
     <span class="n">scitex_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">library_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -973,12 +973,12 @@
     <span class="n">pdf_size_bytes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">pdf_sha256</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># optional scitex-clew provenance hash</span>
 
-    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;pdf_size_bytes&quot;</span><span class="p">)</span>
+    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">"pdf_size_bytes"</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">validate_pdf_size</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate PDF size is non-negative.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Validate PDF size is non-negative."""</span>
         <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">v</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PDF size cannot be negative: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"PDF size cannot be negative: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">v</span>
 
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">populate_by_name</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">validate_assignment</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -987,7 +987,7 @@
 <div class="viewcode-block" id="Paper">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.core.Paper">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Paper</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Complete paper with metadata and container.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Complete paper with metadata and container."""</span>
 
     <span class="n">metadata</span><span class="p">:</span> <span class="n">PaperMetadataStructure</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">PaperMetadataStructure</span><span class="p">)</span>
     <span class="n">container</span><span class="p">:</span> <span class="n">ContainerMetadata</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">ContainerMetadata</span><span class="p">)</span>
@@ -997,12 +997,12 @@
 <div class="viewcode-block" id="Paper.model_dump">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.core.Paper.model_dump">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">model_dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Custom serialization to ensure all nested models use aliases.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Custom serialization to ensure all nested models use aliases."""</span>
         <span class="c1"># Remove by_alias from kwargs if present to avoid duplicate</span>
-        <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;by_alias&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"by_alias"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
-            <span class="s2">&quot;container&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
+            <span class="s2">"metadata"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
+            <span class="s2">"container"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
         <span class="p">}</span></div>
 
 
@@ -1010,23 +1010,23 @@
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.core.Paper.from_dict">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Paper</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create from dictionary (for loading from JSON).</span>
+<span class="w">        </span><span class="sd">"""Create from dictionary (for loading from JSON).</span>
 
-<span class="sd">        Uses Pydantic&#39;s model_validate which handles:</span>
+<span class="sd">        Uses Pydantic's model_validate which handles:</span>
 <span class="sd">        - Type validation</span>
-<span class="sd">        - Type coercion (e.g., &quot;2024&quot; -&gt; 2024)</span>
-<span class="sd">        - Field aliases (e.g., &quot;2025&quot; -&gt; y2025)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        - Type coercion (e.g., "2024" -&gt; 2024)</span>
+<span class="sd">        - Field aliases (e.g., "2025" -&gt; y2025)</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Paper.to_dict">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.core.Paper.to_dict">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert to dictionary for JSON serialization.</span>
+<span class="w">        </span><span class="sd">"""Convert to dictionary for JSON serialization.</span>
 
 <span class="sd">        Alias for model_dump() for backward compatibility.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_dump</span><span class="p">()</span></div>
 
 
@@ -1037,7 +1037,7 @@
         <span class="n">use_unpaywall</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">update_metadata</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OAResult</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Detect open access status for this paper.</span>
 
 <span class="sd">        Uses identifiers (DOI, arXiv ID, PMCID) and known OA sources</span>
@@ -1050,7 +1050,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">            OAResult with detection results</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">.open_access</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_oa_status</span>
 
         <span class="n">result</span> <span class="o">=</span> <span class="n">check_oa_status</span><span class="p">(</span>
@@ -1066,20 +1066,20 @@
         <span class="k">if</span> <span class="n">update_metadata</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">access</span><span class="o">.</span><span class="n">is_open_access</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">is_open_access</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">access</span><span class="o">.</span><span class="n">is_open_access_engines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;detect_oa:</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">source</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"detect_oa:</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">source</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">status</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">access</span><span class="o">.</span><span class="n">oa_status</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">value</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">access</span><span class="o">.</span><span class="n">oa_status_engines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;detect_oa:</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">source</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">"detect_oa:</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">source</span><span class="si">}</span><span class="s2">"</span>
                 <span class="p">)</span>
             <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">oa_url</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">access</span><span class="o">.</span><span class="n">oa_url</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">oa_url</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">access</span><span class="o">.</span><span class="n">oa_url_engines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;detect_oa:</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">source</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">access</span><span class="o">.</span><span class="n">oa_url_engines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"detect_oa:</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">source</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">license</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">access</span><span class="o">.</span><span class="n">license</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">license</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">access</span><span class="o">.</span><span class="n">license_engines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;detect_oa:</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">source</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">"detect_oa:</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">source</span><span class="si">}</span><span class="s2">"</span>
                 <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">result</span></div>
@@ -1087,7 +1087,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">is_open_access</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if paper is open access (quick check without API calls).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Check if paper is open access (quick check without API calls)."""</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">access</span><span class="o">.</span><span class="n">is_open_access</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">access</span><span class="o">.</span><span class="n">is_open_access</span>
 
@@ -1103,134 +1103,134 @@
 
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">80</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Paper Class - Pydantic Type-Safe Metadata with Runtime Validation&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">80</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">80</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Paper Class - Pydantic Type-Safe Metadata with Runtime Validation"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">80</span><span class="p">)</span>
 
     <span class="c1"># 1. Create empty paper</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">1. Create empty Paper:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">1. Create empty Paper:"</span><span class="p">)</span>
     <span class="n">paper</span> <span class="o">=</span> <span class="n">Paper</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Empty paper created: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">paper</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Empty paper created: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">paper</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="c1"># 2. Set basic metadata</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">2. Set basic metadata:&quot;</span><span class="p">)</span>
-    <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Attention Is All You Need&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">2. Set basic metadata:"</span><span class="p">)</span>
+    <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="s2">"Attention Is All You Need"</span>
     <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">authors</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;Vaswani, Ashish&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Shazeer, Noam&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Parmar, Niki&quot;</span><span class="p">,</span>
+        <span class="s2">"Vaswani, Ashish"</span><span class="p">,</span>
+        <span class="s2">"Shazeer, Noam"</span><span class="p">,</span>
+        <span class="s2">"Parmar, Niki"</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="mi">2017</span>
-    <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">abstract</span> <span class="o">=</span> <span class="s2">&quot;The dominant sequence transduction models are based on complex recurrent or convolutional neural networks.&quot;</span>
+    <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">abstract</span> <span class="o">=</span> <span class="s2">"The dominant sequence transduction models are based on complex recurrent or convolutional neural networks."</span>
     <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">keywords</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;transformer&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;attention&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;neural networks&quot;</span><span class="p">,</span>
+        <span class="s2">"transformer"</span><span class="p">,</span>
+        <span class="s2">"attention"</span><span class="p">,</span>
+        <span class="s2">"neural networks"</span><span class="p">,</span>
     <span class="p">]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Title: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Authors: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">authors</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Year: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Title: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Authors: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">authors</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s2">..."</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Year: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">year</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="c1"># 3. Set DOI (auto-syncs URL)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">3. Set DOI (auto-syncs DOI URL):&quot;</span><span class="p">)</span>
-    <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">set_doi</span><span class="p">(</span><span class="s2">&quot;10.48550/arXiv.1706.03762&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   DOI: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">doi</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   DOI URL (auto-synced): </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">3. Set DOI (auto-syncs DOI URL):"</span><span class="p">)</span>
+    <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">set_doi</span><span class="p">(</span><span class="s2">"10.48550/arXiv.1706.03762"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   DOI: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">doi</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   DOI URL (auto-synced): </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="c1"># 4. Set publication details</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">4. Set publication details:&quot;</span><span class="p">)</span>
-    <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">publication</span><span class="o">.</span><span class="n">journal</span> <span class="o">=</span> <span class="s2">&quot;NeurIPS&quot;</span>
-    <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">publication</span><span class="o">.</span><span class="n">volume</span> <span class="o">=</span> <span class="s2">&quot;30&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">4. Set publication details:"</span><span class="p">)</span>
+    <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">publication</span><span class="o">.</span><span class="n">journal</span> <span class="o">=</span> <span class="s2">"NeurIPS"</span>
+    <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">publication</span><span class="o">.</span><span class="n">volume</span> <span class="o">=</span> <span class="s2">"30"</span>
     <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">publication</span><span class="o">.</span><span class="n">impact_factor</span> <span class="o">=</span> <span class="mf">12.345</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Journal: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">publication</span><span class="o">.</span><span class="n">journal</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Volume: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">publication</span><span class="o">.</span><span class="n">volume</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Impact Factor: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">publication</span><span class="o">.</span><span class="n">impact_factor</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Journal: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">publication</span><span class="o">.</span><span class="n">journal</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Volume: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">publication</span><span class="o">.</span><span class="n">volume</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Impact Factor: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">publication</span><span class="o">.</span><span class="n">impact_factor</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="c1"># 5. Set citation counts with year breakdown</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">5. Set citation counts:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">5. Set citation counts:"</span><span class="p">)</span>
     <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">citation_count</span><span class="o">.</span><span class="n">total</span> <span class="o">=</span> <span class="mi">85432</span>
     <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">citation_count</span><span class="o">.</span><span class="n">y2024</span> <span class="o">=</span> <span class="mi">15234</span>
     <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">citation_count</span><span class="o">.</span><span class="n">y2023</span> <span class="o">=</span> <span class="mi">18765</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Total citations: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">citation_count</span><span class="o">.</span><span class="n">total</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   2024 citations: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">citation_count</span><span class="o">.</span><span class="n">y2024</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   2023 citations: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">citation_count</span><span class="o">.</span><span class="n">y2023</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Total citations: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">citation_count</span><span class="o">.</span><span class="n">total</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   2024 citations: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">citation_count</span><span class="o">.</span><span class="n">y2024</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   2023 citations: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">citation_count</span><span class="o">.</span><span class="n">y2023</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="c1"># 6. Set container metadata</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">6. Set container metadata:&quot;</span><span class="p">)</span>
-    <span class="n">paper</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">projects</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;transformers_research&quot;</span><span class="p">,</span> <span class="s2">&quot;nlp_2024&quot;</span><span class="p">]</span>
-    <span class="n">paper</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">library_id</span> <span class="o">=</span> <span class="s2">&quot;ABC12345&quot;</span>
-    <span class="n">paper</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">readable_name</span> <span class="o">=</span> <span class="s2">&quot;Vaswani-2017-NeurIPS&quot;</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Projects: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">projects</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Library ID: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">library_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Readable name: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">readable_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">6. Set container metadata:"</span><span class="p">)</span>
+    <span class="n">paper</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">projects</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"transformers_research"</span><span class="p">,</span> <span class="s2">"nlp_2024"</span><span class="p">]</span>
+    <span class="n">paper</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">library_id</span> <span class="o">=</span> <span class="s2">"ABC12345"</span>
+    <span class="n">paper</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">readable_name</span> <span class="o">=</span> <span class="s2">"Vaswani-2017-NeurIPS"</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Projects: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">projects</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Library ID: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">library_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Readable name: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">readable_name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="c1"># 7. Demonstrate type validation</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">7. Type validation (validate_assignment=True):&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;   ✓ Automatic type coercion: year=&#39;2017&#39; -&gt; 2017 (int)&quot;</span><span class="p">)</span>
-    <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="s2">&quot;2017&quot;</span>  <span class="c1"># String coerced to int</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">7. Type validation (validate_assignment=True):"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"   ✓ Automatic type coercion: year='2017' -&gt; 2017 (int)"</span><span class="p">)</span>
+    <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="s2">"2017"</span>  <span class="c1"># String coerced to int</span>
     <span class="nb">print</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;     Result: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">year</span><span class="si">}</span><span class="s2"> (type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">year</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="sa">f</span><span class="s2">"     Result: </span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">year</span><span class="si">}</span><span class="s2"> (type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">year</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">)"</span>
     <span class="p">)</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;   ✓ Range validation: year must be 1900-2100&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"   ✓ Range validation: year must be 1900-2100"</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="mi">1800</span>  <span class="c1"># Too old</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     ERROR: Should have raised ValidationError&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"     ERROR: Should have raised ValidationError"</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;     Correctly rejected: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"     Correctly rejected: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;   ✓ Non-negative validation: citations cannot be negative&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"   ✓ Non-negative validation: citations cannot be negative"</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">citation_count</span><span class="o">.</span><span class="n">total</span> <span class="o">=</span> <span class="o">-</span><span class="mi">100</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     ERROR: Should have raised ValidationError&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"     ERROR: Should have raised ValidationError"</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;     Correctly rejected: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"     Correctly rejected: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="c1"># Reset to valid value</span>
     <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="mi">2017</span>
     <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">citation_count</span><span class="o">.</span><span class="n">total</span> <span class="o">=</span> <span class="mi">85432</span>
 
     <span class="c1"># 8. Serialize to JSON (with aliases)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">8. Serialize to JSON with field aliases:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">8. Serialize to JSON with field aliases:"</span><span class="p">)</span>
     <span class="n">paper_dict</span> <span class="o">=</span> <span class="n">paper</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;   Year fields use numeric keys in JSON:&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;     &#39;2024&#39;: </span><span class="si">{</span><span class="n">paper_dict</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;citation_count&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;2024&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;     &#39;2023&#39;: </span><span class="si">{</span><span class="n">paper_dict</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;citation_count&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;2023&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"   Year fields use numeric keys in JSON:"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"     '2024': </span><span class="si">{</span><span class="n">paper_dict</span><span class="p">[</span><span class="s1">'metadata'</span><span class="p">][</span><span class="s1">'citation_count'</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'2024'</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"     '2023': </span><span class="si">{</span><span class="n">paper_dict</span><span class="p">[</span><span class="s1">'metadata'</span><span class="p">][</span><span class="s1">'citation_count'</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'2023'</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="c1"># 9. Create from dictionary</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">9. Load from dictionary (from_dict):&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">9. Load from dictionary (from_dict):"</span><span class="p">)</span>
     <span class="n">sample_data</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;basic&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;BERT: Pre-training of Deep Bidirectional Transformers&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;year&quot;</span><span class="p">:</span> <span class="mi">2019</span><span class="p">,</span>
+        <span class="s2">"metadata"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"basic"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"title"</span><span class="p">:</span> <span class="s2">"BERT: Pre-training of Deep Bidirectional Transformers"</span><span class="p">,</span>
+                <span class="s2">"year"</span><span class="p">:</span> <span class="mi">2019</span><span class="p">,</span>
             <span class="p">},</span>
-            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;doi&quot;</span><span class="p">:</span> <span class="s2">&quot;10.18653/v1/N19-1423&quot;</span><span class="p">},</span>
-            <span class="s2">&quot;citation_count&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;2024&quot;</span><span class="p">:</span> <span class="mi">5678</span><span class="p">,</span>  <span class="c1"># Numeric key maps to y2024</span>
-                <span class="s2">&quot;total&quot;</span><span class="p">:</span> <span class="mi">45000</span><span class="p">,</span>
+            <span class="s2">"id"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"doi"</span><span class="p">:</span> <span class="s2">"10.18653/v1/N19-1423"</span><span class="p">},</span>
+            <span class="s2">"citation_count"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"2024"</span><span class="p">:</span> <span class="mi">5678</span><span class="p">,</span>  <span class="c1"># Numeric key maps to y2024</span>
+                <span class="s2">"total"</span><span class="p">:</span> <span class="mi">45000</span><span class="p">,</span>
             <span class="p">},</span>
         <span class="p">}</span>
     <span class="p">}</span>
 
     <span class="n">paper2</span> <span class="o">=</span> <span class="n">Paper</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">sample_data</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Title: </span><span class="si">{</span><span class="n">paper2</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Year: </span><span class="si">{</span><span class="n">paper2</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   DOI: </span><span class="si">{</span><span class="n">paper2</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">doi</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   DOI URL (auto-synced): </span><span class="si">{</span><span class="n">paper2</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   2024 citations: </span><span class="si">{</span><span class="n">paper2</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">citation_count</span><span class="o">.</span><span class="n">y2024</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Title: </span><span class="si">{</span><span class="n">paper2</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Year: </span><span class="si">{</span><span class="n">paper2</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">year</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   DOI: </span><span class="si">{</span><span class="n">paper2</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">doi</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   DOI URL (auto-synced): </span><span class="si">{</span><span class="n">paper2</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">doi</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   2024 citations: </span><span class="si">{</span><span class="n">paper2</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">citation_count</span><span class="o">.</span><span class="n">y2024</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="c1"># 10. Show JSON structure</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">10. Full JSON structure (first 500 chars):&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">10. Full JSON structure (first 500 chars):"</span><span class="p">)</span>
     <span class="n">json_str</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   </span><span class="si">{</span><span class="n">json_str</span><span class="p">[:</span><span class="mi">500</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   </span><span class="si">{</span><span class="n">json_str</span><span class="p">[:</span><span class="mi">500</span><span class="p">]</span><span class="si">}</span><span class="s2">..."</span><span class="p">)</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">80</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ Paper class demonstration complete!&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">80</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="s2">"="</span> <span class="o">*</span> <span class="mi">80</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Paper class demonstration complete!"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">80</span><span class="p">)</span>
 
 <span class="c1"># EOF</span>
 </pre></div>

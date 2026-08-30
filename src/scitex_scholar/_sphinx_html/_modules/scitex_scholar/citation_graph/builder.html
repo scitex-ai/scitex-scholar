@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scitex_scholar.citation_graph.builder &mdash; SciTeX Scholar v1.4.1</title>
+  <title>scitex_scholar.citation_graph.builder &mdash; SciTeX Scholar v1.9.0</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=350a9c04"></script>
+      <script src="../../../_static/documentation_options.js?v=c4cb232b"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -238,6 +238,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._save_to_cache"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._save_to_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_async"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_async()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_sync"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.refresh"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.ensure_loaded()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_source"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_source()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_issn"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_issn()</span></code></a></li>
@@ -251,13 +253,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.__init__"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.__init__()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_instance"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_instance()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._is_cache_valid"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._is_cache_valid()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._load_from_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._load_from_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._save_to_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._save_to_cache()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_async"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_async()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_sync"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.refresh"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.ensure_loaded()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_issn_l"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_issn_l()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.normalize"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.normalize()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_abbreviation"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_abbreviation()</span></code></a></li>
@@ -377,7 +378,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../api/citation_graph.html">scitex_scholar.citation_graph</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.__init__"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._auto_detect"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._auto_detect()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.build"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.build()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._create_paper_node"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._create_paper_node()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._build_citation_edges"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._build_citation_edges()</span></code></a></li>
@@ -501,83 +501,53 @@
            <div itemprop="articleBody">
              
   <h1>Source code for scitex_scholar.citation_graph.builder</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""</span>
 <span class="sd">Citation Graph Builder</span>
 
 <span class="sd">Main interface for building citation networks from CrossRef data.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">.database</span><span class="w"> </span><span class="kn">import</span> <span class="n">CitationDatabase</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">CitationEdge</span><span class="p">,</span> <span class="n">CitationGraph</span><span class="p">,</span> <span class="n">PaperNode</span>
 
 
 <div class="viewcode-block" id="CitationGraphBuilder">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.citation_graph.CitationGraphBuilder">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">CitationGraphBuilder</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Build citation network graphs for academic papers.</span>
 
-<span class="sd">    Auto-detects backend via crossref_local.Config (DB → HTTP).</span>
+<span class="sd">    Citation data is served by crossref-local over HTTP. Scholar does not</span>
+<span class="sd">    open crossref-local's data files itself: the package that owns that</span>
+<span class="sd">    corpus is the one that reads it, and Scholar asks it questions.</span>
 
-<span class="sd">    Example (auto-detect):</span>
+<span class="sd">    Example (auto-detect the endpoint):</span>
 <span class="sd">        &gt;&gt;&gt; builder = CitationGraphBuilder()</span>
-<span class="sd">        &gt;&gt;&gt; graph = builder.build(&quot;10.1038/s41586-020-2008-3&quot;, top_n=20)</span>
+<span class="sd">        &gt;&gt;&gt; graph = builder.build("10.1038/s41586-020-2008-3", top_n=20)</span>
 
-<span class="sd">    Example (explicit SQLite):</span>
-<span class="sd">        &gt;&gt;&gt; builder = CitationGraphBuilder(db_path=&quot;/path/to/crossref.db&quot;)</span>
-
-<span class="sd">    Example (explicit HTTP):</span>
-<span class="sd">        &gt;&gt;&gt; builder = CitationGraphBuilder(api_url=&quot;http://localhost:31291&quot;)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    Example (explicit endpoint):</span>
+<span class="sd">        &gt;&gt;&gt; builder = CitationGraphBuilder(api_url="http://localhost:31291")</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="CitationGraphBuilder.__init__">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.citation_graph.CitationGraphBuilder.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">api_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialize builder with database path, HTTP API URL, or auto-detect.</span>
-
-<span class="sd">        When no args given, delegates to crossref_local.Config for auto-detection:</span>
-<span class="sd">        1. CROSSREF_LOCAL_MODE env var (explicit &quot;db&quot; or &quot;http&quot;)</span>
-<span class="sd">        2. CROSSREF_LOCAL_API_URL env var → HTTP mode</span>
-<span class="sd">        3. Local DB file existence → DB mode</span>
-<span class="sd">        4. Fallback to HTTP mode</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Initialize builder against a crossref-local HTTP endpoint.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            db_path: Path to CrossRef SQLite database (local mode)</span>
-<span class="sd">            api_url: URL of crossref-local HTTP API (HTTP mode)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">api_url</span><span class="p">:</span>
-            <span class="kn">from</span><span class="w"> </span><span class="nn">.database_http</span><span class="w"> </span><span class="kn">import</span> <span class="n">CitationDatabaseHTTP</span>
+<span class="sd">            api_url: URL of the crossref-local HTTP API. When None, resolved</span>
+<span class="sd">                from ``SCITEX_SCHOLAR_CROSSREF_LOCAL_API_URL`` (legacy</span>
+<span class="sd">                ``CROSSREF_LOCAL_API_URL``), falling back to crossref-local's</span>
+<span class="sd">                own default endpoint.</span>
+<span class="sd">        """</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.database_http</span><span class="w"> </span><span class="kn">import</span> <span class="n">CitationDatabaseHTTP</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">db_path</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">CitationDatabaseHTTP</span><span class="p">(</span><span class="n">api_url</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">db_path</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">db_path</span> <span class="o">=</span> <span class="n">db_path</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">CitationDatabase</span><span class="p">(</span><span class="n">db_path</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_auto_detect</span><span class="p">()</span></div>
-
-
-<div class="viewcode-block" id="CitationGraphBuilder._auto_detect">
-<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.citation_graph.CitationGraphBuilder._auto_detect">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_auto_detect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Auto-detect backend via crossref_local.Config.&quot;&quot;&quot;</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">crossref_local._core.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">Config</span>
-
-        <span class="n">mode</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">get_mode</span><span class="p">()</span>
-
-        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;db&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">db_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">get_db_path</span><span class="p">())</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">CitationDatabase</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_path</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="kn">from</span><span class="w"> </span><span class="nn">.database_http</span><span class="w"> </span><span class="kn">import</span> <span class="n">CitationDatabaseHTTP</span>
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">db_path</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">CitationDatabaseHTTP</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">get_api_url</span><span class="p">())</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">CitationDatabaseHTTP</span><span class="p">(</span><span class="n">api_url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">api_url</span></div>
 
 
 <div class="viewcode-block" id="CitationGraphBuilder.build">
@@ -590,7 +560,7 @@
         <span class="n">weight_cocitation</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
         <span class="n">weight_direct</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CitationGraph</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Build citation network around a seed paper.</span>
 
 <span class="sd">        Args:</span>
@@ -603,7 +573,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">            CitationGraph object with nodes and edges</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">:</span>
             <span class="c1"># Calculate similarity scores</span>
             <span class="n">scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_combined_similarity_scores</span><span class="p">(</span>
@@ -634,11 +604,11 @@
                 <span class="n">nodes</span><span class="o">=</span><span class="n">nodes</span><span class="p">,</span>
                 <span class="n">edges</span><span class="o">=</span><span class="n">edges</span><span class="p">,</span>
                 <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
-                    <span class="s2">&quot;top_n&quot;</span><span class="p">:</span> <span class="n">top_n</span><span class="p">,</span>
-                    <span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="p">{</span>
-                        <span class="s2">&quot;coupling&quot;</span><span class="p">:</span> <span class="n">weight_coupling</span><span class="p">,</span>
-                        <span class="s2">&quot;cocitation&quot;</span><span class="p">:</span> <span class="n">weight_cocitation</span><span class="p">,</span>
-                        <span class="s2">&quot;direct&quot;</span><span class="p">:</span> <span class="n">weight_direct</span><span class="p">,</span>
+                    <span class="s2">"top_n"</span><span class="p">:</span> <span class="n">top_n</span><span class="p">,</span>
+                    <span class="s2">"weights"</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">"coupling"</span><span class="p">:</span> <span class="n">weight_coupling</span><span class="p">,</span>
+                        <span class="s2">"cocitation"</span><span class="p">:</span> <span class="n">weight_cocitation</span><span class="p">,</span>
+                        <span class="s2">"direct"</span><span class="p">:</span> <span class="n">weight_direct</span><span class="p">,</span>
                     <span class="p">},</span>
                 <span class="p">},</span>
             <span class="p">)</span>
@@ -649,7 +619,7 @@
 <div class="viewcode-block" id="CitationGraphBuilder._create_paper_node">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.citation_graph.CitationGraphBuilder._create_paper_node">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">_create_paper_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doi</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">similarity_score</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PaperNode</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Create a PaperNode with metadata from database.</span>
 
 <span class="sd">        Args:</span>
@@ -659,31 +629,31 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">            PaperNode object</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_paper_metadata</span><span class="p">(</span><span class="n">doi</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">metadata</span><span class="p">:</span>
             <span class="c1"># Extract author names</span>
-            <span class="n">authors</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;author&quot;</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="n">authors</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"author"</span><span class="p">,</span> <span class="p">[])</span>
             <span class="n">author_names</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;family&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;given&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">)[:</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">authors</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'family'</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'given'</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">)[:</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">authors</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
             <span class="p">]</span>
 
             <span class="c1"># Extract year</span>
             <span class="n">year</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">if</span> <span class="s2">&quot;published&quot;</span> <span class="ow">in</span> <span class="n">metadata</span> <span class="ow">and</span> <span class="s2">&quot;date-parts&quot;</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;published&quot;</span><span class="p">]:</span>
-                <span class="n">date_parts</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;published&quot;</span><span class="p">][</span><span class="s2">&quot;date-parts&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">"published"</span> <span class="ow">in</span> <span class="n">metadata</span> <span class="ow">and</span> <span class="s2">"date-parts"</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">"published"</span><span class="p">]:</span>
+                <span class="n">date_parts</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">"published"</span><span class="p">][</span><span class="s2">"date-parts"</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">date_parts</span> <span class="ow">and</span> <span class="n">date_parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
                     <span class="n">year</span> <span class="o">=</span> <span class="n">date_parts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">date_parts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">else</span> <span class="mi">0</span>
 
             <span class="c1"># Extract journal</span>
-            <span class="n">journal</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-            <span class="k">if</span> <span class="s2">&quot;container-title&quot;</span> <span class="ow">in</span> <span class="n">metadata</span> <span class="ow">and</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;container-title&quot;</span><span class="p">]:</span>
-                <span class="n">journal</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;container-title&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">journal</span> <span class="o">=</span> <span class="s2">""</span>
+            <span class="k">if</span> <span class="s2">"container-title"</span> <span class="ow">in</span> <span class="n">metadata</span> <span class="ow">and</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">"container-title"</span><span class="p">]:</span>
+                <span class="n">journal</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">"container-title"</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
 
             <span class="k">return</span> <span class="n">PaperNode</span><span class="p">(</span>
                 <span class="n">doi</span><span class="o">=</span><span class="n">doi</span><span class="p">,</span>
-                <span class="n">title</span><span class="o">=</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;Unknown&quot;</span><span class="p">])[</span><span class="mi">0</span><span class="p">][:</span><span class="mi">200</span><span class="p">],</span>
+                <span class="n">title</span><span class="o">=</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"title"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"Unknown"</span><span class="p">])[</span><span class="mi">0</span><span class="p">][:</span><span class="mi">200</span><span class="p">],</span>
                 <span class="n">year</span><span class="o">=</span><span class="n">year</span><span class="p">,</span>
                 <span class="n">authors</span><span class="o">=</span><span class="n">author_names</span><span class="p">,</span>
                 <span class="n">journal</span><span class="o">=</span><span class="n">journal</span><span class="p">,</span>
@@ -696,7 +666,7 @@
 <div class="viewcode-block" id="CitationGraphBuilder._build_citation_edges">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.citation_graph.CitationGraphBuilder._build_citation_edges">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">_build_citation_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dois</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">CitationEdge</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Build citation edges between papers in the network.</span>
 
 <span class="sd">        Args:</span>
@@ -705,7 +675,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">            List of CitationEdge objects</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">edges</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">doi_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dois</span><span class="p">)</span>
 
@@ -719,7 +689,7 @@
                         <span class="n">CitationEdge</span><span class="p">(</span>
                             <span class="n">source</span><span class="o">=</span><span class="n">doi</span><span class="p">,</span>
                             <span class="n">target</span><span class="o">=</span><span class="n">cited_doi</span><span class="p">,</span>
-                            <span class="n">edge_type</span><span class="o">=</span><span class="s2">&quot;cites&quot;</span><span class="p">,</span>
+                            <span class="n">edge_type</span><span class="o">=</span><span class="s2">"cites"</span><span class="p">,</span>
                         <span class="p">)</span>
                     <span class="p">)</span>
 
@@ -736,7 +706,7 @@
         <span class="n">weight_cocitation</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
         <span class="n">weight_direct</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CitationGraph</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Build citation network from multiple seed DOIs.</span>
 
 <span class="sd">        Combines similarity scores from all seeds to find papers</span>
@@ -752,7 +722,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">            CitationGraph with all seeds + related papers + edges</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">:</span>
             <span class="n">seed_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dois</span><span class="p">)</span>
 
@@ -789,12 +759,12 @@
                 <span class="n">nodes</span><span class="o">=</span><span class="n">nodes</span><span class="p">,</span>
                 <span class="n">edges</span><span class="o">=</span><span class="n">edges</span><span class="p">,</span>
                 <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
-                    <span class="s2">&quot;num_related_per_doi&quot;</span><span class="p">:</span> <span class="n">num_related_per_doi</span><span class="p">,</span>
-                    <span class="s2">&quot;num_seeds&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">dois</span><span class="p">),</span>
-                    <span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="p">{</span>
-                        <span class="s2">&quot;coupling&quot;</span><span class="p">:</span> <span class="n">weight_coupling</span><span class="p">,</span>
-                        <span class="s2">&quot;cocitation&quot;</span><span class="p">:</span> <span class="n">weight_cocitation</span><span class="p">,</span>
-                        <span class="s2">&quot;direct&quot;</span><span class="p">:</span> <span class="n">weight_direct</span><span class="p">,</span>
+                    <span class="s2">"num_related_per_doi"</span><span class="p">:</span> <span class="n">num_related_per_doi</span><span class="p">,</span>
+                    <span class="s2">"num_seeds"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">dois</span><span class="p">),</span>
+                    <span class="s2">"weights"</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">"coupling"</span><span class="p">:</span> <span class="n">weight_coupling</span><span class="p">,</span>
+                        <span class="s2">"cocitation"</span><span class="p">:</span> <span class="n">weight_cocitation</span><span class="p">,</span>
+                        <span class="s2">"direct"</span><span class="p">:</span> <span class="n">weight_direct</span><span class="p">,</span>
                     <span class="p">},</span>
                 <span class="p">},</span>
             <span class="p">)</span></div>
@@ -811,14 +781,14 @@
         <span class="n">weight_cocitation</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
         <span class="n">weight_direct</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CitationGraph</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Build citation network from a text query.</span>
 
 <span class="sd">        Searches local databases, extracts DOIs from results,</span>
 <span class="sd">        then delegates to build_from_dois().</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            query: Search query (e.g. &quot;hippocampal sharp wave ripples&quot;)</span>
+<span class="sd">            query: Search query (e.g. "hippocampal sharp wave ripples")</span>
 <span class="sd">            num_related_per_doi: Related papers per seed DOI</span>
 <span class="sd">            search_limit: Max papers to fetch from search</span>
 <span class="sd">            weight_coupling: Weight for bibliographic coupling</span>
@@ -828,7 +798,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">            CitationGraph with search-discovered seeds + related papers</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">..local_dbs.unified</span><span class="w"> </span><span class="kn">import</span> <span class="n">search</span>
 
         <span class="n">results</span> <span class="o">=</span> <span class="n">search</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">search_limit</span><span class="p">)</span>
@@ -836,11 +806,11 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">dois</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">CitationGraph</span><span class="p">(</span>
-                <span class="n">seed_doi</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="n">seed_doi</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span>
                 <span class="n">seed_dois</span><span class="o">=</span><span class="p">[],</span>
                 <span class="n">nodes</span><span class="o">=</span><span class="p">[],</span>
                 <span class="n">edges</span><span class="o">=</span><span class="p">[],</span>
-                <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="n">query</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;No papers with DOI found&quot;</span><span class="p">},</span>
+                <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"query"</span><span class="p">:</span> <span class="n">query</span><span class="p">,</span> <span class="s2">"error"</span><span class="p">:</span> <span class="s2">"No papers with DOI found"</span><span class="p">},</span>
             <span class="p">)</span>
 
         <span class="n">graph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_from_dois</span><span class="p">(</span>
@@ -850,30 +820,30 @@
             <span class="n">weight_cocitation</span><span class="o">=</span><span class="n">weight_cocitation</span><span class="p">,</span>
             <span class="n">weight_direct</span><span class="o">=</span><span class="n">weight_direct</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">graph</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;query&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">query</span>
-        <span class="n">graph</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;search_results_count&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">works</span><span class="p">)</span>
+        <span class="n">graph</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"query"</span><span class="p">]</span> <span class="o">=</span> <span class="n">query</span>
+        <span class="n">graph</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"search_results_count"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">works</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">graph</span></div>
 
 
 <div class="viewcode-block" id="CitationGraphBuilder.export_json">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.citation_graph.CitationGraphBuilder.export_json">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">export_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">:</span> <span class="n">CitationGraph</span><span class="p">,</span> <span class="n">output_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Export graph to JSON file for visualization.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            graph: CitationGraph to export</span>
 <span class="sd">            output_path: Path to output JSON file</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">output</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="CitationGraphBuilder.get_paper_summary">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.citation_graph.CitationGraphBuilder.get_paper_summary">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_paper_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doi</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get summary information for a paper.</span>
 
 <span class="sd">        Args:</span>
@@ -882,7 +852,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">            Dictionary with paper summary</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">:</span>
             <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_paper_metadata</span><span class="p">(</span><span class="n">doi</span><span class="p">)</span>
 
@@ -894,16 +864,16 @@
             <span class="n">citations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_citations</span><span class="p">(</span><span class="n">doi</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
 
             <span class="k">return</span> <span class="p">{</span>
-                <span class="s2">&quot;doi&quot;</span><span class="p">:</span> <span class="n">doi</span><span class="p">,</span>
-                <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;Unknown&quot;</span><span class="p">])[</span><span class="mi">0</span><span class="p">],</span>
-                <span class="s2">&quot;year&quot;</span><span class="p">:</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;published&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;date-parts&quot;</span><span class="p">,</span> <span class="p">[[</span><span class="mi">0</span><span class="p">]])[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
-                <span class="s2">&quot;authors&quot;</span><span class="p">:</span> <span class="p">[</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;family&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;given&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-                    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;author&quot;</span><span class="p">,</span> <span class="p">[])[:</span><span class="mi">5</span><span class="p">]</span>
+                <span class="s2">"doi"</span><span class="p">:</span> <span class="n">doi</span><span class="p">,</span>
+                <span class="s2">"title"</span><span class="p">:</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"title"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"Unknown"</span><span class="p">])[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="s2">"year"</span><span class="p">:</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"published"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"date-parts"</span><span class="p">,</span> <span class="p">[[</span><span class="mi">0</span><span class="p">]])[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                <span class="s2">"authors"</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'family'</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'given'</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+                    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"author"</span><span class="p">,</span> <span class="p">[])[:</span><span class="mi">5</span><span class="p">]</span>
                 <span class="p">],</span>
-                <span class="s2">&quot;journal&quot;</span><span class="p">:</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;container-title&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;Unknown&quot;</span><span class="p">])[</span><span class="mi">0</span><span class="p">],</span>
-                <span class="s2">&quot;reference_count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">refs</span><span class="p">),</span>
-                <span class="s2">&quot;citation_count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">citations</span><span class="p">),</span>
+                <span class="s2">"journal"</span><span class="p">:</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"container-title"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"Unknown"</span><span class="p">])[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="s2">"reference_count"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">refs</span><span class="p">),</span>
+                <span class="s2">"citation_count"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">citations</span><span class="p">),</span>
             <span class="p">}</span></div>
 </div>
 

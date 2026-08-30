@@ -1,0 +1,970 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scitex_scholar.pipelines.SearchQueryParser &mdash; SciTeX Scholar v1.9.0</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=c4cb232b"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SciTeX Scholar
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#basic-installation">Basic Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#development">Development</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../quickstart.html#python-api">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../quickstart.html#semantic-pdf-highlighting">Semantic PDF Highlighting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../quickstart.html#cli">CLI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../quickstart.html#next-steps">Next Steps</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">CLI Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../cli.html#top-level-groups">Top-level groups</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../cli.html#paper">paper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cli.html#bibtex">bibtex</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cli.html#mcp">mcp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cli.html#pdf">pdf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cli.html#library">library</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../cli.html#daily">Daily</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../cli.html#layout">Layout</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../cli.html#share">Share</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../cli.html#database-integrity">Database / integrity</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cli.html#skills">skills</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cli.html#python-api-introspection">Python API introspection</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../cli.html#migration-from-pre-1-3-0">Migration from pre-1.3.0</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mcp.html">MCP Server</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../mcp.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../mcp.html#starting-the-server">Starting the Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../mcp.html#mcp-client-configuration">MCP Client Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../mcp.html#available-scholar-tools">Available Scholar Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../mcp.html#handler-integration">Handler Integration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../semantic_highlight.html">Semantic PDF Highlighting</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../semantic_highlight.html#pipeline">Pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../semantic_highlight.html#four-interfaces">Four Interfaces</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../semantic_highlight.html#python-api">Python API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../semantic_highlight.html#cli">CLI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../semantic_highlight.html#mcp">MCP</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../semantic_highlight.html#skill">Skill</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../semantic_highlight.html#model-selection">Model Selection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../semantic_highlight.html#known-limitations">Known Limitations</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/index.html#top-level-package">Top-level package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/index.html#module-scitex_scholar.pdf_highlight">Semantic Highlighter</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight.Block.id"><code class="docutils literal notranslate"><span class="pre">Block.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight.Block.page"><code class="docutils literal notranslate"><span class="pre">Block.page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight.Block.bbox"><code class="docutils literal notranslate"><span class="pre">Block.bbox</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight.Block.text"><code class="docutils literal notranslate"><span class="pre">Block.text</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight.Block.category"><code class="docutils literal notranslate"><span class="pre">Block.category</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight.Block.confidence"><code class="docutils literal notranslate"><span class="pre">Block.confidence</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight.Block.__init__"><code class="docutils literal notranslate"><span class="pre">Block.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight.HighlightResult"><code class="docutils literal notranslate"><span class="pre">HighlightResult</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight.HighlightResult.input_path"><code class="docutils literal notranslate"><span class="pre">HighlightResult.input_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight.HighlightResult.output_path"><code class="docutils literal notranslate"><span class="pre">HighlightResult.output_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight.HighlightResult.blocks"><code class="docutils literal notranslate"><span class="pre">HighlightResult.blocks</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight.HighlightResult.pages"><code class="docutils literal notranslate"><span class="pre">HighlightResult.pages</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight.HighlightResult.annotations_added"><code class="docutils literal notranslate"><span class="pre">HighlightResult.annotations_added</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight.HighlightResult.counts"><code class="docutils literal notranslate"><span class="pre">HighlightResult.counts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight.HighlightResult.__init__"><code class="docutils literal notranslate"><span class="pre">HighlightResult.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight.apply_classifications"><code class="docutils literal notranslate"><span class="pre">apply_classifications()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight.extract_blocks"><code class="docutils literal notranslate"><span class="pre">extract_blocks()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight.highlight_pdf"><code class="docutils literal notranslate"><span class="pre">highlight_pdf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight.save_with_highlights"><code class="docutils literal notranslate"><span class="pre">save_with_highlights()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/index.html#module-scitex_scholar.pdf_highlight._colors">Colour Scheme</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/index.html#module-scitex_scholar.pdf_highlight._blocks">Block Extraction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._blocks.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._blocks._split_sentences"><code class="docutils literal notranslate"><span class="pre">_split_sentences()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._blocks.extract_blocks"><code class="docutils literal notranslate"><span class="pre">extract_blocks()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/index.html#module-scitex_scholar.pdf_highlight._classifier">Classifier</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier._available_models"><code class="docutils literal notranslate"><span class="pre">_available_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier._model_not_found_error"><code class="docutils literal notranslate"><span class="pre">_model_not_found_error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier._retry_wait_seconds"><code class="docutils literal notranslate"><span class="pre">_retry_wait_seconds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier._classify_one_batch"><code class="docutils literal notranslate"><span class="pre">_classify_one_batch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier._apply_predictions"><code class="docutils literal notranslate"><span class="pre">_apply_predictions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier.classify_llm"><code class="docutils literal notranslate"><span class="pre">classify_llm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._classifier.classify_stub"><code class="docutils literal notranslate"><span class="pre">classify_stub()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/index.html#module-scitex_scholar.pdf_highlight._annotator">Annotator</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._annotator._chunk_quads_for_sentence"><code class="docutils literal notranslate"><span class="pre">_chunk_quads_for_sentence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._annotator._search_quads_for_sentence"><code class="docutils literal notranslate"><span class="pre">_search_quads_for_sentence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._annotator.apply_highlights"><code class="docutils literal notranslate"><span class="pre">apply_highlights()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._annotator._corner_rect"><code class="docutils literal notranslate"><span class="pre">_corner_rect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._annotator._draw_legend_overlay"><code class="docutils literal notranslate"><span class="pre">_draw_legend_overlay()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._annotator.add_legend"><code class="docutils literal notranslate"><span class="pre">add_legend()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._annotator.add_legend_page"><code class="docutils literal notranslate"><span class="pre">add_legend_page()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._annotator.add_legend_footer"><code class="docutils literal notranslate"><span class="pre">add_legend_footer()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/index.html#module-scitex_scholar.pdf_highlight._mcp">MCP Tool Spec</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/index.html#scitex_scholar.pdf_highlight._mcp.run_tool"><code class="docutils literal notranslate"><span class="pre">run_tool()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/core.html">scitex_scholar.core</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Paper"><code class="docutils literal notranslate"><span class="pre">Paper</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Paper.model_dump"><code class="docutils literal notranslate"><span class="pre">Paper.model_dump()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Paper.from_dict"><code class="docutils literal notranslate"><span class="pre">Paper.from_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Paper.to_dict"><code class="docutils literal notranslate"><span class="pre">Paper.to_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Paper.detect_open_access"><code class="docutils literal notranslate"><span class="pre">Paper.detect_open_access()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Paper.is_open_access"><code class="docutils literal notranslate"><span class="pre">Paper.is_open_access</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Papers"><code class="docutils literal notranslate"><span class="pre">Papers</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Papers.__init__"><code class="docutils literal notranslate"><span class="pre">Papers.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Papers.__len__"><code class="docutils literal notranslate"><span class="pre">Papers.__len__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Papers.__iter__"><code class="docutils literal notranslate"><span class="pre">Papers.__iter__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Papers.__getitem__"><code class="docutils literal notranslate"><span class="pre">Papers.__getitem__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Papers.__repr__"><code class="docutils literal notranslate"><span class="pre">Papers.__repr__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Papers.__str__"><code class="docutils literal notranslate"><span class="pre">Papers.__str__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Papers.__dir__"><code class="docutils literal notranslate"><span class="pre">Papers.__dir__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Papers.papers"><code class="docutils literal notranslate"><span class="pre">Papers.papers</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Papers.append"><code class="docutils literal notranslate"><span class="pre">Papers.append()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Papers.extend"><code class="docutils literal notranslate"><span class="pre">Papers.extend()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Papers.to_list"><code class="docutils literal notranslate"><span class="pre">Papers.to_list()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Papers.filter"><code class="docutils literal notranslate"><span class="pre">Papers.filter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Papers.sort_by"><code class="docutils literal notranslate"><span class="pre">Papers.sort_by()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Papers.from_bibtex"><code class="docutils literal notranslate"><span class="pre">Papers.from_bibtex()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Papers._from_bibtex_file"><code class="docutils literal notranslate"><span class="pre">Papers._from_bibtex_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Papers._from_bibtex_text"><code class="docutils literal notranslate"><span class="pre">Papers._from_bibtex_text()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Papers._bibtex_entry_to_paper"><code class="docutils literal notranslate"><span class="pre">Papers._bibtex_entry_to_paper()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Papers.save"><code class="docutils literal notranslate"><span class="pre">Papers.save()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Papers.to_dict"><code class="docutils literal notranslate"><span class="pre">Papers.to_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Papers.to_dataframe"><code class="docutils literal notranslate"><span class="pre">Papers.to_dataframe()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Papers.summary"><code class="docutils literal notranslate"><span class="pre">Papers.summary()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Scholar"><code class="docutils literal notranslate"><span class="pre">Scholar</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Scholar.name"><code class="docutils literal notranslate"><span class="pre">Scholar.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.Scholar.__init__"><code class="docutils literal notranslate"><span class="pre">Scholar.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OAStatus"><code class="docutils literal notranslate"><span class="pre">OAStatus</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OAStatus.GOLD"><code class="docutils literal notranslate"><span class="pre">OAStatus.GOLD</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OAStatus.GREEN"><code class="docutils literal notranslate"><span class="pre">OAStatus.GREEN</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OAStatus.HYBRID"><code class="docutils literal notranslate"><span class="pre">OAStatus.HYBRID</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OAStatus.BRONZE"><code class="docutils literal notranslate"><span class="pre">OAStatus.BRONZE</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OAStatus.CLOSED"><code class="docutils literal notranslate"><span class="pre">OAStatus.CLOSED</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OAStatus.UNKNOWN"><code class="docutils literal notranslate"><span class="pre">OAStatus.UNKNOWN</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OAResult"><code class="docutils literal notranslate"><span class="pre">OAResult</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OAResult.is_open_access"><code class="docutils literal notranslate"><span class="pre">OAResult.is_open_access</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OAResult.status"><code class="docutils literal notranslate"><span class="pre">OAResult.status</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OAResult.oa_url"><code class="docutils literal notranslate"><span class="pre">OAResult.oa_url</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OAResult.source"><code class="docutils literal notranslate"><span class="pre">OAResult.source</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OAResult.license"><code class="docutils literal notranslate"><span class="pre">OAResult.license</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OAResult.confidence"><code class="docutils literal notranslate"><span class="pre">OAResult.confidence</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OAResult.__init__"><code class="docutils literal notranslate"><span class="pre">OAResult.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.detect_oa_from_identifiers"><code class="docutils literal notranslate"><span class="pre">detect_oa_from_identifiers()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.check_oa_status"><code class="docutils literal notranslate"><span class="pre">check_oa_status()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.check_oa_status_async"><code class="docutils literal notranslate"><span class="pre">check_oa_status_async()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.is_open_access_source"><code class="docutils literal notranslate"><span class="pre">is_open_access_source()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.is_open_access_journal"><code class="docutils literal notranslate"><span class="pre">is_open_access_journal()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.is_arxiv_id"><code class="docutils literal notranslate"><span class="pre">is_arxiv_id()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache"><code class="docutils literal notranslate"><span class="pre">OASourcesCache</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.__init__"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.get_instance"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.get_instance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._is_cache_valid"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._is_cache_valid()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._load_from_cache"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._load_from_cache()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._save_to_cache"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._save_to_cache()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_async"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_async()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_sync"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.refresh"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.refresh()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.ensure_loaded()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_source"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_source()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_issn"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_issn()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.source_count"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.source_count</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.cache_age_hours"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.cache_age_hours</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.get_oa_cache"><code class="docutils literal notranslate"><span class="pre">get_oa_cache()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.is_oa_journal_cached"><code class="docutils literal notranslate"><span class="pre">is_oa_journal_cached()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.refresh_oa_cache"><code class="docutils literal notranslate"><span class="pre">refresh_oa_cache()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.__init__"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_instance"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_instance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._load_from_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._load_from_cache()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._save_to_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._save_to_cache()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.refresh"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.refresh()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.ensure_loaded()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_issn_l"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_issn_l()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.normalize"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.normalize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_abbreviation"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_abbreviation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_journal_info"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_journal_info()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.is_same_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.is_same_journal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.is_open_access"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.is_open_access()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.search"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.search()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.journal_count"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.journal_count</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.cache_age_hours"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.cache_age_hours</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.get_journal_normalizer"><code class="docutils literal notranslate"><span class="pre">get_journal_normalizer()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.normalize_journal_name"><code class="docutils literal notranslate"><span class="pre">normalize_journal_name()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.get_journal_issn_l"><code class="docutils literal notranslate"><span class="pre">get_journal_issn_l()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.is_same_journal"><code class="docutils literal notranslate"><span class="pre">is_same_journal()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.refresh_journal_cache"><code class="docutils literal notranslate"><span class="pre">refresh_journal_cache()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/auth.html">scitex_scholar.auth</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.ScholarAuthManager"><code class="docutils literal notranslate"><span class="pre">ScholarAuthManager</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.ScholarAuthManager.__init__"><code class="docutils literal notranslate"><span class="pre">ScholarAuthManager.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.ScholarAuthManager.ensure_authenticate_async"><code class="docutils literal notranslate"><span class="pre">ScholarAuthManager.ensure_authenticate_async()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.ScholarAuthManager.is_authenticate_async"><code class="docutils literal notranslate"><span class="pre">ScholarAuthManager.is_authenticate_async()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.ScholarAuthManager.authenticate_async"><code class="docutils literal notranslate"><span class="pre">ScholarAuthManager.authenticate_async()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.ScholarAuthManager.get_auth_headers_async"><code class="docutils literal notranslate"><span class="pre">ScholarAuthManager.get_auth_headers_async()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.ScholarAuthManager.get_auth_options"><code class="docutils literal notranslate"><span class="pre">ScholarAuthManager.get_auth_options()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.ScholarAuthManager.get_auth_cookies_async"><code class="docutils literal notranslate"><span class="pre">ScholarAuthManager.get_auth_cookies_async()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.ScholarAuthManager._register_provider"><code class="docutils literal notranslate"><span class="pre">ScholarAuthManager._register_provider()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.ScholarAuthManager.set_active_provider"><code class="docutils literal notranslate"><span class="pre">ScholarAuthManager.set_active_provider()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.ScholarAuthManager.get_active_provider"><code class="docutils literal notranslate"><span class="pre">ScholarAuthManager.get_active_provider()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.ScholarAuthManager.logout_async"><code class="docutils literal notranslate"><span class="pre">ScholarAuthManager.logout_async()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.ScholarAuthManager.list_providers"><code class="docutils literal notranslate"><span class="pre">ScholarAuthManager.list_providers()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.AuthenticationGateway"><code class="docutils literal notranslate"><span class="pre">AuthenticationGateway</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.AuthenticationGateway.name"><code class="docutils literal notranslate"><span class="pre">AuthenticationGateway.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.AuthenticationGateway.__init__"><code class="docutils literal notranslate"><span class="pre">AuthenticationGateway.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.AuthenticationGateway.prepare_context_async"><code class="docutils literal notranslate"><span class="pre">AuthenticationGateway.prepare_context_async()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.AuthenticationGateway._resolve_publisher_url_async"><code class="docutils literal notranslate"><span class="pre">AuthenticationGateway._resolve_publisher_url_async()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.AuthenticationGateway._check_auth_requirements_from_doi"><code class="docutils literal notranslate"><span class="pre">AuthenticationGateway._check_auth_requirements_from_doi()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.AuthenticationGateway._check_auth_requirements"><code class="docutils literal notranslate"><span class="pre">AuthenticationGateway._check_auth_requirements()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.AuthenticationGateway._establish_authentication_async"><code class="docutils literal notranslate"><span class="pre">AuthenticationGateway._establish_authentication_async()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.URLContext"><code class="docutils literal notranslate"><span class="pre">URLContext</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.URLContext.doi"><code class="docutils literal notranslate"><span class="pre">URLContext.doi</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.URLContext.title"><code class="docutils literal notranslate"><span class="pre">URLContext.title</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.URLContext.url"><code class="docutils literal notranslate"><span class="pre">URLContext.url</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.URLContext.pdf_urls"><code class="docutils literal notranslate"><span class="pre">URLContext.pdf_urls</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.URLContext.requires_auth"><code class="docutils literal notranslate"><span class="pre">URLContext.requires_auth</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.URLContext.auth_provider"><code class="docutils literal notranslate"><span class="pre">URLContext.auth_provider</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.URLContext.auth_gateway_url"><code class="docutils literal notranslate"><span class="pre">URLContext.auth_gateway_url</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/auth.html#scitex_scholar.auth.URLContext.__init__"><code class="docutils literal notranslate"><span class="pre">URLContext.__init__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/browser.html">scitex_scholar.browser</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/browser.html#scitex_scholar.browser.ScholarBrowserManager"><code class="docutils literal notranslate"><span class="pre">ScholarBrowserManager</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/browser.html#scitex_scholar.browser.ScholarBrowserManager.__init__"><code class="docutils literal notranslate"><span class="pre">ScholarBrowserManager.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/browser.html#scitex_scholar.browser.ScholarBrowserManager.get_authenticated_browser_and_context_async"><code class="docutils literal notranslate"><span class="pre">ScholarBrowserManager.get_authenticated_browser_and_context_async()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/browser.html#scitex_scholar.browser.ScholarBrowserManager._new_context_async"><code class="docutils literal notranslate"><span class="pre">ScholarBrowserManager._new_context_async()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/browser.html#scitex_scholar.browser.ScholarBrowserManager._verify_xvfb_running"><code class="docutils literal notranslate"><span class="pre">ScholarBrowserManager._verify_xvfb_running()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/browser.html#scitex_scholar.browser.ScholarBrowserManager._load_auth_cookies_to_persistent_context_async"><code class="docutils literal notranslate"><span class="pre">ScholarBrowserManager._load_auth_cookies_to_persistent_context_async()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/browser.html#scitex_scholar.browser.ScholarBrowserManager.take_screenshot_async"><code class="docutils literal notranslate"><span class="pre">ScholarBrowserManager.take_screenshot_async()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/browser.html#scitex_scholar.browser.ScholarBrowserManager.start_periodic_screenshots_async"><code class="docutils literal notranslate"><span class="pre">ScholarBrowserManager.start_periodic_screenshots_async()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/browser.html#scitex_scholar.browser.ScholarBrowserManager.stop_periodic_screenshots_async"><code class="docutils literal notranslate"><span class="pre">ScholarBrowserManager.stop_periodic_screenshots_async()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/browser.html#scitex_scholar.browser.ScholarBrowserManager.close"><code class="docutils literal notranslate"><span class="pre">ScholarBrowserManager.close()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/config.html">scitex_scholar.config</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/config.html#scitex_scholar.config.ScholarConfig"><code class="docutils literal notranslate"><span class="pre">ScholarConfig</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/config.html#scitex_scholar.config.ScholarConfig.__init__"><code class="docutils literal notranslate"><span class="pre">ScholarConfig.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/config.html#scitex_scholar.config.ScholarConfig.__getattr__"><code class="docutils literal notranslate"><span class="pre">ScholarConfig.__getattr__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/config.html#scitex_scholar.config.ScholarConfig.__dir__"><code class="docutils literal notranslate"><span class="pre">ScholarConfig.__dir__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/config.html#scitex_scholar.config.ScholarConfig.resolve"><code class="docutils literal notranslate"><span class="pre">ScholarConfig.resolve()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/config.html#scitex_scholar.config.ScholarConfig.get"><code class="docutils literal notranslate"><span class="pre">ScholarConfig.get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/config.html#scitex_scholar.config.ScholarConfig.print"><code class="docutils literal notranslate"><span class="pre">ScholarConfig.print()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/config.html#scitex_scholar.config.ScholarConfig.clear_log"><code class="docutils literal notranslate"><span class="pre">ScholarConfig.clear_log()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/config.html#scitex_scholar.config.ScholarConfig.load_yaml"><code class="docutils literal notranslate"><span class="pre">ScholarConfig.load_yaml()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/config.html#scitex_scholar.config.ScholarConfig.load"><code class="docutils literal notranslate"><span class="pre">ScholarConfig.load()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/config.html#scitex_scholar.config.ScholarConfig.paths"><code class="docutils literal notranslate"><span class="pre">ScholarConfig.paths</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/config.html#scitex_scholar.config.PublisherRules"><code class="docutils literal notranslate"><span class="pre">PublisherRules</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/config.html#scitex_scholar.config.PublisherRules.__init__"><code class="docutils literal notranslate"><span class="pre">PublisherRules.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/config.html#scitex_scholar.config.PublisherRules.get_config_for_url"><code class="docutils literal notranslate"><span class="pre">PublisherRules.get_config_for_url()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/config.html#scitex_scholar.config.PublisherRules.merge_with_config"><code class="docutils literal notranslate"><span class="pre">PublisherRules.merge_with_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/config.html#scitex_scholar.config.PublisherRules.is_valid_pdf_url"><code class="docutils literal notranslate"><span class="pre">PublisherRules.is_valid_pdf_url()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/config.html#scitex_scholar.config.PublisherRules.filter_pdf_urls"><code class="docutils literal notranslate"><span class="pre">PublisherRules.filter_pdf_urls()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/filters.html">scitex_scholar.filters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/filters.html#scitex_scholar.filters.apply_filters"><code class="docutils literal notranslate"><span class="pre">apply_filters()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/formatting.html">scitex_scholar.formatting</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/formatting.html#scitex_scholar.formatting.clean_text"><code class="docutils literal notranslate"><span class="pre">clean_text()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/formatting.html#scitex_scholar.formatting.generate_cite_key"><code class="docutils literal notranslate"><span class="pre">generate_cite_key()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/formatting.html#scitex_scholar.formatting.paper_normalize"><code class="docutils literal notranslate"><span class="pre">paper_normalize()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/formatting.html#scitex_scholar.formatting.paper_from_search_result"><code class="docutils literal notranslate"><span class="pre">paper_from_search_result()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/formatting.html#scitex_scholar.formatting.make_citation_key"><code class="docutils literal notranslate"><span class="pre">make_citation_key()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/formatting.html#scitex_scholar.formatting.sanitize_filename"><code class="docutils literal notranslate"><span class="pre">sanitize_filename()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/formatting.html#scitex_scholar.formatting.to_bibtex"><code class="docutils literal notranslate"><span class="pre">to_bibtex()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/formatting.html#scitex_scholar.formatting.to_ris"><code class="docutils literal notranslate"><span class="pre">to_ris()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/formatting.html#scitex_scholar.formatting.to_endnote"><code class="docutils literal notranslate"><span class="pre">to_endnote()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/formatting.html#scitex_scholar.formatting.to_csv_row"><code class="docutils literal notranslate"><span class="pre">to_csv_row()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/formatting.html#scitex_scholar.formatting.to_text_citation"><code class="docutils literal notranslate"><span class="pre">to_text_citation()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/formatting.html#scitex_scholar.formatting.clean_bibtex_for_arxiv"><code class="docutils literal notranslate"><span class="pre">clean_bibtex_for_arxiv()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/formatting.html#scitex_scholar.formatting.papers_to_format"><code class="docutils literal notranslate"><span class="pre">papers_to_format()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/citation_graph.html">scitex_scholar.citation_graph</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.__init__"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.build"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.build()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._create_paper_node"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._create_paper_node()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._build_citation_edges"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._build_citation_edges()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.build_from_dois"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.build_from_dois()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.build_from_query"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.build_from_query()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.export_json"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.export_json()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.get_paper_summary"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.get_paper_summary()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.PaperNode"><code class="docutils literal notranslate"><span class="pre">PaperNode</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.PaperNode.doi"><code class="docutils literal notranslate"><span class="pre">PaperNode.doi</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.PaperNode.title"><code class="docutils literal notranslate"><span class="pre">PaperNode.title</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.PaperNode.year"><code class="docutils literal notranslate"><span class="pre">PaperNode.year</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.PaperNode.authors"><code class="docutils literal notranslate"><span class="pre">PaperNode.authors</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.PaperNode.journal"><code class="docutils literal notranslate"><span class="pre">PaperNode.journal</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.PaperNode.citation_count"><code class="docutils literal notranslate"><span class="pre">PaperNode.citation_count</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.PaperNode.similarity_score"><code class="docutils literal notranslate"><span class="pre">PaperNode.similarity_score</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.PaperNode.is_seed"><code class="docutils literal notranslate"><span class="pre">PaperNode.is_seed</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.PaperNode.metadata"><code class="docutils literal notranslate"><span class="pre">PaperNode.metadata</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.PaperNode.to_dict"><code class="docutils literal notranslate"><span class="pre">PaperNode.to_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.PaperNode.__init__"><code class="docutils literal notranslate"><span class="pre">PaperNode.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationEdge"><code class="docutils literal notranslate"><span class="pre">CitationEdge</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationEdge.source"><code class="docutils literal notranslate"><span class="pre">CitationEdge.source</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationEdge.target"><code class="docutils literal notranslate"><span class="pre">CitationEdge.target</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationEdge.edge_type"><code class="docutils literal notranslate"><span class="pre">CitationEdge.edge_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationEdge.weight"><code class="docutils literal notranslate"><span class="pre">CitationEdge.weight</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationEdge.to_dict"><code class="docutils literal notranslate"><span class="pre">CitationEdge.to_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationEdge.__init__"><code class="docutils literal notranslate"><span class="pre">CitationEdge.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraph"><code class="docutils literal notranslate"><span class="pre">CitationGraph</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraph.seed_doi"><code class="docutils literal notranslate"><span class="pre">CitationGraph.seed_doi</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraph.seed_dois"><code class="docutils literal notranslate"><span class="pre">CitationGraph.seed_dois</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraph.nodes"><code class="docutils literal notranslate"><span class="pre">CitationGraph.nodes</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraph.edges"><code class="docutils literal notranslate"><span class="pre">CitationGraph.edges</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraph.metadata"><code class="docutils literal notranslate"><span class="pre">CitationGraph.metadata</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraph.to_dict"><code class="docutils literal notranslate"><span class="pre">CitationGraph.to_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraph.node_count"><code class="docutils literal notranslate"><span class="pre">CitationGraph.node_count</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraph.edge_count"><code class="docutils literal notranslate"><span class="pre">CitationGraph.edge_count</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraph.to_networkx"><code class="docutils literal notranslate"><span class="pre">CitationGraph.to_networkx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraph.__init__"><code class="docutils literal notranslate"><span class="pre">CitationGraph.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.plot_citation_graph"><code class="docutils literal notranslate"><span class="pre">plot_citation_graph()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.list_backends"><code class="docutils literal notranslate"><span class="pre">list_backends()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/impact_factor.html">scitex_scholar.impact_factor</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/impact_factor.html#scitex_scholar.impact_factor.ImpactFactorEngine"><code class="docutils literal notranslate"><span class="pre">ImpactFactorEngine</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/impact_factor.html#scitex_scholar.impact_factor.ImpactFactorEngine.__init__"><code class="docutils literal notranslate"><span class="pre">ImpactFactorEngine.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/impact_factor.html#scitex_scholar.impact_factor.ImpactFactorEngine._get_jcr_year"><code class="docutils literal notranslate"><span class="pre">ImpactFactorEngine._get_jcr_year()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/impact_factor.html#scitex_scholar.impact_factor.ImpactFactorEngine._get_metrics_uncached"><code class="docutils literal notranslate"><span class="pre">ImpactFactorEngine._get_metrics_uncached()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/impact_factor.html#scitex_scholar.impact_factor.ImpactFactorEngine.get_database_info"><code class="docutils literal notranslate"><span class="pre">ImpactFactorEngine.get_database_info()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/impact_factor.html#scitex_scholar.impact_factor.get_journal_metrics"><code class="docutils literal notranslate"><span class="pre">get_journal_metrics()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/metadata_engines.html">scitex_scholar.metadata_engines</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine"><code class="docutils literal notranslate"><span class="pre">ScholarEngine</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine.__init__"><code class="docutils literal notranslate"><span class="pre">ScholarEngine.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._setup_cache"><code class="docutils literal notranslate"><span class="pre">ScholarEngine._setup_cache()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._load_cache"><code class="docutils literal notranslate"><span class="pre">ScholarEngine._load_cache()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._save_cache"><code class="docutils literal notranslate"><span class="pre">ScholarEngine._save_cache()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._get_cache_key"><code class="docutils literal notranslate"><span class="pre">ScholarEngine._get_cache_key()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine.search_async"><code class="docutils literal notranslate"><span class="pre">ScholarEngine.search_async()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine.search_batch_async"><code class="docutils literal notranslate"><span class="pre">ScholarEngine.search_batch_async()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._search_engine_with_timeout"><code class="docutils literal notranslate"><span class="pre">ScholarEngine._search_engine_with_timeout()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._extract_identifiers"><code class="docutils literal notranslate"><span class="pre">ScholarEngine._extract_identifiers()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._identifiers_match"><code class="docutils literal notranslate"><span class="pre">ScholarEngine._identifiers_match()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._validate_paper_consistency"><code class="docutils literal notranslate"><span class="pre">ScholarEngine._validate_paper_consistency()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._validate_against_query"><code class="docutils literal notranslate"><span class="pre">ScholarEngine._validate_against_query()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._combine_metadata"><code class="docutils literal notranslate"><span class="pre">ScholarEngine._combine_metadata()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._merge_metadata_structures"><code class="docutils literal notranslate"><span class="pre">ScholarEngine._merge_metadata_structures()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/migration.html">scitex_scholar.migration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/migration.html#scitex_scholar.migration.from_connected_papers"><code class="docutils literal notranslate"><span class="pre">from_connected_papers()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/migration.html#scitex_scholar.migration.to_connected_papers"><code class="docutils literal notranslate"><span class="pre">to_connected_papers()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/pdf_download.html">scitex_scholar.pdf_download</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/pdf_download.html#scitex_scholar.pdf_download.ScholarPDFDownloader"><code class="docutils literal notranslate"><span class="pre">ScholarPDFDownloader</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pdf_download.html#scitex_scholar.pdf_download.ScholarPDFDownloader.__init__"><code class="docutils literal notranslate"><span class="pre">ScholarPDFDownloader.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pdf_download.html#scitex_scholar.pdf_download.ScholarPDFDownloader.download_from_urls"><code class="docutils literal notranslate"><span class="pre">ScholarPDFDownloader.download_from_urls()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pdf_download.html#scitex_scholar.pdf_download.ScholarPDFDownloader.download_open_access"><code class="docutils literal notranslate"><span class="pre">ScholarPDFDownloader.download_open_access()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pdf_download.html#scitex_scholar.pdf_download.ScholarPDFDownloader.download_smart"><code class="docutils literal notranslate"><span class="pre">ScholarPDFDownloader.download_smart()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pdf_download.html#scitex_scholar.pdf_download.ScholarPDFDownloader.download_from_url"><code class="docutils literal notranslate"><span class="pre">ScholarPDFDownloader.download_from_url()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SciTeX Scholar</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">scitex_scholar.pipelines.SearchQueryParser</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for scitex_scholar.pipelines.SearchQueryParser</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># File: ./src/scitex/scholar/pipelines/SearchQueryParser.py</span>
+
+<span class="sd">"""</span>
+<span class="sd">SearchQueryParser - Parse advanced search queries with filters</span>
+
+<span class="sd">Supports:</span>
+<span class="sd">  - Positive keywords: "hippocampus sharp wave"</span>
+<span class="sd">  - Negative keywords: "-seizure -epilepsy"</span>
+<span class="sd">  - Year range: "year:2020-2024" or "year:&gt;2020"</span>
+<span class="sd">  - Impact factor: "impact_factor:&gt;5"</span>
+<span class="sd">  - Open access: "open_access:true"</span>
+<span class="sd">  - Citation count: "citations:&gt;100"</span>
+
+<span class="sd">Example:</span>
+<span class="sd">  query = "hippocampus sharp wave -seizure year:2020-2024 impact_factor:&gt;5 open_access:true"</span>
+<span class="sd">  parser = SearchQueryParser(query)</span>
+
+<span class="sd">  filters = parser.get_filters()</span>
+<span class="sd">  # {</span>
+<span class="sd">  #   'positive_keywords': ['hippocampus', 'sharp', 'wave'],</span>
+<span class="sd">  #   'negative_keywords': ['seizure'],</span>
+<span class="sd">  #   'year_start': 2020,</span>
+<span class="sd">  #   'year_end': 2024,</span>
+<span class="sd">  #   'min_impact_factor': 5,</span>
+<span class="sd">  #   'open_access': True</span>
+<span class="sd">  # }</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+
+
+<div class="viewcode-block" id="SearchQueryParser">
+<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.SearchQueryParser">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SearchQueryParser</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Parse advanced search queries with filters."""</span>
+
+<div class="viewcode-block" id="SearchQueryParser.__init__">
+<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.SearchQueryParser.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Initialize parser with query string.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            query: Search query with optional filters</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">original_query</span> <span class="o">=</span> <span class="n">query</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">positive_keywords</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">negative_keywords</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">year_start</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">year_end</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_impact_factor</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_impact_factor</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_citations</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_citations</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">open_access</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">document_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title_includes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title_excludes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">author_includes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">author_excludes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">journal_includes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">journal_excludes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parse</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SearchQueryParser._parse">
+<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.SearchQueryParser._parse">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Parse the query string."""</span>
+        <span class="n">remaining_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_query</span>
+
+        <span class="c1"># Extract year filter: year:2020-2024 or year:&gt;2020 or year:&lt;2024</span>
+        <span class="n">year_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">"year:(\d</span><span class="si">{4}</span><span class="s2">)-(\d</span><span class="si">{4}</span><span class="s2">)|year:([&gt;&lt;])(\d</span><span class="si">{4}</span><span class="s2">)"</span>
+        <span class="n">year_matches</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">year_pattern</span><span class="p">,</span> <span class="n">remaining_text</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">year_matches</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">match</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>  <span class="c1"># Range format: 2020-2024</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">year_start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">year_end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">match</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">and</span> <span class="n">match</span><span class="p">[</span><span class="mi">3</span><span class="p">]:</span>  <span class="c1"># Comparison format: &gt;2020</span>
+                <span class="n">year</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">match</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"&gt;"</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">year_start</span> <span class="o">=</span> <span class="n">year</span>
+                <span class="k">else</span><span class="p">:</span>  <span class="c1"># &lt;</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">year_end</span> <span class="o">=</span> <span class="n">year</span>
+        <span class="n">remaining_text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">year_pattern</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="n">remaining_text</span><span class="p">)</span>
+
+        <span class="c1"># Extract impact factor filter: impact_factor:&gt;5 or if:&gt;5</span>
+        <span class="n">if_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">"(?:impact_factor|if):([&gt;&lt;])?([\d.]+)"</span>
+        <span class="n">if_matches</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">if_pattern</span><span class="p">,</span> <span class="n">remaining_text</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">if_matches</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"&gt;"</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">min_impact_factor</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">elif</span> <span class="n">match</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"&lt;"</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">max_impact_factor</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">min_impact_factor</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="n">remaining_text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">if_pattern</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="n">remaining_text</span><span class="p">)</span>
+
+        <span class="c1"># Extract citation count filter: citations:&gt;100</span>
+        <span class="n">cit_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">"citations?:([&gt;&lt;])?([\d]+)"</span>
+        <span class="n">cit_matches</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">cit_pattern</span><span class="p">,</span> <span class="n">remaining_text</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">cit_matches</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"&gt;"</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">min_citations</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">elif</span> <span class="n">match</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"&lt;"</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">max_citations</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">min_citations</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="n">remaining_text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">cit_pattern</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="n">remaining_text</span><span class="p">)</span>
+
+        <span class="c1"># Extract open access filter: open_access:true or oa:true</span>
+        <span class="n">oa_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">"(?:open_access|oa):(true|false|yes|no|1|0)"</span>
+        <span class="n">oa_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">oa_pattern</span><span class="p">,</span> <span class="n">remaining_text</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">oa_match</span><span class="p">:</span>
+            <span class="n">oa_value</span> <span class="o">=</span> <span class="n">oa_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">open_access</span> <span class="o">=</span> <span class="n">oa_value</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"true"</span><span class="p">,</span> <span class="s2">"yes"</span><span class="p">,</span> <span class="s2">"1"</span><span class="p">]</span>
+        <span class="n">remaining_text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">oa_pattern</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="n">remaining_text</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+
+        <span class="c1"># Extract document type filter: type:article or type:review</span>
+        <span class="n">type_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">"type:(article|review|conference|book)"</span>
+        <span class="n">type_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">type_pattern</span><span class="p">,</span> <span class="n">remaining_text</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">type_match</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">document_type</span> <span class="o">=</span> <span class="n">type_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">remaining_text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">type_pattern</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="n">remaining_text</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+
+        <span class="c1"># Extract negative keywords (words starting with -)</span>
+        <span class="n">neg_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">"-(\w+)"</span>
+        <span class="n">neg_matches</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">neg_pattern</span><span class="p">,</span> <span class="n">remaining_text</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">negative_keywords</span> <span class="o">=</span> <span class="n">neg_matches</span>
+        <span class="n">remaining_text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">neg_pattern</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="n">remaining_text</span><span class="p">)</span>
+
+        <span class="c1"># Extract quoted phrases as single keywords</span>
+        <span class="n">quoted_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">'"([^"]+)"'</span>
+        <span class="n">quoted_matches</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">quoted_pattern</span><span class="p">,</span> <span class="n">remaining_text</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">positive_keywords</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">quoted_matches</span><span class="p">)</span>
+        <span class="n">remaining_text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">quoted_pattern</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="n">remaining_text</span><span class="p">)</span>
+
+        <span class="c1"># Remaining words are positive keywords</span>
+        <span class="n">words</span> <span class="o">=</span> <span class="n">remaining_text</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">words</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">words</span> <span class="k">if</span> <span class="n">w</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">positive_keywords</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">words</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SearchQueryParser.get_keyword_query">
+<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.SearchQueryParser.get_keyword_query">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_keyword_query</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Get cleaned keyword query (positive keywords only)."""</span>
+        <span class="k">return</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positive_keywords</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SearchQueryParser.get_filters">
+<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.SearchQueryParser.get_filters">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Get all filters as dictionary."""</span>
+        <span class="n">filters</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">positive_keywords</span><span class="p">:</span>
+            <span class="n">filters</span><span class="p">[</span><span class="s2">"positive_keywords"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">positive_keywords</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">negative_keywords</span><span class="p">:</span>
+            <span class="n">filters</span><span class="p">[</span><span class="s2">"negative_keywords"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">negative_keywords</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">year_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filters</span><span class="p">[</span><span class="s2">"year_start"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">year_start</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">year_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filters</span><span class="p">[</span><span class="s2">"year_end"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">year_end</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_impact_factor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filters</span><span class="p">[</span><span class="s2">"min_impact_factor"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_impact_factor</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_impact_factor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filters</span><span class="p">[</span><span class="s2">"max_impact_factor"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_impact_factor</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_citations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filters</span><span class="p">[</span><span class="s2">"min_citations"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_citations</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_citations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filters</span><span class="p">[</span><span class="s2">"max_citations"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_citations</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_access</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filters</span><span class="p">[</span><span class="s2">"open_access"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_access</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">document_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filters</span><span class="p">[</span><span class="s2">"document_type"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">document_type</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">title_includes</span><span class="p">:</span>
+            <span class="n">filters</span><span class="p">[</span><span class="s2">"title_includes"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">title_includes</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">title_excludes</span><span class="p">:</span>
+            <span class="n">filters</span><span class="p">[</span><span class="s2">"title_excludes"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">title_excludes</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">author_includes</span><span class="p">:</span>
+            <span class="n">filters</span><span class="p">[</span><span class="s2">"author_includes"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">author_includes</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">author_excludes</span><span class="p">:</span>
+            <span class="n">filters</span><span class="p">[</span><span class="s2">"author_excludes"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">author_excludes</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">journal_includes</span><span class="p">:</span>
+            <span class="n">filters</span><span class="p">[</span><span class="s2">"journal_includes"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">journal_includes</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">journal_excludes</span><span class="p">:</span>
+            <span class="n">filters</span><span class="p">[</span><span class="s2">"journal_excludes"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">journal_excludes</span>
+
+        <span class="k">return</span> <span class="n">filters</span></div>
+
+
+<div class="viewcode-block" id="SearchQueryParser.from_shell_syntax">
+<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.SearchQueryParser.from_shell_syntax">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_shell_syntax</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"SearchQueryParser"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Parse shell-style operators from a query string.</span>
+
+<span class="sd">        Supports the following shell-style operators:</span>
+
+<span class="sd">        .. code-block:: text</span>
+
+<span class="sd">            -t VALUE or --title VALUE      : Title include filter</span>
+<span class="sd">            -t -VALUE                      : Title exclude filter (- prefix on value)</span>
+<span class="sd">            -a VALUE or --author VALUE     : Author include filter</span>
+<span class="sd">            -a -VALUE                      : Author exclude filter</span>
+<span class="sd">            -j VALUE or --journal VALUE    : Journal include filter</span>
+<span class="sd">            -j -VALUE                      : Journal exclude filter</span>
+<span class="sd">            -ymin YYYY or --year-min YYYY  : Minimum year</span>
+<span class="sd">            -ymax YYYY or --year-max YYYY  : Maximum year</span>
+<span class="sd">            -cmin N or --citations-min N   : Minimum citations</span>
+<span class="sd">            -cmax N or --citations-max N   : Maximum citations</span>
+<span class="sd">            -ifmin N or --if-min N         : Minimum impact factor</span>
+<span class="sd">            -ifmax N or --if-max N         : Maximum impact factor</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            query: Query string with shell-style operators</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            SearchQueryParser instance with parsed fields set</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                parser = SearchQueryParser.from_shell_syntax(</span>
+<span class="sd">                    "hippocampus -t theta -a -Smith -ymin 2020 -cmin 50"</span>
+<span class="sd">                )</span>
+<span class="sd">        """</span>
+        <span class="c1"># Create instance without running the standard _parse() on the raw query.</span>
+        <span class="c1"># We do this by initialising with an empty string and then setting</span>
+        <span class="c1"># original_query and the parsed fields manually.</span>
+        <span class="n">instance</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">original_query</span> <span class="o">=</span> <span class="n">query</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">positive_keywords</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">negative_keywords</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">year_start</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">year_end</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">min_impact_factor</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">max_impact_factor</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">min_citations</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">max_citations</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">open_access</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">document_type</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">title_includes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">title_excludes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">author_includes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">author_excludes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">journal_includes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">journal_excludes</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">query</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">instance</span>
+
+        <span class="n">remaining</span> <span class="o">=</span> <span class="n">query</span>
+
+        <span class="c1"># Text filters: -t/-a/-j  (value may be prefixed with - for exclude)</span>
+        <span class="n">text_patterns</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s1">'(?:-t|--title)\s+(-?)([^\s]+|"[^"]+"|</span><span class="se">\'</span><span class="s1">[^</span><span class="se">\'</span><span class="s1">]+</span><span class="se">\'</span><span class="s1">)'</span><span class="p">,</span> <span class="s2">"title"</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s1">'(?:-a|--author)\s+(-?)([^\s]+|"[^"]+"|</span><span class="se">\'</span><span class="s1">[^</span><span class="se">\'</span><span class="s1">]+</span><span class="se">\'</span><span class="s1">)'</span><span class="p">,</span> <span class="s2">"author"</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s1">'(?:-j|--journal)\s+(-?)([^\s]+|"[^"]+"|</span><span class="se">\'</span><span class="s1">[^</span><span class="se">\'</span><span class="s1">]+</span><span class="se">\'</span><span class="s1">)'</span><span class="p">,</span> <span class="s2">"journal"</span><span class="p">),</span>
+        <span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">field_name</span> <span class="ow">in</span> <span class="n">text_patterns</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">remaining</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">):</span>
+                <span class="n">is_exclude</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"-"</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">"</span><span class="se">\"</span><span class="s2">'"</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">is_exclude</span><span class="p">:</span>
+                    <span class="nb">getattr</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">_excludes"</span><span class="p">)</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">getattr</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">_includes"</span><span class="p">)</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">remaining</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="n">remaining</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+
+        <span class="c1"># Numeric filters</span>
+        <span class="n">numeric_patterns</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">"(?:-ymin|--year-min)\s+(\d</span><span class="si">{4}</span><span class="s2">)"</span><span class="p">,</span> <span class="s2">"year_min"</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">"(?:-ymax|--year-max)\s+(\d</span><span class="si">{4}</span><span class="s2">)"</span><span class="p">,</span> <span class="s2">"year_max"</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">"(?:-cmin|--citations-min)\s+(\d+)"</span><span class="p">,</span> <span class="s2">"citations_min"</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">"(?:-cmax|--citations-max)\s+(\d+)"</span><span class="p">,</span> <span class="s2">"citations_max"</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">"(?:-ifmin|--if-min)\s+(\d+(?:\.\d+)?)"</span><span class="p">,</span> <span class="s2">"impact_factor_min"</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">"(?:-ifmax|--if-max)\s+(\d+(?:\.\d+)?)"</span><span class="p">,</span> <span class="s2">"impact_factor_max"</span><span class="p">),</span>
+        <span class="p">]</span>
+
+        <span class="n">field_mapping</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"year_min"</span><span class="p">:</span> <span class="s2">"year_start"</span><span class="p">,</span>
+            <span class="s2">"year_max"</span><span class="p">:</span> <span class="s2">"year_end"</span><span class="p">,</span>
+            <span class="s2">"citations_min"</span><span class="p">:</span> <span class="s2">"min_citations"</span><span class="p">,</span>
+            <span class="s2">"citations_max"</span><span class="p">:</span> <span class="s2">"max_citations"</span><span class="p">,</span>
+            <span class="s2">"impact_factor_min"</span><span class="p">:</span> <span class="s2">"min_impact_factor"</span><span class="p">,</span>
+            <span class="s2">"impact_factor_max"</span><span class="p">:</span> <span class="s2">"max_impact_factor"</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">field_name</span> <span class="ow">in</span> <span class="n">numeric_patterns</span><span class="p">:</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">remaining</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">raw_value</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s2">"impact_factor"</span> <span class="ow">in</span> <span class="n">field_name</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">raw_value</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="s2">"year"</span> <span class="ow">in</span> <span class="n">field_name</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">raw_value</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">raw_value</span><span class="p">)</span>
+                <span class="n">attr_name</span> <span class="o">=</span> <span class="n">field_mapping</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                <span class="n">remaining</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="n">remaining</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+
+        <span class="c1"># Remaining text becomes positive keywords</span>
+        <span class="n">words</span> <span class="o">=</span> <span class="n">remaining</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">positive_keywords</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">words</span> <span class="k">if</span> <span class="n">w</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
+
+        <span class="k">return</span> <span class="n">instance</span></div>
+
+
+<div class="viewcode-block" id="SearchQueryParser.get_api_filters">
+<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.SearchQueryParser.get_api_filters">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_api_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Get filters that can be pushed to API level."""</span>
+        <span class="n">api_filters</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">year_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">api_filters</span><span class="p">[</span><span class="s2">"year_start"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">year_start</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">year_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">api_filters</span><span class="p">[</span><span class="s2">"year_end"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">year_end</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_access</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">api_filters</span><span class="p">[</span><span class="s2">"open_access"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_access</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">document_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">api_filters</span><span class="p">[</span><span class="s2">"document_type"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">document_type</span>
+
+        <span class="k">return</span> <span class="n">api_filters</span></div>
+
+
+<div class="viewcode-block" id="SearchQueryParser.get_post_filters">
+<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.SearchQueryParser.get_post_filters">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_post_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Get filters that must be applied post-API (client-side)."""</span>
+        <span class="n">post_filters</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">negative_keywords</span><span class="p">:</span>
+            <span class="n">post_filters</span><span class="p">[</span><span class="s2">"negative_keywords"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">negative_keywords</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_impact_factor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">post_filters</span><span class="p">[</span><span class="s2">"min_impact_factor"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_impact_factor</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_impact_factor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">post_filters</span><span class="p">[</span><span class="s2">"max_impact_factor"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_impact_factor</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_citations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">post_filters</span><span class="p">[</span><span class="s2">"min_citations"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_citations</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_citations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">post_filters</span><span class="p">[</span><span class="s2">"max_citations"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_citations</span>
+
+        <span class="k">return</span> <span class="n">post_filters</span></div>
+
+
+<div class="viewcode-block" id="SearchQueryParser.to_pubmed_query">
+<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.SearchQueryParser.to_pubmed_query">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_pubmed_query</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Convert to PubMed E-utilities query format."""</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Positive keywords</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">positive_keywords</span><span class="p">:</span>
+            <span class="n">keyword_part</span> <span class="o">=</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positive_keywords</span><span class="p">)</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">keyword_part</span><span class="si">}</span><span class="s2">)[Title/Abstract]"</span><span class="p">)</span>
+
+        <span class="c1"># Negative keywords</span>
+        <span class="k">for</span> <span class="n">neg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">negative_keywords</span><span class="p">:</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"NOT </span><span class="si">{</span><span class="n">neg</span><span class="si">}</span><span class="s2">[Title/Abstract]"</span><span class="p">)</span>
+
+        <span class="c1"># Year range</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">year_start</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">year_end</span><span class="p">:</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">year_start</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">year_end</span><span class="si">}</span><span class="s2">[pdat]"</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">year_start</span><span class="p">:</span>
+            <span class="n">current_year</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">year</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">year_start</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">current_year</span><span class="si">}</span><span class="s2">[pdat]"</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">year_end</span><span class="p">:</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"1900:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">year_end</span><span class="si">}</span><span class="s2">[pdat]"</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="s2">" AND "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="k">if</span> <span class="n">parts</span> <span class="k">else</span> <span class="s2">""</span></div>
+
+
+<div class="viewcode-block" id="SearchQueryParser.to_crossref_params">
+<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.SearchQueryParser.to_crossref_params">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_crossref_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Convert to CrossRef API parameters."""</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Query</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">positive_keywords</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">"query.bibliographic"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positive_keywords</span><span class="p">)</span>
+
+        <span class="c1"># Year filter</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">year_start</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">"filter"</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"from-pub-date:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">year_start</span><span class="si">}</span><span class="s2">"</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">year_end</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">"filter"</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+                <span class="n">params</span><span class="p">[</span><span class="s2">"filter"</span><span class="p">]</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">",until-pub-date:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">year_end</span><span class="si">}</span><span class="s2">"</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">params</span><span class="p">[</span><span class="s2">"filter"</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"until-pub-date:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">year_end</span><span class="si">}</span><span class="s2">"</span>
+
+        <span class="k">return</span> <span class="n">params</span></div>
+
+
+<div class="viewcode-block" id="SearchQueryParser.to_arxiv_query">
+<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.SearchQueryParser.to_arxiv_query">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_arxiv_query</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Convert to arXiv API query format."""</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Positive keywords</span>
+        <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">positive_keywords</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">" "</span> <span class="ow">in</span> <span class="n">kw</span><span class="p">:</span>  <span class="c1"># Quoted phrase</span>
+                <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">'all:"</span><span class="si">{</span><span class="n">kw</span><span class="si">}</span><span class="s1">"'</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"all:</span><span class="si">{</span><span class="n">kw</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+        <span class="c1"># Negative keywords</span>
+        <span class="k">for</span> <span class="n">neg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">negative_keywords</span><span class="p">:</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"ANDNOT all:</span><span class="si">{</span><span class="n">neg</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="s2">" AND "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="k">if</span> <span class="n">parts</span> <span class="k">else</span> <span class="s2">""</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"SearchQueryParser("</span>
+            <span class="sa">f</span><span class="s2">"positive=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">positive_keywords</span><span class="si">}</span><span class="s2">, "</span>
+            <span class="sa">f</span><span class="s2">"negative=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">negative_keywords</span><span class="si">}</span><span class="s2">, "</span>
+            <span class="sa">f</span><span class="s2">"year=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">year_start</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">year_end</span><span class="si">}</span><span class="s2">, "</span>
+            <span class="sa">f</span><span class="s2">"if&gt;=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">min_impact_factor</span><span class="si">}</span><span class="s2">, "</span>
+            <span class="sa">f</span><span class="s2">"oa=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">open_access</span><span class="si">}</span><span class="s2">)"</span>
+        <span class="p">)</span></div>
+
+
+
+<span class="c1"># EOF</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Yusuke Watanabe.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

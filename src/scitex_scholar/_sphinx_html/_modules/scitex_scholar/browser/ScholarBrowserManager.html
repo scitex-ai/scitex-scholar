@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scitex_scholar.browser.ScholarBrowserManager &mdash; SciTeX Scholar v1.4.1</title>
+  <title>scitex_scholar.browser.ScholarBrowserManager &mdash; SciTeX Scholar v1.9.0</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=350a9c04"></script>
+      <script src="../../../_static/documentation_options.js?v=c4cb232b"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -238,6 +238,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._save_to_cache"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._save_to_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_async"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_async()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_sync"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.refresh"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.ensure_loaded()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_source"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_source()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_issn"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_issn()</span></code></a></li>
@@ -251,13 +253,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.__init__"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.__init__()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_instance"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_instance()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._is_cache_valid"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._is_cache_valid()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._load_from_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._load_from_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._save_to_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._save_to_cache()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_async"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_async()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_sync"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.refresh"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.ensure_loaded()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_issn_l"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_issn_l()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.normalize"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.normalize()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_abbreviation"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_abbreviation()</span></code></a></li>
@@ -377,7 +378,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../api/citation_graph.html">scitex_scholar.citation_graph</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.__init__"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._auto_detect"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._auto_detect()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.build"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.build()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._create_paper_node"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._create_paper_node()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._build_citation_edges"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._build_citation_edges()</span></code></a></li>
@@ -503,14 +503,14 @@
   <h1>Source code for scitex_scholar.browser.ScholarBrowserManager</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="c1"># Timestamp: &quot;2025-10-11 07:53:46 (ywatanabe)&quot;</span>
+<span class="c1"># Timestamp: "2025-10-11 07:53:46 (ywatanabe)"</span>
 <span class="c1"># File: /home/ywatanabe/proj/scitex_repo/src/scitex/scholar/browser/ScholarBrowserManager.py</span>
 <span class="c1"># ----------------------------------------</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
-<span class="n">__FILE__</span> <span class="o">=</span> <span class="s2">&quot;./src/scitex/scholar/browser/ScholarBrowserManager.py&quot;</span>
+<span class="n">__FILE__</span> <span class="o">=</span> <span class="s2">"./src/scitex/scholar/browser/ScholarBrowserManager.py"</span>
 <span class="n">__DIR__</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__FILE__</span><span class="p">)</span>
 <span class="c1"># ----------------------------------------</span>
 
@@ -534,7 +534,7 @@
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 <span class="sd">Browser Manager with persistent context support.</span>
 
 <span class="sd">_persistent_context is a **persistent browser context** that stays alive across multiple operations.</span>
@@ -558,7 +558,7 @@
 <span class="sd">)</span>
 
 <span class="sd"># Reused multiple times</span>
-<span class="sd">if hasattr(self, &quot;_persistent_context&quot;) and self._persistent_context:</span>
+<span class="sd">if hasattr(self, "_persistent_context") and self._persistent_context:</span>
 <span class="sd">    context = self._persistent_context  # Same context</span>
 <span class="sd">```</span>
 
@@ -573,13 +573,13 @@
 <span class="sd">## In Your Code</span>
 
 <span class="sd">`_persistent_context` is set in `_launch_persistent_context_async()` and reused in `get_authenticated_browser_and_context_async()`. This allows multiple pages to share the same authenticated, extension-enabled browser session.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 
 <div class="viewcode-block" id="ScholarBrowserManager">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.browser.ScholarBrowserManager">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ScholarBrowserManager</span><span class="p">(</span><span class="n">BrowserMixin</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Manages a local browser instance with stealth enhancements and invisible mode.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Manages a local browser instance with stealth enhancements and invisible mode."""</span>
 
 <div class="viewcode-block" id="ScholarBrowserManager.__init__">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.browser.ScholarBrowserManager.__init__">[docs]</a>
@@ -590,20 +590,20 @@
         <span class="n">chrome_profile_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">config</span><span class="p">:</span> <span class="n">ScholarConfig</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialize ScholarBrowserManager with invisible browser capabilities.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            auth_manager: Authentication manager instance</span>
 <span class="sd">            config: Scholar configuration instance</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># Store scholar_config for use by components like ChromeProfileManager</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span> <span class="ow">or</span> <span class="n">ScholarConfig</span><span class="p">()</span>
 
         <span class="c1"># Browser</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">browser_mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span>
-            <span class="s2">&quot;browser_mode&quot;</span><span class="p">,</span> <span class="n">browser_mode</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;interactive&quot;</span>
+            <span class="s2">"browser_mode"</span><span class="p">,</span> <span class="n">browser_mode</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">"interactive"</span>
         <span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">browser_mode</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_interactive_or_stealth</span><span class="p">(</span><span class="n">browser_mode</span><span class="p">)</span>
@@ -612,7 +612,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">auth_manager</span> <span class="o">=</span> <span class="n">auth_manager</span>
         <span class="k">if</span> <span class="n">auth_manager</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: auth_manager not passed. University Authentication will not be enabled.&quot;</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: auth_manager not passed. University Authentication will not be enabled."</span>
             <span class="p">)</span>
 
         <span class="c1"># Chrome Extension</span>
@@ -637,12 +637,12 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_set_interactive_or_stealth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">browser_mode</span><span class="p">):</span>
         <span class="c1"># Interactive or Stealth</span>
-        <span class="k">if</span> <span class="n">browser_mode</span> <span class="o">==</span> <span class="s2">&quot;interactive&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">browser_mode</span> <span class="o">==</span> <span class="s2">"interactive"</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">headless</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spoof_dimension</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">viewport_size</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1920</span><span class="p">,</span> <span class="mi">1080</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">display</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">elif</span> <span class="n">browser_mode</span> <span class="o">==</span> <span class="s2">&quot;stealth&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">browser_mode</span> <span class="o">==</span> <span class="s2">"stealth"</span><span class="p">:</span>
             <span class="c1"># Must be False for dimension spoofing to work</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">headless</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spoof_dimension</span> <span class="o">=</span> <span class="kc">True</span>
@@ -652,24 +652,24 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">display</span> <span class="o">=</span> <span class="mi">99</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;browser_mode must be eighther of &#39;interactive&#39; or &#39;stealth&#39;&quot;</span>
+                <span class="s2">"browser_mode must be eighther of 'interactive' or 'stealth'"</span>
             <span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Browser initialized:&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: headless: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">headless</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: spoof_dimension: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">spoof_dimension</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: viewport_size: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">viewport_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Browser initialized:"</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: headless: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">headless</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: spoof_dimension: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">spoof_dimension</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: viewport_size: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">viewport_size</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ScholarBrowserManager.get_authenticated_browser_and_context_async">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.browser.ScholarBrowserManager.get_authenticated_browser_and_context_async">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_authenticated_browser_and_context_async</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">context_options</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Browser</span><span class="p">,</span> <span class="n">BrowserContext</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get browser context with authentication cookies and extensions loaded.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Get browser context with authentication cookies and extensions loaded."""</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_manager</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: &quot;</span>
-                <span class="s2">&quot;Authentication manager is not set. &quot;</span>
-                <span class="s2">&quot;To use this method, please initialize ScholarBrowserManager with an auth_manager.&quot;</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: "</span>
+                <span class="s2">"Authentication manager is not set. "</span>
+                <span class="s2">"To use this method, please initialize ScholarBrowserManager with an auth_manager."</span>
             <span class="p">)</span>
 
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_manager</span><span class="o">.</span><span class="n">ensure_authenticate_async</span><span class="p">()</span>
@@ -678,13 +678,13 @@
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_persistent_browser_with_profile_but_not_with_auth_async</span><span class="p">()</span>
         <span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_persistent_context&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_persistent_context</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"_persistent_context"</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_persistent_context</span><span class="p">:</span>
             <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_persistent_context</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Using persistent context with profile and extensions&quot;</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Using persistent context with profile and extensions"</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Falling back to regular context creation&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Falling back to regular context creation"</span><span class="p">)</span>
 
             <span class="n">auth_options</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_manager</span><span class="o">.</span><span class="n">get_auth_options</span><span class="p">()</span>
             <span class="n">context_options</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">auth_options</span><span class="p">)</span>
@@ -699,7 +699,7 @@
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_new_context_async</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">browser</span><span class="p">:</span> <span class="n">Browser</span><span class="p">,</span> <span class="o">**</span><span class="n">context_options</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BrowserContext</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a new browser context with stealth options and invisible mode applied.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Creates a new browser context with stealth options and invisible mode applied."""</span>
         <span class="n">stealth_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stealth_manager</span><span class="o">.</span><span class="n">get_stealth_options</span><span class="p">()</span>
         <span class="n">context</span> <span class="o">=</span> <span class="k">await</span> <span class="n">browser</span><span class="o">.</span><span class="n">new_context</span><span class="p">({</span><span class="o">**</span><span class="n">stealth_options</span><span class="p">,</span> <span class="o">**</span><span class="n">context_options</span><span class="p">})</span>
 
@@ -736,12 +736,12 @@
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_ensure_extensions_installed_async</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">chrome_profile_manager</span><span class="o">.</span><span class="n">check_extensions_installed</span><span class="p">():</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Chrome extensions not verified&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Chrome extensions not verified"</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Trying install extensions&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Trying install extensions"</span><span class="p">)</span>
                 <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">chrome_profile_manager</span><span class="o">.</span><span class="n">install_extensions_manually_if_not_installed_async</span><span class="p">()</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Installation failed: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Installation failed: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_launch_persistent_context_async</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">persistent_context_launch_options</span> <span class="o">=</span> <span class="p">(</span>
@@ -756,10 +756,10 @@
 
         <span class="c1"># Multiple possible lock file locations</span>
         <span class="n">lock_files</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">profile_dir</span> <span class="o">/</span> <span class="s2">&quot;SingletonLock&quot;</span><span class="p">,</span>
-            <span class="n">profile_dir</span> <span class="o">/</span> <span class="s2">&quot;SingletonSocket&quot;</span><span class="p">,</span>
-            <span class="n">profile_dir</span> <span class="o">/</span> <span class="s2">&quot;SingletonCookie&quot;</span><span class="p">,</span>
-            <span class="n">profile_dir</span> <span class="o">/</span> <span class="s2">&quot;lockfile&quot;</span><span class="p">,</span>
+            <span class="n">profile_dir</span> <span class="o">/</span> <span class="s2">"SingletonLock"</span><span class="p">,</span>
+            <span class="n">profile_dir</span> <span class="o">/</span> <span class="s2">"SingletonSocket"</span><span class="p">,</span>
+            <span class="n">profile_dir</span> <span class="o">/</span> <span class="s2">"SingletonCookie"</span><span class="p">,</span>
+            <span class="n">profile_dir</span> <span class="o">/</span> <span class="s2">"lockfile"</span><span class="p">,</span>
         <span class="p">]</span>
 
         <span class="n">removed_locks</span> <span class="o">=</span> <span class="mi">0</span>
@@ -768,16 +768,16 @@
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">lock_file</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Removed Chrome lock file: </span><span class="si">{</span><span class="n">lock_file</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Removed Chrome lock file: </span><span class="si">{</span><span class="n">lock_file</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span>
                     <span class="p">)</span>
                     <span class="n">removed_locks</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Could not remove </span><span class="si">{</span><span class="n">lock_file</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Could not remove </span><span class="si">{</span><span class="n">lock_file</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span>
                     <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">removed_locks</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Cleaned up </span><span class="si">{</span><span class="n">removed_locks</span><span class="si">}</span><span class="s2"> Chrome lock files&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Cleaned up </span><span class="si">{</span><span class="n">removed_locks</span><span class="si">}</span><span class="s2"> Chrome lock files"</span><span class="p">)</span>
             <span class="c1"># Wait a moment for the system to release file handles</span>
             <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
@@ -786,20 +786,20 @@
             <span class="n">profile_path_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">profile_dir</span><span class="p">)</span>
             <span class="c1"># Find and kill Chrome processes using this profile</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-                <span class="p">[</span><span class="s2">&quot;pkill&quot;</span><span class="p">,</span> <span class="s2">&quot;-f&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;user-data-dir=</span><span class="si">{</span><span class="n">profile_path_str</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">],</span>
+                <span class="p">[</span><span class="s2">"pkill"</span><span class="p">,</span> <span class="s2">"-f"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"user-data-dir=</span><span class="si">{</span><span class="n">profile_path_str</span><span class="si">}</span><span class="s2">"</span><span class="p">],</span>
                 <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Killed lingering Chrome processes for this profile&quot;</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Killed lingering Chrome processes for this profile"</span>
                 <span class="p">)</span>
                 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># Give processes time to fully terminate</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Chrome process cleanup attempt: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Chrome process cleanup attempt: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="c1"># This show_asyncs a small screen with 4 extensions show_asyncn</span>
-        <span class="n">persistent_context_launch_options</span><span class="p">[</span><span class="s2">&quot;headless&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">persistent_context_launch_options</span><span class="p">[</span><span class="s2">"headless"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_persistent_context</span> <span class="o">=</span> <span class="p">(</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_persistent_playwright</span><span class="o">.</span><span class="n">chromium</span><span class="o">.</span><span class="n">launch_persistent_context</span><span class="p">(</span>
                 <span class="o">**</span><span class="n">persistent_context_launch_options</span>
@@ -823,60 +823,60 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_persistent_browser</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_persistent_context</span><span class="o">.</span><span class="n">browser</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="c1"># Post-mortem of persistent-context setup failure: capture the</span>
-            <span class="c1"># first open page&#39;s screenshot + HTML if one exists.</span>
+            <span class="c1"># first open page's screenshot + HTML if one exists.</span>
             <span class="kn">from</span><span class="w"> </span><span class="nn">scitex_browser.debugging</span><span class="w"> </span><span class="kn">import</span> <span class="n">capture_debug_artifacts_async</span>
 
             <span class="n">pages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_persistent_context</span><span class="o">.</span><span class="n">pages</span>
             <span class="k">if</span> <span class="n">pages</span><span class="p">:</span>
                 <span class="k">await</span> <span class="n">capture_debug_artifacts_async</span><span class="p">(</span>
-                    <span class="n">pages</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;persistent_context_launch_error&quot;</span>
+                    <span class="n">pages</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">"persistent_context_launch_error"</span>
                 <span class="p">)</span>
             <span class="k">raise</span>
 
 <div class="viewcode-block" id="ScholarBrowserManager._verify_xvfb_running">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.browser.ScholarBrowserManager._verify_xvfb_running">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">_verify_xvfb_running</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_recursed</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Verify Xvfb virtual display is running; auto-start if absent.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Verify Xvfb virtual display is running; auto-start if absent."""</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-                <span class="p">[</span><span class="s2">&quot;xdpyinfo&quot;</span><span class="p">,</span> <span class="s2">&quot;-display&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">],</span>
+                <span class="p">[</span><span class="s2">"xdpyinfo"</span><span class="p">,</span> <span class="s2">"-display"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">":</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="si">}</span><span class="s2">"</span><span class="p">],</span>
                 <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">running</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: xdpyinfo failed (</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">); assuming display absent&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: xdpyinfo failed (</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">); assuming display absent"</span><span class="p">)</span>
             <span class="n">running</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="k">if</span> <span class="n">running</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Xvfb display :</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="si">}</span><span class="s2"> is running&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Xvfb display :</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="si">}</span><span class="s2"> is running"</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="n">_recursed</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Xvfb :</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="si">}</span><span class="s2"> failed to start&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Xvfb :</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="si">}</span><span class="s2"> failed to start"</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">False</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Starting Xvfb display :</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;pkill&quot;</span><span class="p">,</span> <span class="s2">&quot;-f&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Xvfb.*:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">],</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Starting Xvfb display :</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">"pkill"</span><span class="p">,</span> <span class="s2">"-f"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"Xvfb.*:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="si">}</span><span class="s2">"</span><span class="p">],</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
         <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
             <span class="p">[</span>
-                <span class="s2">&quot;Xvfb&quot;</span><span class="p">,</span>
-                <span class="sa">f</span><span class="s2">&quot;:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;-screen&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;0&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;1920x1080x24&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;-ac&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;+extension&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;GLX&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;+extension&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;RANDR&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;+render&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;-noreset&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;-dpi&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;96&quot;</span><span class="p">,</span>
+                <span class="s2">"Xvfb"</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">":</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                <span class="s2">"-screen"</span><span class="p">,</span>
+                <span class="s2">"0"</span><span class="p">,</span>
+                <span class="s2">"1920x1080x24"</span><span class="p">,</span>
+                <span class="s2">"-ac"</span><span class="p">,</span>
+                <span class="s2">"+extension"</span><span class="p">,</span>
+                <span class="s2">"GLX"</span><span class="p">,</span>
+                <span class="s2">"+extension"</span><span class="p">,</span>
+                <span class="s2">"RANDR"</span><span class="p">,</span>
+                <span class="s2">"+render"</span><span class="p">,</span>
+                <span class="s2">"-noreset"</span><span class="p">,</span>
+                <span class="s2">"-dpi"</span><span class="p">,</span>
+                <span class="s2">"96"</span><span class="p">,</span>
             <span class="p">],</span>
-            <span class="n">env</span><span class="o">=</span><span class="p">{</span><span class="o">**</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span> <span class="s2">&quot;DISPLAY&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">},</span>
+            <span class="n">env</span><span class="o">=</span><span class="p">{</span><span class="o">**</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span> <span class="s2">"DISPLAY"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">":</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="si">}</span><span class="s2">"</span><span class="p">},</span>
         <span class="p">)</span>
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verify_xvfb_running</span><span class="p">(</span><span class="n">_recursed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
@@ -886,46 +886,46 @@
         <span class="n">stealth_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stealth_manager</span><span class="o">.</span><span class="n">get_stealth_options_additional</span><span class="p">()</span>
         <span class="n">extension_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chrome_profile_manager</span><span class="o">.</span><span class="n">get_extension_args</span><span class="p">()</span>
         <span class="n">pdf_download_args</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;--always-open-pdf-externally&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--disable-plugins-discovery&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--plugin-policy=block&quot;</span><span class="p">,</span>
+            <span class="s2">"--always-open-pdf-externally"</span><span class="p">,</span>
+            <span class="s2">"--disable-plugins-discovery"</span><span class="p">,</span>
+            <span class="s2">"--plugin-policy=block"</span><span class="p">,</span>
         <span class="p">]</span>
 
         <span class="n">stealth_args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
             <span class="p">[</span>
-                <span class="sa">f</span><span class="s2">&quot;--display=:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;--window-size=1920,1080&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">"--display=:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                <span class="s2">"--window-size=1920,1080"</span><span class="p">,</span>
             <span class="p">]</span>
         <span class="p">)</span>
 
         <span class="n">no_welcome_args</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;--disable-extensions-file-access-check&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--disable-extensions-http-throttling&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--disable-component-extensions-with-background-pages&quot;</span><span class="p">,</span>
+            <span class="s2">"--disable-extensions-file-access-check"</span><span class="p">,</span>
+            <span class="s2">"--disable-extensions-http-throttling"</span><span class="p">,</span>
+            <span class="s2">"--disable-component-extensions-with-background-pages"</span><span class="p">,</span>
         <span class="p">]</span>
 
-        <span class="c1"># Disable &quot;Restore pages?&quot; popup and session restore dialogs</span>
+        <span class="c1"># Disable "Restore pages?" popup and session restore dialogs</span>
         <span class="n">no_restore_args</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;--disable-session-crashed-bubble&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--disable-infobars&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--no-first-run&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--no-default-browser-check&quot;</span><span class="p">,</span>
+            <span class="s2">"--disable-session-crashed-bubble"</span><span class="p">,</span>
+            <span class="s2">"--disable-infobars"</span><span class="p">,</span>
+            <span class="s2">"--no-first-run"</span><span class="p">,</span>
+            <span class="s2">"--no-default-browser-check"</span><span class="p">,</span>
         <span class="p">]</span>
 
         <span class="n">screenshot_args</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;--no-sandbox&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--disable-blink-features=AutomationControlled&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--disable-features=VizDisplayCompositor&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--disable-web-security&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--disable-features=TranslateUI&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--disable-ipc-flooding-protection&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--font-render-hinting=none&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--disable-font-subpixel-positioning&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--disable-remote-fonts&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--disable-background-timer-throttling&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--disable-backgrounding-occluded-windows&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--disable-renderer-backgrounding&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--disable-font-loading-api&quot;</span><span class="p">,</span>
+            <span class="s2">"--no-sandbox"</span><span class="p">,</span>
+            <span class="s2">"--disable-blink-features=AutomationControlled"</span><span class="p">,</span>
+            <span class="s2">"--disable-features=VizDisplayCompositor"</span><span class="p">,</span>
+            <span class="s2">"--disable-web-security"</span><span class="p">,</span>
+            <span class="s2">"--disable-features=TranslateUI"</span><span class="p">,</span>
+            <span class="s2">"--disable-ipc-flooding-protection"</span><span class="p">,</span>
+            <span class="s2">"--font-render-hinting=none"</span><span class="p">,</span>
+            <span class="s2">"--disable-font-subpixel-positioning"</span><span class="p">,</span>
+            <span class="s2">"--disable-remote-fonts"</span><span class="p">,</span>
+            <span class="s2">"--disable-background-timer-throttling"</span><span class="p">,</span>
+            <span class="s2">"--disable-backgrounding-occluded-windows"</span><span class="p">,</span>
+            <span class="s2">"--disable-renderer-backgrounding"</span><span class="p">,</span>
+            <span class="s2">"--disable-font-loading-api"</span><span class="p">,</span>
         <span class="p">]</span>
 
         <span class="n">launch_args</span> <span class="o">=</span> <span class="p">(</span>
@@ -939,8 +939,8 @@
 
         <span class="c1"># Debug: Show window args for stealth mode</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spoof_dimension</span><span class="p">:</span>
-            <span class="n">window_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">arg</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">launch_args</span> <span class="k">if</span> <span class="s2">&quot;window-&quot;</span> <span class="ow">in</span> <span class="n">arg</span><span class="p">]</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Stealth window args: </span><span class="si">{</span><span class="n">window_args</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">window_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">arg</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">launch_args</span> <span class="k">if</span> <span class="s2">"window-"</span> <span class="ow">in</span> <span class="n">arg</span><span class="p">]</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Stealth window args: </span><span class="si">{</span><span class="n">window_args</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="n">proxy_config</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -948,19 +948,19 @@
         <span class="n">downloads_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_library_downloads_dir</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;user_data_dir&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chrome_profile_manager</span><span class="o">.</span><span class="n">profile_dir</span><span class="p">),</span>
-            <span class="s2">&quot;headless&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">headless</span><span class="p">,</span>
-            <span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="n">launch_args</span><span class="p">,</span>
-            <span class="s2">&quot;accept_downloads&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># Enable download handling</span>
-            <span class="s2">&quot;downloads_path&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">downloads_path</span><span class="p">),</span>  <span class="c1"># Set custom download directory</span>
-            <span class="s2">&quot;proxy&quot;</span><span class="p">:</span> <span class="n">proxy_config</span><span class="p">,</span>
-            <span class="s2">&quot;viewport&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewport_size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewport_size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="s2">"user_data_dir"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chrome_profile_manager</span><span class="o">.</span><span class="n">profile_dir</span><span class="p">),</span>
+            <span class="s2">"headless"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">headless</span><span class="p">,</span>
+            <span class="s2">"args"</span><span class="p">:</span> <span class="n">launch_args</span><span class="p">,</span>
+            <span class="s2">"accept_downloads"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># Enable download handling</span>
+            <span class="s2">"downloads_path"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">downloads_path</span><span class="p">),</span>  <span class="c1"># Set custom download directory</span>
+            <span class="s2">"proxy"</span><span class="p">:</span> <span class="n">proxy_config</span><span class="p">,</span>
+            <span class="s2">"viewport"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"width"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewport_size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="s2">"height"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewport_size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
             <span class="p">},</span>
-            <span class="s2">&quot;screen&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewport_size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewport_size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="s2">"screen"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"width"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewport_size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="s2">"height"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewport_size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
             <span class="p">},</span>
         <span class="p">}</span>
 
@@ -978,10 +978,10 @@
 <div class="viewcode-block" id="ScholarBrowserManager._load_auth_cookies_to_persistent_context_async">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.browser.ScholarBrowserManager._load_auth_cookies_to_persistent_context_async">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_load_auth_cookies_to_persistent_context_async</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load authentication cookies into the persistent browser context.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Load authentication cookies into the persistent browser context."""</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_manager</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: No auth_manager available, skipping cookie loading&quot;</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: No auth_manager available, skipping cookie loading"</span>
             <span class="p">)</span>
             <span class="k">return</span>
 
@@ -992,14 +992,14 @@
                 <span class="k">if</span> <span class="n">cookies</span><span class="p">:</span>
                     <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_persistent_context</span><span class="o">.</span><span class="n">add_cookies</span><span class="p">(</span><span class="n">cookies</span><span class="p">)</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Loaded </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cookies</span><span class="p">)</span><span class="si">}</span><span class="s2"> authentication cookies into persistent browser context&quot;</span>
+                        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Loaded </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cookies</span><span class="p">)</span><span class="si">}</span><span class="s2"> authentication cookies into persistent browser context"</span>
                     <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: No cookies available from auth manager&quot;</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: No cookies available from auth manager"</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Not authenticated, skipping cookie loading&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Not authenticated, skipping cookie loading"</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Failed to load authentication cookies: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Failed to load authentication cookies: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ScholarBrowserManager.take_screenshot_async">
@@ -1012,14 +1012,14 @@
         <span class="n">timeout_after_sec</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">30.0</span><span class="p">,</span>
         <span class="n">full_page</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Take screenshot without viewport changes.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Take screenshot without viewport changes."""</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">screenshot</span><span class="p">(</span>
                 <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout_sec</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">full_page</span><span class="o">=</span><span class="n">full_page</span>
             <span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Saved: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Saved: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Screenshot failed for </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+            <span class="n">logger</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Screenshot failed for </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ScholarBrowserManager.start_periodic_screenshots_async">
@@ -1028,12 +1028,12 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">page</span><span class="p">,</span>
         <span class="n">output_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
-        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;periodic&quot;</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"periodic"</span><span class="p">,</span>
         <span class="n">interval_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">duration_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Start taking periodic screenshots in the background.</span>
 
 <span class="sd">        Args:</span>
@@ -1045,7 +1045,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            asyncio.Task that can be cancelled to stop screenshots</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">take_periodic_screenshots</span><span class="p">():</span>
             <span class="n">elapsed</span> <span class="o">=</span> <span class="mi">0</span>
@@ -1053,31 +1053,31 @@
 
             <span class="k">while</span> <span class="n">duration_seconds</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">elapsed</span> <span class="o">&lt;</span> <span class="n">duration_seconds</span><span class="p">:</span>
                 <span class="n">step</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="n">timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">_%H%M%S_</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">)[</span>
+                <span class="n">timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%Y%m</span><span class="si">%d</span><span class="s2">_%H%M%S_</span><span class="si">%f</span><span class="s2">"</span><span class="p">)[</span>
                     <span class="p">:</span><span class="o">-</span><span class="mi">3</span>
                 <span class="p">]</span>  <span class="c1"># Include milliseconds</span>
                 <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                     <span class="nb">str</span><span class="p">(</span><span class="n">output_dir</span><span class="p">),</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">_step</span><span class="si">{</span><span class="n">step</span><span class="si">:</span><span class="s2">03d</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">browser_mode</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">_step</span><span class="si">{</span><span class="n">step</span><span class="si">:</span><span class="s2">03d</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">browser_mode</span><span class="si">}</span><span class="s2">.png"</span><span class="p">,</span>
                 <span class="p">)</span>
 
                 <span class="k">try</span><span class="p">:</span>
                     <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">screenshot</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Screenshot </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Screenshot </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
                     <span class="k">elif</span> <span class="n">step</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Started periodic screenshots: </span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">_*&quot;</span>
+                            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Started periodic screenshots: </span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">_*"</span>
                         <span class="p">)</span>
                 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Screenshot </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2"> failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Screenshot </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2"> failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
                 <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">interval_seconds</span><span class="p">)</span>
                 <span class="n">elapsed</span> <span class="o">+=</span> <span class="n">interval_seconds</span>
 
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Completed </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2"> periodic screenshots for </span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Completed </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2"> periodic screenshots for </span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
         <span class="c1"># Start the task in background</span>
@@ -1088,13 +1088,13 @@
 <div class="viewcode-block" id="ScholarBrowserManager.stop_periodic_screenshots_async">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.browser.ScholarBrowserManager.stop_periodic_screenshots_async">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stop_periodic_screenshots_async</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Task</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop periodic screenshots task.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Stop periodic screenshots task."""</span>
         <span class="k">if</span> <span class="n">task</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">task</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
             <span class="n">task</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">await</span> <span class="n">task</span>
             <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Periodic screenshots stopped&quot;</span><span class="p">)</span></div>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Periodic screenshots stopped"</span><span class="p">)</span></div>
 
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__aexit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
@@ -1103,29 +1103,29 @@
 <div class="viewcode-block" id="ScholarBrowserManager.close">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.browser.ScholarBrowserManager.close">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Close browser while preserving authentication and extension data.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Close browser while preserving authentication and extension data."""</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_persistent_context</span>
                 <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_persistent_context</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">is_connected</span><span class="p">()</span>
             <span class="p">):</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Browser already closed&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Browser already closed"</span><span class="p">)</span>
                 <span class="k">return</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_persistent_context</span><span class="p">:</span>
                 <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_persistent_context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Closed persistent browser context&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Closed persistent browser context"</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_persistent_browser</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_persistent_browser</span><span class="o">.</span><span class="n">is_connected</span><span class="p">():</span>
                 <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_persistent_browser</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Closed persistent browser&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Closed persistent browser"</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_persistent_playwright</span><span class="p">:</span>
                 <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_persistent_playwright</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Stopped Playwright instance&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Stopped Playwright instance"</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Error during browser cleanup: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Error during browser cleanup: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="c1"># Reset references but keep auth_manager and chrome_profile_manager</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_persistent_context</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1135,14 +1135,14 @@
 
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
 
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">browser_mode</span><span class="o">=</span><span class="s2">&quot;interactive&quot;</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Example usage of ScholarBrowserManager with stealth features.&quot;&quot;&quot;</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">browser_mode</span><span class="o">=</span><span class="s2">"interactive"</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Example usage of ScholarBrowserManager with stealth features."""</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">scitex_scholar</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScholarAuthManager</span><span class="p">,</span> <span class="n">ScholarBrowserManager</span>
 
         <span class="n">browser_manager</span> <span class="o">=</span> <span class="n">ScholarBrowserManager</span><span class="p">(</span>
-            <span class="n">chrome_profile_name</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">,</span>
+            <span class="n">chrome_profile_name</span><span class="o">=</span><span class="s2">"system"</span><span class="p">,</span>
             <span class="n">browser_mode</span><span class="o">=</span><span class="n">browser_mode</span><span class="p">,</span>
             <span class="n">auth_manager</span><span class="o">=</span><span class="n">ScholarAuthManager</span><span class="p">(),</span>
         <span class="p">)</span>
@@ -1156,34 +1156,34 @@
         <span class="c1"># Test sites configuration</span>
         <span class="n">test_sites</span> <span class="o">=</span> <span class="p">[</span>
             <span class="c1"># {</span>
-            <span class="c1">#     &quot;name&quot;: &quot;Extensions Test&quot;,</span>
-            <span class="c1">#     &quot;url&quot;: &quot;&quot;,</span>
-            <span class="c1">#     &quot;screenshot_spath&quot;: &quot;/tmp/openathens_test.png&quot;,</span>
+            <span class="c1">#     "name": "Extensions Test",</span>
+            <span class="c1">#     "url": "",</span>
+            <span class="c1">#     "screenshot_spath": "/tmp/openathens_test.png",</span>
             <span class="c1"># },</span>
             <span class="c1"># {</span>
-            <span class="c1">#     &quot;name&quot;: &quot;SSO Test&quot;,</span>
-            <span class="c1">#     &quot;url&quot;: &quot;https://sso.unimelb.edu.au/&quot;,</span>
-            <span class="c1">#     &quot;screenshot_spath&quot;: &quot;/tmp/unimelb_sso_test.png&quot;,</span>
+            <span class="c1">#     "name": "SSO Test",</span>
+            <span class="c1">#     "url": "https://sso.unimelb.edu.au/",</span>
+            <span class="c1">#     "screenshot_spath": "/tmp/unimelb_sso_test.png",</span>
             <span class="c1"># },</span>
             <span class="c1"># {</span>
-            <span class="c1">#     &quot;name&quot;: &quot;OpenAthens&quot;,</span>
-            <span class="c1">#     &quot;url&quot;: &quot;https://my.openathens.net/account&quot;,</span>
-            <span class="c1">#     &quot;screenshot_spath&quot;: &quot;/tmp/openathens_test.png&quot;,</span>
+            <span class="c1">#     "name": "OpenAthens",</span>
+            <span class="c1">#     "url": "https://my.openathens.net/account",</span>
+            <span class="c1">#     "screenshot_spath": "/tmp/openathens_test.png",</span>
             <span class="c1"># },</span>
             <span class="c1"># {</span>
-            <span class="c1">#     &quot;name&quot;: &quot;CAPTCHA Test&quot;,</span>
-            <span class="c1">#     &quot;url&quot;: &quot;https://www.google.com/recaptcha/api2/demo&quot;,</span>
-            <span class="c1">#     &quot;screenshot_spath&quot;: &quot;/tmp/captcha_test.png&quot;,</span>
+            <span class="c1">#     "name": "CAPTCHA Test",</span>
+            <span class="c1">#     "url": "https://www.google.com/recaptcha/api2/demo",</span>
+            <span class="c1">#     "screenshot_spath": "/tmp/captcha_test.png",</span>
             <span class="c1"># },</span>
             <span class="p">{</span>
-                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Nature Test&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://www.nature.com/articles/s41593-025-01990-7&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;screenshot_spath&quot;</span><span class="p">:</span> <span class="s2">&quot;/tmp/nature_test.png&quot;</span><span class="p">,</span>
+                <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Nature Test"</span><span class="p">,</span>
+                <span class="s2">"url"</span><span class="p">:</span> <span class="s2">"https://www.nature.com/articles/s41593-025-01990-7"</span><span class="p">,</span>
+                <span class="s2">"screenshot_spath"</span><span class="p">:</span> <span class="s2">"/tmp/nature_test.png"</span><span class="p">,</span>
             <span class="p">},</span>
             <span class="c1"># {</span>
-            <span class="c1">#     &quot;name&quot;: &quot;Google Test&quot;,</span>
-            <span class="c1">#     &quot;url&quot;: &quot;https://www.google.com&quot;,</span>
-            <span class="c1">#     &quot;screenshot_spath&quot;: &quot;/tmp/google_test.png&quot;,</span>
+            <span class="c1">#     "name": "Google Test",</span>
+            <span class="c1">#     "url": "https://www.google.com",</span>
+            <span class="c1">#     "screenshot_spath": "/tmp/google_test.png",</span>
             <span class="c1"># },</span>
         <span class="p">]</span>
 
@@ -1191,27 +1191,27 @@
         <span class="k">for</span> <span class="n">site</span> <span class="ow">in</span> <span class="n">test_sites</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span>
-                    <span class="n">site</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">],</span> <span class="n">wait_until</span><span class="o">=</span><span class="s2">&quot;domcontentloaded&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30000</span>
+                    <span class="n">site</span><span class="p">[</span><span class="s2">"url"</span><span class="p">],</span> <span class="n">wait_until</span><span class="o">=</span><span class="s2">"domcontentloaded"</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30000</span>
                 <span class="p">)</span>
 
                 <span class="k">await</span> <span class="n">browser_manager</span><span class="o">.</span><span class="n">take_screenshot_async</span><span class="p">(</span>
-                    <span class="n">page</span><span class="p">,</span> <span class="n">site</span><span class="p">[</span><span class="s2">&quot;screenshot_spath&quot;</span><span class="p">]</span>
+                    <span class="n">page</span><span class="p">,</span> <span class="n">site</span><span class="p">[</span><span class="s2">"screenshot_spath"</span><span class="p">]</span>
                 <span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to process </span><span class="si">{</span><span class="n">site</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to process </span><span class="si">{</span><span class="n">site</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
                 <span class="k">continue</span>
 
     <span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
 
-    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;ScholarBrowserManager testing&quot;</span><span class="p">)</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"ScholarBrowserManager testing"</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s2">&quot;--stealth&quot;</span><span class="p">,</span>
-        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Use stealth mode (default: interactive)&quot;</span><span class="p">,</span>
+        <span class="s2">"--stealth"</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">"store_true"</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">"Use stealth mode (default: interactive)"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
 
-    <span class="n">browser_mode</span> <span class="o">=</span> <span class="s2">&quot;stealth&quot;</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">stealth</span> <span class="k">else</span> <span class="s2">&quot;interactive&quot;</span>
+    <span class="n">browser_mode</span> <span class="o">=</span> <span class="s2">"stealth"</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">stealth</span> <span class="k">else</span> <span class="s2">"interactive"</span>
     <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">(</span><span class="n">browser_mode</span><span class="o">=</span><span class="n">browser_mode</span><span class="p">))</span>
 
 <span class="c1"># python -m scitex_scholar.browser.ScholarBrowserManager --stealth</span>

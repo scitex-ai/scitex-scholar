@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scitex_scholar.core.journal_normalizer &mdash; SciTeX Scholar v1.4.1</title>
+  <title>scitex_scholar.search_engines.ScholarSearchEngine &mdash; SciTeX Scholar v1.9.0</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=350a9c04"></script>
+      <script src="../../../_static/documentation_options.js?v=c4cb232b"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -238,6 +238,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._save_to_cache"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._save_to_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_async"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_async()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_sync"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.refresh"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.ensure_loaded()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_source"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_source()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_issn"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_issn()</span></code></a></li>
@@ -251,13 +253,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.__init__"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.__init__()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_instance"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_instance()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._is_cache_valid"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._is_cache_valid()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._load_from_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._load_from_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._save_to_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._save_to_cache()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_async"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_async()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_sync"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.refresh"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.ensure_loaded()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_issn_l"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_issn_l()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.normalize"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.normalize()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_abbreviation"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_abbreviation()</span></code></a></li>
@@ -377,7 +378,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../api/citation_graph.html">scitex_scholar.citation_graph</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.__init__"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._auto_detect"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._auto_detect()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.build"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.build()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._create_paper_node"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._create_paper_node()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._build_citation_edges"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._build_citation_edges()</span></code></a></li>
@@ -491,7 +491,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">scitex_scholar.core.journal_normalizer</li>
+      <li class="breadcrumb-item active">scitex_scholar.search_engines.ScholarSearchEngine</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -500,607 +500,309 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for scitex_scholar.core.journal_normalizer</h1><div class="highlight"><pre>
+  <h1>Source code for scitex_scholar.search_engines.ScholarSearchEngine</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
-<span class="c1"># File: /home/ywatanabe/proj/scitex-code/src/scitex/scholar/core/journal_normalizer.py</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Journal Name Normalizer.</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># File: ./src/scitex/scholar/search_engines/ScholarSearchEngine.py</span>
 
-<span class="sd">Handles journal name variations, abbreviations, and historical names</span>
-<span class="sd">using ISSN-L as the unique identifier (single source of truth).</span>
+<span class="sd">"""</span>
+<span class="sd">ScholarSearchEngine - Unified academic paper search interface</span>
 
-<span class="sd">Data sources:</span>
-<span class="sd">- OpenAlex API (display_name, alternate_titles, abbreviated_title, issn_l)</span>
-<span class="sd">- Crossref API (container-title, short-container-title)</span>
-<span class="sd">- Local cache with 1-day TTL</span>
+<span class="sd">Functionalities:</span>
+<span class="sd">  - Unified interface for academic paper search</span>
+<span class="sd">  - Supports both parallel and sequential search modes</span>
+<span class="sd">  - Query parsing with advanced filters</span>
+<span class="sd">  - Aggregates results from multiple academic databases</span>
 
-<span class="sd">Usage:</span>
-<span class="sd">    from scitex_scholar.core import JournalNormalizer</span>
+<span class="sd">Features:</span>
+<span class="sd">  - Advanced query syntax (negative keywords, year ranges, filters)</span>
+<span class="sd">  - Automatic mode selection (parallel vs sequential)</span>
+<span class="sd">  - Result deduplication and ranking</span>
+<span class="sd">  - Rich metadata aggregation</span>
 
-<span class="sd">    normalizer = JournalNormalizer.get_instance()</span>
+<span class="sd">Dependencies:</span>
+<span class="sd">  - ScholarPipelineSearchParallel (fast parallel search)</span>
+<span class="sd">  - ScholarPipelineSearchSingle (sequential search for rate-limited scenarios)</span>
+<span class="sd">  - SearchQueryParser (advanced query parsing)</span>
 
-<span class="sd">    # Normalize any journal name variant</span>
-<span class="sd">    canonical = normalizer.normalize(&quot;J. Neurosci.&quot;)  # → &quot;Journal of Neuroscience&quot;</span>
+<span class="sd">IO:</span>
+<span class="sd">  - input: Query string with optional filters and search mode</span>
+<span class="sd">  - output: List of paper dictionaries with metadata</span>
+<span class="sd">"""</span>
 
-<span class="sd">    # Get ISSN-L for a journal</span>
-<span class="sd">    issn_l = normalizer.get_issn_l(&quot;PLOS ONE&quot;)  # → &quot;1932-6203&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="sd">    # Check if two names refer to same journal</span>
-<span class="sd">    normalizer.is_same_journal(&quot;J Neurosci&quot;, &quot;Journal of Neuroscience&quot;)  # → True</span>
-<span class="sd">&quot;&quot;&quot;</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">aiohttp</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">scitex_logging</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">logging</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">scitex_scholar.pipelines.ScholarPipelineSearchParallel</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ScholarPipelineSearchParallel</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scitex_scholar.pipelines.ScholarPipelineSearchSingle</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ScholarPipelineSearchSingle</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scitex_scholar.pipelines.SearchQueryParser</span><span class="w"> </span><span class="kn">import</span> <span class="n">SearchQueryParser</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<span class="c1"># Cache settings</span>
-<span class="n">CACHE_TTL_SECONDS</span> <span class="o">=</span> <span class="mi">86400</span>  <span class="c1"># 1 day</span>
-<span class="n">OPENALEX_SOURCES_URL</span> <span class="o">=</span> <span class="s2">&quot;https://api.openalex.org/sources&quot;</span>
-<span class="n">OPENALEX_POLITE_EMAIL</span> <span class="o">=</span> <span class="s2">&quot;research@scitex.io&quot;</span>
 
+<div class="viewcode-block" id="ScholarSearchEngine">
+<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.ScholarSearchEngine">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ScholarSearchEngine</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Unified academic paper search engine with multiple database support."""</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_get_default_cache_dir</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get default cache directory via PathManager (runtime/cache).&quot;&quot;&quot;</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">scitex_scholar.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScholarConfig</span>
-
-    <span class="k">return</span> <span class="n">ScholarConfig</span><span class="p">()</span><span class="o">.</span><span class="n">path_manager</span><span class="o">.</span><span class="n">cache_dir</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_normalize_name</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Basic string normalization for matching.</span>
-
-<span class="sd">    - Lowercase</span>
-<span class="sd">    - Remove extra whitespace</span>
-<span class="sd">    - Normalize punctuation</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
-    <span class="c1"># Lowercase</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-    <span class="c1"># Normalize whitespace</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
-    <span class="c1"># Remove common punctuation variations</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-    <span class="c1"># Normalize ampersand</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &amp; &quot;</span><span class="p">,</span> <span class="s2">&quot; and &quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">name</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_normalize_issn</span><span class="p">(</span><span class="n">issn</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Normalize ISSN format to XXXX-XXXX.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">issn</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
-    <span class="n">issn</span> <span class="o">=</span> <span class="n">issn</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">issn</span><span class="p">)</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">issn</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">issn</span><span class="p">[</span><span class="mi">4</span><span class="p">:]</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="k">return</span> <span class="n">issn</span>
-
-
-<div class="viewcode-block" id="JournalNormalizer">
-<a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">JournalNormalizer</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Journal name normalizer using ISSN-L as unique identifier.</span>
-
-<span class="sd">    Handles:</span>
-<span class="sd">    - Full names ↔ abbreviations</span>
-<span class="sd">    - Name variants (spelling, punctuation, capitalization)</span>
-<span class="sd">    - Historical/former names</span>
-<span class="sd">    - Publisher variations</span>
-
-<span class="sd">    Data is cached locally with daily refresh from OpenAlex.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">_instance</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">JournalNormalizer</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-
-<div class="viewcode-block" id="JournalNormalizer.__init__">
-<a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cache_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cache_dir</span> <span class="o">=</span> <span class="n">cache_dir</span> <span class="ow">or</span> <span class="n">_get_default_cache_dir</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cache_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache_dir</span> <span class="o">/</span> <span class="s2">&quot;journal_normalizer_cache.json&quot;</span>
-
-        <span class="c1"># Core mappings (ISSN-L is the key)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_issn_l_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># ISSN-L → full metadata</span>
-
-        <span class="c1"># Lookup indexes (for fast search)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_name_to_issn_l</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># normalized name → ISSN-L</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_issn_to_issn_l</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># any ISSN → ISSN-L</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_abbrev_to_issn_l</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># abbreviated name → ISSN-L</span>
-
-        <span class="c1"># Stats</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_last_updated</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_journal_count</span> <span class="o">=</span> <span class="mi">0</span></div>
-
-
-<div class="viewcode-block" id="JournalNormalizer.get_instance">
-<a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_instance">[docs]</a>
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_instance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cache_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JournalNormalizer</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get singleton instance.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span></div>
-
-
-<div class="viewcode-block" id="JournalNormalizer._is_cache_valid">
-<a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._is_cache_valid">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_is_cache_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if cache exists and is within TTL.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-            <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-            <span class="n">cached_time</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;timestamp&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-            <span class="k">return</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">cached_time</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">CACHE_TTL_SECONDS</span>
-        <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">):</span>
-            <span class="k">return</span> <span class="kc">False</span></div>
-
-
-<div class="viewcode-block" id="JournalNormalizer._load_from_cache">
-<a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._load_from_cache">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_load_from_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load cached data from file.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-            <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">_issn_l_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;issn_l_data&quot;</span><span class="p">,</span> <span class="p">{})</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_name_to_issn_l</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name_to_issn_l&quot;</span><span class="p">,</span> <span class="p">{})</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_issn_to_issn_l</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;issn_to_issn_l&quot;</span><span class="p">,</span> <span class="p">{})</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_abbrev_to_issn_l</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;abbrev_to_issn_l&quot;</span><span class="p">,</span> <span class="p">{})</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_last_updated</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;timestamp&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_journal_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_issn_l_data</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="o">=</span> <span class="kc">True</span>
-
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_journal_count</span><span class="si">}</span><span class="s2"> journals from normalizer cache&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="kc">True</span>
-        <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to load journal normalizer cache: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="kc">False</span></div>
-
-
-<div class="viewcode-block" id="JournalNormalizer._save_to_cache">
-<a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._save_to_cache">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_save_to_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Save current data to cache file.&quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_cache_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
-                <span class="s2">&quot;journal_count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_issn_l_data</span><span class="p">),</span>
-                <span class="s2">&quot;issn_l_data&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_issn_l_data</span><span class="p">,</span>
-                <span class="s2">&quot;name_to_issn_l&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name_to_issn_l</span><span class="p">,</span>
-                <span class="s2">&quot;issn_to_issn_l&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_issn_to_issn_l</span><span class="p">,</span>
-                <span class="s2">&quot;abbrev_to_issn_l&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_abbrev_to_issn_l</span><span class="p">,</span>
-            <span class="p">}</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saved </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_issn_l_data</span><span class="p">)</span><span class="si">}</span><span class="s2"> journals to normalizer cache&quot;</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to save journal normalizer cache: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="JournalNormalizer._add_journal">
-<a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_add_journal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Add a journal to the normalizer from OpenAlex source data.</span>
+<div class="viewcode-block" id="ScholarSearchEngine.__init__">
+<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.ScholarSearchEngine.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">default_mode</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"parallel"</span><span class="p">,</span> <span class="s2">"single"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"parallel"</span><span class="p">,</span>
+        <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">email</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Initialize unified search engine.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            source_data: OpenAlex source object with display_name, issn_l, etc.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">issn_l</span> <span class="o">=</span> <span class="n">source_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;issn_l&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">issn_l</span><span class="p">:</span>
-            <span class="k">return</span>
+<span class="sd">            default_mode: Default search mode ('parallel' or 'single')</span>
+<span class="sd">            use_cache: Whether to use caching for API results</span>
+<span class="sd">            email: User email for API rate limit benefits (PubMed, CrossRef, OpenAlex)</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_mode</span> <span class="o">=</span> <span class="n">default_mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_cache</span> <span class="o">=</span> <span class="n">use_cache</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">email</span> <span class="o">=</span> <span class="n">email</span>
 
-        <span class="n">issn_l</span> <span class="o">=</span> <span class="n">_normalize_issn</span><span class="p">(</span><span class="n">issn_l</span><span class="p">)</span>
-        <span class="n">display_name</span> <span class="o">=</span> <span class="n">source_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;display_name&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-        <span class="n">abbreviated_title</span> <span class="o">=</span> <span class="n">source_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;abbreviated_title&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-        <span class="n">alternate_titles</span> <span class="o">=</span> <span class="n">source_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;alternate_titles&quot;</span><span class="p">,</span> <span class="p">[])</span> <span class="ow">or</span> <span class="p">[]</span>
-        <span class="n">issns</span> <span class="o">=</span> <span class="n">source_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;issn&quot;</span><span class="p">,</span> <span class="p">[])</span> <span class="ow">or</span> <span class="p">[]</span>
-        <span class="n">is_oa</span> <span class="o">=</span> <span class="n">source_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;is_oa&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="c1"># Initialize both pipeline modes with email for rate limit benefits</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parallel_pipeline</span> <span class="o">=</span> <span class="n">ScholarPipelineSearchParallel</span><span class="p">(</span>
+            <span class="n">max_workers</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+            <span class="n">timeout_per_engine</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
+            <span class="n">use_cache</span><span class="o">=</span><span class="n">use_cache</span><span class="p">,</span>
+            <span class="n">email</span><span class="o">=</span><span class="n">email</span><span class="p">,</span>
+        <span class="p">)</span>
 
-        <span class="c1"># Store full metadata</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_issn_l_data</span><span class="p">[</span><span class="n">issn_l</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;canonical_name&quot;</span><span class="p">:</span> <span class="n">display_name</span><span class="p">,</span>
-            <span class="s2">&quot;abbreviated_title&quot;</span><span class="p">:</span> <span class="n">abbreviated_title</span><span class="p">,</span>
-            <span class="s2">&quot;alternate_titles&quot;</span><span class="p">:</span> <span class="n">alternate_titles</span><span class="p">,</span>
-            <span class="s2">&quot;issns&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">_normalize_issn</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">issns</span> <span class="k">if</span> <span class="n">i</span><span class="p">],</span>
-            <span class="s2">&quot;is_oa&quot;</span><span class="p">:</span> <span class="n">is_oa</span><span class="p">,</span>
-            <span class="s2">&quot;publisher&quot;</span><span class="p">:</span> <span class="n">source_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;host_organization_name&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">single_pipeline</span> <span class="o">=</span> <span class="n">ScholarPipelineSearchSingle</span><span class="p">(</span>
+            <span class="n">use_cache</span><span class="o">=</span><span class="n">use_cache</span><span class="p">,</span>
+            <span class="n">email</span><span class="o">=</span><span class="n">email</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Statistics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"total_searches"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">"parallel_searches"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">"single_searches"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">"total_results"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">"avg_search_time"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="p">}</span>
 
-        <span class="c1"># Build lookup indexes</span>
-        <span class="c1"># 1. Canonical name</span>
-        <span class="k">if</span> <span class="n">display_name</span><span class="p">:</span>
-            <span class="n">norm_name</span> <span class="o">=</span> <span class="n">_normalize_name</span><span class="p">(</span><span class="n">display_name</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_name_to_issn_l</span><span class="p">[</span><span class="n">norm_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">issn_l</span>
-
-        <span class="c1"># 2. Alternate titles (variants)</span>
-        <span class="k">for</span> <span class="n">alt</span> <span class="ow">in</span> <span class="n">alternate_titles</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">alt</span><span class="p">:</span>
-                <span class="n">norm_alt</span> <span class="o">=</span> <span class="n">_normalize_name</span><span class="p">(</span><span class="n">alt</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">norm_alt</span> <span class="ow">and</span> <span class="n">norm_alt</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name_to_issn_l</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_name_to_issn_l</span><span class="p">[</span><span class="n">norm_alt</span><span class="p">]</span> <span class="o">=</span> <span class="n">issn_l</span>
-
-        <span class="c1"># 3. Abbreviated title</span>
-        <span class="k">if</span> <span class="n">abbreviated_title</span><span class="p">:</span>
-            <span class="n">norm_abbrev</span> <span class="o">=</span> <span class="n">_normalize_name</span><span class="p">(</span><span class="n">abbreviated_title</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_abbrev_to_issn_l</span><span class="p">[</span><span class="n">norm_abbrev</span><span class="p">]</span> <span class="o">=</span> <span class="n">issn_l</span>
-            <span class="c1"># Also add without periods (common variation)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_abbrev_to_issn_l</span><span class="p">[</span><span class="n">norm_abbrev</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">issn_l</span>
-
-        <span class="c1"># 4. All ISSNs → ISSN-L</span>
-        <span class="k">for</span> <span class="n">issn</span> <span class="ow">in</span> <span class="n">issns</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">issn</span><span class="p">:</span>
-                <span class="n">norm_issn</span> <span class="o">=</span> <span class="n">_normalize_issn</span><span class="p">(</span><span class="n">issn</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_issn_to_issn_l</span><span class="p">[</span><span class="n">norm_issn</span><span class="p">]</span> <span class="o">=</span> <span class="n">issn_l</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_issn_to_issn_l</span><span class="p">[</span><span class="n">issn_l</span><span class="p">]</span> <span class="o">=</span> <span class="n">issn_l</span>  <span class="c1"># Self-reference</span></div>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Initialized with default mode '</span><span class="si">{</span><span class="n">default_mode</span><span class="si">}</span><span class="s2">', "</span>
+            <span class="sa">f</span><span class="s2">"cache=</span><span class="si">{</span><span class="s1">'enabled'</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">use_cache</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'disabled'</span><span class="si">}</span><span class="s2">"</span>
+        <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="JournalNormalizer._fetch_journals_async">
-<a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_async">[docs]</a>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_journals_async</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">max_pages</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span> <span class="n">filter_oa_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Fetch journal data from OpenAlex API.</span>
+<div class="viewcode-block" id="ScholarSearchEngine.search">
+<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.ScholarSearchEngine.search">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">"parallel"</span><span class="p">,</span> <span class="s2">"single"</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">filters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">max_results</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="n">parse_query</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Search for academic papers across multiple databases.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            max_pages: Maximum pages to fetch (200 per page)</span>
-<span class="sd">            filter_oa_only: If True, only fetch OA journals</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">per_page</span> <span class="o">=</span> <span class="mi">200</span>
-        <span class="n">cursor</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span>
-        <span class="n">pages_fetched</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="sd">            query: Search query string (supports advanced syntax if parse_query=True)</span>
+<span class="sd">            mode: Search mode ('parallel' or 'single'), defaults to default_mode</span>
+<span class="sd">            filters: Additional filters (merged with parsed query filters)</span>
+<span class="sd">            max_results: Maximum number of results to return</span>
+<span class="sd">            parse_query: Whether to parse query for advanced syntax</span>
 
-        <span class="c1"># Select fields to minimize response size</span>
-        <span class="n">select_fields</span> <span class="o">=</span> <span class="s2">&quot;display_name,issn_l,issn,abbreviated_title,alternate_titles,is_oa,host_organization_name&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict with:</span>
 
-        <span class="n">filter_param</span> <span class="o">=</span> <span class="s2">&quot;is_oa:true&quot;</span> <span class="k">if</span> <span class="n">filter_oa_only</span> <span class="k">else</span> <span class="s2">&quot;type:journal&quot;</span>
+<span class="sd">            - results: List of paper dictionaries</span>
+<span class="sd">            - metadata: Search metadata (query, filters, timing, etc.)</span>
+<span class="sd">            - stats: Search statistics</span>
 
-        <span class="k">async</span> <span class="k">with</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-            <span class="k">while</span> <span class="n">pages_fetched</span> <span class="o">&lt;</span> <span class="n">max_pages</span><span class="p">:</span>
-                <span class="n">url</span> <span class="o">=</span> <span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">OPENALEX_SOURCES_URL</span><span class="si">}</span><span class="s2">&quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;?filter=</span><span class="si">{</span><span class="n">filter_param</span><span class="si">}</span><span class="s2">&quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;&amp;per_page=</span><span class="si">{</span><span class="n">per_page</span><span class="si">}</span><span class="s2">&quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;&amp;cursor=</span><span class="si">{</span><span class="n">cursor</span><span class="si">}</span><span class="s2">&quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;&amp;mailto=</span><span class="si">{</span><span class="n">OPENALEX_POLITE_EMAIL</span><span class="si">}</span><span class="s2">&quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;&amp;select=</span><span class="si">{</span><span class="n">select_fields</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="p">)</span>
+<span class="sd">        Examples:</span>
+<span class="sd">            .. code-block:: python</span>
 
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="k">async</span> <span class="k">with</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-                        <span class="n">url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientTimeout</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
-                    <span class="p">)</span> <span class="k">as</span> <span class="n">resp</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="n">resp</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
-                            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;OpenAlex API returned </span><span class="si">{</span><span class="n">resp</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                            <span class="k">break</span>
+<span class="sd">                # Simple query</span>
+<span class="sd">                results = await engine.search("hippocampus")</span>
 
-                        <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-                        <span class="n">results</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;results&quot;</span><span class="p">,</span> <span class="p">[])</span>
+<span class="sd">                # Advanced query with filters</span>
+<span class="sd">                results = await engine.search(</span>
+<span class="sd">                    "hippocampus sharp wave -seizure year:2020-2024 if:&gt;5"</span>
+<span class="sd">                )</span>
 
-                        <span class="k">if</span> <span class="ow">not</span> <span class="n">results</span><span class="p">:</span>
-                            <span class="k">break</span>
+<span class="sd">                # Explicit filters (merged with parsed filters)</span>
+<span class="sd">                results = await engine.search(</span>
+<span class="sd">                    "epilepsy",</span>
+<span class="sd">                    filters={'year_start': 2020, 'open_access': True}</span>
+<span class="sd">                )</span>
+<span class="sd">        """</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s2">"total_searches"</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
 
-                        <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">_add_journal</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="c1"># Determine search mode</span>
+        <span class="n">search_mode</span> <span class="o">=</span> <span class="n">mode</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_mode</span>
 
-                        <span class="c1"># Get next cursor</span>
-                        <span class="n">meta</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;meta&quot;</span><span class="p">,</span> <span class="p">{})</span>
-                        <span class="n">next_cursor</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;next_cursor&quot;</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="ow">not</span> <span class="n">next_cursor</span> <span class="ow">or</span> <span class="n">next_cursor</span> <span class="o">==</span> <span class="n">cursor</span><span class="p">:</span>
-                            <span class="k">break</span>
-                        <span class="n">cursor</span> <span class="o">=</span> <span class="n">next_cursor</span>
-                        <span class="n">pages_fetched</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="c1"># Parse query if requested</span>
+        <span class="k">if</span> <span class="n">parse_query</span><span class="p">:</span>
+            <span class="n">parser</span> <span class="o">=</span> <span class="n">SearchQueryParser</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+            <span class="n">parsed_filters</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">get_filters</span><span class="p">()</span>
 
-                        <span class="c1"># Progress log</span>
-                        <span class="k">if</span> <span class="n">pages_fetched</span> <span class="o">%</span> <span class="mi">20</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                                <span class="sa">f</span><span class="s2">&quot;Fetched </span><span class="si">{</span><span class="n">pages_fetched</span><span class="si">}</span><span class="s2"> pages, </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_issn_l_data</span><span class="p">)</span><span class="si">}</span><span class="s2"> journals...&quot;</span>
-                            <span class="p">)</span>
+            <span class="c1"># Merge filters (explicit filters override parsed)</span>
+            <span class="n">combined_filters</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">parsed_filters</span><span class="p">,</span> <span class="o">**</span><span class="p">(</span><span class="n">filters</span> <span class="ow">or</span> <span class="p">{})}</span>
 
-                <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;OpenAlex API timeout&quot;</span><span class="p">)</span>
-                    <span class="k">break</span>
-                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error fetching journals: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                    <span class="k">break</span>
+            <span class="c1"># Build clean query from positive keywords</span>
+            <span class="n">clean_query</span> <span class="o">=</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parsed_filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"positive_keywords"</span><span class="p">,</span> <span class="p">[</span><span class="n">query</span><span class="p">]))</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_journal_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_issn_l_data</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_last_updated</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Parsed query '</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">' -&gt; "</span>
+                <span class="sa">f</span><span class="s2">"keywords='</span><span class="si">{</span><span class="n">clean_query</span><span class="si">}</span><span class="s2">', filters=</span><span class="si">{</span><span class="n">combined_filters</span><span class="si">}</span><span class="s2">"</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">clean_query</span> <span class="o">=</span> <span class="n">query</span>
+            <span class="n">combined_filters</span> <span class="o">=</span> <span class="n">filters</span> <span class="ow">or</span> <span class="p">{}</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_journal_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_save_to_cache</span><span class="p">()</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Fetched </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_journal_count</span><span class="si">}</span><span class="s2"> journals from OpenAlex&quot;</span><span class="p">)</span></div>
+        <span class="c1"># Select pipeline</span>
+        <span class="k">if</span> <span class="n">search_mode</span> <span class="o">==</span> <span class="s2">"parallel"</span><span class="p">:</span>
+            <span class="n">pipeline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parallel_pipeline</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s2">"parallel_searches"</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Using parallel search mode"</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pipeline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">single_pipeline</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s2">"single_searches"</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Using single (sequential) search mode"</span><span class="p">)</span>
 
-
-<div class="viewcode-block" id="JournalNormalizer._fetch_journals_sync">
-<a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_sync">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_journals_sync</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">max_pages</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span> <span class="n">filter_oa_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Synchronous wrapper for fetching journals (handles nested event loops).&quot;&quot;&quot;</span>
-        <span class="kn">import</span><span class="w"> </span><span class="nn">concurrent.futures</span>
-
+        <span class="c1"># Execute search</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span>
-            <span class="c1"># Already in async context - use thread to avoid nested loop error</span>
-            <span class="k">with</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">ThreadPoolExecutor</span><span class="p">()</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
-                <span class="n">future</span> <span class="o">=</span> <span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span>
-                    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_journals_async</span><span class="p">(</span><span class="n">max_pages</span><span class="p">,</span> <span class="n">filter_oa_only</span><span class="p">)</span>
-                <span class="p">)</span>
-                <span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
-            <span class="c1"># No running loop - safe to run directly</span>
-            <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_journals_async</span><span class="p">(</span><span class="n">max_pages</span><span class="p">,</span> <span class="n">filter_oa_only</span><span class="p">))</span></div>
+            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">search_async</span><span class="p">(</span>
+                <span class="n">query</span><span class="o">=</span><span class="n">clean_query</span><span class="p">,</span>
+                <span class="n">filters</span><span class="o">=</span><span class="n">combined_filters</span><span class="p">,</span>
+                <span class="n">max_results</span><span class="o">=</span><span class="n">max_results</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Update statistics</span>
+            <span class="n">search_time</span> <span class="o">=</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s2">"total_searches"</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s2">"avg_search_time"</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s2">"avg_search_time"</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">search_time</span>
+            <span class="p">)</span> <span class="o">/</span> <span class="n">n</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s2">"total_results"</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"results"</span><span class="p">,</span> <span class="p">[]))</span>
+
+            <span class="c1"># Add search engine metadata</span>
+            <span class="n">result</span><span class="p">[</span><span class="s2">"metadata"</span><span class="p">][</span><span class="s2">"search_mode"</span><span class="p">]</span> <span class="o">=</span> <span class="n">search_mode</span>
+            <span class="n">result</span><span class="p">[</span><span class="s2">"metadata"</span><span class="p">][</span><span class="s2">"parsed_query"</span><span class="p">]</span> <span class="o">=</span> <span class="n">clean_query</span> <span class="k">if</span> <span class="n">parse_query</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">result</span><span class="p">[</span><span class="s2">"metadata"</span><span class="p">][</span><span class="s2">"original_query"</span><span class="p">]</span> <span class="o">=</span> <span class="n">query</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Search completed in </span><span class="si">{</span><span class="n">search_time</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s, "</span>
+                <span class="sa">f</span><span class="s2">"found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'results'</span><span class="p">,</span><span class="w"> </span><span class="p">[]))</span><span class="si">}</span><span class="s2"> papers"</span>
+            <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">result</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Search failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">raise</span></div>
 
 
-<div class="viewcode-block" id="JournalNormalizer.ensure_loaded">
-<a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.ensure_loaded">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">ensure_loaded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force_refresh</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">max_pages</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Ensure cache is loaded, fetching from API if needed.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            force_refresh: Force refresh even if cache is valid</span>
-<span class="sd">            max_pages: Max pages to fetch if refreshing</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force_refresh</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_cache_valid</span><span class="p">():</span>
-            <span class="k">return</span>
-
-        <span class="c1"># Try loading from cache first</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">force_refresh</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_from_cache</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_cache_valid</span><span class="p">():</span>
-            <span class="k">return</span>
-
-        <span class="c1"># Fetch from API</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Refreshing journal normalizer cache from OpenAlex...&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_journals_sync</span><span class="p">(</span><span class="n">max_pages</span><span class="p">)</span></div>
-
-
-    <span class="c1"># ==================== Public API ====================</span>
-
-<div class="viewcode-block" id="JournalNormalizer.get_issn_l">
-<a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_issn_l">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_issn_l</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">journal_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get ISSN-L for a journal name.</span>
+<div class="viewcode-block" id="ScholarSearchEngine.search_by_doi">
+<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.ScholarSearchEngine.search_by_doi">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">search_by_doi</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">doi</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">"parallel"</span><span class="p">,</span> <span class="s2">"single"</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Search for a paper by DOI.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            journal_name: Any journal name variant, abbreviation, or ISSN</span>
+<span class="sd">            doi: DOI identifier</span>
+<span class="sd">            mode: Search mode (defaults to default_mode)</span>
 
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">            ISSN-L if found, None otherwise</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ensure_loaded</span><span class="p">()</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">journal_name</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>
-
-        <span class="c1"># Check if it&#39;s an ISSN</span>
-        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^\d</span><span class="si">{4}</span><span class="s2">-?\d</span><span class="si">{3}</span><span class="s2">[\dXx]$&quot;</span><span class="p">,</span> <span class="n">journal_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)):</span>
-            <span class="n">norm_issn</span> <span class="o">=</span> <span class="n">_normalize_issn</span><span class="p">(</span><span class="n">journal_name</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">norm_issn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_issn_to_issn_l</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_issn_to_issn_l</span><span class="p">[</span><span class="n">norm_issn</span><span class="p">]</span>
-
-        <span class="c1"># Try normalized name lookup</span>
-        <span class="n">norm_name</span> <span class="o">=</span> <span class="n">_normalize_name</span><span class="p">(</span><span class="n">journal_name</span><span class="p">)</span>
-
-        <span class="c1"># Check full names</span>
-        <span class="k">if</span> <span class="n">norm_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name_to_issn_l</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name_to_issn_l</span><span class="p">[</span><span class="n">norm_name</span><span class="p">]</span>
-
-        <span class="c1"># Check abbreviations</span>
-        <span class="k">if</span> <span class="n">norm_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_abbrev_to_issn_l</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_abbrev_to_issn_l</span><span class="p">[</span><span class="n">norm_name</span><span class="p">]</span>
-
-        <span class="k">return</span> <span class="kc">None</span></div>
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict with single paper result or empty results</span>
+<span class="sd">        """</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Searching by DOI: </span><span class="si">{</span><span class="n">doi</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+            <span class="n">query</span><span class="o">=</span><span class="n">doi</span><span class="p">,</span>
+            <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
+            <span class="n">filters</span><span class="o">=</span><span class="p">{},</span>
+            <span class="n">max_results</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">parse_query</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="JournalNormalizer.normalize">
-<a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.normalize">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">journal_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Normalize journal name to canonical form.</span>
+<div class="viewcode-block" id="ScholarSearchEngine.search_by_title">
+<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.ScholarSearchEngine.search_by_title">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">search_by_title</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">title</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">"parallel"</span><span class="p">,</span> <span class="s2">"single"</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">max_results</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Search for papers by title.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            journal_name: Any journal name variant</span>
+<span class="sd">            title: Paper title</span>
+<span class="sd">            mode: Search mode (defaults to default_mode)</span>
+<span class="sd">            max_results: Maximum results</span>
 
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">            Canonical journal name, or original if not found</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">issn_l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_issn_l</span><span class="p">(</span><span class="n">journal_name</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">issn_l</span> <span class="ow">and</span> <span class="n">issn_l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_issn_l_data</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_issn_l_data</span><span class="p">[</span><span class="n">issn_l</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;canonical_name&quot;</span><span class="p">,</span> <span class="n">journal_name</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">journal_name</span></div>
-
-
-<div class="viewcode-block" id="JournalNormalizer.get_abbreviation">
-<a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_abbreviation">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_abbreviation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">journal_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get abbreviated title for a journal.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            journal_name: Any journal name variant</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">            Abbreviated title if available</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">issn_l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_issn_l</span><span class="p">(</span><span class="n">journal_name</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">issn_l</span> <span class="ow">and</span> <span class="n">issn_l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_issn_l_data</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_issn_l_data</span><span class="p">[</span><span class="n">issn_l</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;abbreviated_title&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="kc">None</span></div>
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict with matching papers</span>
+<span class="sd">        """</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Searching by title: </span><span class="si">{</span><span class="n">title</span><span class="p">[:</span><span class="mi">50</span><span class="p">]</span><span class="si">}</span><span class="s2">..."</span><span class="p">)</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+            <span class="n">query</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+            <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
+            <span class="n">filters</span><span class="o">=</span><span class="p">{},</span>
+            <span class="n">max_results</span><span class="o">=</span><span class="n">max_results</span><span class="p">,</span>
+            <span class="n">parse_query</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="JournalNormalizer.get_journal_info">
-<a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_journal_info">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_journal_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">journal_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get full journal metadata.</span>
+<div class="viewcode-block" id="ScholarSearchEngine.get_statistics">
+<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.ScholarSearchEngine.get_statistics">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_statistics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Get search engine statistics.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            journal_name: Any journal name variant</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">            Dict with canonical_name, abbreviated_title, alternate_titles, issns, is_oa, publisher</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">issn_l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_issn_l</span><span class="p">(</span><span class="n">journal_name</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">issn_l</span> <span class="ow">and</span> <span class="n">issn_l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_issn_l_data</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;issn_l&quot;</span><span class="p">:</span> <span class="n">issn_l</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_issn_l_data</span><span class="p">[</span><span class="n">issn_l</span><span class="p">]}</span>
-        <span class="k">return</span> <span class="kc">None</span></div>
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict with statistics from engine and pipelines</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"engine_stats"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">,</span>
+            <span class="s2">"parallel_pipeline_stats"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">parallel_pipeline</span><span class="o">.</span><span class="n">get_statistics</span><span class="p">(),</span>
+            <span class="s2">"single_pipeline_stats"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">single_pipeline</span><span class="o">.</span><span class="n">get_statistics</span><span class="p">(),</span>
+        <span class="p">}</span></div>
 
 
-<div class="viewcode-block" id="JournalNormalizer.is_same_journal">
-<a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.is_same_journal">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">is_same_journal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name2</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Check if two names refer to the same journal.</span>
+<div class="viewcode-block" id="ScholarSearchEngine.get_supported_engines">
+<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.ScholarSearchEngine.get_supported_engines">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_supported_engines</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Get list of supported academic databases.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of engine names</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parallel_pipeline</span><span class="o">.</span><span class="n">engines</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="ScholarSearchEngine.get_engine_capabilities">
+<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.ScholarSearchEngine.get_engine_capabilities">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_engine_capabilities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">engine_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Get capabilities of a specific engine.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            name1: First journal name</span>
-<span class="sd">            name2: Second journal name</span>
+<span class="sd">            engine_name: Name of the engine</span>
 
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">            True if both names resolve to the same ISSN-L</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">issn_l_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_issn_l</span><span class="p">(</span><span class="n">name1</span><span class="p">)</span>
-        <span class="n">issn_l_2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_issn_l</span><span class="p">(</span><span class="n">name2</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">issn_l_1</span> <span class="ow">and</span> <span class="n">issn_l_2</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">issn_l_1</span> <span class="o">==</span> <span class="n">issn_l_2</span>
-
-        <span class="c1"># Fallback: simple normalization comparison</span>
-        <span class="k">return</span> <span class="n">_normalize_name</span><span class="p">(</span><span class="n">name1</span><span class="p">)</span> <span class="o">==</span> <span class="n">_normalize_name</span><span class="p">(</span><span class="n">name2</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="JournalNormalizer.is_open_access">
-<a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.is_open_access">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">is_open_access</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">journal_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Check if journal is Open Access.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            journal_name: Any journal name variant</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">            True if journal is OA</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">issn_l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_issn_l</span><span class="p">(</span><span class="n">journal_name</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">issn_l</span> <span class="ow">and</span> <span class="n">issn_l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_issn_l_data</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_issn_l_data</span><span class="p">[</span><span class="n">issn_l</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;is_oa&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-        <span class="k">return</span> <span class="kc">False</span></div>
-
-
-<div class="viewcode-block" id="JournalNormalizer.search">
-<a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.search">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Search for journals by name (prefix/substring match).</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            query: Search query</span>
-<span class="sd">            limit: Maximum results</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">            List of matching journal info dicts</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ensure_loaded</span><span class="p">()</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">query</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">[]</span>
-
-        <span class="n">norm_query</span> <span class="o">=</span> <span class="n">_normalize_name</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
-        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
-
-        <span class="k">for</span> <span class="n">norm_name</span><span class="p">,</span> <span class="n">issn_l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name_to_issn_l</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">norm_query</span> <span class="ow">in</span> <span class="n">norm_name</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">issn_l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_issn_l_data</span><span class="p">:</span>
-                    <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;issn_l&quot;</span><span class="p">:</span> <span class="n">issn_l</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_issn_l_data</span><span class="p">[</span><span class="n">issn_l</span><span class="p">]})</span>
-                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">limit</span><span class="p">:</span>
-                        <span class="k">break</span>
-
-        <span class="k">return</span> <span class="n">results</span></div>
-
-
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">journal_count</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get number of cached journals.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ensure_loaded</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_journal_count</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">cache_age_hours</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get cache age in hours.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_updated</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_updated</span><span class="p">)</span> <span class="o">/</span> <span class="mi">3600</span></div>
-
-
-
-<span class="c1"># ==================== Convenience Functions ====================</span>
-<div class="viewcode-block" id="get_journal_normalizer">
-<a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.get_journal_normalizer">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">get_journal_normalizer</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JournalNormalizer</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the journal normalizer singleton.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">JournalNormalizer</span><span class="o">.</span><span class="n">get_instance</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">)</span></div>
-
-
-
-<div class="viewcode-block" id="normalize_journal_name">
-<a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.normalize_journal_name">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">normalize_journal_name</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Normalize journal name to canonical form.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">get_journal_normalizer</span><span class="p">()</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
-
-
-
-<div class="viewcode-block" id="get_journal_issn_l">
-<a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.get_journal_issn_l">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">get_journal_issn_l</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get ISSN-L for a journal name.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">get_journal_normalizer</span><span class="p">()</span><span class="o">.</span><span class="n">get_issn_l</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
-
-
-
-<div class="viewcode-block" id="is_same_journal">
-<a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.is_same_journal">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">is_same_journal</span><span class="p">(</span><span class="n">name1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name2</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if two names refer to the same journal.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">get_journal_normalizer</span><span class="p">()</span><span class="o">.</span><span class="n">is_same_journal</span><span class="p">(</span><span class="n">name1</span><span class="p">,</span> <span class="n">name2</span><span class="p">)</span></div>
-
-
-
-<div class="viewcode-block" id="refresh_journal_cache">
-<a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.refresh_journal_cache">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">refresh_journal_cache</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Force refresh the journal normalizer cache.&quot;&quot;&quot;</span>
-    <span class="n">get_journal_normalizer</span><span class="p">()</span><span class="o">.</span><span class="n">ensure_loaded</span><span class="p">(</span><span class="n">force_refresh</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict with engine capabilities</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parallel_pipeline</span><span class="o">.</span><span class="n">get_engine_capabilities</span><span class="p">(</span><span class="n">engine_name</span><span class="p">)</span></div>
+</div>
 
 
 

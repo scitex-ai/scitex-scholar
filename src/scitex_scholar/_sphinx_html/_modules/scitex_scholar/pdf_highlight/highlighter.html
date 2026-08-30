@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scitex_scholar.pdf_highlight.highlighter &mdash; SciTeX Scholar v1.4.1</title>
+  <title>scitex_scholar.pdf_highlight.highlighter &mdash; SciTeX Scholar v1.9.0</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=350a9c04"></script>
+      <script src="../../../_static/documentation_options.js?v=c4cb232b"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -238,6 +238,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._save_to_cache"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._save_to_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_async"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_async()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_sync"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.refresh"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.ensure_loaded()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_source"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_source()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_issn"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_issn()</span></code></a></li>
@@ -251,13 +253,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.__init__"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.__init__()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_instance"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_instance()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._is_cache_valid"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._is_cache_valid()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._load_from_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._load_from_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._save_to_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._save_to_cache()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_async"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_async()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_sync"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.refresh"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.ensure_loaded()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_issn_l"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_issn_l()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.normalize"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.normalize()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_abbreviation"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_abbreviation()</span></code></a></li>
@@ -377,7 +378,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../api/citation_graph.html">scitex_scholar.citation_graph</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.__init__"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._auto_detect"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._auto_detect()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.build"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.build()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._create_paper_node"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._create_paper_node()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._build_citation_edges"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._build_citation_edges()</span></code></a></li>
@@ -501,7 +501,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for scitex_scholar.pdf_highlight.highlighter</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Thin orchestrator — wires extraction, classification, and annotation.</span>
+<span></span><span class="sd">"""Thin orchestrator — wires extraction, classification, and annotation.</span>
 
 <span class="sd">Public entry points:</span>
 <span class="sd">- :func:`highlight_pdf` — end-to-end: extract → classify → write annotated PDF.</span>
@@ -510,7 +510,7 @@
 
 <span class="sd">The source PDF bytes are not modified; highlights are PDF annotation</span>
 <span class="sd">objects compatible with any PDF viewer.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -529,28 +529,28 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">._colors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CATEGORIES</span><span class="p">,</span> <span class="n">CATEGORY_LABELS</span><span class="p">,</span> <span class="n">COLOR_RGB</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;CATEGORIES&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;COLOR_RGB&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;CATEGORY_LABELS&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Block&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;HighlightResult&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;apply_classifications&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;extract_blocks&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;highlight_pdf&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;save_with_highlights&quot;</span><span class="p">,</span>
+    <span class="s2">"CATEGORIES"</span><span class="p">,</span>
+    <span class="s2">"COLOR_RGB"</span><span class="p">,</span>
+    <span class="s2">"CATEGORY_LABELS"</span><span class="p">,</span>
+    <span class="s2">"Block"</span><span class="p">,</span>
+    <span class="s2">"HighlightResult"</span><span class="p">,</span>
+    <span class="s2">"apply_classifications"</span><span class="p">,</span>
+    <span class="s2">"extract_blocks"</span><span class="p">,</span>
+    <span class="s2">"highlight_pdf"</span><span class="p">,</span>
+    <span class="s2">"save_with_highlights"</span><span class="p">,</span>
 <span class="p">]</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_package_version</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_md</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="s2">&quot;scitex-scholar&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_md</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="s2">"scitex-scholar"</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;unknown&quot;</span>
+        <span class="k">return</span> <span class="s2">"unknown"</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_default_signature</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="n">ts</span> <span class="o">=</span> <span class="n">_dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Highlighted by scitex-scholar v</span><span class="si">{</span><span class="n">_package_version</span><span class="p">()</span><span class="si">}</span><span class="s2"> (pdf_highlight) — </span><span class="si">{</span><span class="n">ts</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">ts</span> <span class="o">=</span> <span class="n">_dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"Highlighted by scitex-scholar v</span><span class="si">{</span><span class="n">_package_version</span><span class="p">()</span><span class="si">}</span><span class="s2"> (pdf_highlight) — </span><span class="si">{</span><span class="n">ts</span><span class="si">}</span><span class="s2">"</span>
 
 
 <div class="viewcode-block" id="apply_classifications">
@@ -559,25 +559,25 @@
     <span class="n">blocks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span>
     <span class="n">classifications</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Assign offline-produced labels to already-extracted blocks.</span>
+<span class="w">    </span><span class="sd">"""Assign offline-produced labels to already-extracted blocks.</span>
 
 <span class="sd">    Each entry must contain at least ``id`` and ``category``; ``confidence``</span>
 <span class="sd">    is optional (defaults to 0.0). Categories outside :data:`CATEGORIES`</span>
 <span class="sd">    are silently dropped.</span>
 
 <span class="sd">    Returns the number of blocks that received a label.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">by_id</span> <span class="o">=</span> <span class="p">{</span><span class="n">b</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">b</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">}</span>
     <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">classifications</span><span class="p">:</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="n">by_id</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]))</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">by_id</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]))</span>
         <span class="k">if</span> <span class="n">b</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">continue</span>
-        <span class="n">cat</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">)</span>
+        <span class="n">cat</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"category"</span><span class="p">,</span> <span class="s2">"none"</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">cat</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">CATEGORIES</span><span class="p">:</span>
             <span class="k">continue</span>
         <span class="n">b</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">cat</span>
-        <span class="n">b</span><span class="o">.</span><span class="n">confidence</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;confidence&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+        <span class="n">b</span><span class="o">.</span><span class="n">confidence</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"confidence"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
         <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
     <span class="k">return</span> <span class="n">n</span></div>
 
@@ -597,7 +597,7 @@
     <span class="n">min_confidence</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">on_info</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write ``doc`` with highlight annotations for all labelled blocks.</span>
+<span class="w">    </span><span class="sd">"""Write ``doc`` with highlight annotations for all labelled blocks.</span>
 
 <span class="sd">    When ``add_legend=True`` (default) a colour legend + signature page is</span>
 <span class="sd">    prepended so readers can see which colour means what. ``min_confidence``</span>
@@ -608,7 +608,7 @@
 <span class="sd">    The save deliberately uses ``garbage=0, deflate=False``. The earlier</span>
 <span class="sd">    ``garbage=3, deflate=True`` recompressed every stream of the source</span>
 <span class="sd">    PDF, which on a large (20 MB+) image-heavy paper ran for minutes</span>
-<span class="sd">    entirely inside pymupdf&#39;s C code — and because CPython only delivers</span>
+<span class="sd">    entirely inside pymupdf's C code — and because CPython only delivers</span>
 <span class="sd">    ``KeyboardInterrupt`` between bytecode ops, that made the run both</span>
 <span class="sd">    slow *and* uninterruptible (Ctrl-C queued but never fired). Appending</span>
 <span class="sd">    the annotation objects without recompression is near-instant and keeps</span>
@@ -616,7 +616,7 @@
 
 <span class="sd">    Returns the number of highlight annotations added (not counting the</span>
 <span class="sd">    legend page).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">info</span> <span class="o">=</span> <span class="n">on_info</span> <span class="ow">or</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">_msg</span><span class="p">:</span> <span class="kc">None</span><span class="p">)</span>
     <span class="n">n</span> <span class="o">=</span> <span class="n">apply_highlights</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">blocks</span><span class="p">,</span> <span class="n">min_confidence</span><span class="o">=</span><span class="n">min_confidence</span><span class="p">,</span> <span class="n">on_info</span><span class="o">=</span><span class="n">on_info</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">add_legend</span><span class="p">:</span>
@@ -624,13 +624,13 @@
             <span class="n">doc</span><span class="p">,</span>
             <span class="n">signature</span><span class="o">=</span><span class="n">signature</span> <span class="ow">or</span> <span class="n">_default_signature</span><span class="p">(</span><span class="n">model_label</span><span class="p">),</span>
             <span class="n">model_label</span><span class="o">=</span><span class="n">model_label</span><span class="p">,</span>
-            <span class="n">source_name</span><span class="o">=</span><span class="n">source_name</span> <span class="ow">or</span> <span class="s2">&quot;(unknown)&quot;</span><span class="p">,</span>
+            <span class="n">source_name</span><span class="o">=</span><span class="n">source_name</span> <span class="ow">or</span> <span class="s2">"(unknown)"</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
-    <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;      writing </span><span class="si">{</span><span class="n">doc</span><span class="o">.</span><span class="n">page_count</span><span class="si">}</span><span class="s2"> pages → </span><span class="si">{</span><span class="n">out</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"      writing </span><span class="si">{</span><span class="n">doc</span><span class="o">.</span><span class="n">page_count</span><span class="si">}</span><span class="s2"> pages → </span><span class="si">{</span><span class="n">out</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="n">doc</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">garbage</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">deflate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">size_mb</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="o">/</span> <span class="mf">1e6</span>
-    <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;      wrote </span><span class="si">{</span><span class="n">size_mb</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MB&quot;</span><span class="p">)</span>
+    <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"      wrote </span><span class="si">{</span><span class="n">size_mb</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MB"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">n</span></div>
 
 
@@ -650,7 +650,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">counts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
         <span class="n">c</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">:</span>
-            <span class="n">c</span><span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">category</span> <span class="ow">or</span> <span class="s2">&quot;none&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">category</span> <span class="ow">or</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">c</span><span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">category</span> <span class="ow">or</span> <span class="s2">"none"</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">category</span> <span class="ow">or</span> <span class="s2">"none"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="n">c</span></div>
 </div>
 
@@ -662,7 +662,7 @@
     <span class="n">pdf_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">,</span>
     <span class="n">output_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
-    <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;claude-haiku-4-5-20251001&quot;</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"claude-haiku-4-5-20251001"</span><span class="p">,</span>
     <span class="n">use_stub</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">dry_run</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">max_blocks</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
@@ -675,7 +675,7 @@
     <span class="n">on_info</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">on_warning</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HighlightResult</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Annotate a PDF with rhetorical-role highlights.</span>
+<span class="w">    </span><span class="sd">"""Annotate a PDF with rhetorical-role highlights.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        pdf_path: Input PDF path.</span>
@@ -693,7 +693,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        ``HighlightResult`` with the classified units and annotation count.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">info</span> <span class="o">=</span> <span class="n">on_info</span> <span class="ow">or</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">_msg</span><span class="p">:</span> <span class="kc">None</span><span class="p">)</span>
     <span class="n">warn</span> <span class="o">=</span> <span class="n">on_warning</span> <span class="ow">or</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">_msg</span><span class="p">:</span> <span class="kc">None</span><span class="p">)</span>
 
@@ -708,28 +708,28 @@
         <span class="n">out</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">Path</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">output_path</span>
-            <span class="k">else</span> <span class="n">pdf</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">pdf</span><span class="o">.</span><span class="n">stem</span> <span class="o">+</span> <span class="s2">&quot;.highlighted.pdf&quot;</span><span class="p">)</span>
+            <span class="k">else</span> <span class="n">pdf</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">pdf</span><span class="o">.</span><span class="n">stem</span> <span class="o">+</span> <span class="s2">".highlighted.pdf"</span><span class="p">)</span>
         <span class="p">)</span>
 
     <span class="n">info</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;[1/3] Extracting </span><span class="si">{</span><span class="s1">&#39;sentences&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">sentence_level</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;paragraphs&#39;</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">pdf</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="sa">f</span><span class="s2">"[1/3] Extracting </span><span class="si">{</span><span class="s1">'sentences'</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">sentence_level</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'paragraphs'</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">pdf</span><span class="si">}</span><span class="s2">"</span>
     <span class="p">)</span>
     <span class="n">doc</span><span class="p">,</span> <span class="n">blocks</span> <span class="o">=</span> <span class="n">extract_blocks</span><span class="p">(</span>
         <span class="n">pdf</span><span class="p">,</span> <span class="n">min_chars</span><span class="o">=</span><span class="n">min_chars</span><span class="p">,</span> <span class="n">sentence_level</span><span class="o">=</span><span class="n">sentence_level</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">max_blocks</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">blocks</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[:</span><span class="n">max_blocks</span><span class="p">]</span>
-    <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;      </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span><span class="si">}</span><span class="s2"> candidate units across </span><span class="si">{</span><span class="n">doc</span><span class="o">.</span><span class="n">page_count</span><span class="si">}</span><span class="s2"> pages&quot;</span><span class="p">)</span>
+    <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"      </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span><span class="si">}</span><span class="s2"> candidate units across </span><span class="si">{</span><span class="n">doc</span><span class="o">.</span><span class="n">page_count</span><span class="si">}</span><span class="s2"> pages"</span><span class="p">)</span>
 
-    <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[2/3] Classifying (</span><span class="si">{</span><span class="s1">&#39;stub&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">use_stub</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="n">model</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[2/3] Classifying (</span><span class="si">{</span><span class="s1">'stub'</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">use_stub</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="n">model</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">use_stub</span><span class="p">:</span>
         <span class="n">classify_stub</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">API_KEY_ENV</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">API_KEY_ENV</span><span class="si">}</span><span class="s2"> is not set (or call with use_stub=True). &quot;</span>
-                <span class="s2">&quot;Scholar uses a namespaced key and does not read the ambient &quot;</span>
-                <span class="s2">&quot;ANTHROPIC_API_KEY.&quot;</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">API_KEY_ENV</span><span class="si">}</span><span class="s2"> is not set (or call with use_stub=True). "</span>
+                <span class="s2">"Scholar uses a namespaced key and does not read the ambient "</span>
+                <span class="s2">"ANTHROPIC_API_KEY."</span>
             <span class="p">)</span>
         <span class="n">classify_llm</span><span class="p">(</span>
             <span class="n">blocks</span><span class="p">,</span>
@@ -742,10 +742,10 @@
 
     <span class="n">added</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">if</span> <span class="n">dry_run</span><span class="p">:</span>
-        <span class="n">info</span><span class="p">(</span><span class="s2">&quot;[3/3] dry-run — not writing PDF&quot;</span><span class="p">)</span>
+        <span class="n">info</span><span class="p">(</span><span class="s2">"[3/3] dry-run — not writing PDF"</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">assert</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[3/3] Writing highlights to </span><span class="si">{</span><span class="n">out</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[3/3] Writing highlights to </span><span class="si">{</span><span class="n">out</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">added</span> <span class="o">=</span> <span class="n">save_with_highlights</span><span class="p">(</span>
             <span class="n">doc</span><span class="p">,</span>
             <span class="n">blocks</span><span class="p">,</span>
@@ -756,7 +756,7 @@
             <span class="n">min_confidence</span><span class="o">=</span><span class="n">min_confidence</span><span class="p">,</span>
             <span class="n">on_info</span><span class="o">=</span><span class="n">info</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;      added </span><span class="si">{</span><span class="n">added</span><span class="si">}</span><span class="s2"> highlight annotations&quot;</span><span class="p">)</span>
+        <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"      added </span><span class="si">{</span><span class="n">added</span><span class="si">}</span><span class="s2"> highlight annotations"</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">HighlightResult</span><span class="p">(</span>
         <span class="n">input_path</span><span class="o">=</span><span class="n">pdf</span><span class="p">,</span>

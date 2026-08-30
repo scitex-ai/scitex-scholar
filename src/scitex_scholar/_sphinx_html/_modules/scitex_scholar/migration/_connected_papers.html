@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scitex_scholar.migration._connected_papers &mdash; SciTeX Scholar v1.4.1</title>
+  <title>scitex_scholar.migration._connected_papers &mdash; SciTeX Scholar v1.9.0</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=350a9c04"></script>
+      <script src="../../../_static/documentation_options.js?v=c4cb232b"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -238,6 +238,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._save_to_cache"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._save_to_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_async"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_async()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_sync"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.refresh"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.ensure_loaded()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_source"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_source()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_issn"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_issn()</span></code></a></li>
@@ -251,13 +253,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.__init__"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.__init__()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_instance"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_instance()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._is_cache_valid"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._is_cache_valid()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._load_from_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._load_from_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._save_to_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._save_to_cache()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_async"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_async()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_sync"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.refresh"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.ensure_loaded()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_issn_l"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_issn_l()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.normalize"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.normalize()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_abbreviation"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_abbreviation()</span></code></a></li>
@@ -377,7 +378,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../api/citation_graph.html">scitex_scholar.citation_graph</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.__init__"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._auto_detect"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._auto_detect()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.build"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.build()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._create_paper_node"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._create_paper_node()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._build_citation_edges"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._build_citation_edges()</span></code></a></li>
@@ -502,18 +502,18 @@
              
   <h1>Source code for scitex_scholar.migration._connected_papers</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
-<span class="sd">&quot;&quot;&quot;Connected Papers import/export for scitex_scholar.</span>
+<span class="sd">"""Connected Papers import/export for scitex_scholar.</span>
 
 <span class="sd">Import: Fetch a Connected Papers graph and convert to CitationGraph or Papers.</span>
 <span class="sd">Export: Convert CitationGraph to BibTeX/JSON importable by CP web UI.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;from_connected_papers&quot;</span><span class="p">,</span> <span class="s2">&quot;to_connected_papers&quot;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"from_connected_papers"</span><span class="p">,</span> <span class="s2">"to_connected_papers"</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="from_connected_papers">
@@ -523,10 +523,10 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">cp_api_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">s2_api_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">output_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;citation_graph&quot;</span><span class="p">,</span>
+    <span class="n">output_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"citation_graph"</span><span class="p">,</span>
     <span class="n">dry_run</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Import a Connected Papers graph into scitex.</span>
+<span class="w">    </span><span class="sd">"""Import a Connected Papers graph into scitex.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -537,7 +537,7 @@
 <span class="sd">    s2_api_key : str, optional</span>
 <span class="sd">        Semantic Scholar API key for DOI resolution.</span>
 <span class="sd">    output_format : str</span>
-<span class="sd">        &quot;citation_graph&quot; returns CitationGraph, &quot;papers&quot; returns Papers.</span>
+<span class="sd">        "citation_graph" returns CitationGraph, "papers" returns Papers.</span>
 <span class="sd">    dry_run : bool</span>
 <span class="sd">        If True, fetch and report stats without creating objects.</span>
 
@@ -546,23 +546,23 @@
 <span class="sd">    dict</span>
 <span class="sd">        {success: True, graph/papers, stats, warnings} or</span>
 <span class="sd">        {success: False, error: str}.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">connectedpapers</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-            <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="p">(</span>
-                <span class="s2">&quot;connectedpapers-py is required. &quot;</span>
-                <span class="s2">&quot;Install with: pip install connectedpapers-py&quot;</span>
+            <span class="s2">"success"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">"error"</span><span class="p">:</span> <span class="p">(</span>
+                <span class="s2">"connectedpapers-py is required. "</span>
+                <span class="s2">"Install with: pip install connectedpapers-py"</span>
             <span class="p">),</span>
         <span class="p">}</span>
 
-    <span class="k">if</span> <span class="n">output_format</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;citation_graph&quot;</span><span class="p">,</span> <span class="s2">&quot;papers&quot;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">output_format</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"citation_graph"</span><span class="p">,</span> <span class="s2">"papers"</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-            <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Invalid output_format: </span><span class="si">{</span><span class="n">output_format</span><span class="si">!r}</span><span class="s2">. &quot;</span>
-            <span class="s2">&quot;Must be &#39;citation_graph&#39; or &#39;papers&#39;.&quot;</span><span class="p">,</span>
+            <span class="s2">"success"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Invalid output_format: </span><span class="si">{</span><span class="n">output_format</span><span class="si">!r}</span><span class="s2">. "</span>
+            <span class="s2">"Must be 'citation_graph' or 'papers'."</span><span class="p">,</span>
         <span class="p">}</span>
 
     <span class="n">warnings</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
@@ -572,8 +572,8 @@
         <span class="n">client</span> <span class="o">=</span> <span class="n">connectedpapers</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="n">cp_api_key</span><span class="p">)</span>
         <span class="n">graph_response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_graph_sync</span><span class="p">(</span><span class="n">paper_id</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">graph_response</span><span class="p">,</span> <span class="s2">&quot;graph&quot;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;No graph data in CP response.&quot;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">graph_response</span><span class="p">,</span> <span class="s2">"graph"</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">"success"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">"error"</span><span class="p">:</span> <span class="s2">"No graph data in CP response."</span><span class="p">}</span>
 
         <span class="n">cp_graph</span> <span class="o">=</span> <span class="n">graph_response</span><span class="o">.</span><span class="n">graph</span>
         <span class="n">nodes</span> <span class="o">=</span> <span class="n">cp_graph</span><span class="o">.</span><span class="n">nodes</span> <span class="ow">or</span> <span class="p">{}</span>
@@ -583,10 +583,10 @@
         <span class="n">s2_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">s2_ids</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">{</span>
-                <span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-                <span class="s2">&quot;dry_run&quot;</span><span class="p">:</span> <span class="n">dry_run</span><span class="p">,</span>
-                <span class="s2">&quot;stats&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;node_count&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;edge_count&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;resolved_dois&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-                <span class="s2">&quot;warnings&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Graph contains no papers.&quot;</span><span class="p">],</span>
+                <span class="s2">"success"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s2">"dry_run"</span><span class="p">:</span> <span class="n">dry_run</span><span class="p">,</span>
+                <span class="s2">"stats"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"node_count"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"edge_count"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"resolved_dois"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+                <span class="s2">"warnings"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"Graph contains no papers."</span><span class="p">],</span>
             <span class="p">}</span>
 
         <span class="c1"># Bulk resolve S2 IDs → DOIs</span>
@@ -597,21 +597,21 @@
         <span class="n">unresolved</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">doi_map</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">unresolved</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">unresolved</span><span class="p">)</span><span class="si">}</span><span class="s2"> papers could not be resolved to DOIs.&quot;</span><span class="p">)</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">unresolved</span><span class="p">)</span><span class="si">}</span><span class="s2"> papers could not be resolved to DOIs."</span><span class="p">)</span>
 
         <span class="n">stats</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;node_count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">s2_ids</span><span class="p">),</span>
-            <span class="s2">&quot;edge_count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">),</span>
-            <span class="s2">&quot;resolved_dois&quot;</span><span class="p">:</span> <span class="n">resolved_count</span><span class="p">,</span>
-            <span class="s2">&quot;unresolved_count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">unresolved</span><span class="p">),</span>
+            <span class="s2">"node_count"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">s2_ids</span><span class="p">),</span>
+            <span class="s2">"edge_count"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">),</span>
+            <span class="s2">"resolved_dois"</span><span class="p">:</span> <span class="n">resolved_count</span><span class="p">,</span>
+            <span class="s2">"unresolved_count"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">unresolved</span><span class="p">),</span>
         <span class="p">}</span>
 
         <span class="k">if</span> <span class="n">dry_run</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">{</span>
-                <span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-                <span class="s2">&quot;dry_run&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-                <span class="s2">&quot;stats&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">,</span>
-                <span class="s2">&quot;warnings&quot;</span><span class="p">:</span> <span class="n">warnings</span><span class="p">,</span>
+                <span class="s2">"success"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s2">"dry_run"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s2">"stats"</span><span class="p">:</span> <span class="n">stats</span><span class="p">,</span>
+                <span class="s2">"warnings"</span><span class="p">:</span> <span class="n">warnings</span><span class="p">,</span>
             <span class="p">}</span>
 
         <span class="c1"># Get full metadata for resolved papers</span>
@@ -619,29 +619,29 @@
 
         <span class="n">metadata_map</span> <span class="o">=</span> <span class="n">bulk_resolve_metadata</span><span class="p">(</span><span class="n">s2_ids</span><span class="p">,</span> <span class="n">api_key</span><span class="o">=</span><span class="n">s2_api_key</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;citation_graph&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s2">"citation_graph"</span><span class="p">:</span>
             <span class="n">result_obj</span> <span class="o">=</span> <span class="n">_build_citation_graph</span><span class="p">(</span>
                 <span class="n">paper_id</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">edges</span><span class="p">,</span> <span class="n">doi_map</span><span class="p">,</span> <span class="n">metadata_map</span><span class="p">,</span> <span class="n">warnings</span>
             <span class="p">)</span>
             <span class="k">return</span> <span class="p">{</span>
-                <span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-                <span class="s2">&quot;dry_run&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-                <span class="s2">&quot;graph&quot;</span><span class="p">:</span> <span class="n">result_obj</span><span class="p">,</span>
-                <span class="s2">&quot;stats&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">,</span>
-                <span class="s2">&quot;warnings&quot;</span><span class="p">:</span> <span class="n">warnings</span><span class="p">,</span>
+                <span class="s2">"success"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s2">"dry_run"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s2">"graph"</span><span class="p">:</span> <span class="n">result_obj</span><span class="p">,</span>
+                <span class="s2">"stats"</span><span class="p">:</span> <span class="n">stats</span><span class="p">,</span>
+                <span class="s2">"warnings"</span><span class="p">:</span> <span class="n">warnings</span><span class="p">,</span>
             <span class="p">}</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">result_obj</span> <span class="o">=</span> <span class="n">_build_papers</span><span class="p">(</span><span class="n">doi_map</span><span class="p">,</span> <span class="n">metadata_map</span><span class="p">,</span> <span class="n">warnings</span><span class="p">)</span>
             <span class="k">return</span> <span class="p">{</span>
-                <span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-                <span class="s2">&quot;dry_run&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-                <span class="s2">&quot;papers&quot;</span><span class="p">:</span> <span class="n">result_obj</span><span class="p">,</span>
-                <span class="s2">&quot;stats&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">,</span>
-                <span class="s2">&quot;warnings&quot;</span><span class="p">:</span> <span class="n">warnings</span><span class="p">,</span>
+                <span class="s2">"success"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s2">"dry_run"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s2">"papers"</span><span class="p">:</span> <span class="n">result_obj</span><span class="p">,</span>
+                <span class="s2">"stats"</span><span class="p">:</span> <span class="n">stats</span><span class="p">,</span>
+                <span class="s2">"warnings"</span><span class="p">:</span> <span class="n">warnings</span><span class="p">,</span>
             <span class="p">}</span>
 
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)}</span></div>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"success"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">"error"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)}</span></div>
 
 
 
@@ -652,7 +652,7 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">output</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Export a CitationGraph as BibTeX/JSON for Connected Papers.</span>
+<span class="w">    </span><span class="sd">"""Export a CitationGraph as BibTeX/JSON for Connected Papers.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -665,7 +665,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    dict</span>
 <span class="sd">        {success, bibtex_path, json_path, paper_count} or {success: False, error}.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">scitex_scholar</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_bibtex</span>
 
@@ -673,37 +673,37 @@
         <span class="n">out_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="c1"># Export as JSON (graph structure with S2-compatible metadata)</span>
-        <span class="n">json_path</span> <span class="o">=</span> <span class="n">out_dir</span> <span class="o">/</span> <span class="s2">&quot;connected_papers_export.json&quot;</span>
+        <span class="n">json_path</span> <span class="o">=</span> <span class="n">out_dir</span> <span class="o">/</span> <span class="s2">"connected_papers_export.json"</span>
         <span class="n">_write_json</span><span class="p">(</span><span class="n">json_path</span><span class="p">,</span> <span class="n">graph</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
 
         <span class="c1"># Export as BibTeX (importable by CP web UI)</span>
-        <span class="n">bibtex_path</span> <span class="o">=</span> <span class="n">out_dir</span> <span class="o">/</span> <span class="s2">&quot;connected_papers_export.bib&quot;</span>
+        <span class="n">bibtex_path</span> <span class="o">=</span> <span class="n">out_dir</span> <span class="o">/</span> <span class="s2">"connected_papers_export.bib"</span>
         <span class="n">entries</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">doi</span><span class="p">:</span>
-                <span class="n">authors</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;authors&quot;</span><span class="p">,</span> <span class="p">[])</span> <span class="ow">or</span> <span class="p">[]</span>
+                <span class="n">authors</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">"authors"</span><span class="p">,</span> <span class="p">[])</span> <span class="ow">or</span> <span class="p">[]</span>
                 <span class="n">paper_dict</span> <span class="o">=</span> <span class="p">{</span>
-                    <span class="s2">&quot;doi&quot;</span><span class="p">:</span> <span class="n">node</span><span class="o">.</span><span class="n">doi</span><span class="p">,</span>
-                    <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-                    <span class="s2">&quot;year&quot;</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;year&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-                    <span class="s2">&quot;authors_str&quot;</span><span class="p">:</span> <span class="s2">&quot; and &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">authors</span><span class="p">)</span> <span class="k">if</span> <span class="n">authors</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;journal&quot;</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;journal&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+                    <span class="s2">"doi"</span><span class="p">:</span> <span class="n">node</span><span class="o">.</span><span class="n">doi</span><span class="p">,</span>
+                    <span class="s2">"title"</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">"title"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+                    <span class="s2">"year"</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">"year"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                    <span class="s2">"authors_str"</span><span class="p">:</span> <span class="s2">" and "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">authors</span><span class="p">)</span> <span class="k">if</span> <span class="n">authors</span> <span class="k">else</span> <span class="s2">""</span><span class="p">,</span>
+                    <span class="s2">"journal"</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">"journal"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
                 <span class="p">}</span>
                 <span class="n">bib</span> <span class="o">=</span> <span class="n">to_bibtex</span><span class="p">(</span><span class="n">paper_dict</span><span class="p">)</span>
                 <span class="n">entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bib</span><span class="p">)</span>
 
-        <span class="n">bibtex_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">entries</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+        <span class="n">bibtex_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s2">"</span><span class="se">\n\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">entries</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-            <span class="s2">&quot;bibtex_path&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">bibtex_path</span><span class="p">),</span>
-            <span class="s2">&quot;json_path&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">json_path</span><span class="p">),</span>
-            <span class="s2">&quot;paper_count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">),</span>
-            <span class="s2">&quot;bibtex_entries&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">entries</span><span class="p">),</span>
+            <span class="s2">"success"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">"bibtex_path"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">bibtex_path</span><span class="p">),</span>
+            <span class="s2">"json_path"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">json_path</span><span class="p">),</span>
+            <span class="s2">"paper_count"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">),</span>
+            <span class="s2">"bibtex_entries"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">entries</span><span class="p">),</span>
         <span class="p">}</span>
 
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)}</span></div>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"success"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">"error"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)}</span></div>
 
 
 
@@ -713,7 +713,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_build_citation_graph</span><span class="p">(</span><span class="n">seed_id</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">edges</span><span class="p">,</span> <span class="n">doi_map</span><span class="p">,</span> <span class="n">metadata_map</span><span class="p">,</span> <span class="n">warnings</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert CP graph data to CitationGraph.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Convert CP graph data to CitationGraph."""</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">scitex_scholar.citation_graph.models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
         <span class="n">CitationEdge</span><span class="p">,</span>
         <span class="n">CitationGraph</span><span class="p">,</span>
@@ -726,33 +726,33 @@
     <span class="k">for</span> <span class="n">s2_id</span><span class="p">,</span> <span class="n">node_data</span> <span class="ow">in</span> <span class="n">nodes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">doi</span> <span class="o">=</span> <span class="n">doi_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">s2_id</span><span class="p">)</span>
         <span class="n">meta</span> <span class="o">=</span> <span class="n">metadata_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">s2_id</span><span class="p">,</span> <span class="p">{})</span> <span class="ow">or</span> <span class="p">{}</span>
-        <span class="n">ext_ids</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;externalIds&quot;</span><span class="p">,</span> <span class="p">{})</span> <span class="ow">or</span> <span class="p">{}</span>
-        <span class="n">authors</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="p">(</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;authors&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[])]</span>
+        <span class="n">ext_ids</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"externalIds"</span><span class="p">,</span> <span class="p">{})</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="n">authors</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="p">(</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"authors"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[])]</span>
 
         <span class="n">paper_nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
             <span class="n">PaperNode</span><span class="p">(</span>
                 <span class="n">doi</span><span class="o">=</span><span class="n">doi</span> <span class="ow">or</span> <span class="n">s2_id</span><span class="p">,</span>
-                <span class="n">title</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">node_data</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)),</span>
-                <span class="n">year</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;year&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"title"</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">node_data</span><span class="p">,</span> <span class="s2">"title"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)),</span>
+                <span class="n">year</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"year"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">,</span>
                 <span class="n">authors</span><span class="o">=</span><span class="n">authors</span><span class="p">,</span>
-                <span class="n">journal</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;venue&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-                <span class="n">citation_count</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;citationCount&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="n">journal</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"venue"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+                <span class="n">citation_count</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"citationCount"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">,</span>
                 <span class="n">is_seed</span><span class="o">=</span><span class="p">(</span><span class="n">s2_id</span> <span class="o">==</span> <span class="n">seed_id</span><span class="p">),</span>
-                <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;s2_id&quot;</span><span class="p">:</span> <span class="n">s2_id</span><span class="p">,</span> <span class="s2">&quot;external_ids&quot;</span><span class="p">:</span> <span class="n">ext_ids</span><span class="p">},</span>
+                <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"s2_id"</span><span class="p">:</span> <span class="n">s2_id</span><span class="p">,</span> <span class="s2">"external_ids"</span><span class="p">:</span> <span class="n">ext_ids</span><span class="p">},</span>
             <span class="p">)</span>
         <span class="p">)</span>
 
     <span class="n">citation_edges</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">edge_data</span> <span class="ow">in</span> <span class="n">edges</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="n">edges</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-        <span class="n">src</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">edge_data</span><span class="p">,</span> <span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="n">tgt</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">edge_data</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">edge_data</span><span class="p">,</span> <span class="s2">"source"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">tgt</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">edge_data</span><span class="p">,</span> <span class="s2">"target"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">src</span> <span class="ow">and</span> <span class="n">tgt</span><span class="p">:</span>
             <span class="n">citation_edges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="n">CitationEdge</span><span class="p">(</span>
                     <span class="n">source</span><span class="o">=</span><span class="n">doi_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">src</span><span class="p">),</span>
                     <span class="n">target</span><span class="o">=</span><span class="n">doi_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">tgt</span><span class="p">,</span> <span class="n">tgt</span><span class="p">),</span>
-                    <span class="n">edge_type</span><span class="o">=</span><span class="s2">&quot;similar&quot;</span><span class="p">,</span>
-                    <span class="n">weight</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">edge_data</span><span class="p">,</span> <span class="s2">&quot;weight&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+                    <span class="n">edge_type</span><span class="o">=</span><span class="s2">"similar"</span><span class="p">,</span>
+                    <span class="n">weight</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">edge_data</span><span class="p">,</span> <span class="s2">"weight"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
                 <span class="p">)</span>
             <span class="p">)</span>
 
@@ -761,12 +761,12 @@
         <span class="n">seed_dois</span><span class="o">=</span><span class="p">[</span><span class="n">seed_doi</span><span class="p">]</span> <span class="k">if</span> <span class="n">seed_doi</span> <span class="k">else</span> <span class="p">[],</span>
         <span class="n">nodes</span><span class="o">=</span><span class="n">paper_nodes</span><span class="p">,</span>
         <span class="n">edges</span><span class="o">=</span><span class="n">citation_edges</span><span class="p">,</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;connected_papers&quot;</span><span class="p">,</span> <span class="s2">&quot;seed_s2_id&quot;</span><span class="p">:</span> <span class="n">seed_id</span><span class="p">},</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"source"</span><span class="p">:</span> <span class="s2">"connected_papers"</span><span class="p">,</span> <span class="s2">"seed_s2_id"</span><span class="p">:</span> <span class="n">seed_id</span><span class="p">},</span>
     <span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_build_papers</span><span class="p">(</span><span class="n">doi_map</span><span class="p">,</span> <span class="n">metadata_map</span><span class="p">,</span> <span class="n">warnings</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert resolved metadata to Papers collection.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Convert resolved metadata to Papers collection."""</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">scitex_scholar.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">Paper</span><span class="p">,</span> <span class="n">Papers</span>
 
     <span class="n">papers</span> <span class="o">=</span> <span class="p">[]</span>
@@ -779,23 +779,23 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">paper</span> <span class="o">=</span> <span class="n">Paper</span><span class="p">()</span>
             <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">set_doi</span><span class="p">(</span><span class="n">doi</span><span class="p">)</span>
-            <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-            <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;year&quot;</span><span class="p">)</span>
+            <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"title"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+            <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"year"</span><span class="p">)</span>
             <span class="n">paper</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">authors</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">a</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="p">(</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;authors&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[])</span>
+                <span class="n">a</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="p">(</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"authors"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[])</span>
             <span class="p">]</span>
             <span class="n">papers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">paper</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create Paper for </span><span class="si">{</span><span class="n">doi</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to create Paper for </span><span class="si">{</span><span class="n">doi</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">Papers</span><span class="p">(</span><span class="n">papers</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_write_json</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write dict to JSON file.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Write dict to JSON file."""</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 
-    <span class="n">path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="n">path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
 
 
 <span class="c1"># EOF</span>

@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scitex_scholar.formatting &mdash; SciTeX Scholar v1.4.1</title>
+  <title>scitex_scholar.formatting &mdash; SciTeX Scholar v1.9.0</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=350a9c04"></script>
+      <script src="../../_static/documentation_options.js?v=c4cb232b"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -238,6 +238,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.OASourcesCache._save_to_cache"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._save_to_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_async"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_async()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_sync"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.OASourcesCache._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.OASourcesCache.refresh"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.OASourcesCache.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.ensure_loaded()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_source"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_source()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_issn"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_issn()</span></code></a></li>
@@ -251,13 +253,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer.__init__"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.__init__()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer.get_instance"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_instance()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer._is_cache_valid"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._is_cache_valid()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer._load_from_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._load_from_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer._save_to_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._save_to_cache()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_async"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_async()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_sync"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer.refresh"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.ensure_loaded()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer.get_issn_l"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_issn_l()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer.normalize"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.normalize()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer.get_abbreviation"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_abbreviation()</span></code></a></li>
@@ -377,7 +378,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../api/citation_graph.html">scitex_scholar.citation_graph</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.__init__"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._auto_detect"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._auto_detect()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.build"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.build()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._create_paper_node"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._create_paper_node()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._build_citation_edges"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._build_citation_edges()</span></code></a></li>
@@ -502,7 +502,7 @@
              
   <h1>Source code for scitex_scholar.formatting</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
-<span class="sd">&quot;&quot;&quot;Citation formatting for plain paper dicts.</span>
+<span class="sd">"""Citation formatting for plain paper dicts.</span>
 
 <span class="sd">Provides BibTeX, RIS, EndNote, CSV, and text-style (APA, MLA, Chicago,</span>
 <span class="sd">Vancouver) formatters.  Every function accepts a standard paper dict —</span>
@@ -513,7 +513,7 @@
 <span class="sd">    title, authors_str, journal, year, doi, pmid, arxiv_id, url,</span>
 <span class="sd">    abstract, document_type, citation_count, impact_factor,</span>
 <span class="sd">    is_open_access, source, volume, number, pages, cite_key</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -523,71 +523,71 @@
 <span class="c1"># ── Type mappings ───────────────────────────────────────────────</span>
 
 <span class="n">DOC_TYPE_TO_BIBTEX</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;article&quot;</span><span class="p">:</span> <span class="s2">&quot;article&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;preprint&quot;</span><span class="p">:</span> <span class="s2">&quot;misc&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;book&quot;</span><span class="p">:</span> <span class="s2">&quot;book&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;chapter&quot;</span><span class="p">:</span> <span class="s2">&quot;inbook&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;conference&quot;</span><span class="p">:</span> <span class="s2">&quot;inproceedings&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;thesis&quot;</span><span class="p">:</span> <span class="s2">&quot;phdthesis&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;report&quot;</span><span class="p">:</span> <span class="s2">&quot;techreport&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dataset&quot;</span><span class="p">:</span> <span class="s2">&quot;misc&quot;</span><span class="p">,</span>
+    <span class="s2">"article"</span><span class="p">:</span> <span class="s2">"article"</span><span class="p">,</span>
+    <span class="s2">"preprint"</span><span class="p">:</span> <span class="s2">"misc"</span><span class="p">,</span>
+    <span class="s2">"book"</span><span class="p">:</span> <span class="s2">"book"</span><span class="p">,</span>
+    <span class="s2">"chapter"</span><span class="p">:</span> <span class="s2">"inbook"</span><span class="p">,</span>
+    <span class="s2">"conference"</span><span class="p">:</span> <span class="s2">"inproceedings"</span><span class="p">,</span>
+    <span class="s2">"thesis"</span><span class="p">:</span> <span class="s2">"phdthesis"</span><span class="p">,</span>
+    <span class="s2">"report"</span><span class="p">:</span> <span class="s2">"techreport"</span><span class="p">,</span>
+    <span class="s2">"dataset"</span><span class="p">:</span> <span class="s2">"misc"</span><span class="p">,</span>
 <span class="p">}</span>
 
 <span class="n">DOC_TYPE_TO_RIS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;article&quot;</span><span class="p">:</span> <span class="s2">&quot;JOUR&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;book&quot;</span><span class="p">:</span> <span class="s2">&quot;BOOK&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;chapter&quot;</span><span class="p">:</span> <span class="s2">&quot;CHAP&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;conference&quot;</span><span class="p">:</span> <span class="s2">&quot;CONF&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;thesis&quot;</span><span class="p">:</span> <span class="s2">&quot;THES&quot;</span><span class="p">,</span>
+    <span class="s2">"article"</span><span class="p">:</span> <span class="s2">"JOUR"</span><span class="p">,</span>
+    <span class="s2">"book"</span><span class="p">:</span> <span class="s2">"BOOK"</span><span class="p">,</span>
+    <span class="s2">"chapter"</span><span class="p">:</span> <span class="s2">"CHAP"</span><span class="p">,</span>
+    <span class="s2">"conference"</span><span class="p">:</span> <span class="s2">"CONF"</span><span class="p">,</span>
+    <span class="s2">"thesis"</span><span class="p">:</span> <span class="s2">"THES"</span><span class="p">,</span>
 <span class="p">}</span>
 
 <span class="n">DOC_TYPE_TO_ENDNOTE</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;article&quot;</span><span class="p">:</span> <span class="s2">&quot;Journal Article&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;book&quot;</span><span class="p">:</span> <span class="s2">&quot;Book&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;chapter&quot;</span><span class="p">:</span> <span class="s2">&quot;Book Section&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;conference&quot;</span><span class="p">:</span> <span class="s2">&quot;Conference Paper&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;thesis&quot;</span><span class="p">:</span> <span class="s2">&quot;Thesis&quot;</span><span class="p">,</span>
+    <span class="s2">"article"</span><span class="p">:</span> <span class="s2">"Journal Article"</span><span class="p">,</span>
+    <span class="s2">"book"</span><span class="p">:</span> <span class="s2">"Book"</span><span class="p">,</span>
+    <span class="s2">"chapter"</span><span class="p">:</span> <span class="s2">"Book Section"</span><span class="p">,</span>
+    <span class="s2">"conference"</span><span class="p">:</span> <span class="s2">"Conference Paper"</span><span class="p">,</span>
+    <span class="s2">"thesis"</span><span class="p">:</span> <span class="s2">"Thesis"</span><span class="p">,</span>
 <span class="p">}</span>
 
 <span class="n">FORMAT_EXTENSIONS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;bibtex&quot;</span><span class="p">:</span> <span class="s2">&quot;.bib&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;endnote&quot;</span><span class="p">:</span> <span class="s2">&quot;.enw&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;ris&quot;</span><span class="p">:</span> <span class="s2">&quot;.ris&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;csv&quot;</span><span class="p">:</span> <span class="s2">&quot;.csv&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;json&quot;</span><span class="p">:</span> <span class="s2">&quot;.json&quot;</span><span class="p">,</span>
+    <span class="s2">"bibtex"</span><span class="p">:</span> <span class="s2">".bib"</span><span class="p">,</span>
+    <span class="s2">"endnote"</span><span class="p">:</span> <span class="s2">".enw"</span><span class="p">,</span>
+    <span class="s2">"ris"</span><span class="p">:</span> <span class="s2">".ris"</span><span class="p">,</span>
+    <span class="s2">"csv"</span><span class="p">:</span> <span class="s2">".csv"</span><span class="p">,</span>
+    <span class="s2">"json"</span><span class="p">:</span> <span class="s2">".json"</span><span class="p">,</span>
 <span class="p">}</span>
 
 <span class="c1"># ── Text citation style templates ───────────────────────────────</span>
 
 <span class="n">CITATION_STYLES</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;apa&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;dataset&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{authors}</span><span class="s2"> (</span><span class="si">{year}</span><span class="s2">). </span><span class="si">{title}</span><span class="s2"> [Data set]. </span><span class="si">{publisher}</span><span class="s2">. </span><span class="si">{doi}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;article&quot;</span><span class="p">:</span> <span class="p">(</span>
-            <span class="s2">&quot;</span><span class="si">{authors}</span><span class="s2"> (</span><span class="si">{year}</span><span class="s2">). </span><span class="si">{title}</span><span class="s2">. </span><span class="si">{journal}</span><span class="s2">, </span><span class="si">{volume}</span><span class="s2">(</span><span class="si">{issue}</span><span class="s2">), </span><span class="si">{pages}</span><span class="s2">. </span><span class="si">{doi}</span><span class="s2">&quot;</span>
+    <span class="s2">"apa"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"dataset"</span><span class="p">:</span> <span class="s2">"</span><span class="si">{authors}</span><span class="s2"> (</span><span class="si">{year}</span><span class="s2">). </span><span class="si">{title}</span><span class="s2"> [Data set]. </span><span class="si">{publisher}</span><span class="s2">. </span><span class="si">{doi}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">"article"</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s2">"</span><span class="si">{authors}</span><span class="s2"> (</span><span class="si">{year}</span><span class="s2">). </span><span class="si">{title}</span><span class="s2">. </span><span class="si">{journal}</span><span class="s2">, </span><span class="si">{volume}</span><span class="s2">(</span><span class="si">{issue}</span><span class="s2">), </span><span class="si">{pages}</span><span class="s2">. </span><span class="si">{doi}</span><span class="s2">"</span>
         <span class="p">),</span>
     <span class="p">},</span>
-    <span class="s2">&quot;mla&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;dataset&quot;</span><span class="p">:</span> <span class="s1">&#39;&quot;</span><span class="si">{title}</span><span class="s1">.&quot; </span><span class="si">{publisher}</span><span class="s1">, </span><span class="si">{year}</span><span class="s1">, </span><span class="si">{doi}</span><span class="s1">.&#39;</span><span class="p">,</span>
-        <span class="s2">&quot;article&quot;</span><span class="p">:</span> <span class="p">(</span>
-            <span class="s1">&#39;</span><span class="si">{authors}</span><span class="s1">. &quot;</span><span class="si">{title}</span><span class="s1">.&quot; </span><span class="si">{journal}</span><span class="s1">, vol. </span><span class="si">{volume}</span><span class="s1">, &#39;</span>
-            <span class="s2">&quot;no. </span><span class="si">{issue}</span><span class="s2">, </span><span class="si">{year}</span><span class="s2">, pp. </span><span class="si">{pages}</span><span class="s2">. </span><span class="si">{doi}</span><span class="s2">.&quot;</span>
+    <span class="s2">"mla"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"dataset"</span><span class="p">:</span> <span class="s1">'"</span><span class="si">{title}</span><span class="s1">." </span><span class="si">{publisher}</span><span class="s1">, </span><span class="si">{year}</span><span class="s1">, </span><span class="si">{doi}</span><span class="s1">.'</span><span class="p">,</span>
+        <span class="s2">"article"</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s1">'</span><span class="si">{authors}</span><span class="s1">. "</span><span class="si">{title}</span><span class="s1">." </span><span class="si">{journal}</span><span class="s1">, vol. </span><span class="si">{volume}</span><span class="s1">, '</span>
+            <span class="s2">"no. </span><span class="si">{issue}</span><span class="s2">, </span><span class="si">{year}</span><span class="s2">, pp. </span><span class="si">{pages}</span><span class="s2">. </span><span class="si">{doi}</span><span class="s2">."</span>
         <span class="p">),</span>
     <span class="p">},</span>
-    <span class="s2">&quot;chicago&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;dataset&quot;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{authors}</span><span class="s1">. &quot;</span><span class="si">{title}</span><span class="s1">.&quot; </span><span class="si">{publisher}</span><span class="s1">, </span><span class="si">{year}</span><span class="s1">. </span><span class="si">{doi}</span><span class="s1">.&#39;</span><span class="p">,</span>
-        <span class="s2">&quot;article&quot;</span><span class="p">:</span> <span class="p">(</span>
-            <span class="s1">&#39;</span><span class="si">{authors}</span><span class="s1">. &quot;</span><span class="si">{title}</span><span class="s1">.&quot; </span><span class="si">{journal}</span><span class="s1"> </span><span class="si">{volume}</span><span class="s1">, &#39;</span>
-            <span class="s2">&quot;no. </span><span class="si">{issue}</span><span class="s2"> (</span><span class="si">{year}</span><span class="s2">): </span><span class="si">{pages}</span><span class="s2">. </span><span class="si">{doi}</span><span class="s2">.&quot;</span>
+    <span class="s2">"chicago"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"dataset"</span><span class="p">:</span> <span class="s1">'</span><span class="si">{authors}</span><span class="s1">. "</span><span class="si">{title}</span><span class="s1">." </span><span class="si">{publisher}</span><span class="s1">, </span><span class="si">{year}</span><span class="s1">. </span><span class="si">{doi}</span><span class="s1">.'</span><span class="p">,</span>
+        <span class="s2">"article"</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s1">'</span><span class="si">{authors}</span><span class="s1">. "</span><span class="si">{title}</span><span class="s1">." </span><span class="si">{journal}</span><span class="s1"> </span><span class="si">{volume}</span><span class="s1">, '</span>
+            <span class="s2">"no. </span><span class="si">{issue}</span><span class="s2"> (</span><span class="si">{year}</span><span class="s2">): </span><span class="si">{pages}</span><span class="s2">. </span><span class="si">{doi}</span><span class="s2">."</span>
         <span class="p">),</span>
     <span class="p">},</span>
-    <span class="s2">&quot;vancouver&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;dataset&quot;</span><span class="p">:</span> <span class="p">(</span>
-            <span class="s2">&quot;</span><span class="si">{authors}</span><span class="s2">. </span><span class="si">{title}</span><span class="s2"> [dataset]. </span><span class="si">{publisher}</span><span class="s2">; </span><span class="si">{year}</span><span class="s2">. Available from: </span><span class="si">{doi}</span><span class="s2">&quot;</span>
+    <span class="s2">"vancouver"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"dataset"</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s2">"</span><span class="si">{authors}</span><span class="s2">. </span><span class="si">{title}</span><span class="s2"> [dataset]. </span><span class="si">{publisher}</span><span class="s2">; </span><span class="si">{year}</span><span class="s2">. Available from: </span><span class="si">{doi}</span><span class="s2">"</span>
         <span class="p">),</span>
-        <span class="s2">&quot;article&quot;</span><span class="p">:</span> <span class="p">(</span>
-            <span class="s2">&quot;</span><span class="si">{authors}</span><span class="s2">. </span><span class="si">{title}</span><span class="s2">. &quot;</span>
-            <span class="s2">&quot;</span><span class="si">{journal}</span><span class="s2">. </span><span class="si">{year}</span><span class="s2">;</span><span class="si">{volume}</span><span class="s2">(</span><span class="si">{issue}</span><span class="s2">):</span><span class="si">{pages}</span><span class="s2">. &quot;</span>
-            <span class="s2">&quot;Available from: </span><span class="si">{doi}</span><span class="s2">&quot;</span>
+        <span class="s2">"article"</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s2">"</span><span class="si">{authors}</span><span class="s2">. </span><span class="si">{title}</span><span class="s2">. "</span>
+            <span class="s2">"</span><span class="si">{journal}</span><span class="s2">. </span><span class="si">{year}</span><span class="s2">;</span><span class="si">{volume}</span><span class="s2">(</span><span class="si">{issue}</span><span class="s2">):</span><span class="si">{pages}</span><span class="s2">. "</span>
+            <span class="s2">"Available from: </span><span class="si">{doi}</span><span class="s2">"</span>
         <span class="p">),</span>
     <span class="p">},</span>
 <span class="p">}</span>
@@ -598,54 +598,54 @@
 <div class="viewcode-block" id="clean_text">
 <a class="viewcode-back" href="../../api/formatting.html#scitex_scholar.formatting.clean_text">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">clean_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Remove characters that break citation formats and normalise whitespace.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Remove characters that break citation formats and normalise whitespace."""</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">text</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
-    <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[</span><span class="si">{}</span><span class="s2">\[\]</span><span class="se">\\</span><span class="s2">]&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="s2">""</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">"[</span><span class="si">{}</span><span class="s2">\[\]</span><span class="se">\\</span><span class="s2">]"</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\s+"</span><span class="p">,</span> <span class="s2">" "</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
 
 
 
 <div class="viewcode-block" id="generate_cite_key">
 <a class="viewcode-back" href="../../api/index.html#scitex_scholar.formatting.generate_cite_key">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">generate_cite_key</span><span class="p">(</span><span class="n">paper</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a BibTeX citation key from a paper dict.&quot;&quot;&quot;</span>
-    <span class="n">authors</span> <span class="o">=</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;authors_str&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;unknown&quot;</span>
-    <span class="n">first_author</span> <span class="o">=</span> <span class="n">authors</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">authors</span> <span class="k">else</span> <span class="s2">&quot;unknown&quot;</span>
-    <span class="n">first_author</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[^a-zA-Z]&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">first_author</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-    <span class="n">year</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;year&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;XXXX&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">first_author</span><span class="si">}{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span></div>
+<span class="w">    </span><span class="sd">"""Generate a BibTeX citation key from a paper dict."""</span>
+    <span class="n">authors</span> <span class="o">=</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"authors_str"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">"unknown"</span>
+    <span class="n">first_author</span> <span class="o">=</span> <span class="n">authors</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">authors</span> <span class="k">else</span> <span class="s2">"unknown"</span>
+    <span class="n">first_author</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">"[^a-zA-Z]"</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="n">first_author</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">year</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"year"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">"XXXX"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">first_author</span><span class="si">}{</span><span class="n">year</span><span class="si">}</span><span class="s2">"</span></div>
 
 
 
 <div class="viewcode-block" id="paper_normalize">
 <a class="viewcode-back" href="../../api/formatting.html#scitex_scholar.formatting.paper_normalize">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">paper_normalize</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Normalise a raw dict (e.g. API search result) to a standard paper dict.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Normalise a raw dict (e.g. API search result) to a standard paper dict."""</span>
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;Unknown&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;authors_str&quot;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;authors&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;author&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;journal&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;journal&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s*\(IF.*\)&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;year&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;year&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;doi&quot;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;doi&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DOI&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;pmid&quot;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pmid&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;arxiv_id&quot;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;arxiv_id&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="p">(</span>
-            <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;externalUrl&quot;</span><span class="p">)</span>
-            <span class="ow">or</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;external_url&quot;</span><span class="p">)</span>
-            <span class="ow">or</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">)</span>
-            <span class="ow">or</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pdf_url&quot;</span><span class="p">)</span>
-            <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+        <span class="s2">"title"</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"title"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">"Unknown"</span><span class="p">,</span>
+        <span class="s2">"authors_str"</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"authors"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"author"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"journal"</span><span class="p">:</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"journal"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\s*\(IF.*\)"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+        <span class="s2">"year"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"year"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">),</span>
+        <span class="s2">"doi"</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"doi"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"DOI"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"pmid"</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"pmid"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"arxiv_id"</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"arxiv_id"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"url"</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"externalUrl"</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"external_url"</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"url"</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"pdf_url"</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="s2">""</span>
         <span class="p">),</span>
-        <span class="s2">&quot;abstract&quot;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;abstract&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;snippet&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;document_type&quot;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;document_type&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;article&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;citation_count&quot;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;citations&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;citation_count&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="s2">&quot;impact_factor&quot;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;impact_factor&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="s2">&quot;is_open_access&quot;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;is_open_access&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
-        <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;unknown&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;volume&quot;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;volume&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;number&quot;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;number&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;pages&quot;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pages&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">"abstract"</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"abstract"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"snippet"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"document_type"</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"document_type"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">"article"</span><span class="p">,</span>
+        <span class="s2">"citation_count"</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"citations"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"citation_count"</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">"impact_factor"</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"impact_factor"</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">"is_open_access"</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"is_open_access"</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+        <span class="s2">"source"</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"source"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">"unknown"</span><span class="p">,</span>
+        <span class="s2">"volume"</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"volume"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"number"</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"number"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"pages"</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"pages"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
     <span class="p">}</span></div>
 
 
@@ -656,47 +656,47 @@
 <div class="viewcode-block" id="to_bibtex">
 <a class="viewcode-back" href="../../api/index.html#scitex_scholar.formatting.to_bibtex">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">to_bibtex</span><span class="p">(</span><span class="n">paper</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Format a standard paper dict as a BibTeX entry.&quot;&quot;&quot;</span>
-    <span class="n">doc_type</span> <span class="o">=</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;document_type&quot;</span><span class="p">,</span> <span class="s2">&quot;article&quot;</span><span class="p">)</span>
-    <span class="n">entry_type</span> <span class="o">=</span> <span class="n">DOC_TYPE_TO_BIBTEX</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">doc_type</span><span class="p">,</span> <span class="s2">&quot;article&quot;</span><span class="p">)</span>
-    <span class="n">key</span> <span class="o">=</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cite_key&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">generate_cite_key</span><span class="p">(</span><span class="n">paper</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">"""Format a standard paper dict as a BibTeX entry."""</span>
+    <span class="n">doc_type</span> <span class="o">=</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"document_type"</span><span class="p">,</span> <span class="s2">"article"</span><span class="p">)</span>
+    <span class="n">entry_type</span> <span class="o">=</span> <span class="n">DOC_TYPE_TO_BIBTEX</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">doc_type</span><span class="p">,</span> <span class="s2">"article"</span><span class="p">)</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"cite_key"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">generate_cite_key</span><span class="p">(</span><span class="n">paper</span><span class="p">)</span>
 
-    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;@</span><span class="si">{</span><span class="n">entry_type</span><span class="si">}</span><span class="se">{{</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">,&quot;</span><span class="p">]</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"@</span><span class="si">{</span><span class="n">entry_type</span><span class="si">}</span><span class="se">{{</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">,"</span><span class="p">]</span>
 
-    <span class="n">title</span> <span class="o">=</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"title"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  title = </span><span class="se">{{</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="se">}}</span><span class="s2">,&quot;</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  title = </span><span class="se">{{</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="se">}}</span><span class="s2">,"</span><span class="p">)</span>
 
-    <span class="n">authors</span> <span class="o">=</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;authors_str&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
-    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  author = </span><span class="se">{{</span><span class="si">{</span><span class="n">authors</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;Unknown&#39;</span><span class="si">}</span><span class="se">}}</span><span class="s2">,&quot;</span><span class="p">)</span>
+    <span class="n">authors</span> <span class="o">=</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"authors_str"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  author = </span><span class="se">{{</span><span class="si">{</span><span class="n">authors</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">'Unknown'</span><span class="si">}</span><span class="se">}}</span><span class="s2">,"</span><span class="p">)</span>
 
-    <span class="n">journal</span> <span class="o">=</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;journal&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">journal</span> <span class="o">=</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"journal"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">journal</span><span class="p">:</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  journal = </span><span class="se">{{</span><span class="si">{</span><span class="n">journal</span><span class="si">}</span><span class="se">}}</span><span class="s2">,&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;year&quot;</span><span class="p">):</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  year = </span><span class="se">{{</span><span class="si">{</span><span class="n">paper</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">}}</span><span class="s2">,&quot;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;volume&quot;</span><span class="p">,</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;pages&quot;</span><span class="p">):</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  journal = </span><span class="se">{{</span><span class="si">{</span><span class="n">journal</span><span class="si">}</span><span class="se">}}</span><span class="s2">,"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"year"</span><span class="p">):</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  year = </span><span class="se">{{</span><span class="si">{</span><span class="n">paper</span><span class="p">[</span><span class="s1">'year'</span><span class="p">]</span><span class="si">}</span><span class="se">}}</span><span class="s2">,"</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"volume"</span><span class="p">,</span> <span class="s2">"number"</span><span class="p">,</span> <span class="s2">"pages"</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">field</span><span class="p">):</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2"> = </span><span class="se">{{</span><span class="si">{</span><span class="n">paper</span><span class="p">[</span><span class="n">field</span><span class="p">]</span><span class="si">}</span><span class="se">}}</span><span class="s2">,&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;doi&quot;</span><span class="p">):</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  doi = </span><span class="se">{{</span><span class="si">{</span><span class="n">paper</span><span class="p">[</span><span class="s1">&#39;doi&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">}}</span><span class="s2">,&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pmid&quot;</span><span class="p">):</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  pmid = </span><span class="se">{{</span><span class="si">{</span><span class="n">paper</span><span class="p">[</span><span class="s1">&#39;pmid&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">}}</span><span class="s2">,&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;arxiv_id&quot;</span><span class="p">):</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  eprint = </span><span class="se">{{</span><span class="si">{</span><span class="n">paper</span><span class="p">[</span><span class="s1">&#39;arxiv_id&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">}}</span><span class="s2">,&quot;</span><span class="p">)</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;  archivePrefix = </span><span class="si">{arXiv}</span><span class="s2">,&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">):</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  url = </span><span class="se">{{</span><span class="si">{</span><span class="n">paper</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">}}</span><span class="s2">,&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;abstract&quot;</span><span class="p">):</span>
-        <span class="n">abstract</span> <span class="o">=</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="p">[</span><span class="s2">&quot;abstract&quot;</span><span class="p">])</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2"> = </span><span class="se">{{</span><span class="si">{</span><span class="n">paper</span><span class="p">[</span><span class="n">field</span><span class="p">]</span><span class="si">}</span><span class="se">}}</span><span class="s2">,"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"doi"</span><span class="p">):</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  doi = </span><span class="se">{{</span><span class="si">{</span><span class="n">paper</span><span class="p">[</span><span class="s1">'doi'</span><span class="p">]</span><span class="si">}</span><span class="se">}}</span><span class="s2">,"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"pmid"</span><span class="p">):</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  pmid = </span><span class="se">{{</span><span class="si">{</span><span class="n">paper</span><span class="p">[</span><span class="s1">'pmid'</span><span class="p">]</span><span class="si">}</span><span class="se">}}</span><span class="s2">,"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"arxiv_id"</span><span class="p">):</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  eprint = </span><span class="se">{{</span><span class="si">{</span><span class="n">paper</span><span class="p">[</span><span class="s1">'arxiv_id'</span><span class="p">]</span><span class="si">}</span><span class="se">}}</span><span class="s2">,"</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"  archivePrefix = </span><span class="si">{arXiv}</span><span class="s2">,"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"url"</span><span class="p">):</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  url = </span><span class="se">{{</span><span class="si">{</span><span class="n">paper</span><span class="p">[</span><span class="s1">'url'</span><span class="p">]</span><span class="si">}</span><span class="se">}}</span><span class="s2">,"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"abstract"</span><span class="p">):</span>
+        <span class="n">abstract</span> <span class="o">=</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="p">[</span><span class="s2">"abstract"</span><span class="p">])</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">abstract</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">500</span><span class="p">:</span>
-            <span class="n">abstract</span> <span class="o">=</span> <span class="n">abstract</span><span class="p">[:</span><span class="mi">500</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  abstract = </span><span class="se">{{</span><span class="si">{</span><span class="n">abstract</span><span class="si">}</span><span class="se">}}</span><span class="s2">,&quot;</span><span class="p">)</span>
+            <span class="n">abstract</span> <span class="o">=</span> <span class="n">abstract</span><span class="p">[:</span><span class="mi">500</span><span class="p">]</span> <span class="o">+</span> <span class="s2">"..."</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  abstract = </span><span class="se">{{</span><span class="si">{</span><span class="n">abstract</span><span class="si">}</span><span class="se">}}</span><span class="s2">,"</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">","</span><span class="p">):</span>
         <span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"}"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
 
 
 
@@ -706,39 +706,39 @@
 <div class="viewcode-block" id="to_ris">
 <a class="viewcode-back" href="../../api/index.html#scitex_scholar.formatting.to_ris">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">to_ris</span><span class="p">(</span><span class="n">paper</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Format a standard paper dict as a RIS entry.&quot;&quot;&quot;</span>
-    <span class="n">doc_type</span> <span class="o">=</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;document_type&quot;</span><span class="p">,</span> <span class="s2">&quot;article&quot;</span><span class="p">)</span>
-    <span class="n">ris_type</span> <span class="o">=</span> <span class="n">DOC_TYPE_TO_RIS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">doc_type</span><span class="p">,</span> <span class="s2">&quot;GEN&quot;</span><span class="p">)</span>
-    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;TY  - </span><span class="si">{</span><span class="n">ris_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">"""Format a standard paper dict as a RIS entry."""</span>
+    <span class="n">doc_type</span> <span class="o">=</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"document_type"</span><span class="p">,</span> <span class="s2">"article"</span><span class="p">)</span>
+    <span class="n">ris_type</span> <span class="o">=</span> <span class="n">DOC_TYPE_TO_RIS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">doc_type</span><span class="p">,</span> <span class="s2">"GEN"</span><span class="p">)</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"TY  - </span><span class="si">{</span><span class="n">ris_type</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span>
 
-    <span class="n">title</span> <span class="o">=</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"title"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;TI  - </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"TI  - </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-    <span class="n">authors</span> <span class="o">=</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;authors_str&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">authors</span> <span class="o">=</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"authors_str"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span>
     <span class="k">if</span> <span class="n">authors</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">author</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s+and\s+|,\s*&quot;</span><span class="p">,</span> <span class="n">authors</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">author</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\s+and\s+|,\s*"</span><span class="p">,</span> <span class="n">authors</span><span class="p">):</span>
             <span class="n">author</span> <span class="o">=</span> <span class="n">author</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">author</span><span class="p">:</span>
-                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;AU  - </span><span class="si">{</span><span class="n">author</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"AU  - </span><span class="si">{</span><span class="n">author</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-    <span class="n">journal</span> <span class="o">=</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;journal&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">journal</span> <span class="o">=</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"journal"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">journal</span><span class="p">:</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;JO  - </span><span class="si">{</span><span class="n">journal</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;year&quot;</span><span class="p">):</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PY  - </span><span class="si">{</span><span class="n">paper</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;doi&quot;</span><span class="p">):</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DO  - </span><span class="si">{</span><span class="n">paper</span><span class="p">[</span><span class="s1">&#39;doi&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">):</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;UR  - </span><span class="si">{</span><span class="n">paper</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;abstract&quot;</span><span class="p">):</span>
-        <span class="n">abstract</span> <span class="o">=</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="p">[</span><span class="s2">&quot;abstract&quot;</span><span class="p">])</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"JO  - </span><span class="si">{</span><span class="n">journal</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"year"</span><span class="p">):</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"PY  - </span><span class="si">{</span><span class="n">paper</span><span class="p">[</span><span class="s1">'year'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"doi"</span><span class="p">):</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"DO  - </span><span class="si">{</span><span class="n">paper</span><span class="p">[</span><span class="s1">'doi'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"url"</span><span class="p">):</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"UR  - </span><span class="si">{</span><span class="n">paper</span><span class="p">[</span><span class="s1">'url'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"abstract"</span><span class="p">):</span>
+        <span class="n">abstract</span> <span class="o">=</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="p">[</span><span class="s2">"abstract"</span><span class="p">])</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">abstract</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1000</span><span class="p">:</span>
-            <span class="n">abstract</span> <span class="o">=</span> <span class="n">abstract</span><span class="p">[:</span><span class="mi">1000</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;AB  - </span><span class="si">{</span><span class="n">abstract</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">abstract</span> <span class="o">=</span> <span class="n">abstract</span><span class="p">[:</span><span class="mi">1000</span><span class="p">]</span> <span class="o">+</span> <span class="s2">"..."</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"AB  - </span><span class="si">{</span><span class="n">abstract</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;ER  - &quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"ER  - "</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
 
 
 
@@ -748,38 +748,38 @@
 <div class="viewcode-block" id="to_endnote">
 <a class="viewcode-back" href="../../api/index.html#scitex_scholar.formatting.to_endnote">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">to_endnote</span><span class="p">(</span><span class="n">paper</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Format a standard paper dict as an EndNote entry.&quot;&quot;&quot;</span>
-    <span class="n">doc_type</span> <span class="o">=</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;document_type&quot;</span><span class="p">,</span> <span class="s2">&quot;article&quot;</span><span class="p">)</span>
-    <span class="n">endnote_type</span> <span class="o">=</span> <span class="n">DOC_TYPE_TO_ENDNOTE</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">doc_type</span><span class="p">,</span> <span class="s2">&quot;Generic&quot;</span><span class="p">)</span>
-    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;%0 </span><span class="si">{</span><span class="n">endnote_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">"""Format a standard paper dict as an EndNote entry."""</span>
+    <span class="n">doc_type</span> <span class="o">=</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"document_type"</span><span class="p">,</span> <span class="s2">"article"</span><span class="p">)</span>
+    <span class="n">endnote_type</span> <span class="o">=</span> <span class="n">DOC_TYPE_TO_ENDNOTE</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">doc_type</span><span class="p">,</span> <span class="s2">"Generic"</span><span class="p">)</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"%0 </span><span class="si">{</span><span class="n">endnote_type</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span>
 
-    <span class="n">title</span> <span class="o">=</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"title"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;%T </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"%T </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-    <span class="n">authors</span> <span class="o">=</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;authors_str&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">authors</span> <span class="o">=</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"authors_str"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span>
     <span class="k">if</span> <span class="n">authors</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">author</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s+and\s+|,\s*&quot;</span><span class="p">,</span> <span class="n">authors</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">author</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\s+and\s+|,\s*"</span><span class="p">,</span> <span class="n">authors</span><span class="p">):</span>
             <span class="n">author</span> <span class="o">=</span> <span class="n">author</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">author</span><span class="p">:</span>
-                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;%A </span><span class="si">{</span><span class="n">author</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"%A </span><span class="si">{</span><span class="n">author</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-    <span class="n">journal</span> <span class="o">=</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;journal&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">journal</span> <span class="o">=</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"journal"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">journal</span><span class="p">:</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;%J </span><span class="si">{</span><span class="n">journal</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;year&quot;</span><span class="p">):</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;%D </span><span class="si">{</span><span class="n">paper</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;doi&quot;</span><span class="p">):</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;%R </span><span class="si">{</span><span class="n">paper</span><span class="p">[</span><span class="s1">&#39;doi&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">):</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;%U </span><span class="si">{</span><span class="n">paper</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;abstract&quot;</span><span class="p">):</span>
-        <span class="n">abstract</span> <span class="o">=</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="p">[</span><span class="s2">&quot;abstract&quot;</span><span class="p">])</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"%J </span><span class="si">{</span><span class="n">journal</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"year"</span><span class="p">):</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"%D </span><span class="si">{</span><span class="n">paper</span><span class="p">[</span><span class="s1">'year'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"doi"</span><span class="p">):</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"%R </span><span class="si">{</span><span class="n">paper</span><span class="p">[</span><span class="s1">'doi'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"url"</span><span class="p">):</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"%U </span><span class="si">{</span><span class="n">paper</span><span class="p">[</span><span class="s1">'url'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"abstract"</span><span class="p">):</span>
+        <span class="n">abstract</span> <span class="o">=</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="p">[</span><span class="s2">"abstract"</span><span class="p">])</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">abstract</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1000</span><span class="p">:</span>
-            <span class="n">abstract</span> <span class="o">=</span> <span class="n">abstract</span><span class="p">[:</span><span class="mi">1000</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;%X </span><span class="si">{</span><span class="n">abstract</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">abstract</span> <span class="o">=</span> <span class="n">abstract</span><span class="p">[:</span><span class="mi">1000</span><span class="p">]</span> <span class="o">+</span> <span class="s2">"..."</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"%X </span><span class="si">{</span><span class="n">abstract</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
 
 
 
@@ -789,16 +789,16 @@
 <div class="viewcode-block" id="to_csv_row">
 <a class="viewcode-back" href="../../api/formatting.html#scitex_scholar.formatting.to_csv_row">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">to_csv_row</span><span class="p">(</span><span class="n">paper</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Format a standard paper dict as a CSV row dict.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Format a standard paper dict as a CSV row dict."""</span>
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;Title&quot;</span><span class="p">:</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;Authors&quot;</span><span class="p">:</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;authors_str&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Journal&quot;</span><span class="p">:</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;journal&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;Year&quot;</span><span class="p">:</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;year&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;DOI&quot;</span><span class="p">:</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;doi&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;PMID&quot;</span><span class="p">:</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pmid&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;URL&quot;</span><span class="p">:</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Abstract&quot;</span><span class="p">:</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;abstract&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+        <span class="s2">"Title"</span><span class="p">:</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"title"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">),</span>
+        <span class="s2">"Authors"</span><span class="p">:</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"authors_str"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"Journal"</span><span class="p">:</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"journal"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">),</span>
+        <span class="s2">"Year"</span><span class="p">:</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"year"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"DOI"</span><span class="p">:</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"doi"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"PMID"</span><span class="p">:</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"pmid"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"URL"</span><span class="p">:</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"url"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"Abstract"</span><span class="p">:</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"abstract"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">),</span>
     <span class="p">}</span></div>
 
 
@@ -810,10 +810,10 @@
 <a class="viewcode-back" href="../../api/index.html#scitex_scholar.formatting.to_text_citation">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">to_text_citation</span><span class="p">(</span>
     <span class="n">paper</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
-    <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;apa&quot;</span><span class="p">,</span>
-    <span class="n">doc_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;article&quot;</span><span class="p">,</span>
+    <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"apa"</span><span class="p">,</span>
+    <span class="n">doc_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"article"</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Format a paper dict as a text citation in the given style.</span>
+<span class="w">    </span><span class="sd">"""Format a paper dict as a text citation in the given style.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -828,27 +828,27 @@
 <span class="sd">    -------</span>
 <span class="sd">    str</span>
 <span class="sd">        Formatted citation string.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">templates</span> <span class="o">=</span> <span class="n">CITATION_STYLES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="n">CITATION_STYLES</span><span class="p">[</span><span class="s2">&quot;apa&quot;</span><span class="p">])</span>
-    <span class="n">template</span> <span class="o">=</span> <span class="n">templates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">doc_type</span><span class="p">,</span> <span class="n">templates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;article&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+<span class="sd">    """</span>
+    <span class="n">templates</span> <span class="o">=</span> <span class="n">CITATION_STYLES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="n">CITATION_STYLES</span><span class="p">[</span><span class="s2">"apa"</span><span class="p">])</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="n">templates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">doc_type</span><span class="p">,</span> <span class="n">templates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"article"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span>
 
     <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;authors&quot;</span><span class="p">:</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;authors_str&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;Unknown&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;year&quot;</span><span class="p">:</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;year&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;journal&quot;</span><span class="p">:</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;journal&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;volume&quot;</span><span class="p">:</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;volume&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;issue&quot;</span><span class="p">:</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;number&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;pages&quot;</span><span class="p">:</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pages&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;doi&quot;</span><span class="p">:</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;doi&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;publisher&quot;</span><span class="p">:</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;publisher&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">"authors"</span><span class="p">:</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"authors_str"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">"Unknown"</span><span class="p">,</span>
+        <span class="s2">"year"</span><span class="p">:</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"year"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"title"</span><span class="p">:</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"title"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">),</span>
+        <span class="s2">"journal"</span><span class="p">:</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"journal"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">),</span>
+        <span class="s2">"volume"</span><span class="p">:</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"volume"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"issue"</span><span class="p">:</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"number"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"pages"</span><span class="p">:</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"pages"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"doi"</span><span class="p">:</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"doi"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"url"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"publisher"</span><span class="p">:</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"publisher"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
     <span class="p">}</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;authors&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">). </span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;journal&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="s1">'authors'</span><span class="p">]</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="s1">'year'</span><span class="p">]</span><span class="si">}</span><span class="s2">). </span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="s1">'title'</span><span class="p">]</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="s1">'journal'</span><span class="p">]</span><span class="si">}</span><span class="s2">."</span>
         <span class="p">)</span></div>
 
 
@@ -856,36 +856,36 @@
 <span class="c1"># ── arXiv BibTeX cleaning ──────────────────────────────────────</span>
 
 <span class="n">_BIBLATEX_TO_BIBTEX</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;journaltitle&quot;</span><span class="p">:</span> <span class="s2">&quot;journal&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="s2">&quot;address&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;date&quot;</span><span class="p">:</span> <span class="s2">&quot;year&quot;</span><span class="p">,</span>
+    <span class="s2">"journaltitle"</span><span class="p">:</span> <span class="s2">"journal"</span><span class="p">,</span>
+    <span class="s2">"location"</span><span class="p">:</span> <span class="s2">"address"</span><span class="p">,</span>
+    <span class="s2">"date"</span><span class="p">:</span> <span class="s2">"year"</span><span class="p">,</span>
 <span class="p">}</span>
 
-<span class="n">_ARXIV_UNSUPPORTED_FIELDS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="s2">&quot;urldate&quot;</span><span class="p">,</span> <span class="s2">&quot;file&quot;</span><span class="p">,</span> <span class="s2">&quot;abstract&quot;</span><span class="p">]</span>
+<span class="n">_ARXIV_UNSUPPORTED_FIELDS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"url"</span><span class="p">,</span> <span class="s2">"urldate"</span><span class="p">,</span> <span class="s2">"file"</span><span class="p">,</span> <span class="s2">"abstract"</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="clean_bibtex_for_arxiv">
 <a class="viewcode-back" href="../../api/formatting.html#scitex_scholar.formatting.clean_bibtex_for_arxiv">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">clean_bibtex_for_arxiv</span><span class="p">(</span><span class="n">bibtex_entry</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Clean a BibTeX entry for arXiv compatibility.</span>
+<span class="w">    </span><span class="sd">"""Clean a BibTeX entry for arXiv compatibility.</span>
 
 <span class="sd">    Converts biblatex fields to standard bibtex and removes</span>
 <span class="sd">    unsupported fields (url, urldate, file, abstract).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">for</span> <span class="n">biblatex_field</span><span class="p">,</span> <span class="n">bibtex_field</span> <span class="ow">in</span> <span class="n">_BIBLATEX_TO_BIBTEX</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">bibtex_entry</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
-            <span class="sa">rf</span><span class="s2">&quot;\b</span><span class="si">{</span><span class="n">biblatex_field</span><span class="si">}</span><span class="s2">\s*=&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bibtex_field</span><span class="si">}</span><span class="s2"> =&quot;</span><span class="p">,</span> <span class="n">bibtex_entry</span>
+            <span class="sa">rf</span><span class="s2">"\b</span><span class="si">{</span><span class="n">biblatex_field</span><span class="si">}</span><span class="s2">\s*="</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">bibtex_field</span><span class="si">}</span><span class="s2"> ="</span><span class="p">,</span> <span class="n">bibtex_entry</span>
         <span class="p">)</span>
 
     <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">_ARXIV_UNSUPPORTED_FIELDS</span><span class="p">:</span>
         <span class="n">bibtex_entry</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
-            <span class="sa">rf</span><span class="s2">&quot;\s*</span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2">\s*=\s*\</span><span class="se">{{</span><span class="s2">[^</span><span class="se">}}</span><span class="s2">]*\</span><span class="se">}}</span><span class="s2">,?\s*&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="sa">rf</span><span class="s2">"\s*</span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2">\s*=\s*\</span><span class="se">{{</span><span class="s2">[^</span><span class="se">}}</span><span class="s2">]*\</span><span class="se">}}</span><span class="s2">,?\s*"</span><span class="p">,</span>
+            <span class="s2">""</span><span class="p">,</span>
             <span class="n">bibtex_entry</span><span class="p">,</span>
             <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="n">bibtex_entry</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;,\s*}&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">}&quot;</span><span class="p">,</span> <span class="n">bibtex_entry</span><span class="p">)</span>
+    <span class="n">bibtex_entry</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">",\s*}"</span><span class="p">,</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">}"</span><span class="p">,</span> <span class="n">bibtex_entry</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">bibtex_entry</span></div>
 
 
@@ -893,20 +893,20 @@
 <span class="c1"># ── Batch helpers ───────────────────────────────────────────────</span>
 
 <span class="n">_FORMAT_FUNCS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;bibtex&quot;</span><span class="p">:</span> <span class="n">to_bibtex</span><span class="p">,</span>
-    <span class="s2">&quot;ris&quot;</span><span class="p">:</span> <span class="n">to_ris</span><span class="p">,</span>
-    <span class="s2">&quot;endnote&quot;</span><span class="p">:</span> <span class="n">to_endnote</span><span class="p">,</span>
+    <span class="s2">"bibtex"</span><span class="p">:</span> <span class="n">to_bibtex</span><span class="p">,</span>
+    <span class="s2">"ris"</span><span class="p">:</span> <span class="n">to_ris</span><span class="p">,</span>
+    <span class="s2">"endnote"</span><span class="p">:</span> <span class="n">to_endnote</span><span class="p">,</span>
 <span class="p">}</span>
 
 
 <div class="viewcode-block" id="papers_to_format">
 <a class="viewcode-back" href="../../api/index.html#scitex_scholar.formatting.papers_to_format">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">papers_to_format</span><span class="p">(</span><span class="n">papers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Format a list of paper dicts to the given format string.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Format a list of paper dicts to the given format string."""</span>
     <span class="n">func</span> <span class="o">=</span> <span class="n">_FORMAT_FUNCS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">func</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported format: </span><span class="si">{</span><span class="n">fmt</span><span class="si">}</span><span class="s2">. Use: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_FORMAT_FUNCS</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">papers</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unsupported format: </span><span class="si">{</span><span class="n">fmt</span><span class="si">}</span><span class="s2">. Use: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_FORMAT_FUNCS</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">"</span><span class="se">\n\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">papers</span><span class="p">)</span></div>
 
 
 
@@ -916,34 +916,34 @@
 <div class="viewcode-block" id="paper_from_search_result">
 <a class="viewcode-back" href="../../api/formatting.html#scitex_scholar.formatting.paper_from_search_result">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">paper_from_search_result</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Normalize a raw search-API result dict to the standard paper format.</span>
+<span class="w">    </span><span class="sd">"""Normalize a raw search-API result dict to the standard paper format.</span>
 
 <span class="sd">    Handles field aliases from different search engines (externalUrl, snippet, etc.)</span>
 <span class="sd">    and fills missing fields with safe defaults.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">journal</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;journal&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+<span class="sd">    """</span>
+    <span class="n">journal</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"journal"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">re</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_re</span>
 
-    <span class="n">journal</span> <span class="o">=</span> <span class="n">_re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s*\(IF[^)]*\)&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">journal</span><span class="p">)</span>
+    <span class="n">journal</span> <span class="o">=</span> <span class="n">_re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\s*\(IF[^)]*\)"</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="n">journal</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;Unknown&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;authors&quot;</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;authors&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;journal&quot;</span><span class="p">:</span> <span class="n">journal</span><span class="p">,</span>
-        <span class="s2">&quot;year&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;year&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;doi&quot;</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;doi&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DOI&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;pmid&quot;</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pmid&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;arxiv_id&quot;</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;arxiv_id&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;citations&quot;</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;citations&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;citation_count&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="s2">&quot;impact_factor&quot;</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;impact_factor&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="s2">&quot;is_open_access&quot;</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;is_open_access&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
-        <span class="s2">&quot;abstract&quot;</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;abstract&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;snippet&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="p">(</span>
-            <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;externalUrl&quot;</span><span class="p">)</span>
-            <span class="ow">or</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;external_url&quot;</span><span class="p">)</span>
-            <span class="ow">or</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pdf_url&quot;</span><span class="p">)</span>
-            <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+        <span class="s2">"title"</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"title"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">"Unknown"</span><span class="p">,</span>
+        <span class="s2">"authors"</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"authors"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"journal"</span><span class="p">:</span> <span class="n">journal</span><span class="p">,</span>
+        <span class="s2">"year"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"year"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">),</span>
+        <span class="s2">"doi"</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"doi"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"DOI"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"pmid"</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"pmid"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"arxiv_id"</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"arxiv_id"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"citations"</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"citations"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"citation_count"</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">"impact_factor"</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"impact_factor"</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">"is_open_access"</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"is_open_access"</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+        <span class="s2">"abstract"</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"abstract"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"snippet"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"url"</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"externalUrl"</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"external_url"</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"pdf_url"</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="s2">""</span>
         <span class="p">),</span>
-        <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;unknown&quot;</span><span class="p">,</span>
+        <span class="s2">"source"</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"source"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">"unknown"</span><span class="p">,</span>
     <span class="p">}</span></div>
 
 
@@ -951,7 +951,7 @@
 <div class="viewcode-block" id="make_citation_key">
 <a class="viewcode-back" href="../../api/index.html#scitex_scholar.formatting.make_citation_key">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">make_citation_key</span><span class="p">(</span><span class="n">last_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">year</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a citation key from author last name and year.</span>
+<span class="w">    </span><span class="sd">"""Generate a citation key from author last name and year.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        last_name: Author last name (special chars stripped).</span>
@@ -960,51 +960,51 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">        Citation key string, e.g. ``smith2024``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">re</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_re</span>
 
-    <span class="n">name</span> <span class="o">=</span> <span class="n">_re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[^a-zA-Z]&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">last_name</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">year</span> <span class="k">else</span> <span class="n">name</span></div>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">_re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">"[^a-zA-Z]"</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="n">last_name</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}{</span><span class="n">year</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">year</span> <span class="k">else</span> <span class="n">name</span></div>
 
 
 
 <div class="viewcode-block" id="sanitize_filename">
 <a class="viewcode-back" href="../../api/formatting.html#scitex_scholar.formatting.sanitize_filename">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">sanitize_filename</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sanitize a string for use as a download filename.</span>
+<span class="w">    </span><span class="sd">"""Sanitize a string for use as a download filename.</span>
 
 <span class="sd">    Replaces shell-unsafe characters with underscores, collapses whitespace,</span>
 <span class="sd">    and truncates to *max_length* characters.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">re</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_re</span>
 
-    <span class="n">filename</span> <span class="o">=</span> <span class="n">_re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[&lt;&gt;:&quot;/</span><span class="se">\\</span><span class="s1">|?*]&#39;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">_re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">'[&lt;&gt;:"/</span><span class="se">\\</span><span class="s1">|?*]'</span><span class="p">,</span> <span class="s2">"_"</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
     <span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span><span class="p">[:</span><span class="n">max_length</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">_re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span></div>
+    <span class="k">return</span> <span class="n">_re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\s+"</span><span class="p">,</span> <span class="s2">"_"</span><span class="p">,</span> <span class="n">filename</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span></div>
 
 
 
 <span class="c1"># ── Public API ──────────────────────────────────────────────────</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;clean_text&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;generate_cite_key&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;paper_normalize&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;paper_from_search_result&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;make_citation_key&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;sanitize_filename&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;to_bibtex&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;to_ris&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;to_endnote&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;to_csv_row&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;to_text_citation&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;clean_bibtex_for_arxiv&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;papers_to_format&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;FORMAT_EXTENSIONS&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;DOC_TYPE_TO_BIBTEX&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;DOC_TYPE_TO_RIS&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;DOC_TYPE_TO_ENDNOTE&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;CITATION_STYLES&quot;</span><span class="p">,</span>
+    <span class="s2">"clean_text"</span><span class="p">,</span>
+    <span class="s2">"generate_cite_key"</span><span class="p">,</span>
+    <span class="s2">"paper_normalize"</span><span class="p">,</span>
+    <span class="s2">"paper_from_search_result"</span><span class="p">,</span>
+    <span class="s2">"make_citation_key"</span><span class="p">,</span>
+    <span class="s2">"sanitize_filename"</span><span class="p">,</span>
+    <span class="s2">"to_bibtex"</span><span class="p">,</span>
+    <span class="s2">"to_ris"</span><span class="p">,</span>
+    <span class="s2">"to_endnote"</span><span class="p">,</span>
+    <span class="s2">"to_csv_row"</span><span class="p">,</span>
+    <span class="s2">"to_text_citation"</span><span class="p">,</span>
+    <span class="s2">"clean_bibtex_for_arxiv"</span><span class="p">,</span>
+    <span class="s2">"papers_to_format"</span><span class="p">,</span>
+    <span class="s2">"FORMAT_EXTENSIONS"</span><span class="p">,</span>
+    <span class="s2">"DOC_TYPE_TO_BIBTEX"</span><span class="p">,</span>
+    <span class="s2">"DOC_TYPE_TO_RIS"</span><span class="p">,</span>
+    <span class="s2">"DOC_TYPE_TO_ENDNOTE"</span><span class="p">,</span>
+    <span class="s2">"CITATION_STYLES"</span><span class="p">,</span>
 <span class="p">]</span>
 
 <span class="c1"># EOF</span>

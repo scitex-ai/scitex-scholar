@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Zotero local SQLite reader — no API key required.
+Zotero local database reader — no API key required.
 
-Reads directly from Zotero's local database file (zotero.sqlite).
+Reads directly from Zotero's own local database file.
 Auto-detects Linux and Windows (WSL) Zotero installations.
 
 Usage:
@@ -42,12 +42,13 @@ _SKIP_TYPES = {"attachment", "note", "annotation"}
 
 
 class ZoteroLocalReader:
-    """Read papers from a local Zotero SQLite database.
+    """Read papers from a local Zotero database.
 
     Parameters
     ----------
     db_path : str or Path, optional
-        Path to zotero.sqlite. If None, auto-detects Linux then WSL paths.
+        Path to the Zotero database file. If None, auto-detects Linux then
+        WSL paths.
     project : str
         Scholar project name for the returned Papers collection.
     """
@@ -166,11 +167,11 @@ class ZoteroLocalReader:
     # ── Internal helpers ──────────────────────────────────────────────────────
 
     def get_zotero_base_dir(self) -> Path:
-        """Return the Zotero data directory (parent of zotero.sqlite)."""
+        """Return the Zotero data directory (parent of the database file)."""
         return self.db_path.parent
 
     def _detect_db_path(self) -> Path:
-        """Auto-detect Zotero SQLite: Linux first, then WSL Windows mount.
+        """Auto-detect the Zotero database: Linux first, then WSL Windows mount.
 
         Searches multiple known subpaths under each Windows user directory
         to find the largest (most items) database.
@@ -192,7 +193,7 @@ class ZoteroLocalReader:
         )
 
     def _connect(self) -> sqlite3.Connection:
-        """Open a read-only SQLite connection."""
+        """Open a read-only connection to the Zotero database."""
         conn = sqlite3.connect(f"file:{self.db_path}?mode=ro", uri=True)
         conn.row_factory = sqlite3.Row
         return conn
@@ -352,7 +353,7 @@ class ZoteroLocalReader:
         creators: List[dict],
         tags: List[str],
     ) -> dict:
-        """Convert raw SQLite rows to the Zotero API dict format ZoteroMapper expects."""
+        """Convert raw database rows to the Zotero API dict format ZoteroMapper expects."""
         return {
             "key": key,
             "version": 0,

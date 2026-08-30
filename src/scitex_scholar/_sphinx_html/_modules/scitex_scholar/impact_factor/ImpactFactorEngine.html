@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scitex_scholar.impact_factor.ImpactFactorEngine &mdash; SciTeX Scholar v1.4.1</title>
+  <title>scitex_scholar.impact_factor.ImpactFactorEngine &mdash; SciTeX Scholar v1.9.0</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=350a9c04"></script>
+      <script src="../../../_static/documentation_options.js?v=c4cb232b"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -238,6 +238,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._save_to_cache"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._save_to_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_async"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_async()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_sync"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.refresh"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.ensure_loaded()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_source"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_source()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_issn"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_issn()</span></code></a></li>
@@ -251,13 +253,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.__init__"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.__init__()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_instance"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_instance()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._is_cache_valid"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._is_cache_valid()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._load_from_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._load_from_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._save_to_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._save_to_cache()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_async"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_async()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_sync"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.refresh"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.ensure_loaded()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_issn_l"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_issn_l()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.normalize"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.normalize()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_abbreviation"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_abbreviation()</span></code></a></li>
@@ -377,7 +378,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../api/citation_graph.html">scitex_scholar.citation_graph</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.__init__"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._auto_detect"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._auto_detect()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.build"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.build()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._create_paper_node"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._create_paper_node()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._build_citation_edges"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._build_citation_edges()</span></code></a></li>
@@ -503,20 +503,20 @@
   <h1>Source code for scitex_scholar.impact_factor.ImpactFactorEngine</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="c1"># Timestamp: &quot;2025-10-11 23:58:17 (ywatanabe)&quot;</span>
+<span class="c1"># Timestamp: "2025-10-11 23:58:17 (ywatanabe)"</span>
 <span class="c1"># File: /home/ywatanabe/proj/scitex_repo/src/scitex/scholar/extra/JournalMetrics.py</span>
 <span class="c1"># ----------------------------------------</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
-<span class="n">__FILE__</span> <span class="o">=</span> <span class="s2">&quot;./src/scitex/scholar/extra/JournalMetrics.py&quot;</span>
+<span class="n">__FILE__</span> <span class="o">=</span> <span class="s2">"./src/scitex/scholar/extra/JournalMetrics.py"</span>
 <span class="n">__DIR__</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__FILE__</span><span class="p">)</span>
 <span class="c1"># ----------------------------------------</span>
 
 <span class="n">__FILE__</span> <span class="o">=</span> <span class="vm">__file__</span>
 
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 <span class="sd">Functionalities:</span>
 <span class="sd">- Retrieves journal impact factors and quartiles</span>
 <span class="sd">- Provides standalone journal metrics lookup</span>
@@ -531,36 +531,38 @@
 
 <span class="sd">Output:</span>
 <span class="sd">- Dictionary containing impact factor and quartile data</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
-<span class="sd">&quot;&quot;&quot;Imports&quot;&quot;&quot;</span>
+<span class="sd">"""Imports"""</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">scitex_logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">getLogger</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">.jcr.ImpactFactorJCREngine</span><span class="w"> </span><span class="kn">import</span> <span class="n">TABLE</span> <span class="k">as</span> <span class="n">JCR_TABLE</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.jcr.ImpactFactorJCREngine</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImpactFactorJCREngine</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<span class="sd">&quot;&quot;&quot;Parameters&quot;&quot;&quot;</span>
+<span class="sd">"""Parameters"""</span>
 
-<span class="sd">&quot;&quot;&quot;Functions &amp; Classes&quot;&quot;&quot;</span>
+<span class="sd">"""Functions &amp; Classes"""</span>
 
 
 <div class="viewcode-block" id="ImpactFactorEngine">
 <a class="viewcode-back" href="../../../api/impact_factor.html#scitex_scholar.impact_factor.ImpactFactorEngine">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImpactFactorEngine</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Impact factor service - finds journal metrics from JCR database.</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Impact factor service - finds journal metrics from the JCR table.</span>
 
-<span class="sd">    Uses JCR database lookup with caching for performance.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    Reads the JCR rows through :class:`ImpactFactorJCREngine`, with an LRU</span>
+<span class="sd">    cache in front so repeated lookups of the same journal are free.</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="ImpactFactorEngine.__init__">
 <a class="viewcode-back" href="../../../api/impact_factor.html#scitex_scholar.impact_factor.ImpactFactorEngine.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cache_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize with optional cache size.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Initialize with optional cache size."""</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">jcr_engine</span> <span class="o">=</span> <span class="n">ImpactFactorJCREngine</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">get_metrics</span> <span class="o">=</span> <span class="n">lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="n">cache_size</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_metrics_uncached</span><span class="p">)</span></div>
@@ -569,49 +571,30 @@
 <div class="viewcode-block" id="ImpactFactorEngine._get_jcr_year">
 <a class="viewcode-back" href="../../../api/impact_factor.html#scitex_scholar.impact_factor.ImpactFactorEngine._get_jcr_year">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_jcr_year</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extract JCR year from database or package metadata.</span>
+<span class="w">        </span><span class="sd">"""Which JCR edition the numbers came from.</span>
 
-<span class="sd">        Returns &quot;Source Unknown&quot; if the year can&#39;t be determined. Any</span>
-<span class="sd">        underlying error is logged at debug level so callers can distinguish</span>
-<span class="sd">        a truly unknown year from a misconfigured DB.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        The edition is stamped on every row when the export is loaded, so</span>
+<span class="sd">        it is read rather than inferred. Returns "Source Unknown" when no</span>
+<span class="sd">        row carries one -- rows loaded before the field existed, or an</span>
+<span class="sd">        empty table.</span>
+<span class="sd">        """</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="kn">import</span><span class="w"> </span><span class="nn">sqlite3</span>
-
-            <span class="k">with</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jcr_engine</span><span class="o">.</span><span class="n">dbfile</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
-                <span class="n">cursor</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-
-                <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT name FROM sqlite_master WHERE type=&#39;table&#39;&quot;</span><span class="p">)</span>
-                <span class="n">tables</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()]</span>
-
-                <span class="k">if</span> <span class="s2">&quot;metadata&quot;</span> <span class="ow">in</span> <span class="n">tables</span><span class="p">:</span>
-                    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-                        <span class="s2">&quot;SELECT value FROM metadata WHERE key=&#39;year&#39; OR key=&#39;jcr_year&#39;&quot;</span>
-                    <span class="p">)</span>
-                    <span class="n">year_result</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
-                    <span class="k">if</span> <span class="n">year_result</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;JCR </span><span class="si">{</span><span class="n">year_result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
-
-                <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
-
-                <span class="n">db_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jcr_engine</span><span class="o">.</span><span class="n">dbfile</span><span class="p">)</span>
-                <span class="n">year_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;20\d</span><span class="si">{2}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">db_path</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">year_match</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;JCR </span><span class="si">{</span><span class="n">year_match</span><span class="o">.</span><span class="n">group</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
-
+            <span class="n">year</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jcr_engine</span><span class="o">.</span><span class="n">jcr_year</span>
+            <span class="k">if</span> <span class="n">year</span><span class="p">:</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s2">"JCR </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">"</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;ImpactFactorEngine: JCR year lookup failed &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">); returning &#39;Source Unknown&#39;&quot;</span>
+                <span class="sa">f</span><span class="s2">"ImpactFactorEngine: JCR year lookup failed "</span>
+                <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">); returning 'Source Unknown'"</span>
             <span class="p">)</span>
 
-        <span class="k">return</span> <span class="s2">&quot;Source Unknown&quot;</span></div>
+        <span class="k">return</span> <span class="s2">"Source Unknown"</span></div>
 
 
 <div class="viewcode-block" id="ImpactFactorEngine._get_metrics_uncached">
 <a class="viewcode-back" href="../../../api/impact_factor.html#scitex_scholar.impact_factor.ImpactFactorEngine._get_metrics_uncached">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_metrics_uncached</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">journal_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get journal metrics without caching.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Get journal metrics without caching."""</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">jcr_engine</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">journal_name</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
@@ -620,12 +603,19 @@
             <span class="k">if</span> <span class="n">results</span><span class="p">:</span>
                 <span class="n">result</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="k">return</span> <span class="p">{</span>
-                    <span class="s2">&quot;impact_factor&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;factor&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
-                    <span class="s2">&quot;quartile&quot;</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;jcr&quot;</span><span class="p">,</span> <span class="s2">&quot;Unknown&quot;</span><span class="p">),</span>
-                    <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_jcr_year</span><span class="p">(),</span>
+                    <span class="s2">"impact_factor"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"factor"</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">),</span>
+                    <span class="s2">"quartile"</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"jcr"</span><span class="p">,</span> <span class="s2">"Unknown"</span><span class="p">),</span>
+                    <span class="s2">"source"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_jcr_year</span><span class="p">(),</span>
                 <span class="p">}</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="k">pass</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="c1"># Logged, not swallowed: "no metrics for this journal" and "the</span>
+            <span class="c1"># table could not be read at all" are different answers, and the</span>
+            <span class="c1"># bare `pass` that used to be here made an unreachable store look</span>
+            <span class="c1"># exactly like an unlisted journal.</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"ImpactFactorEngine: lookup for </span><span class="si">{</span><span class="n">journal_name</span><span class="si">!r}</span><span class="s2"> failed "</span>
+                <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">)"</span>
+            <span class="p">)</span>
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
@@ -633,41 +623,24 @@
 <div class="viewcode-block" id="ImpactFactorEngine.get_database_info">
 <a class="viewcode-back" href="../../../api/impact_factor.html#scitex_scholar.impact_factor.ImpactFactorEngine.get_database_info">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_database_info</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get information about the impact factor database.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Describe where the impact-factor rows live and what is in them."""</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">jcr_engine</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Database not available&quot;</span><span class="p">}</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="s2">"JCR engine not available"</span><span class="p">}</span>
 
-        <span class="kn">import</span><span class="w"> </span><span class="nn">sqlite3</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">records</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jcr_engine</span><span class="o">.</span><span class="n">records</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
 
-        <span class="n">db_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jcr_engine</span><span class="o">.</span><span class="n">dbfile</span>
-
-        <span class="k">with</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">db_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
-            <span class="n">cursor</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-
-            <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT name FROM sqlite_master WHERE type=&#39;table&#39;&quot;</span><span class="p">)</span>
-            <span class="n">tables</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()]</span>
-
-            <span class="n">info</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;database_path&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">db_path</span><span class="p">),</span>
-                <span class="s2">&quot;tables&quot;</span><span class="p">:</span> <span class="n">tables</span><span class="p">,</span>
-                <span class="s2">&quot;total_journals&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="s2">&quot;data_year&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_jcr_year</span><span class="p">(),</span>
-            <span class="p">}</span>
-
-            <span class="k">if</span> <span class="n">tables</span><span class="p">:</span>
-                <span class="n">main_table</span> <span class="o">=</span> <span class="n">tables</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SELECT COUNT(*) FROM </span><span class="si">{</span><span class="n">main_table</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="n">info</span><span class="p">[</span><span class="s2">&quot;total_journals&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-
-                <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PRAGMA table_info(</span><span class="si">{</span><span class="n">main_table</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-                <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()]</span>
-                <span class="n">info</span><span class="p">[</span><span class="s2">&quot;columns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">columns</span>
-
-                <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SELECT * FROM </span><span class="si">{</span><span class="n">main_table</span><span class="si">}</span><span class="s2"> LIMIT 3&quot;</span><span class="p">)</span>
-                <span class="n">sample_data</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
-                <span class="n">info</span><span class="p">[</span><span class="s2">&quot;sample_data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample_data</span>
-
-            <span class="k">return</span> <span class="n">info</span></div>
+        <span class="n">info</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"store"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">jcr_engine</span><span class="o">.</span><span class="n">store</span><span class="p">,</span>
+            <span class="s2">"table"</span><span class="p">:</span> <span class="n">JCR_TABLE</span><span class="p">,</span>
+            <span class="s2">"total_journals"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">records</span><span class="p">),</span>
+            <span class="s2">"data_year"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_jcr_year</span><span class="p">(),</span>
+            <span class="s2">"columns"</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">records</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">records</span> <span class="k">else</span> <span class="p">[],</span>
+            <span class="s2">"sample_data"</span><span class="p">:</span> <span class="n">records</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">info</span></div>
 </div>
 
 
@@ -675,7 +648,7 @@
 <div class="viewcode-block" id="get_journal_metrics">
 <a class="viewcode-back" href="../../../api/impact_factor.html#scitex_scholar.impact_factor.get_journal_metrics">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_journal_metrics</span><span class="p">(</span><span class="n">journal_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Standalone function to get journal metrics.</span>
+<span class="w">    </span><span class="sd">"""Standalone function to get journal metrics.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -689,41 +662,41 @@
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
-<span class="sd">    &gt;&gt;&gt; metrics = get_journal_metrics(&quot;Nature&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; print(metrics[&quot;impact_factor&quot;])</span>
+<span class="sd">    &gt;&gt;&gt; metrics = get_journal_metrics("Nature")</span>
+<span class="sd">    &gt;&gt;&gt; print(metrics["impact_factor"])</span>
 <span class="sd">    64.8</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">engine</span> <span class="o">=</span> <span class="n">ImpactFactorEngine</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">engine</span><span class="o">.</span><span class="n">get_metrics</span><span class="p">(</span><span class="n">journal_name</span><span class="p">)</span></div>
 
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Demonstrate journal metrics lookup.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Demonstrate journal metrics lookup."""</span>
         <span class="n">metrics_instance</span> <span class="o">=</span> <span class="n">ImpactFactorEngine</span><span class="p">()</span>
 
-        <span class="c1"># Show database info</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Database Information&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+        <span class="c1"># Show where the rows come from</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Impact-factor table"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
         <span class="n">db_info</span> <span class="o">=</span> <span class="n">metrics_instance</span><span class="o">.</span><span class="n">get_database_info</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">db_info</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Journal Metrics Lookup Demo&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Journal Metrics Lookup Demo"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
 
-        <span class="n">test_journals</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Nature&quot;</span><span class="p">,</span> <span class="s2">&quot;Science&quot;</span><span class="p">,</span> <span class="s2">&quot;Cell&quot;</span><span class="p">]</span>
+        <span class="n">test_journals</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Nature"</span><span class="p">,</span> <span class="s2">"Science"</span><span class="p">,</span> <span class="s2">"Cell"</span><span class="p">]</span>
 
         <span class="k">for</span> <span class="n">journal</span> <span class="ow">in</span> <span class="n">test_journals</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Journal: </span><span class="si">{</span><span class="n">journal</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Journal: </span><span class="si">{</span><span class="n">journal</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="n">metrics</span> <span class="o">=</span> <span class="n">get_journal_metrics</span><span class="p">(</span><span class="n">journal</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">metrics</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">metrics</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  No metrics found&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">"  No metrics found"</span><span class="p">)</span>
 
     <span class="n">main</span><span class="p">()</span>
 <span class="c1"># python -m scitex_scholar.extra.JournalMetrics</span>
