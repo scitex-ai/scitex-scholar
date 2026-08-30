@@ -7,7 +7,7 @@ assume or mention any particular downstream consumer. The symlink is
 expected to point at a scholar library (either the home library or a
 previously materialized subtree).
 
-See docs/architecture/ADR-100-project-tree-link.md.
+See docs/adr/0100-project-tree-link.md.
 """
 
 from __future__ import annotations

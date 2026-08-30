@@ -2,7 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-29
-- **Supersedes:** [ADR-100](ADR-100-project-tree-link.md) §3 and its Non-goals
+- **Supersedes:** [ADR-100](0100-project-tree-link.md) §3 and its Non-goals
   clause about `index.db`
 - **Context:** fleet storage ruling, 2026-08-29
 
