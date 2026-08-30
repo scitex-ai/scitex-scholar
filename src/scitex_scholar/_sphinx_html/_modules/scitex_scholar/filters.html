@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scitex_scholar.filters &mdash; SciTeX Scholar v1.4.1</title>
+  <title>scitex_scholar.filters &mdash; SciTeX Scholar v1.9.0</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=350a9c04"></script>
+      <script src="../../_static/documentation_options.js?v=c4cb232b"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -238,6 +238,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.OASourcesCache._save_to_cache"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._save_to_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_async"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_async()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_sync"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.OASourcesCache._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.OASourcesCache.refresh"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.OASourcesCache.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.ensure_loaded()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_source"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_source()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_issn"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_issn()</span></code></a></li>
@@ -251,13 +253,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer.__init__"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.__init__()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer.get_instance"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_instance()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer._is_cache_valid"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._is_cache_valid()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer._load_from_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._load_from_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer._save_to_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._save_to_cache()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_async"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_async()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_sync"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer.refresh"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.ensure_loaded()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer.get_issn_l"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_issn_l()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer.normalize"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.normalize()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/core.html#scitex_scholar.core.JournalNormalizer.get_abbreviation"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_abbreviation()</span></code></a></li>
@@ -377,7 +378,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../api/citation_graph.html">scitex_scholar.citation_graph</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.__init__"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._auto_detect"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._auto_detect()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.build"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.build()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._create_paper_node"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._create_paper_node()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._build_citation_edges"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._build_citation_edges()</span></code></a></li>
@@ -504,7 +504,7 @@
 <span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="c1"># File: ./src/scitex/scholar/filters.py</span>
 
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 <span class="sd">Pure-function paper filtering for scitex_scholar.</span>
 
 <span class="sd">Works on plain dicts only — no Django ORM or model imports required.</span>
@@ -519,7 +519,7 @@
 <span class="sd">    is_open_access: bool</span>
 <span class="sd">    source        : str</span>
 <span class="sd">    snippet       : str  (optional, used for doc_type detection)</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
@@ -531,7 +531,7 @@
     <span class="n">filters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">parsed_operators</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter a list of paper dicts by various criteria.</span>
+<span class="w">    </span><span class="sd">"""Filter a list of paper dicts by various criteria.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -549,8 +549,8 @@
 <span class="sd">        - ``authors`` -- list of author name strings (legacy)</span>
 <span class="sd">        - ``journal`` -- journal name substring (legacy, str)</span>
 <span class="sd">        - ``open_access`` -- bool</span>
-<span class="sd">        - ``doc_type`` -- ``&quot;review&quot;`` | ``&quot;preprint&quot;`` | other</span>
-<span class="sd">        - ``language`` -- language string (``&quot;english&quot;`` passes)</span>
+<span class="sd">        - ``doc_type`` -- ``"review"`` | ``"preprint"`` | other</span>
+<span class="sd">        - ``language`` -- language string (``"english"`` passes)</span>
 <span class="sd">    parsed_operators</span>
 <span class="sd">        Dict produced by ``SearchQueryParser.from_shell_syntax()`` or the</span>
 <span class="sd">        equivalent ``parse_query_operators()`` function from scitex-cloud.</span>
@@ -567,7 +567,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    list of dict</span>
 <span class="sd">        Filtered list of paper dicts (same objects, not copies).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">filters</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">parsed_operators</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">papers</span>
 
@@ -578,71 +578,71 @@
         <span class="c1"># Title includes / excludes  (from parsed_operators)</span>
         <span class="c1"># ------------------------------------------------------------------</span>
         <span class="k">if</span> <span class="n">parsed_operators</span><span class="p">:</span>
-            <span class="n">title</span> <span class="o">=</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"title"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
-            <span class="k">if</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title_includes&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"title_includes"</span><span class="p">):</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
-                    <span class="n">term</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">title</span> <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">parsed_operators</span><span class="p">[</span><span class="s2">&quot;title_includes&quot;</span><span class="p">]</span>
+                    <span class="n">term</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">title</span> <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">parsed_operators</span><span class="p">[</span><span class="s2">"title_includes"</span><span class="p">]</span>
                 <span class="p">):</span>
                     <span class="k">continue</span>
 
-            <span class="k">if</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title_excludes&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"title_excludes"</span><span class="p">):</span>
                 <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
-                    <span class="n">term</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">title</span> <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">parsed_operators</span><span class="p">[</span><span class="s2">&quot;title_excludes&quot;</span><span class="p">]</span>
+                    <span class="n">term</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">title</span> <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">parsed_operators</span><span class="p">[</span><span class="s2">"title_excludes"</span><span class="p">]</span>
                 <span class="p">):</span>
                     <span class="k">continue</span>
 
             <span class="c1"># ------------------------------------------------------------------</span>
             <span class="c1"># Author includes / excludes  (from parsed_operators)</span>
             <span class="c1"># ------------------------------------------------------------------</span>
-            <span class="n">authors_text</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;authors&quot;</span><span class="p">,</span> <span class="p">[]))</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="n">authors_text</span> <span class="o">=</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"authors"</span><span class="p">,</span> <span class="p">[]))</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
-            <span class="k">if</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;author_includes&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"author_includes"</span><span class="p">):</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
                     <span class="n">term</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">authors_text</span>
-                    <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">parsed_operators</span><span class="p">[</span><span class="s2">&quot;author_includes&quot;</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">parsed_operators</span><span class="p">[</span><span class="s2">"author_includes"</span><span class="p">]</span>
                 <span class="p">):</span>
                     <span class="k">continue</span>
 
-            <span class="k">if</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;author_excludes&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"author_excludes"</span><span class="p">):</span>
                 <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
                     <span class="n">term</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">authors_text</span>
-                    <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">parsed_operators</span><span class="p">[</span><span class="s2">&quot;author_excludes&quot;</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">parsed_operators</span><span class="p">[</span><span class="s2">"author_excludes"</span><span class="p">]</span>
                 <span class="p">):</span>
                     <span class="k">continue</span>
 
             <span class="c1"># ------------------------------------------------------------------</span>
             <span class="c1"># Journal includes / excludes  (from parsed_operators)</span>
             <span class="c1"># ------------------------------------------------------------------</span>
-            <span class="n">journal_name</span> <span class="o">=</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;journal&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="n">journal_name</span> <span class="o">=</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"journal"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
-            <span class="k">if</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;journal_includes&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"journal_includes"</span><span class="p">):</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
                     <span class="n">term</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">journal_name</span>
-                    <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">parsed_operators</span><span class="p">[</span><span class="s2">&quot;journal_includes&quot;</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">parsed_operators</span><span class="p">[</span><span class="s2">"journal_includes"</span><span class="p">]</span>
                 <span class="p">):</span>
                     <span class="k">continue</span>
 
-            <span class="k">if</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;journal_excludes&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"journal_excludes"</span><span class="p">):</span>
                 <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
                     <span class="n">term</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">journal_name</span>
-                    <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">parsed_operators</span><span class="p">[</span><span class="s2">&quot;journal_excludes&quot;</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">parsed_operators</span><span class="p">[</span><span class="s2">"journal_excludes"</span><span class="p">]</span>
                 <span class="p">):</span>
                     <span class="k">continue</span>
 
         <span class="c1"># ------------------------------------------------------------------</span>
         <span class="c1"># Year range  (filters take precedence, parsed_operators can override)</span>
         <span class="c1"># ------------------------------------------------------------------</span>
-        <span class="n">year_from</span> <span class="o">=</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;year_from&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">filters</span> <span class="k">else</span> <span class="kc">None</span>
-        <span class="n">year_to</span> <span class="o">=</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;year_to&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">filters</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">year_from</span> <span class="o">=</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"year_from"</span><span class="p">)</span> <span class="k">if</span> <span class="n">filters</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">year_to</span> <span class="o">=</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"year_to"</span><span class="p">)</span> <span class="k">if</span> <span class="n">filters</span> <span class="k">else</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="n">parsed_operators</span><span class="p">:</span>
-            <span class="n">year_from</span> <span class="o">=</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;year_min&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">year_from</span>
-            <span class="n">year_to</span> <span class="o">=</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;year_max&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">year_to</span>
+            <span class="n">year_from</span> <span class="o">=</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"year_min"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">year_from</span>
+            <span class="n">year_to</span> <span class="o">=</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"year_max"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">year_to</span>
 
         <span class="k">if</span> <span class="n">year_from</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">year_to</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">year</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;year&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+                <span class="n">year</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"year"</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
                 <span class="k">if</span> <span class="n">year_from</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">year</span> <span class="o">&lt;</span> <span class="n">year_from</span><span class="p">:</span>
                     <span class="k">continue</span>
                 <span class="k">if</span> <span class="n">year_to</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">year</span> <span class="o">&gt;</span> <span class="n">year_to</span><span class="p">:</span>
@@ -653,16 +653,16 @@
         <span class="c1"># ------------------------------------------------------------------</span>
         <span class="c1"># Citation count</span>
         <span class="c1"># ------------------------------------------------------------------</span>
-        <span class="n">min_citations</span> <span class="o">=</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;min_citations&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">filters</span> <span class="k">else</span> <span class="kc">None</span>
-        <span class="n">max_citations</span> <span class="o">=</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_citations&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">filters</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">min_citations</span> <span class="o">=</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"min_citations"</span><span class="p">)</span> <span class="k">if</span> <span class="n">filters</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">max_citations</span> <span class="o">=</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"max_citations"</span><span class="p">)</span> <span class="k">if</span> <span class="n">filters</span> <span class="k">else</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="n">parsed_operators</span><span class="p">:</span>
-            <span class="n">min_citations</span> <span class="o">=</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;citations_min&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">min_citations</span>
-            <span class="n">max_citations</span> <span class="o">=</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;citations_max&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">max_citations</span>
+            <span class="n">min_citations</span> <span class="o">=</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"citations_min"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">min_citations</span>
+            <span class="n">max_citations</span> <span class="o">=</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"citations_max"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">max_citations</span>
 
         <span class="k">if</span> <span class="n">min_citations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">max_citations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">citations</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;citations&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+                <span class="n">citations</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"citations"</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
                 <span class="k">if</span> <span class="n">min_citations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">citations</span> <span class="o">&lt;</span> <span class="n">min_citations</span><span class="p">:</span>
                     <span class="k">continue</span>
                 <span class="k">if</span> <span class="n">max_citations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">citations</span> <span class="o">&gt;</span> <span class="n">max_citations</span><span class="p">:</span>
@@ -673,16 +673,16 @@
         <span class="c1"># ------------------------------------------------------------------</span>
         <span class="c1"># Impact factor</span>
         <span class="c1"># ------------------------------------------------------------------</span>
-        <span class="n">min_if</span> <span class="o">=</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;min_impact_factor&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">filters</span> <span class="k">else</span> <span class="kc">None</span>
-        <span class="n">max_if</span> <span class="o">=</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_impact_factor&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">filters</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">min_if</span> <span class="o">=</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"min_impact_factor"</span><span class="p">)</span> <span class="k">if</span> <span class="n">filters</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">max_if</span> <span class="o">=</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"max_impact_factor"</span><span class="p">)</span> <span class="k">if</span> <span class="n">filters</span> <span class="k">else</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="n">parsed_operators</span><span class="p">:</span>
-            <span class="n">min_if</span> <span class="o">=</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;impact_factor_min&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">min_if</span>
-            <span class="n">max_if</span> <span class="o">=</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;impact_factor_max&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">max_if</span>
+            <span class="n">min_if</span> <span class="o">=</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"impact_factor_min"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">min_if</span>
+            <span class="n">max_if</span> <span class="o">=</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"impact_factor_max"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">max_if</span>
 
         <span class="k">if</span> <span class="n">min_if</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">max_if</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">impact_factor</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;impact_factor&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">impact_factor</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"impact_factor"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">min_if</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">impact_factor</span> <span class="o">&lt;</span> <span class="n">min_if</span><span class="p">:</span>
                     <span class="k">continue</span>
                 <span class="k">if</span> <span class="n">max_if</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">impact_factor</span> <span class="o">&gt;</span> <span class="n">max_if</span><span class="p">:</span>
@@ -691,49 +691,49 @@
                 <span class="k">continue</span>
 
         <span class="c1"># ------------------------------------------------------------------</span>
-        <span class="c1"># Legacy author filter  (filters[&quot;authors&quot;] is a list of name strings)</span>
+        <span class="c1"># Legacy author filter  (filters["authors"] is a list of name strings)</span>
         <span class="c1"># ------------------------------------------------------------------</span>
-        <span class="k">if</span> <span class="n">filters</span> <span class="ow">and</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;authors&quot;</span><span class="p">):</span>
-            <span class="n">authors_text</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;authors&quot;</span><span class="p">,</span> <span class="p">[]))</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">authors_text</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">filters</span><span class="p">[</span><span class="s2">&quot;authors&quot;</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">filters</span> <span class="ow">and</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"authors"</span><span class="p">):</span>
+            <span class="n">authors_text</span> <span class="o">=</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"authors"</span><span class="p">,</span> <span class="p">[]))</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">authors_text</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">filters</span><span class="p">[</span><span class="s2">"authors"</span><span class="p">]):</span>
                 <span class="k">continue</span>
 
         <span class="c1"># ------------------------------------------------------------------</span>
-        <span class="c1"># Legacy journal filter  (filters[&quot;journal&quot;] is a substring)</span>
+        <span class="c1"># Legacy journal filter  (filters["journal"] is a substring)</span>
         <span class="c1"># ------------------------------------------------------------------</span>
-        <span class="k">if</span> <span class="n">filters</span> <span class="ow">and</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;journal&quot;</span><span class="p">):</span>
-            <span class="n">journal_name</span> <span class="o">=</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;journal&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">filters</span><span class="p">[</span><span class="s2">&quot;journal&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">journal_name</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">filters</span> <span class="ow">and</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"journal"</span><span class="p">):</span>
+            <span class="n">journal_name</span> <span class="o">=</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"journal"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">filters</span><span class="p">[</span><span class="s2">"journal"</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">journal_name</span><span class="p">:</span>
                 <span class="k">continue</span>
 
         <span class="c1"># ------------------------------------------------------------------</span>
         <span class="c1"># Open access</span>
         <span class="c1"># ------------------------------------------------------------------</span>
-        <span class="k">if</span> <span class="n">filters</span> <span class="ow">and</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;open_access&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;is_open_access&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">filters</span> <span class="ow">and</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"open_access"</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"is_open_access"</span><span class="p">):</span>
             <span class="k">continue</span>
 
         <span class="c1"># ------------------------------------------------------------------</span>
         <span class="c1"># Document type  (basic heuristic)</span>
         <span class="c1"># ------------------------------------------------------------------</span>
-        <span class="k">if</span> <span class="n">filters</span> <span class="ow">and</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;doc_type&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">filters</span> <span class="ow">and</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"doc_type"</span><span class="p">):</span>
             <span class="n">title_and_snippet</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;snippet&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"title"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span> <span class="o">+</span> <span class="s2">" "</span> <span class="o">+</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"snippet"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
             <span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-            <span class="n">doc_type</span> <span class="o">=</span> <span class="n">filters</span><span class="p">[</span><span class="s2">&quot;doc_type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="n">doc_type</span> <span class="o">=</span> <span class="n">filters</span><span class="p">[</span><span class="s2">"doc_type"</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
-            <span class="k">if</span> <span class="n">doc_type</span> <span class="o">==</span> <span class="s2">&quot;review&quot;</span> <span class="ow">and</span> <span class="s2">&quot;review&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">title_and_snippet</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">doc_type</span> <span class="o">==</span> <span class="s2">"review"</span> <span class="ow">and</span> <span class="s2">"review"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">title_and_snippet</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="k">elif</span> <span class="p">(</span>
-                <span class="n">doc_type</span> <span class="o">==</span> <span class="s2">&quot;preprint&quot;</span>
-                <span class="ow">and</span> <span class="s2">&quot;preprint&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                <span class="n">doc_type</span> <span class="o">==</span> <span class="s2">"preprint"</span>
+                <span class="ow">and</span> <span class="s2">"preprint"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">paper</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"source"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
             <span class="p">):</span>
                 <span class="k">continue</span>
 
         <span class="c1"># ------------------------------------------------------------------</span>
-        <span class="c1"># Language  (basic: only &quot;english&quot; passes)</span>
+        <span class="c1"># Language  (basic: only "english" passes)</span>
         <span class="c1"># ------------------------------------------------------------------</span>
-        <span class="k">if</span> <span class="n">filters</span> <span class="ow">and</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;language&quot;</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">filters</span><span class="p">[</span><span class="s2">&quot;language&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;english&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">filters</span> <span class="ow">and</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"language"</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">filters</span><span class="p">[</span><span class="s2">"language"</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">"english"</span><span class="p">:</span>
                 <span class="k">continue</span>
 
         <span class="n">filtered</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">paper</span><span class="p">)</span>

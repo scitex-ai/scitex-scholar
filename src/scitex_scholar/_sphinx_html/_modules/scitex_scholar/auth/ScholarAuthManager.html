@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scitex_scholar.auth.ScholarAuthManager &mdash; SciTeX Scholar v1.4.1</title>
+  <title>scitex_scholar.auth.ScholarAuthManager &mdash; SciTeX Scholar v1.9.0</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=350a9c04"></script>
+      <script src="../../../_static/documentation_options.js?v=c4cb232b"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -238,6 +238,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._save_to_cache"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._save_to_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_async"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_async()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_sync"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.refresh"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.ensure_loaded()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_source"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_source()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_issn"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_issn()</span></code></a></li>
@@ -251,13 +253,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.__init__"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.__init__()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_instance"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_instance()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._is_cache_valid"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._is_cache_valid()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._load_from_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._load_from_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._save_to_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._save_to_cache()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_async"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_async()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_sync"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.refresh"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.ensure_loaded()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_issn_l"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_issn_l()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.normalize"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.normalize()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_abbreviation"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_abbreviation()</span></code></a></li>
@@ -377,7 +378,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../api/citation_graph.html">scitex_scholar.citation_graph</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.__init__"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._auto_detect"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._auto_detect()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.build"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.build()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._create_paper_node"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._create_paper_node()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._build_citation_edges"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._build_citation_edges()</span></code></a></li>
@@ -503,25 +503,25 @@
   <h1>Source code for scitex_scholar.auth.ScholarAuthManager</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="c1"># Timestamp: &quot;2025-10-10 00:48:00 (ywatanabe)&quot;</span>
+<span class="c1"># Timestamp: "2025-10-10 00:48:00 (ywatanabe)"</span>
 <span class="c1"># File: /home/ywatanabe/proj/scitex_repo/src/scitex/scholar/auth/ScholarAuthManager.py</span>
 <span class="c1"># ----------------------------------------</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
-<span class="n">__FILE__</span> <span class="o">=</span> <span class="s2">&quot;./src/scitex/scholar/auth/ScholarAuthManager.py&quot;</span>
+<span class="n">__FILE__</span> <span class="o">=</span> <span class="s2">"./src/scitex/scholar/auth/ScholarAuthManager.py"</span>
 <span class="n">__DIR__</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__FILE__</span><span class="p">)</span>
 <span class="c1"># ----------------------------------------</span>
 
 <span class="n">__FILE__</span> <span class="o">=</span> <span class="vm">__file__</span>
 
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 <span class="sd">Authentication manager for coordinating multiple authentication providers.</span>
 
 <span class="sd">This module manages different authentication methods and provides a unified</span>
 <span class="sd">interface for authentication operations.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
@@ -542,30 +542,30 @@
 <div class="viewcode-block" id="ScholarAuthManager">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.auth.ScholarAuthManager">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ScholarAuthManager</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Manages multiple authentication providers.</span>
 
 <span class="sd">    This class coordinates between different authentication methods</span>
 <span class="sd">    (OpenAthens, Lean Library, etc.) and provides a unified interface.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="ScholarAuthManager.__init__">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.auth.ScholarAuthManager.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">email_openathens</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;SCITEX_SCHOLAR_OPENATHENS_EMAIL&quot;</span><span class="p">),</span>
-        <span class="n">email_ezproxy</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;SCITEX_SCHOLAR_EZPROXY_EMAIL&quot;</span><span class="p">),</span>
-        <span class="n">email_shibboleth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;SCITEX_SCHOLAR_SHIBBOLETH_EMAIL&quot;</span><span class="p">),</span>
+        <span class="n">email_openathens</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"SCITEX_SCHOLAR_OPENATHENS_EMAIL"</span><span class="p">),</span>
+        <span class="n">email_ezproxy</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"SCITEX_SCHOLAR_EZPROXY_EMAIL"</span><span class="p">),</span>
+        <span class="n">email_shibboleth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"SCITEX_SCHOLAR_SHIBBOLETH_EMAIL"</span><span class="p">),</span>
         <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ScholarConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the authentication manager.</span>
+<span class="w">        </span><span class="sd">"""Initialize the authentication manager.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            email_openathens: User&#39;s institutional email for OpenAthens authentication</span>
-<span class="sd">            email_ezproxy: User&#39;s institutional email for EZProxy authentication</span>
-<span class="sd">            email_shibboleth: User&#39;s institutional email for Shibboleth authentication</span>
+<span class="sd">            email_openathens: User's institutional email for OpenAthens authentication</span>
+<span class="sd">            email_ezproxy: User's institutional email for EZProxy authentication</span>
+<span class="sd">            email_shibboleth: User's institutional email for Shibboleth authentication</span>
 <span class="sd">            config: ScholarConfig instance (creates new if None)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># Initialize config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span> <span class="ow">or</span> <span class="n">ScholarConfig</span><span class="p">()</span>
@@ -575,16 +575,16 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">([</span><span class="n">email_openathens</span><span class="p">,</span> <span class="n">email_ezproxy</span><span class="p">,</span> <span class="n">email_shibboleth</span><span class="p">]):</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: &quot;</span>
-                <span class="s2">&quot;No authentication provider configured. &quot;</span>
-                <span class="s2">&quot;Set SCITEX_SCHOLAR_OPENATHENS_EMAIL or other provider email.&quot;</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: "</span>
+                <span class="s2">"No authentication provider configured. "</span>
+                <span class="s2">"Set SCITEX_SCHOLAR_OPENATHENS_EMAIL or other provider email."</span>
             <span class="p">)</span>
             <span class="k">return</span>
 
         <span class="k">for</span> <span class="n">email</span><span class="p">,</span> <span class="n">provider_str</span><span class="p">,</span> <span class="n">provider_authenticator</span> <span class="ow">in</span> <span class="p">[</span>
-            <span class="p">(</span><span class="n">email_openathens</span><span class="p">,</span> <span class="s2">&quot;openathens&quot;</span><span class="p">,</span> <span class="n">OpenAthensAuthenticator</span><span class="p">),</span>
-            <span class="p">(</span><span class="n">email_ezproxy</span><span class="p">,</span> <span class="s2">&quot;ezproxy&quot;</span><span class="p">,</span> <span class="n">EZProxyAuthenticator</span><span class="p">),</span>
-            <span class="p">(</span><span class="n">email_shibboleth</span><span class="p">,</span> <span class="s2">&quot;shibboleth&quot;</span><span class="p">,</span> <span class="n">ShibbolethAuthenticator</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">email_openathens</span><span class="p">,</span> <span class="s2">"openathens"</span><span class="p">,</span> <span class="n">OpenAthensAuthenticator</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">email_ezproxy</span><span class="p">,</span> <span class="s2">"ezproxy"</span><span class="p">,</span> <span class="n">EZProxyAuthenticator</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">email_shibboleth</span><span class="p">,</span> <span class="s2">"shibboleth"</span><span class="p">,</span> <span class="n">ShibbolethAuthenticator</span><span class="p">),</span>
         <span class="p">]:</span>
             <span class="k">if</span> <span class="n">email</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_register_provider</span><span class="p">(</span>
@@ -607,16 +607,27 @@
         <span class="k">if</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_authenticate_async</span><span class="p">(</span><span class="n">verify_live</span><span class="o">=</span><span class="n">verify_live</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">True</span>
 
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">:</span>
+            <span class="c1"># No provider was ever configured (no OpenAthens/EZProxy/Shibboleth</span>
+            <span class="c1"># email set) -- this is the expected shape for open-access-only</span>
+            <span class="c1"># usage, not a failure. Proceed anonymously rather than block</span>
+            <span class="c1"># every browser-based fetch behind institutional auth.</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: No authentication providers configured; "</span>
+                <span class="s2">"proceeding anonymously (open-access only)."</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
         <span class="k">if</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">authenticate_async</span><span class="p">(</span><span class="n">provider_name</span><span class="o">=</span><span class="n">provider_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">True</span>
 
-        <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span><span class="s2">&quot;Authentication not ensured&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span><span class="s2">"Authentication not ensured"</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ScholarAuthManager.is_authenticate_async">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.auth.ScholarAuthManager.is_authenticate_async">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">is_authenticate_async</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verify_live</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if authenticate_async with any provider.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Check if authenticate_async with any provider."""</span>
         <span class="c1"># Check active provider first</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_provider</span><span class="p">:</span>
             <span class="n">provider</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">active_provider</span><span class="p">]</span>
@@ -630,7 +641,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">active_provider</span> <span class="o">=</span> <span class="n">name</span>
                     <span class="k">return</span> <span class="kc">True</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Not authenticate_async.&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Not authenticate_async."</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">False</span></div>
 
 
@@ -639,21 +650,21 @@
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">authenticate_async</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">provider_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Authenticate with specified or active provider.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Authenticate with specified or active provider."""</span>
         <span class="k">if</span> <span class="n">provider_name</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">provider_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Provider &#39;</span><span class="si">{</span><span class="n">provider_name</span><span class="si">}</span><span class="s2">&#39; not found&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Provider '</span><span class="si">{</span><span class="n">provider_name</span><span class="si">}</span><span class="s2">' not found"</span><span class="p">)</span>
             <span class="n">provider</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">[</span><span class="n">provider_name</span><span class="p">]</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_provider</span><span class="p">:</span>
             <span class="n">provider</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">active_provider</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span><span class="s2">&quot;No authentication provider configured&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span><span class="s2">"No authentication provider configured"</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">auth_session</span> <span class="o">=</span> <span class="k">await</span> <span class="n">provider</span><span class="o">.</span><span class="n">authenticate_async</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_session</span> <span class="ow">and</span> <span class="n">provider_name</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">active_provider</span> <span class="o">=</span> <span class="n">provider_name</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Authentication succeeded by </span><span class="si">{</span><span class="n">provider_name</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Authentication succeeded by </span><span class="si">{</span><span class="n">provider_name</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_session</span></div>
 
@@ -661,14 +672,14 @@
 <div class="viewcode-block" id="ScholarAuthManager.get_auth_headers_async">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.auth.ScholarAuthManager.get_auth_headers_async">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_auth_headers_async</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get authentication headers from active provider.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Get authentication headers from active provider."""</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensure_authenticate_async</span><span class="p">()</span>
         <span class="n">provider</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_active_provider</span><span class="p">()</span>
         <span class="c1"># if not provider:</span>
-        <span class="c1">#     raise AuthenticationError(&quot;No active authentication provider&quot;)</span>
+        <span class="c1">#     raise AuthenticationError("No active authentication provider")</span>
 
         <span class="c1"># if not await provider.is_authenticate_async():</span>
-        <span class="c1">#     raise AuthenticationError(&quot;Not authenticate_async&quot;)</span>
+        <span class="c1">#     raise AuthenticationError("Not authenticate_async")</span>
 
         <span class="k">return</span> <span class="k">await</span> <span class="n">provider</span><span class="o">.</span><span class="n">get_auth_headers_async</span><span class="p">()</span></div>
 
@@ -677,19 +688,19 @@
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.auth.ScholarAuthManager.get_auth_options">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_auth_options</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensure_authenticate_async</span><span class="p">()</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_session</span> <span class="ow">and</span> <span class="s2">&quot;cookies&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_session</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;storage_state&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;cookies&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_session</span><span class="p">[</span><span class="s2">&quot;cookies&quot;</span><span class="p">]}}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_session</span> <span class="ow">and</span> <span class="s2">"cookies"</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_session</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">"storage_state"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"cookies"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_session</span><span class="p">[</span><span class="s2">"cookies"</span><span class="p">]}}</span>
         <span class="k">return</span> <span class="p">{}</span></div>
 
 
     <span class="c1"># async def get_auth_cookies_async(self) -&gt; List[Dict[str, Any]]:</span>
-    <span class="c1">#     &quot;&quot;&quot;Get authentication cookies from active provider.&quot;&quot;&quot;</span>
+    <span class="c1">#     """Get authentication cookies from active provider."""</span>
     <span class="c1">#     provider = self.get_active_provider()</span>
     <span class="c1">#     if not provider:</span>
-    <span class="c1">#         raise AuthenticationError(&quot;No active authentication provider&quot;)</span>
+    <span class="c1">#         raise AuthenticationError("No active authentication provider")</span>
 
     <span class="c1">#     if not await provider.is_authenticate_async():</span>
-    <span class="c1">#         raise AuthenticationError(&quot;Not authenticate_async&quot;)</span>
+    <span class="c1">#         raise AuthenticationError("Not authenticate_async")</span>
 
     <span class="c1">#     authenticated_cookies = await provider.get_auth_cookies_async()</span>
 
@@ -700,13 +711,13 @@
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_auth_cookies_async</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">essential_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get authentication cookies from active provider.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Get authentication cookies from active provider."""</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensure_authenticate_async</span><span class="p">()</span>
         <span class="n">provider</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_active_provider</span><span class="p">()</span>
         <span class="c1"># if not provider:</span>
-        <span class="c1">#     raise AuthenticationError(&quot;No active authentication provider&quot;)</span>
+        <span class="c1">#     raise AuthenticationError("No active authentication provider")</span>
         <span class="c1"># if not await provider.is_authenticate_async():</span>
-        <span class="c1">#     raise AuthenticationError(&quot;Not authenticate_async&quot;)</span>
+        <span class="c1">#     raise AuthenticationError("Not authenticate_async")</span>
 
         <span class="n">authenticated_cookies</span> <span class="o">=</span> <span class="k">await</span> <span class="n">provider</span><span class="o">.</span><span class="n">get_auth_cookies_async</span><span class="p">()</span>
 
@@ -714,19 +725,19 @@
             <span class="k">return</span> <span class="n">authenticated_cookies</span>
 
         <span class="c1"># Filter by provider type</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_provider</span> <span class="o">==</span> <span class="s2">&quot;openathens&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_provider</span> <span class="o">==</span> <span class="s2">"openathens"</span><span class="p">:</span>
             <span class="n">essential_names</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="s2">&quot;oa-session&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;oa-xsrf-token&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;oatmpsid&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;oalastorg&quot;</span><span class="p">,</span>
+                <span class="s2">"oa-session"</span><span class="p">,</span>
+                <span class="s2">"oa-xsrf-token"</span><span class="p">,</span>
+                <span class="s2">"oatmpsid"</span><span class="p">,</span>
+                <span class="s2">"oalastorg"</span><span class="p">,</span>
             <span class="p">]</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_provider</span> <span class="o">==</span> <span class="s2">&quot;ezproxy&quot;</span><span class="p">:</span>
-            <span class="n">essential_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ezproxy&quot;</span><span class="p">,</span> <span class="s2">&quot;session_id&quot;</span><span class="p">]</span>  <span class="c1"># adjust as needed</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_provider</span> <span class="o">==</span> <span class="s2">&quot;shibboleth&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_provider</span> <span class="o">==</span> <span class="s2">"ezproxy"</span><span class="p">:</span>
+            <span class="n">essential_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"ezproxy"</span><span class="p">,</span> <span class="s2">"session_id"</span><span class="p">]</span>  <span class="c1"># adjust as needed</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_provider</span> <span class="o">==</span> <span class="s2">"shibboleth"</span><span class="p">:</span>
             <span class="n">essential_names</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="s2">&quot;shib_session&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;_shibsession_&quot;</span><span class="p">,</span>
+                <span class="s2">"shib_session"</span><span class="p">,</span>
+                <span class="s2">"_shibsession_"</span><span class="p">,</span>
             <span class="p">]</span>  <span class="c1"># adjust as needed</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">authenticated_cookies</span>
@@ -734,11 +745,11 @@
         <span class="n">filtered_cookies</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">cookie</span>
             <span class="k">for</span> <span class="n">cookie</span> <span class="ow">in</span> <span class="n">authenticated_cookies</span>
-            <span class="k">if</span> <span class="n">cookie</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">essential_names</span>
+            <span class="k">if</span> <span class="n">cookie</span><span class="p">[</span><span class="s2">"name"</span><span class="p">]</span> <span class="ow">in</span> <span class="n">essential_names</span>
         <span class="p">]</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Filtered to </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">filtered_cookies</span><span class="p">)</span><span class="si">}</span><span class="s2"> essential cookies for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">active_provider</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Filtered to </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">filtered_cookies</span><span class="p">)</span><span class="si">}</span><span class="s2"> essential cookies for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">active_provider</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">filtered_cookies</span></div>
 
@@ -746,50 +757,50 @@
 <div class="viewcode-block" id="ScholarAuthManager._register_provider">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.auth.ScholarAuthManager._register_provider">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">_register_provider</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">provider</span><span class="p">:</span> <span class="n">BaseAuthenticator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Register an authentication provider with email context.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Register an authentication provider with email context."""</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">provider</span><span class="p">,</span> <span class="n">BaseAuthenticator</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Provider must inherit from BaseAuthenticator, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">provider</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Provider must inherit from BaseAuthenticator, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">provider</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">provider</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_provider</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">active_provider</span> <span class="o">=</span> <span class="n">name</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Registered authentication provider: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Registered authentication provider: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ScholarAuthManager.set_active_provider">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.auth.ScholarAuthManager.set_active_provider">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_active_provider</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the active authentication provider.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Set the active authentication provider."""</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Provider &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; not found. &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Available providers: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Provider '</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">' not found. "</span>
+                <span class="sa">f</span><span class="s2">"Available providers: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">active_provider</span> <span class="o">=</span> <span class="n">name</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Set active authentication provider: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Set active authentication provider: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ScholarAuthManager.get_active_provider">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.auth.ScholarAuthManager.get_active_provider">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_active_provider</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BaseAuthenticator</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the currently active provider.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Get the currently active provider."""</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_provider</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">active_provider</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Active provider not found. Please set active provider&quot;</span><span class="p">)</span></div>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Active provider not found. Please set active provider"</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ScholarAuthManager.logout_async">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.auth.ScholarAuthManager.logout_async">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">logout_async</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Log out from all providers.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Log out from all providers."""</span>
         <span class="k">for</span> <span class="n">provider</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">await</span> <span class="n">provider</span><span class="o">.</span><span class="n">logout_async</span><span class="p">()</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Logged out from </span><span class="si">{</span><span class="n">provider</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Logged out from </span><span class="si">{</span><span class="n">provider</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Error logging out from </span><span class="si">{</span><span class="n">provider</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Error logging out from </span><span class="si">{</span><span class="n">provider</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">active_provider</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">auth_session</span> <span class="o">=</span> <span class="kc">None</span></div>
@@ -798,13 +809,13 @@
 <div class="viewcode-block" id="ScholarAuthManager.list_providers">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.auth.ScholarAuthManager.list_providers">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">list_providers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;List all registered providers.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""List all registered providers."""</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
 </div>
 
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
@@ -813,7 +824,7 @@
         <span class="kn">from</span><span class="w"> </span><span class="nn">scitex_scholar.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScholarAuthManager</span>
 
         <span class="n">auth_manager</span> <span class="o">=</span> <span class="n">ScholarAuthManager</span><span class="p">(</span>
-            <span class="n">email_openathens</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;SCITEX_SCHOLAR_OPENATHENS_EMAIL&quot;</span><span class="p">),</span>
+            <span class="n">email_openathens</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"SCITEX_SCHOLAR_OPENATHENS_EMAIL"</span><span class="p">),</span>
         <span class="p">)</span>
         <span class="n">auth_manager</span><span class="o">.</span><span class="n">list_providers</span><span class="p">()</span>
 

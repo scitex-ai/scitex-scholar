@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scitex_scholar.core.oa_cache &mdash; SciTeX Scholar v1.4.1</title>
+  <title>scitex_scholar.core.oa_cache &mdash; SciTeX Scholar v1.9.0</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=350a9c04"></script>
+      <script src="../../../_static/documentation_options.js?v=c4cb232b"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -238,6 +238,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._save_to_cache"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._save_to_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_async"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_async()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_sync"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.refresh"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.ensure_loaded()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_source"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_source()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_issn"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_issn()</span></code></a></li>
@@ -251,13 +253,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.__init__"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.__init__()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_instance"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_instance()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._is_cache_valid"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._is_cache_valid()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._load_from_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._load_from_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._save_to_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._save_to_cache()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_async"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_async()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_sync"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.refresh"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.ensure_loaded()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_issn_l"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_issn_l()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.normalize"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.normalize()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_abbreviation"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_abbreviation()</span></code></a></li>
@@ -377,7 +378,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../api/citation_graph.html">scitex_scholar.citation_graph</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.__init__"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._auto_detect"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._auto_detect()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.build"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.build()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._create_paper_node"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._create_paper_node()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._build_citation_edges"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._build_citation_edges()</span></code></a></li>
@@ -504,12 +504,12 @@
 <span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1"># File: /home/ywatanabe/proj/scitex-code/src/scitex/scholar/core/oa_cache.py</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 <span class="sd">Open Access Sources Cache.</span>
 
 <span class="sd">Caches OA journal/source information from OpenAlex API with daily refresh.</span>
 <span class="sd">Provides fast local lookups without per-paper API calls.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -527,12 +527,12 @@
 
 <span class="c1"># Cache settings</span>
 <span class="n">CACHE_TTL_SECONDS</span> <span class="o">=</span> <span class="mi">86400</span>  <span class="c1"># 1 day</span>
-<span class="n">OPENALEX_OA_SOURCES_URL</span> <span class="o">=</span> <span class="s2">&quot;https://api.openalex.org/sources&quot;</span>
-<span class="n">OPENALEX_POLITE_EMAIL</span> <span class="o">=</span> <span class="s2">&quot;research@scitex.io&quot;</span>
+<span class="n">OPENALEX_OA_SOURCES_URL</span> <span class="o">=</span> <span class="s2">"https://api.openalex.org/sources"</span>
+<span class="n">OPENALEX_POLITE_EMAIL</span> <span class="o">=</span> <span class="s2">"research@scitex.io"</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_get_default_cache_dir</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get default cache directory via PathManager (runtime/cache).&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Get default cache directory via PathManager (runtime/cache)."""</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">scitex_scholar.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScholarConfig</span>
 
     <span class="k">return</span> <span class="n">ScholarConfig</span><span class="p">()</span><span class="o">.</span><span class="n">path_manager</span><span class="o">.</span><span class="n">cache_dir</span>
@@ -541,26 +541,24 @@
 <div class="viewcode-block" id="OASourcesCache">
 <a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.OASourcesCache">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">OASourcesCache</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Manages cached Open Access sources from OpenAlex.</span>
 
-<span class="sd">    Features:</span>
-<span class="sd">    - Lazy loading on first access</span>
-<span class="sd">    - 1-day TTL with automatic refresh</span>
-<span class="sd">    - Thread-safe singleton pattern</span>
-<span class="sd">    - Fallback to config YAML if API fails</span>
-<span class="sd">    - Journal name normalization via ISSN-L</span>
-<span class="sd">    - Handles abbreviations, variants, and historical names</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    A lookup loads the local cache lazily and never crawls the network. The</span>
+<span class="sd">    1-day TTL is advisory: a stale cache is used as-is, and refreshing it is</span>
+<span class="sd">    an explicit, out-of-band call (``refresh_oa_cache``), never triggered by</span>
+<span class="sd">    a lookup. Journal-name and ISSN matching run against the cached OpenAlex</span>
+<span class="sd">    OA sources; the instance is a thread-safe singleton.</span>
+<span class="sd">    """</span>
 
-    <span class="n">_instance</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;OASourcesCache&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">_lock</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">asyncio</span><span class="p">,</span> <span class="s2">&quot;Lock&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="n">_instance</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">"OASourcesCache"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_lock</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">asyncio</span><span class="p">,</span> <span class="s2">"Lock"</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="OASourcesCache.__init__">
 <a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cache_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cache_dir</span> <span class="o">=</span> <span class="n">cache_dir</span> <span class="ow">or</span> <span class="n">_get_default_cache_dir</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cache_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache_dir</span> <span class="o">/</span> <span class="s2">&quot;oa_sources_cache.json&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache_dir</span> <span class="o">/</span> <span class="s2">"oa_sources_cache.json"</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_oa_source_ids</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>  <span class="c1"># OpenAlex source IDs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_oa_source_names</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>  <span class="c1"># Lowercase source names</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_oa_issns</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>  <span class="c1"># ISSNs for journal lookup</span>
@@ -568,14 +566,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_name_to_issn_l</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># name variant → ISSN-L</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_issn_l_to_canonical</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># ISSN-L → canonical name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_last_updated</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="o">=</span> <span class="kc">False</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cold_warning_emitted</span> <span class="o">=</span> <span class="kc">False</span></div>
 
 
 <div class="viewcode-block" id="OASourcesCache.get_instance">
 <a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.get_instance">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_instance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cache_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;OASourcesCache&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get singleton instance.&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_instance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cache_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"OASourcesCache"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Get singleton instance."""</span>
         <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span></div>
@@ -584,13 +583,13 @@
 <div class="viewcode-block" id="OASourcesCache._is_cache_valid">
 <a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._is_cache_valid">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">_is_cache_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if cache exists and is within TTL.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Check if cache exists and is within TTL."""</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache_file</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-            <span class="n">cached_time</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;timestamp&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">cached_time</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"timestamp"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
             <span class="k">return</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">cached_time</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">CACHE_TTL_SECONDS</span>
         <span class="k">except</span> <span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">,</span> <span class="ne">IOError</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span></div>
@@ -599,69 +598,69 @@
 <div class="viewcode-block" id="OASourcesCache._load_from_cache">
 <a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._load_from_cache">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">_load_from_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load cached data from file.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Load cached data from file."""</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache_file</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">_oa_source_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source_names&quot;</span><span class="p">,</span> <span class="p">[]))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_oa_issns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;issns&quot;</span><span class="p">,</span> <span class="p">[]))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_last_updated</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;timestamp&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_oa_source_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"source_names"</span><span class="p">,</span> <span class="p">[]))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_oa_issns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"issns"</span><span class="p">,</span> <span class="p">[]))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_updated</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"timestamp"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="o">=</span> <span class="kc">True</span>
 
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_oa_source_names</span><span class="p">)</span><span class="si">}</span><span class="s2"> OA sources from cache&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Loaded </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_oa_source_names</span><span class="p">)</span><span class="si">}</span><span class="s2"> OA sources from cache"</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">except</span> <span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">,</span> <span class="ne">IOError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to load OA cache: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to load OA cache: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">False</span></div>
 
 
 <div class="viewcode-block" id="OASourcesCache._save_to_cache">
 <a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._save_to_cache">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">_save_to_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Save current data to cache file.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Save current data to cache file."""</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_cache_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
-                <span class="s2">&quot;source_names&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_oa_source_names</span><span class="p">),</span>
-                <span class="s2">&quot;issns&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_oa_issns</span><span class="p">),</span>
-                <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_oa_source_names</span><span class="p">),</span>
+                <span class="s2">"timestamp"</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+                <span class="s2">"source_names"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_oa_source_names</span><span class="p">),</span>
+                <span class="s2">"issns"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_oa_issns</span><span class="p">),</span>
+                <span class="s2">"count"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_oa_source_names</span><span class="p">),</span>
             <span class="p">}</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache_file</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saved </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_oa_source_names</span><span class="p">)</span><span class="si">}</span><span class="s2"> OA sources to cache&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Saved </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_oa_source_names</span><span class="p">)</span><span class="si">}</span><span class="s2"> OA sources to cache"</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to save OA cache: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to save OA cache: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="OASourcesCache._fetch_oa_sources_async">
 <a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_async">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_oa_sources_async</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_pages</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Fetch OA sources from OpenAlex API.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            max_pages: Maximum pages to fetch (200 sources per page)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">source_names</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="n">issns</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
         <span class="n">per_page</span> <span class="o">=</span> <span class="mi">200</span>
-        <span class="n">cursor</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span>
+        <span class="n">cursor</span> <span class="o">=</span> <span class="s2">"*"</span>
         <span class="n">pages_fetched</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="k">async</span> <span class="k">with</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
             <span class="k">while</span> <span class="n">pages_fetched</span> <span class="o">&lt;</span> <span class="n">max_pages</span><span class="p">:</span>
                 <span class="n">url</span> <span class="o">=</span> <span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">OPENALEX_OA_SOURCES_URL</span><span class="si">}</span><span class="s2">&quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;?filter=is_oa:true&quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;&amp;per_page=</span><span class="si">{</span><span class="n">per_page</span><span class="si">}</span><span class="s2">&quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;&amp;cursor=</span><span class="si">{</span><span class="n">cursor</span><span class="si">}</span><span class="s2">&quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;&amp;mailto=</span><span class="si">{</span><span class="n">OPENALEX_POLITE_EMAIL</span><span class="si">}</span><span class="s2">&quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;&amp;select=display_name,issn&quot;</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">OPENALEX_OA_SOURCES_URL</span><span class="si">}</span><span class="s2">"</span>
+                    <span class="sa">f</span><span class="s2">"?filter=is_oa:true"</span>
+                    <span class="sa">f</span><span class="s2">"&amp;per_page=</span><span class="si">{</span><span class="n">per_page</span><span class="si">}</span><span class="s2">"</span>
+                    <span class="sa">f</span><span class="s2">"&amp;cursor=</span><span class="si">{</span><span class="n">cursor</span><span class="si">}</span><span class="s2">"</span>
+                    <span class="sa">f</span><span class="s2">"&amp;mailto=</span><span class="si">{</span><span class="n">OPENALEX_POLITE_EMAIL</span><span class="si">}</span><span class="s2">"</span>
+                    <span class="sa">f</span><span class="s2">"&amp;select=display_name,issn"</span>
                 <span class="p">)</span>
 
                 <span class="k">try</span><span class="p">:</span>
@@ -669,29 +668,29 @@
                         <span class="n">url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientTimeout</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
                     <span class="p">)</span> <span class="k">as</span> <span class="n">resp</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">resp</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
-                            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;OpenAlex API returned </span><span class="si">{</span><span class="n">resp</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"OpenAlex API returned </span><span class="si">{</span><span class="n">resp</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
                             <span class="k">break</span>
 
                         <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-                        <span class="n">results</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;results&quot;</span><span class="p">,</span> <span class="p">[])</span>
+                        <span class="n">results</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"results"</span><span class="p">,</span> <span class="p">[])</span>
 
                         <span class="k">if</span> <span class="ow">not</span> <span class="n">results</span><span class="p">:</span>
                             <span class="k">break</span>
 
                         <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
-                            <span class="n">name</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;display_name&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                            <span class="n">name</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"display_name"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
                             <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
                                 <span class="n">source_names</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
 
                             <span class="c1"># Also store ISSNs for precise matching</span>
-                            <span class="n">source_issns</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;issn&quot;</span><span class="p">,</span> <span class="p">[])</span> <span class="ow">or</span> <span class="p">[]</span>
+                            <span class="n">source_issns</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"issn"</span><span class="p">,</span> <span class="p">[])</span> <span class="ow">or</span> <span class="p">[]</span>
                             <span class="k">for</span> <span class="n">issn</span> <span class="ow">in</span> <span class="n">source_issns</span><span class="p">:</span>
                                 <span class="k">if</span> <span class="n">issn</span><span class="p">:</span>
                                     <span class="n">issns</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">issn</span><span class="p">)</span>
 
                         <span class="c1"># Get next cursor</span>
-                        <span class="n">meta</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;meta&quot;</span><span class="p">,</span> <span class="p">{})</span>
-                        <span class="n">next_cursor</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;next_cursor&quot;</span><span class="p">)</span>
+                        <span class="n">meta</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"meta"</span><span class="p">,</span> <span class="p">{})</span>
+                        <span class="n">next_cursor</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"next_cursor"</span><span class="p">)</span>
                         <span class="k">if</span> <span class="ow">not</span> <span class="n">next_cursor</span> <span class="ow">or</span> <span class="n">next_cursor</span> <span class="o">==</span> <span class="n">cursor</span><span class="p">:</span>
                             <span class="k">break</span>
                         <span class="n">cursor</span> <span class="o">=</span> <span class="n">next_cursor</span>
@@ -700,14 +699,14 @@
                         <span class="c1"># Progress log every 10 pages</span>
                         <span class="k">if</span> <span class="n">pages_fetched</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                                <span class="sa">f</span><span class="s2">&quot;Fetched </span><span class="si">{</span><span class="n">pages_fetched</span><span class="si">}</span><span class="s2"> pages, </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">source_names</span><span class="p">)</span><span class="si">}</span><span class="s2"> sources so far...&quot;</span>
+                                <span class="sa">f</span><span class="s2">"Fetched </span><span class="si">{</span><span class="n">pages_fetched</span><span class="si">}</span><span class="s2"> pages, </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">source_names</span><span class="p">)</span><span class="si">}</span><span class="s2"> sources so far..."</span>
                             <span class="p">)</span>
 
                 <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;OpenAlex API timeout&quot;</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"OpenAlex API timeout"</span><span class="p">)</span>
                     <span class="k">break</span>
                 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error fetching OA sources: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Error fetching OA sources: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
                     <span class="k">break</span>
 
         <span class="k">if</span> <span class="n">source_names</span><span class="p">:</span>
@@ -716,47 +715,124 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_last_updated</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_save_to_cache</span><span class="p">()</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Fetched </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">source_names</span><span class="p">)</span><span class="si">}</span><span class="s2"> OA sources from OpenAlex&quot;</span><span class="p">)</span></div>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Fetched </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">source_names</span><span class="p">)</span><span class="si">}</span><span class="s2"> OA sources from OpenAlex"</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="OASourcesCache._fetch_oa_sources_sync">
 <a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_sync">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_oa_sources_sync</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_pages</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Synchronous wrapper for fetching OA sources.&quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span>
-        <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
-            <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">new_event_loop</span><span class="p">()</span>
-            <span class="n">asyncio</span><span class="o">.</span><span class="n">set_event_loop</span><span class="p">(</span><span class="n">loop</span><span class="p">)</span>
+<span class="w">        </span><span class="sd">"""Blocking wrapper around the OA-sources crawl.</span>
 
-        <span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_oa_sources_async</span><span class="p">(</span><span class="n">max_pages</span><span class="p">))</span></div>
+<span class="sd">        Runs the coroutine on its own loop. If a loop is ALREADY running in</span>
+<span class="sd">        this thread (an explicit refresh triggered from async code), the</span>
+<span class="sd">        crawl runs on a dedicated thread instead of calling</span>
+<span class="sd">        run_until_complete on the live loop -- which raises "This event loop</span>
+<span class="sd">        is already running" (reproduced). Either way this blocks for the</span>
+<span class="sd">        full crawl (minutes): there is no honest bound to advertise, and the</span>
+<span class="sd">        crawl is kept OFF the lookup hot path so a request never waits on it.</span>
+<span class="sd">        """</span>
+        <span class="n">coro</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_oa_sources_async</span><span class="p">(</span><span class="n">max_pages</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+            <span class="c1"># No running loop: safe to drive the coroutine directly.</span>
+            <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">coro</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Already inside an event loop: run on its own loop in a thread.</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+
+        <span class="n">error</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="ne">BaseException</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_runner</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">coro</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># surfaced to the caller below</span>
+                <span class="n">error</span><span class="p">[</span><span class="s2">"err"</span><span class="p">]</span> <span class="o">=</span> <span class="n">e</span>
+
+        <span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">_runner</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"oa-sources-refresh"</span><span class="p">)</span>
+        <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="n">thread</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="s2">"err"</span> <span class="ow">in</span> <span class="n">error</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">error</span><span class="p">[</span><span class="s2">"err"</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="OASourcesCache._ensure_indexes">
+<a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._ensure_indexes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ensure_indexes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Make cached data available to a lookup. NEVER touches the network.</span>
+
+<span class="sd">        Every public lookup goes through here. A stale cache is used as-is;</span>
+<span class="sd">        with no cache at all, lookups answer "not known" (is_oa_source -&gt;</span>
+<span class="sd">        False), which is already the documented contract for an unrecognised</span>
+<span class="sd">        journal. That degraded state is reported ONCE, loudly, with the</span>
+<span class="sd">        command that fixes it -- it is not a silent fallback, and it is not a</span>
+<span class="sd">        multi-minute corpus crawl inside somebody's request.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_from_cache</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_cache_valid</span><span class="p">():</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">"OA sources cache is stale and in use as-is. Refresh out "</span>
+                    <span class="s2">"of band with `python -c 'from scitex_scholar.core.oa_cache "</span>
+                    <span class="s2">"import refresh_oa_cache; refresh_oa_cache()'`."</span>
+                <span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># No cache on disk. Degrade loudly rather than crawl on the hot path.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cold_warning_emitted</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cold_warning_emitted</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"No OA sources cache at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache_file</span><span class="si">}</span><span class="s2">: open-access "</span>
+                <span class="sa">f</span><span class="s2">"detection via this tier is DEGRADED (every source reads as "</span>
+                <span class="sa">f</span><span class="s2">"'not known'). This does NOT auto-fetch, because the corpus "</span>
+                <span class="sa">f</span><span class="s2">"crawl takes minutes and must not run inside a request. "</span>
+                <span class="sa">f</span><span class="s2">"Populate it with `python -c 'from scitex_scholar.core.oa_cache "</span>
+                <span class="sa">f</span><span class="s2">"import refresh_oa_cache; refresh_oa_cache()'`."</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="OASourcesCache.refresh">
+<a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.refresh">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">refresh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_pages</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Crawl OpenAlex and rebuild the cache. Takes MINUTES; blocks.</span>
+
+<span class="sd">        The only path that hits the network. Call it out of band (CLI or a</span>
+<span class="sd">        scheduled job), never from inside a user request.</span>
+<span class="sd">        """</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Refreshing OA sources cache from OpenAlex..."</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_oa_sources_sync</span><span class="p">(</span><span class="n">max_pages</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="OASourcesCache.ensure_loaded">
 <a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.ensure_loaded">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">ensure_loaded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force_refresh</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Ensure cache is loaded, fetching from API if needed.</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Ensure cache is available.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            force_refresh: Force refresh even if cache is valid</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force_refresh</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_cache_valid</span><span class="p">():</span>
-            <span class="k">return</span>
+<span class="sd">            force_refresh: Crawl OpenAlex and rebuild the cache (minutes).</span>
 
-        <span class="c1"># Try loading from cache first</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">force_refresh</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_from_cache</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_cache_valid</span><span class="p">():</span>
+<span class="sd">        Without ``force_refresh`` this only reads the local cache; it will</span>
+<span class="sd">        NOT silently escalate to a network crawl. That escalation was the</span>
+<span class="sd">        defect: it hung every cold-cache lookup for minutes on the sync path</span>
+<span class="sd">        and raised "event loop is already running" on the async path.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">force_refresh</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
             <span class="k">return</span>
-
-        <span class="c1"># Fetch from API</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Refreshing OA sources cache from OpenAlex...&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_oa_sources_sync</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_indexes</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="OASourcesCache.is_oa_source">
 <a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_source">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">is_oa_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Check if a source/journal name is in the OA list.</span>
 
 <span class="sd">        Args:</span>
@@ -764,8 +840,8 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            True if source is known to be Open Access</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ensure_loaded</span><span class="p">()</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_indexes</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">source_name</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="n">source_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_oa_source_names</span></div>
@@ -774,7 +850,7 @@
 <div class="viewcode-block" id="OASourcesCache.is_oa_issn">
 <a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_issn">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">is_oa_issn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">issn</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Check if an ISSN belongs to an OA journal.</span>
 
 <span class="sd">        Args:</span>
@@ -782,26 +858,26 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            True if ISSN belongs to an OA journal</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ensure_loaded</span><span class="p">()</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_indexes</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">issn</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="c1"># Normalize ISSN format</span>
-        <span class="n">issn</span> <span class="o">=</span> <span class="n">issn</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">issn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_oa_issns</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">issn</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">issn</span><span class="p">[</span><span class="mi">4</span><span class="p">:]</span><span class="si">}</span><span class="s2">&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_oa_issns</span></div>
+        <span class="n">issn</span> <span class="o">=</span> <span class="n">issn</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"-"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">issn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_oa_issns</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">issn</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">issn</span><span class="p">[</span><span class="mi">4</span><span class="p">:]</span><span class="si">}</span><span class="s2">"</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_oa_issns</span></div>
 
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">source_count</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get number of cached OA sources.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ensure_loaded</span><span class="p">()</span>
+<span class="w">        </span><span class="sd">"""Get number of cached OA sources."""</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_indexes</span><span class="p">()</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_oa_source_names</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cache_age_hours</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get cache age in hours.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Get cache age in hours."""</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_updated</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"inf"</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_updated</span><span class="p">)</span> <span class="o">/</span> <span class="mi">3600</span></div>
 
 
@@ -810,7 +886,7 @@
 <div class="viewcode-block" id="get_oa_cache">
 <a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.get_oa_cache">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_oa_cache</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OASourcesCache</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the OA sources cache singleton.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Get the OA sources cache singleton."""</span>
     <span class="k">return</span> <span class="n">OASourcesCache</span><span class="o">.</span><span class="n">get_instance</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">)</span></div>
 
 
@@ -818,7 +894,7 @@
 <div class="viewcode-block" id="is_oa_journal_cached">
 <a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.is_oa_journal_cached">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">is_oa_journal_cached</span><span class="p">(</span><span class="n">journal_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if journal is OA using cached OpenAlex data.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Check if journal is OA using cached OpenAlex data."""</span>
     <span class="k">return</span> <span class="n">get_oa_cache</span><span class="p">()</span><span class="o">.</span><span class="n">is_oa_source</span><span class="p">(</span><span class="n">journal_name</span><span class="p">)</span></div>
 
 
@@ -826,7 +902,7 @@
 <div class="viewcode-block" id="refresh_oa_cache">
 <a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.refresh_oa_cache">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">refresh_oa_cache</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Force refresh the OA sources cache.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Force refresh the OA sources cache."""</span>
     <span class="n">get_oa_cache</span><span class="p">()</span><span class="o">.</span><span class="n">ensure_loaded</span><span class="p">(</span><span class="n">force_refresh</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 

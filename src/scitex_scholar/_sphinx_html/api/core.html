@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scitex_scholar.core &mdash; SciTeX Scholar v1.4.1</title>
+  <title>scitex_scholar.core &mdash; SciTeX Scholar v1.9.0</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=350a9c04"></script>
+      <script src="../_static/documentation_options.js?v=c4cb232b"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -241,6 +241,8 @@
 <li class="toctree-l3"><a class="reference internal" href="#scitex_scholar.core.OASourcesCache._save_to_cache"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._save_to_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#scitex_scholar.core.OASourcesCache._fetch_oa_sources_async"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_async()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#scitex_scholar.core.OASourcesCache._fetch_oa_sources_sync"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scitex_scholar.core.OASourcesCache._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scitex_scholar.core.OASourcesCache.refresh"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#scitex_scholar.core.OASourcesCache.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.ensure_loaded()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#scitex_scholar.core.OASourcesCache.is_oa_source"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_source()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#scitex_scholar.core.OASourcesCache.is_oa_issn"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_issn()</span></code></a></li>
@@ -254,13 +256,12 @@
 <li class="toctree-l2"><a class="reference internal" href="#scitex_scholar.core.JournalNormalizer"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#scitex_scholar.core.JournalNormalizer.__init__"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.__init__()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#scitex_scholar.core.JournalNormalizer.get_instance"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_instance()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#scitex_scholar.core.JournalNormalizer._is_cache_valid"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._is_cache_valid()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#scitex_scholar.core.JournalNormalizer._load_from_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._load_from_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#scitex_scholar.core.JournalNormalizer._save_to_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._save_to_cache()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#scitex_scholar.core.JournalNormalizer._fetch_journals_async"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_async()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#scitex_scholar.core.JournalNormalizer._fetch_journals_sync"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scitex_scholar.core.JournalNormalizer._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scitex_scholar.core.JournalNormalizer.refresh"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#scitex_scholar.core.JournalNormalizer.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.ensure_loaded()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#scitex_scholar.core.JournalNormalizer.get_issn_l"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_issn_l()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#scitex_scholar.core.JournalNormalizer.normalize"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.normalize()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#scitex_scholar.core.JournalNormalizer.get_abbreviation"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_abbreviation()</span></code></a></li>
@@ -380,7 +381,6 @@
 <li class="toctree-l1"><a class="reference internal" href="citation_graph.html">scitex_scholar.citation_graph</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.__init__"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._auto_detect"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._auto_detect()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.build"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.build()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._create_paper_node"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._create_paper_node()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._build_citation_edges"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._build_citation_edges()</span></code></a></li>
@@ -495,7 +495,7 @@
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">scitex_scholar.core</li>
       <li class="wy-breadcrumbs-aside">
-              <a href="https://github.com/ywatanabe1989/scitex-scholar/blob/develop/docs/sphinx/api/core.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/scitex-ai/scitex-scholar/blob/develop/docs/sphinx/api/core.rst" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul>
   <hr/>
@@ -750,7 +750,7 @@ Complex operations should use Scholar or utility functions.</p>
 <dd class="field-even"><p>New Papers collection with filtered papers.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#scitex_scholar.core.Papers" title="scitex_scholar.core.Papers.Papers">Papers</a></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#scitex_scholar.core.Papers" title="scitex_scholar.core.Papers.Papers"><code class="xref py py-class docutils literal notranslate"><span class="pre">Papers</span></code></a></span></p>
 </dd>
 </dl>
 <div class="admonition-examples admonition">
@@ -773,7 +773,7 @@ Complex operations should use Scholar or utility functions.</p>
     <span class="n">min_citations</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
     <span class="n">year_min</span><span class="o">=</span><span class="mi">2015</span><span class="p">,</span>
     <span class="n">year_max</span><span class="o">=</span><span class="mi">2023</span><span class="p">,</span>
-    <span class="n">journal</span><span class="o">=</span><span class="s2">&quot;Nature&quot;</span><span class="p">,</span>
+    <span class="n">journal</span><span class="o">=</span><span class="s2">"Nature"</span><span class="p">,</span>
     <span class="n">has_doi</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
@@ -801,7 +801,7 @@ Complex operations should use Scholar or utility functions.</p>
 <dd class="field-even"><p>New sorted Papers collection.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#scitex_scholar.core.Papers" title="scitex_scholar.core.Papers.Papers">Papers</a></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#scitex_scholar.core.Papers" title="scitex_scholar.core.Papers.Papers"><code class="xref py py-class docutils literal notranslate"><span class="pre">Papers</span></code></a></span></p>
 </dd>
 </dl>
 <div class="admonition-notes admonition">
@@ -822,12 +822,12 @@ Complex operations should use Scholar or utility functions.</p>
 <div class="admonition-examples admonition">
 <p class="admonition-title">Examples</p>
 <p>Sort by a single field:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">by_year</span> <span class="o">=</span> <span class="n">papers</span><span class="o">.</span><span class="n">sort_by</span><span class="p">(</span><span class="s1">&#39;year&#39;</span><span class="p">)</span>
-<span class="n">by_citations_desc</span> <span class="o">=</span> <span class="n">papers</span><span class="o">.</span><span class="n">sort_by</span><span class="p">(</span><span class="s1">&#39;citation_count&#39;</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">by_year</span> <span class="o">=</span> <span class="n">papers</span><span class="o">.</span><span class="n">sort_by</span><span class="p">(</span><span class="s1">'year'</span><span class="p">)</span>
+<span class="n">by_citations_desc</span> <span class="o">=</span> <span class="n">papers</span><span class="o">.</span><span class="n">sort_by</span><span class="p">(</span><span class="s1">'citation_count'</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Sort by multiple fields (primary, secondary, etc.):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">by_year_then_citations</span> <span class="o">=</span> <span class="n">papers</span><span class="o">.</span><span class="n">sort_by</span><span class="p">(</span><span class="s1">&#39;year&#39;</span><span class="p">,</span> <span class="s1">&#39;citation_count&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">by_year_then_citations</span> <span class="o">=</span> <span class="n">papers</span><span class="o">.</span><span class="n">sort_by</span><span class="p">(</span><span class="s1">'year'</span><span class="p">,</span> <span class="s1">'citation_count'</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Sort using a lambda function:</p>
@@ -996,9 +996,9 @@ This method is kept for backward compatibility.</p>
 <p class="admonition-title">Examples</p>
 <p>Basic search with automatic enrichment:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">scholar</span> <span class="o">=</span> <span class="n">Scholar</span><span class="p">()</span>
-<span class="n">papers</span> <span class="o">=</span> <span class="n">scholar</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;deep learning neuroscience&quot;</span><span class="p">)</span>
+<span class="n">papers</span> <span class="o">=</span> <span class="n">scholar</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">"deep learning neuroscience"</span><span class="p">)</span>
 <span class="c1"># Papers now have impact_factor and citation_count populated</span>
-<span class="n">papers</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;my_pac.bib&quot;</span><span class="p">)</span>
+<span class="n">papers</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">"my_pac.bib"</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Disable automatic enrichment if needed:</p>
@@ -1007,21 +1007,21 @@ This method is kept for backward compatibility.</p>
 </pre></div>
 </div>
 <p>Search a specific source:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">papers</span> <span class="o">=</span> <span class="n">scholar</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;transformer models&quot;</span><span class="p">,</span> <span class="n">sources</span><span class="o">=</span><span class="s1">&#39;arxiv&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">papers</span> <span class="o">=</span> <span class="n">scholar</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">"transformer models"</span><span class="p">,</span> <span class="n">sources</span><span class="o">=</span><span class="s1">'arxiv'</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Advanced workflow:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">papers</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">scholar</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;transformer models&quot;</span><span class="p">,</span> <span class="n">year_min</span><span class="o">=</span><span class="mi">2020</span><span class="p">)</span>
+    <span class="n">scholar</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">"transformer models"</span><span class="p">,</span> <span class="n">year_min</span><span class="o">=</span><span class="mi">2020</span><span class="p">)</span>
            <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">min_citations</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
-           <span class="o">.</span><span class="n">sort_by</span><span class="p">(</span><span class="s2">&quot;impact_factor&quot;</span><span class="p">)</span>
-           <span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;transformers.bib&quot;</span><span class="p">)</span>
+           <span class="o">.</span><span class="n">sort_by</span><span class="p">(</span><span class="s2">"impact_factor"</span><span class="p">)</span>
+           <span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">"transformers.bib"</span><span class="p">)</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 <p>Local library:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">scholar</span><span class="o">.</span><span class="n">_index_local_pdfs</span><span class="p">(</span><span class="s2">&quot;./my_papers&quot;</span><span class="p">)</span>
-<span class="n">local_papers</span> <span class="o">=</span> <span class="n">scholar</span><span class="o">.</span><span class="n">search_local</span><span class="p">(</span><span class="s2">&quot;attention mechanism&quot;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">scholar</span><span class="o">.</span><span class="n">_index_local_pdfs</span><span class="p">(</span><span class="s2">"./my_papers"</span><span class="p">)</span>
+<span class="n">local_papers</span> <span class="o">=</span> <span class="n">scholar</span><span class="o">.</span><span class="n">search_local</span><span class="p">(</span><span class="s2">"attention mechanism"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1057,7 +1057,7 @@ This method is kept for backward compatibility.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="scitex_scholar.core.OAStatus">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scitex_scholar.core.</span></span><span class="sig-name descname"><span class="pre">OAStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/open_access.html#OAStatus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.OAStatus" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scitex_scholar.core.</span></span><span class="sig-name descname"><span class="pre">OAStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/open_access.html#OAStatus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.OAStatus" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
 <p>Open Access status categories (aligned with Unpaywall).</p>
 <dl class="py attribute">
@@ -1253,13 +1253,11 @@ if the status is uncertain.</p>
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scitex_scholar.core.</span></span><span class="sig-name descname"><span class="pre">OASourcesCache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/oa_cache.html#OASourcesCache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.OASourcesCache" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Manages cached Open Access sources from OpenAlex.</p>
-<p>Features:
-- Lazy loading on first access
-- 1-day TTL with automatic refresh
-- Thread-safe singleton pattern
-- Fallback to config YAML if API fails
-- Journal name normalization via ISSN-L
-- Handles abbreviations, variants, and historical names</p>
+<p>A lookup loads the local cache lazily and never crawls the network. The
+1-day TTL is advisory: a stale cache is used as-is, and refreshing it is
+an explicit, out-of-band call (<code class="docutils literal notranslate"><span class="pre">refresh_oa_cache</span></code>), never triggered by
+a lookup. Journal-name and ISSN matching run against the cached OpenAlex
+OA sources; the instance is a thread-safe singleton.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="scitex_scholar.core.OASourcesCache.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/oa_cache.html#OASourcesCache.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.OASourcesCache.__init__" title="Link to this definition"></a></dt>
@@ -1326,7 +1324,44 @@ if the status is uncertain.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="scitex_scholar.core.OASourcesCache._fetch_oa_sources_sync">
 <span class="sig-name descname"><span class="pre">_fetch_oa_sources_sync</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_pages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/oa_cache.html#OASourcesCache._fetch_oa_sources_sync"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.OASourcesCache._fetch_oa_sources_sync" title="Link to this definition"></a></dt>
-<dd><p>Synchronous wrapper for fetching OA sources.</p>
+<dd><p>Blocking wrapper around the OA-sources crawl.</p>
+<p>Runs the coroutine on its own loop. If a loop is ALREADY running in
+this thread (an explicit refresh triggered from async code), the
+crawl runs on a dedicated thread instead of calling
+run_until_complete on the live loop – which raises “This event loop
+is already running” (reproduced). Either way this blocks for the
+full crawl (minutes): there is no honest bound to advertise, and the
+crawl is kept OFF the lookup hot path so a request never waits on it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scitex_scholar.core.OASourcesCache._ensure_indexes">
+<span class="sig-name descname"><span class="pre">_ensure_indexes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/oa_cache.html#OASourcesCache._ensure_indexes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.OASourcesCache._ensure_indexes" title="Link to this definition"></a></dt>
+<dd><p>Make cached data available to a lookup. NEVER touches the network.</p>
+<p>Every public lookup goes through here. A stale cache is used as-is;
+with no cache at all, lookups answer “not known” (is_oa_source -&gt;
+False), which is already the documented contract for an unrecognised
+journal. That degraded state is reported ONCE, loudly, with the
+command that fixes it – it is not a silent fallback, and it is not a
+multi-minute corpus crawl inside somebody’s request.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scitex_scholar.core.OASourcesCache.refresh">
+<span class="sig-name descname"><span class="pre">refresh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_pages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/oa_cache.html#OASourcesCache.refresh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.OASourcesCache.refresh" title="Link to this definition"></a></dt>
+<dd><p>Crawl OpenAlex and rebuild the cache. Takes MINUTES; blocks.</p>
+<p>The only path that hits the network. Call it out of band (CLI or a
+scheduled job), never from inside a user request.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
@@ -1337,15 +1372,19 @@ if the status is uncertain.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="scitex_scholar.core.OASourcesCache.ensure_loaded">
 <span class="sig-name descname"><span class="pre">ensure_loaded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">force_refresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/oa_cache.html#OASourcesCache.ensure_loaded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.OASourcesCache.ensure_loaded" title="Link to this definition"></a></dt>
-<dd><p>Ensure cache is loaded, fetching from API if needed.</p>
+<dd><p>Ensure cache is available.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>force_refresh</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Force refresh even if cache is valid</p>
+<dd class="field-odd"><p><strong>force_refresh</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Crawl OpenAlex and rebuild the cache (minutes).</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
 </dd>
 </dl>
+<p>Without <code class="docutils literal notranslate"><span class="pre">force_refresh</span></code> this only reads the local cache; it will
+NOT silently escalate to a network crawl. That escalation was the
+defect: it hung every cold-cache lookup for minutes on the sync path
+and raised “event loop is already running” on the async path.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1431,46 +1470,37 @@ if the status is uncertain.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="scitex_scholar.core.JournalNormalizer">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scitex_scholar.core.</span></span><span class="sig-name descname"><span class="pre">JournalNormalizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/journal_normalizer.html#JournalNormalizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">scitex_scholar.core.</span></span><span class="sig-name descname"><span class="pre">JournalNormalizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/_journal_normalizer/_normalizer.html#JournalNormalizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Journal name normalizer using ISSN-L as unique identifier.</p>
 <p>Handles:
-- Full names ↔ abbreviations
+- Full names &lt;-&gt; abbreviations
 - Name variants (spelling, punctuation, capitalization)
 - Historical/former names
 - Publisher variations</p>
-<p>Data is cached locally with daily refresh from OpenAlex.</p>
+<p>Lookups are served from the local cache. Refreshing that cache from
+OpenAlex is an explicit, out-of-band operation (<cite>refresh()</cite>), never a
+side effect of a lookup.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="scitex_scholar.core.JournalNormalizer.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/journal_normalizer.html#JournalNormalizer.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer.__init__" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/_journal_normalizer/_normalizer.html#JournalNormalizer.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer.__init__" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="scitex_scholar.core.JournalNormalizer.get_instance">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/journal_normalizer.html#JournalNormalizer.get_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer.get_instance" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/_journal_normalizer/_normalizer.html#JournalNormalizer.get_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer.get_instance" title="Link to this definition"></a></dt>
 <dd><p>Get singleton instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#scitex_scholar.core.JournalNormalizer" title="scitex_scholar.core.journal_normalizer.JournalNormalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">JournalNormalizer</span></code></a></span></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="scitex_scholar.core.JournalNormalizer._is_cache_valid">
-<span class="sig-name descname"><span class="pre">_is_cache_valid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/journal_normalizer.html#JournalNormalizer._is_cache_valid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer._is_cache_valid" title="Link to this definition"></a></dt>
-<dd><p>Check if cache exists and is within TTL.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#scitex_scholar.core.JournalNormalizer" title="scitex_scholar.core._journal_normalizer._normalizer.JournalNormalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">JournalNormalizer</span></code></a></span></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="scitex_scholar.core.JournalNormalizer._load_from_cache">
-<span class="sig-name descname"><span class="pre">_load_from_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/journal_normalizer.html#JournalNormalizer._load_from_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer._load_from_cache" title="Link to this definition"></a></dt>
-<dd><p>Load cached data from file.</p>
+<span class="sig-name descname"><span class="pre">_load_from_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/_journal_normalizer/_normalizer.html#JournalNormalizer._load_from_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer._load_from_cache" title="Link to this definition"></a></dt>
+<dd><p>Populate indexes from the cache file. True if data was loaded.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
@@ -1480,8 +1510,8 @@ if the status is uncertain.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="scitex_scholar.core.JournalNormalizer._save_to_cache">
-<span class="sig-name descname"><span class="pre">_save_to_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/journal_normalizer.html#JournalNormalizer._save_to_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer._save_to_cache" title="Link to this definition"></a></dt>
-<dd><p>Save current data to cache file.</p>
+<span class="sig-name descname"><span class="pre">_save_to_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/_journal_normalizer/_normalizer.html#JournalNormalizer._save_to_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer._save_to_cache" title="Link to this definition"></a></dt>
+<dd><p>Persist current indexes to the cache file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
@@ -1490,8 +1520,60 @@ if the status is uncertain.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="scitex_scholar.core.JournalNormalizer._ensure_indexes">
+<span class="sig-name descname"><span class="pre">_ensure_indexes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/_journal_normalizer/_normalizer.html#JournalNormalizer._ensure_indexes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer._ensure_indexes" title="Link to this definition"></a></dt>
+<dd><p>Make cached data available to a lookup. NEVER touches the network.</p>
+<p>Every public lookup goes through here. A stale cache is used as-is:
+journal identity moves on the scale of years, so serving year-old
+data beats blocking a user’s request on a corpus crawl.</p>
+<p>With no cache at all, lookups answer from empty indexes – which for
+this class’s contract means “not known” (<cite>get_issn_l</cite> -&gt; None,
+<cite>is_open_access</cite> -&gt; False, both already the documented answer for an
+unrecognised journal). That is reported once, loudly, with the
+command that fixes it – it is not a silent fallback.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scitex_scholar.core.JournalNormalizer.refresh">
+<span class="sig-name descname"><span class="pre">refresh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_pages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/_journal_normalizer/_normalizer.html#JournalNormalizer.refresh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer.refresh" title="Link to this definition"></a></dt>
+<dd><p>Crawl OpenAlex and rebuild the cache. Takes MINUTES; blocks.</p>
+<p>This is the only path that hits the network. Call it from a CLI, a
+scheduled job, or a warm-up step – never from inside a user request.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scitex_scholar.core.JournalNormalizer.ensure_loaded">
+<span class="sig-name descname"><span class="pre">ensure_loaded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">force_refresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_pages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/_journal_normalizer/_normalizer.html#JournalNormalizer.ensure_loaded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer.ensure_loaded" title="Link to this definition"></a></dt>
+<dd><p>Ensure indexes are available.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>force_refresh</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Crawl OpenAlex and rebuild the cache (minutes).</p></li>
+<li><p><strong>max_pages</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Page cap for that crawl.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+<p>Without <cite>force_refresh</cite> this only reads the local cache. It will not
+silently escalate to a network crawl – that was the old behaviour and
+it blocked every first search of the day for minutes before failing.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="scitex_scholar.core.JournalNormalizer._add_journal">
-<span class="sig-name descname"><span class="pre">_add_journal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/journal_normalizer.html#JournalNormalizer._add_journal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer._add_journal" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">_add_journal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/_journal_normalizer/_normalizer.html#JournalNormalizer._add_journal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer._add_journal" title="Link to this definition"></a></dt>
 <dd><p>Add a journal to the normalizer from OpenAlex source data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1504,53 +1586,8 @@ if the status is uncertain.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="scitex_scholar.core.JournalNormalizer._fetch_journals_async">
-<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_fetch_journals_async</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_pages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_oa_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/journal_normalizer.html#JournalNormalizer._fetch_journals_async"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer._fetch_journals_async" title="Link to this definition"></a></dt>
-<dd><p>Fetch journal data from OpenAlex API.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>max_pages</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Maximum pages to fetch (200 per page)</p></li>
-<li><p><strong>filter_oa_only</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – If True, only fetch OA journals</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="scitex_scholar.core.JournalNormalizer._fetch_journals_sync">
-<span class="sig-name descname"><span class="pre">_fetch_journals_sync</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_pages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_oa_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/journal_normalizer.html#JournalNormalizer._fetch_journals_sync"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer._fetch_journals_sync" title="Link to this definition"></a></dt>
-<dd><p>Synchronous wrapper for fetching journals (handles nested event loops).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="scitex_scholar.core.JournalNormalizer.ensure_loaded">
-<span class="sig-name descname"><span class="pre">ensure_loaded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">force_refresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_pages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/journal_normalizer.html#JournalNormalizer.ensure_loaded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer.ensure_loaded" title="Link to this definition"></a></dt>
-<dd><p>Ensure cache is loaded, fetching from API if needed.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>force_refresh</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Force refresh even if cache is valid</p></li>
-<li><p><strong>max_pages</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Max pages to fetch if refreshing</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="scitex_scholar.core.JournalNormalizer.get_issn_l">
-<span class="sig-name descname"><span class="pre">get_issn_l</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">journal_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/journal_normalizer.html#JournalNormalizer.get_issn_l"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer.get_issn_l" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_issn_l</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">journal_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/_journal_normalizer/_normalizer.html#JournalNormalizer.get_issn_l"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer.get_issn_l" title="Link to this definition"></a></dt>
 <dd><p>Get ISSN-L for a journal name.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1567,7 +1604,7 @@ if the status is uncertain.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="scitex_scholar.core.JournalNormalizer.normalize">
-<span class="sig-name descname"><span class="pre">normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">journal_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/journal_normalizer.html#JournalNormalizer.normalize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer.normalize" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">journal_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/_journal_normalizer/_normalizer.html#JournalNormalizer.normalize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer.normalize" title="Link to this definition"></a></dt>
 <dd><p>Normalize journal name to canonical form.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1584,7 +1621,7 @@ if the status is uncertain.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="scitex_scholar.core.JournalNormalizer.get_abbreviation">
-<span class="sig-name descname"><span class="pre">get_abbreviation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">journal_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/journal_normalizer.html#JournalNormalizer.get_abbreviation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer.get_abbreviation" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_abbreviation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">journal_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/_journal_normalizer/_normalizer.html#JournalNormalizer.get_abbreviation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer.get_abbreviation" title="Link to this definition"></a></dt>
 <dd><p>Get abbreviated title for a journal.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1601,7 +1638,7 @@ if the status is uncertain.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="scitex_scholar.core.JournalNormalizer.get_journal_info">
-<span class="sig-name descname"><span class="pre">get_journal_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">journal_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/journal_normalizer.html#JournalNormalizer.get_journal_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer.get_journal_info" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_journal_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">journal_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/_journal_normalizer/_normalizer.html#JournalNormalizer.get_journal_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer.get_journal_info" title="Link to this definition"></a></dt>
 <dd><p>Get full journal metadata.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1611,14 +1648,15 @@ if the status is uncertain.</p>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]]</span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Dict with canonical_name, abbreviated_title, alternate_titles, issns, is_oa, publisher</p>
+<dd class="field-odd"><p>Dict with canonical_name, abbreviated_title, alternate_titles,
+issns, is_oa, publisher</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="scitex_scholar.core.JournalNormalizer.is_same_journal">
-<span class="sig-name descname"><span class="pre">is_same_journal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/journal_normalizer.html#JournalNormalizer.is_same_journal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer.is_same_journal" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">is_same_journal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/_journal_normalizer/_normalizer.html#JournalNormalizer.is_same_journal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer.is_same_journal" title="Link to this definition"></a></dt>
 <dd><p>Check if two names refer to the same journal.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1638,7 +1676,7 @@ if the status is uncertain.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="scitex_scholar.core.JournalNormalizer.is_open_access">
-<span class="sig-name descname"><span class="pre">is_open_access</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">journal_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/journal_normalizer.html#JournalNormalizer.is_open_access"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer.is_open_access" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">is_open_access</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">journal_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/_journal_normalizer/_normalizer.html#JournalNormalizer.is_open_access"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer.is_open_access" title="Link to this definition"></a></dt>
 <dd><p>Check if journal is Open Access.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1648,14 +1686,16 @@ if the status is uncertain.</p>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>True if journal is OA</p>
+<dd class="field-odd"><p>True if the journal is KNOWN to be OA. False means “not known to
+be OA” – including when the local cache is absent, which is
+reported loudly rather than silently fetched.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="scitex_scholar.core.JournalNormalizer.search">
-<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/journal_normalizer.html#JournalNormalizer.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer.search" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/_journal_normalizer/_normalizer.html#JournalNormalizer.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.JournalNormalizer.search" title="Link to this definition"></a></dt>
 <dd><p>Search for journals by name (prefix/substring match).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1689,18 +1729,18 @@ if the status is uncertain.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="scitex_scholar.core.get_journal_normalizer">
-<span class="sig-prename descclassname"><span class="pre">scitex_scholar.core.</span></span><span class="sig-name descname"><span class="pre">get_journal_normalizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/journal_normalizer.html#get_journal_normalizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.get_journal_normalizer" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">scitex_scholar.core.</span></span><span class="sig-name descname"><span class="pre">get_journal_normalizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/_journal_normalizer/_normalizer.html#get_journal_normalizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.get_journal_normalizer" title="Link to this definition"></a></dt>
 <dd><p>Get the journal normalizer singleton.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#scitex_scholar.core.JournalNormalizer" title="scitex_scholar.core.journal_normalizer.JournalNormalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">JournalNormalizer</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#scitex_scholar.core.JournalNormalizer" title="scitex_scholar.core._journal_normalizer._normalizer.JournalNormalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">JournalNormalizer</span></code></a></span></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="scitex_scholar.core.normalize_journal_name">
-<span class="sig-prename descclassname"><span class="pre">scitex_scholar.core.</span></span><span class="sig-name descname"><span class="pre">normalize_journal_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/journal_normalizer.html#normalize_journal_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.normalize_journal_name" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">scitex_scholar.core.</span></span><span class="sig-name descname"><span class="pre">normalize_journal_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/_journal_normalizer/_normalizer.html#normalize_journal_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.normalize_journal_name" title="Link to this definition"></a></dt>
 <dd><p>Normalize journal name to canonical form.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -1711,7 +1751,7 @@ if the status is uncertain.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="scitex_scholar.core.get_journal_issn_l">
-<span class="sig-prename descclassname"><span class="pre">scitex_scholar.core.</span></span><span class="sig-name descname"><span class="pre">get_journal_issn_l</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/journal_normalizer.html#get_journal_issn_l"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.get_journal_issn_l" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">scitex_scholar.core.</span></span><span class="sig-name descname"><span class="pre">get_journal_issn_l</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/_journal_normalizer/_normalizer.html#get_journal_issn_l"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.get_journal_issn_l" title="Link to this definition"></a></dt>
 <dd><p>Get ISSN-L for a journal name.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -1722,7 +1762,7 @@ if the status is uncertain.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="scitex_scholar.core.is_same_journal">
-<span class="sig-prename descclassname"><span class="pre">scitex_scholar.core.</span></span><span class="sig-name descname"><span class="pre">is_same_journal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/journal_normalizer.html#is_same_journal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.is_same_journal" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">scitex_scholar.core.</span></span><span class="sig-name descname"><span class="pre">is_same_journal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/_journal_normalizer/_normalizer.html#is_same_journal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.is_same_journal" title="Link to this definition"></a></dt>
 <dd><p>Check if two names refer to the same journal.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -1733,8 +1773,8 @@ if the status is uncertain.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="scitex_scholar.core.refresh_journal_cache">
-<span class="sig-prename descclassname"><span class="pre">scitex_scholar.core.</span></span><span class="sig-name descname"><span class="pre">refresh_journal_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/journal_normalizer.html#refresh_journal_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.refresh_journal_cache" title="Link to this definition"></a></dt>
-<dd><p>Force refresh the journal normalizer cache.</p>
+<span class="sig-prename descclassname"><span class="pre">scitex_scholar.core.</span></span><span class="sig-name descname"><span class="pre">refresh_journal_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/core/_journal_normalizer/_normalizer.html#refresh_journal_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.core.refresh_journal_cache" title="Link to this definition"></a></dt>
+<dd><p>Force refresh the journal normalizer cache. Takes minutes; blocks.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>

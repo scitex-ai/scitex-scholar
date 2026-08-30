@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scitex_scholar.config.ScholarConfig &mdash; SciTeX Scholar v1.4.1</title>
+  <title>scitex_scholar.config.ScholarConfig &mdash; SciTeX Scholar v1.9.0</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=350a9c04"></script>
+      <script src="../../../_static/documentation_options.js?v=c4cb232b"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -238,6 +238,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._save_to_cache"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._save_to_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_async"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_async()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_sync"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.refresh"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.ensure_loaded()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_source"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_source()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_issn"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_issn()</span></code></a></li>
@@ -251,13 +253,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.__init__"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.__init__()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_instance"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_instance()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._is_cache_valid"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._is_cache_valid()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._load_from_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._load_from_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._save_to_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._save_to_cache()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_async"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_async()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_sync"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.refresh"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.ensure_loaded()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_issn_l"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_issn_l()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.normalize"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.normalize()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_abbreviation"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_abbreviation()</span></code></a></li>
@@ -377,7 +378,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../api/citation_graph.html">scitex_scholar.citation_graph</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.__init__"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._auto_detect"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._auto_detect()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.build"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.build()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._create_paper_node"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._create_paper_node()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._build_citation_edges"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._build_citation_edges()</span></code></a></li>
@@ -503,14 +503,14 @@
   <h1>Source code for scitex_scholar.config.ScholarConfig</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="c1"># Timestamp: &quot;2025-10-11 06:45:52 (ywatanabe)&quot;</span>
+<span class="c1"># Timestamp: "2025-10-11 06:45:52 (ywatanabe)"</span>
 <span class="c1"># File: /home/ywatanabe/proj/scitex_repo/src/scitex/scholar/config/ScholarConfig.py</span>
 <span class="c1"># ----------------------------------------</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
-<span class="n">__FILE__</span> <span class="o">=</span> <span class="s2">&quot;./src/scitex/scholar/config/ScholarConfig.py&quot;</span>
+<span class="n">__FILE__</span> <span class="o">=</span> <span class="s2">"./src/scitex/scholar/config/ScholarConfig.py"</span>
 <span class="n">__DIR__</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__FILE__</span><span class="p">)</span>
 <span class="c1"># ----------------------------------------</span>
 
@@ -539,47 +539,47 @@
         <span class="n">config_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">scholar_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize ScholarConfig.</span>
+<span class="w">        </span><span class="sd">"""Initialize ScholarConfig.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            config_path: Path to custom config YAML file</span>
 <span class="sd">            scholar_dir: Direct path to scholar directory (e.g., /data/users/alice/.scitex)</span>
 <span class="sd">                        This bypasses SCITEX_DIR env var for thread-safe multi-user usage.</span>
 <span class="sd">                        Use this in Django/multi-user environments to avoid race conditions.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_explicit_scholar_dir</span> <span class="o">=</span> <span class="n">scholar_dir</span>  <span class="c1"># Store for thread-safe access</span>
 
         <span class="k">if</span> <span class="n">config_path</span> <span class="ow">and</span> <span class="n">Path</span><span class="p">(</span><span class="n">config_path</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
             <span class="n">config_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_yaml</span><span class="p">(</span><span class="n">config_path</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">default_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;default.yaml&quot;</span>
+            <span class="n">default_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"default.yaml"</span>
             <span class="n">config_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_yaml</span><span class="p">(</span><span class="n">default_path</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">cascade</span> <span class="o">=</span> <span class="n">CascadeConfig</span><span class="p">(</span><span class="n">config_data</span><span class="p">,</span> <span class="s2">&quot;SCITEX_SCHOLAR_&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cascade</span> <span class="o">=</span> <span class="n">CascadeConfig</span><span class="p">(</span><span class="n">config_data</span><span class="p">,</span> <span class="s2">"SCITEX_SCHOLAR_"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_setup_path_manager</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="ScholarConfig.__getattr__">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.config.ScholarConfig.__getattr__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Delegate all ``get_*`` methods to ``path_manager``.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;get_&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_manager</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Delegate all ``get_*`` methods to ``path_manager``."""</span>
+        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"get_"</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_manager</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_manager</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&#39; object has no attribute &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+            <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">' object has no attribute '</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">'"</span>
         <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ScholarConfig.__dir__">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.config.ScholarConfig.__dir__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Include ``path_manager``&#39;s ``get_*`` methods in ``dir()`` output.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Include ``path_manager``'s ``get_*`` methods in ``dir()`` output."""</span>
         <span class="n">own_attrs</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">path_manager_get_methods</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">attr</span>
             <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_manager</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">attr</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;get_&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">callable</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_manager</span><span class="p">,</span> <span class="n">attr</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">attr</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"get_"</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">callable</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_manager</span><span class="p">,</span> <span class="n">attr</span><span class="p">))</span>
         <span class="p">]</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">own_attrs</span><span class="p">)</span> <span class="o">+</span> <span class="n">path_manager_get_methods</span></div>
 
@@ -588,28 +588,28 @@
 <div class="viewcode-block" id="ScholarConfig.resolve">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.config.ScholarConfig.resolve">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">direct_val</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve configuration value with precedence: direct → config → env → default&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Resolve configuration value with precedence: direct → config → env → default"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cascade</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">direct_val</span><span class="p">,</span> <span class="n">default</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ScholarConfig.get">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.config.ScholarConfig.get">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get value from config dict only&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Get value from config dict only"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cascade</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ScholarConfig.print">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.config.ScholarConfig.print">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">print</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Print how each config was resolved&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Print how each config was resolved"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cascade</span><span class="o">.</span><span class="n">print</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="ScholarConfig.clear_log">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.config.ScholarConfig.clear_log">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">clear_log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Clear resolution log&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Clear resolution log"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cascade</span><span class="o">.</span><span class="n">clear_log</span><span class="p">()</span></div>
 
 
@@ -622,27 +622,27 @@
 
             <span class="k">def</span><span class="w"> </span><span class="nf">env_replacer</span><span class="p">(</span><span class="n">match</span><span class="p">):</span>
                 <span class="n">env_expr</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                <span class="k">if</span> <span class="s2">&quot;:-&quot;</span> <span class="ow">in</span> <span class="n">env_expr</span><span class="p">:</span>
-                    <span class="n">var_name</span><span class="p">,</span> <span class="n">default_value</span> <span class="o">=</span> <span class="n">env_expr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:-&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-                    <span class="n">value</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">default_value</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">))</span>
+                <span class="k">if</span> <span class="s2">":-"</span> <span class="ow">in</span> <span class="n">env_expr</span><span class="p">:</span>
+                    <span class="n">var_name</span><span class="p">,</span> <span class="n">default_value</span> <span class="o">=</span> <span class="n">env_expr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">":-"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">default_value</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">'"'</span><span class="p">))</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">value</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">env_expr</span><span class="p">)</span>
 
-                <span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;true&quot;</span><span class="p">,</span> <span class="s2">&quot;false&quot;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"true"</span><span class="p">,</span> <span class="s2">"false"</span><span class="p">]:</span>
                     <span class="k">return</span> <span class="n">value</span>
-                <span class="k">elif</span> <span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;null&quot;</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="s2">&quot;null&quot;</span>
-                <span class="k">elif</span> <span class="n">value</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)):</span>
-                    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
+                <span class="k">elif</span> <span class="n">value</span> <span class="o">==</span> <span class="s2">"null"</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="s2">"null"</span>
+                <span class="k">elif</span> <span class="n">value</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'"'</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">'"'</span><span class="p">)):</span>
+                    <span class="k">return</span> <span class="sa">f</span><span class="s1">'"</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">"'</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="n">value</span> <span class="ow">or</span> <span class="s2">&quot;null&quot;</span>
+                    <span class="k">return</span> <span class="n">value</span> <span class="ow">or</span> <span class="s2">"null"</span>
 
-            <span class="n">content</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\$\{([^}]+)\}&quot;</span><span class="p">,</span> <span class="n">env_replacer</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
-            <span class="c1"># logger.info(f&quot;ScholarConfig object configured with: {path}&quot;)</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\$\{([^}]+)\}"</span><span class="p">,</span> <span class="n">env_replacer</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
+            <span class="c1"># logger.info(f"ScholarConfig object configured with: {path}")</span>
             <span class="k">return</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ScholarError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> not loaded and ScholarConfig object not created&quot;</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> not loaded and ScholarConfig object not created"</span>
             <span class="p">)</span></div>
 
 
@@ -658,16 +658,16 @@
         <span class="c1"># Priority: explicit parameter &gt; env var &gt; config &gt; default</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_explicit_scholar_dir</span><span class="p">:</span>
             <span class="c1"># Use explicitly provided path (thread-safe for multi-user)</span>
-            <span class="n">base_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_explicit_scholar_dir</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;scholar&quot;</span>
+            <span class="n">base_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_explicit_scholar_dir</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span> <span class="o">/</span> <span class="s2">"scholar"</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Fall back to cascade resolution (uses SCITEX_DIR env var)</span>
-            <span class="n">scholar_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cascade</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="s2">&quot;scholar_dir&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;~/.scitex&quot;</span><span class="p">)</span>
-            <span class="n">base_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">scholar_dir</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;scholar&quot;</span>
+            <span class="n">scholar_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cascade</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="s2">"scholar_dir"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">"~/.scitex"</span><span class="p">)</span>
+            <span class="n">base_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">scholar_dir</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span> <span class="o">/</span> <span class="s2">"scholar"</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">path_manager</span> <span class="o">=</span> <span class="n">PathManager</span><span class="p">(</span><span class="n">scholar_dir</span><span class="o">=</span><span class="n">base_path</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">paths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Access to path manager for organized directory structure&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Access to path manager for organized directory structure"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">path_manager</span></div>
 
 

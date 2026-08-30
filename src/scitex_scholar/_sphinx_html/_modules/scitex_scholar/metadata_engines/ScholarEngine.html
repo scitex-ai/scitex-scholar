@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scitex_scholar.metadata_engines.ScholarEngine &mdash; SciTeX Scholar v1.4.1</title>
+  <title>scitex_scholar.metadata_engines.ScholarEngine &mdash; SciTeX Scholar v1.9.0</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=350a9c04"></script>
+      <script src="../../../_static/documentation_options.js?v=c4cb232b"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -238,6 +238,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._save_to_cache"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._save_to_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_async"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_async()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_sync"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.refresh"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.ensure_loaded()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_source"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_source()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_issn"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_issn()</span></code></a></li>
@@ -251,13 +253,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.__init__"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.__init__()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_instance"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_instance()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._is_cache_valid"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._is_cache_valid()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._load_from_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._load_from_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._save_to_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._save_to_cache()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_async"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_async()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_sync"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.refresh"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.ensure_loaded()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_issn_l"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_issn_l()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.normalize"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.normalize()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_abbreviation"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_abbreviation()</span></code></a></li>
@@ -377,7 +378,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../api/citation_graph.html">scitex_scholar.citation_graph</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.__init__"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._auto_detect"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._auto_detect()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.build"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.build()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._create_paper_node"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._create_paper_node()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._build_citation_edges"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._build_citation_edges()</span></code></a></li>
@@ -503,14 +503,14 @@
   <h1>Source code for scitex_scholar.metadata_engines.ScholarEngine</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="c1"># Timestamp: &quot;2025-10-13 11:01:42 (ywatanabe)&quot;</span>
+<span class="c1"># Timestamp: "2025-10-13 11:01:42 (ywatanabe)"</span>
 <span class="c1"># File: /home/ywatanabe/proj/scitex_repo/src/scitex/scholar/metadata_engines/ScholarEngine.py</span>
 <span class="c1"># ----------------------------------------</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
-<span class="n">__FILE__</span> <span class="o">=</span> <span class="s2">&quot;./src/scitex/scholar/metadata_engines/ScholarEngine.py&quot;</span>
+<span class="n">__FILE__</span> <span class="o">=</span> <span class="s2">"./src/scitex/scholar/metadata_engines/ScholarEngine.py"</span>
 <span class="n">__DIR__</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__FILE__</span><span class="p">)</span>
 <span class="c1"># ----------------------------------------</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
@@ -545,7 +545,7 @@
 <div class="viewcode-block" id="ScholarEngine">
 <a class="viewcode-back" href="../../../api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ScholarEngine</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Aggregates metadata from multiple engines for enrichment.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Aggregates metadata from multiple engines for enrichment."""</span>
 
 <div class="viewcode-block" id="ScholarEngine.__init__">
 <a class="viewcode-back" href="../../../api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine.__init__">[docs]</a>
@@ -558,13 +558,13 @@
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span> <span class="k">if</span> <span class="n">config</span> <span class="k">else</span> <span class="n">ScholarConfig</span><span class="p">()</span>
-        <span class="n">_engines_resolved</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="s2">&quot;engines&quot;</span><span class="p">,</span> <span class="n">engines</span><span class="p">)</span>
+        <span class="n">_engines_resolved</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="s2">"engines"</span><span class="p">,</span> <span class="n">engines</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">engines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
             <span class="nb">list</span><span class="p">(</span><span class="n">_engines_resolved</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_engines_resolved</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span>
             <span class="k">else</span> <span class="p">[]</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">use_cache</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="s2">&quot;use_cache_engine&quot;</span><span class="p">,</span> <span class="n">use_cache</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_cache</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="s2">"use_cache_engine"</span><span class="p">,</span> <span class="n">use_cache</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_engine_instances</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rotation_manager</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -575,14 +575,14 @@
 <div class="viewcode-block" id="ScholarEngine._setup_cache">
 <a class="viewcode-back" href="../../../api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._setup_cache">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">_setup_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clear_cache</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Setup cache directory and files.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Setup cache directory and files."""</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">path_manager</span><span class="o">.</span><span class="n">get_cache_engine_dir</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cache_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span> <span class="o">/</span> <span class="s2">&quot;search_results.json&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span> <span class="o">/</span> <span class="s2">"search_results.json"</span>
 
         <span class="k">if</span> <span class="n">clear_cache</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cache_file</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">Cleared engine search cache&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">Cleared engine search cache"</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_load_cache</span><span class="p">()</span></div>
 
@@ -590,16 +590,16 @@
 <div class="viewcode-block" id="ScholarEngine._load_cache">
 <a class="viewcode-back" href="../../../api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._load_cache">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">_load_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load cache from file.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Load cache from file."""</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cache</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_file</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
                 <span class="c1"># self._cache = stx.io.load(self.cache_file)</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;ScholarEngine cache unreadable at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_file</span><span class="si">}</span><span class="s2">, &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;resetting (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">)&quot;</span>
+                    <span class="sa">f</span><span class="s2">"ScholarEngine cache unreadable at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_file</span><span class="si">}</span><span class="s2">, "</span>
+                    <span class="sa">f</span><span class="s2">"resetting (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">)"</span>
                 <span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">else</span><span class="p">:</span>
@@ -609,21 +609,21 @@
 <div class="viewcode-block" id="ScholarEngine._save_cache">
 <a class="viewcode-back" href="../../../api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._save_cache">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">_save_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Save cache to file.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Save cache to file."""</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cache</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_file</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                     <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
                 <span class="c1"># stx.io.save(self._cache, self.cache_file)</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to save engine cache: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to save engine cache: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ScholarEngine._get_cache_key">
 <a class="viewcode-back" href="../../../api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._get_cache_key">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_cache_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">doi</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate cache key for search parameters.&quot;&quot;&quot;</span>
-        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span> <span class="s2">&quot;doi&quot;</span><span class="p">:</span> <span class="n">doi</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">}</span>
+<span class="w">        </span><span class="sd">"""Generate cache key for search parameters."""</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span> <span class="s2">"doi"</span><span class="p">:</span> <span class="n">doi</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">}</span>
         <span class="c1"># Remove None values</span>
         <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
         <span class="c1"># Create hash from sorted params</span>
@@ -638,34 +638,34 @@
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">search_async</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">doi</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Search all engines and return combined results.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Search all engines and return combined results."""</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">_build_readable_query_str</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">doi</span><span class="p">):</span>
             <span class="c1"># Log failure if no results found</span>
             <span class="n">query_str</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;title: </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"title: </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">"</span>
                 <span class="k">if</span> <span class="n">title</span>
-                <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;doi: </span><span class="si">{</span><span class="n">doi</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">else</span> <span class="sa">f</span><span class="s2">"doi: </span><span class="si">{</span><span class="n">doi</span><span class="si">}</span><span class="s2">"</span>
                 <span class="k">if</span> <span class="n">doi</span>
-                <span class="k">else</span> <span class="s2">&quot;unknown query&quot;</span>
+                <span class="k">else</span> <span class="s2">"unknown query"</span>
             <span class="p">)</span>
             <span class="n">N_PRINT</span> <span class="o">=</span> <span class="mi">50</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">query_str</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">N_PRINT</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">query_str</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">query_str</span><span class="p">[:</span><span class="n">N_PRINT</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">query_str</span><span class="p">[:</span><span class="n">N_PRINT</span><span class="p">]</span><span class="si">}</span><span class="s2">..."</span>
 
         <span class="c1"># Check cache first</span>
         <span class="n">cache_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_cache_key</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">doi</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cache</span> <span class="ow">and</span> <span class="n">cache_key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Using cached search result&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Using cached search result"</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="n">cache_key</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_last_query_title</span> <span class="o">=</span> <span class="n">title</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_attempted_engines</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation_manager</span><span class="p">:</span>
-            <span class="n">paper_info</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">}</span>
+            <span class="n">paper_info</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">}</span>
             <span class="n">engine_order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation_manager</span><span class="o">.</span><span class="n">get_optimal_engine_order</span><span class="p">(</span>
                 <span class="n">paper_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">engines</span><span class="p">,</span> <span class="n">max_engines</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">engines</span><span class="p">)</span>
             <span class="p">)</span>
@@ -687,11 +687,11 @@
         <span class="n">engine_results</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="p">(</span><span class="n">engine_name</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">engine_order</span><span class="p">,</span> <span class="n">results</span><span class="p">)):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">):</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error from </span><span class="si">{</span><span class="n">engine_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Error from </span><span class="si">{</span><span class="n">engine_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">engine_name</span><span class="si">}</span><span class="s2"> returned title: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;basic&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;N/A&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">engine_name</span><span class="si">}</span><span class="s2"> returned title: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'basic'</span><span class="p">,</span><span class="w"> </span><span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'title'</span><span class="p">,</span><span class="w"> </span><span class="s1">'N/A'</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
                 <span class="p">)</span>
                 <span class="n">engine_results</span><span class="p">[</span><span class="n">engine_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
 
@@ -700,14 +700,14 @@
         <span class="n">query_str</span> <span class="o">=</span> <span class="n">_build_readable_query_str</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">doi</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">combined_result</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No metadata found for </span><span class="si">{</span><span class="n">query_str</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No metadata found for </span><span class="si">{</span><span class="n">query_str</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="c1"># Cache result</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cache</span> <span class="ow">and</span> <span class="n">combined_result</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="n">cache_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">combined_result</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_save_cache</span><span class="p">()</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Metadata retrieved for this query: </span><span class="si">{</span><span class="n">query_str</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Metadata retrieved for this query: </span><span class="si">{</span><span class="n">query_str</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">combined_result</span></div>
 
@@ -719,7 +719,7 @@
         <span class="n">titles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">dois</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Search multiple papers in batch with parallel processing.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Search multiple papers in batch with parallel processing."""</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">_print_stats</span><span class="p">(</span><span class="n">queries</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
             <span class="n">failed_queries</span> <span class="o">=</span> <span class="p">[]</span>
@@ -728,23 +728,23 @@
             <span class="k">for</span> <span class="n">query</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">queries</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">):</span>
                     <span class="n">failed_queries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">query</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">result</span><span class="p">)))</span>
-                <span class="k">elif</span> <span class="n">result</span> <span class="ow">and</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;doi&quot;</span><span class="p">):</span>
+                <span class="k">elif</span> <span class="n">result</span> <span class="ow">and</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"id"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"doi"</span><span class="p">):</span>
                     <span class="n">found_count</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">failed_queries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">query</span><span class="p">,</span> <span class="s2">&quot;No metadata found&quot;</span><span class="p">))</span>
+                    <span class="n">failed_queries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">query</span><span class="p">,</span> <span class="s2">"No metadata found"</span><span class="p">))</span>
 
             <span class="n">n_total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">queries</span><span class="p">)</span>
             <span class="n">success_rate</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="nb">round</span><span class="p">(</span><span class="mf">100.0</span> <span class="o">*</span> <span class="n">found_count</span> <span class="o">/</span> <span class="n">n_total</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">n_total</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span>
             <span class="p">)</span>
 
-            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Search engines found </span><span class="si">{</span><span class="n">found_count</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">n_total</span><span class="si">}</span><span class="s2"> DOIs from publications (= </span><span class="si">{</span><span class="n">success_rate</span><span class="si">}</span><span class="s2">%)&quot;</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Search engines found </span><span class="si">{</span><span class="n">found_count</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">n_total</span><span class="si">}</span><span class="s2"> DOIs from publications (= </span><span class="si">{</span><span class="n">success_rate</span><span class="si">}</span><span class="s2">%)"</span>
             <span class="k">if</span> <span class="n">found_count</span> <span class="o">==</span> <span class="n">n_total</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">query</span><span class="p">,</span> <span class="n">error</span> <span class="ow">in</span> <span class="n">failed_queries</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed query &#39;</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed query '</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">': </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">dois</span><span class="p">:</span>
             <span class="n">batched_metadata</span> <span class="o">=</span> <span class="p">[</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">search_async</span><span class="p">(</span><span class="n">doi</span><span class="o">=</span><span class="n">doi</span><span class="p">)</span> <span class="k">for</span> <span class="n">doi</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">dois</span><span class="p">)]</span>
@@ -764,37 +764,37 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_engine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_engine_instances</span><span class="p">:</span>
             <span class="n">engine_classes</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;URL&quot;</span><span class="p">:</span> <span class="n">URLDOIEngine</span><span class="p">,</span>
-                <span class="s2">&quot;CrossRef&quot;</span><span class="p">:</span> <span class="n">CrossRefEngine</span><span class="p">,</span>
-                <span class="s2">&quot;CrossRefLocal&quot;</span><span class="p">:</span> <span class="n">CrossRefLocalEngine</span><span class="p">,</span>
-                <span class="s2">&quot;OpenAlex&quot;</span><span class="p">:</span> <span class="n">OpenAlexEngine</span><span class="p">,</span>
-                <span class="s2">&quot;OpenAlexLocal&quot;</span><span class="p">:</span> <span class="n">OpenAlexLocalEngine</span><span class="p">,</span>
-                <span class="s2">&quot;PubMed&quot;</span><span class="p">:</span> <span class="n">PubMedEngine</span><span class="p">,</span>
-                <span class="s2">&quot;Semantic_Scholar&quot;</span><span class="p">:</span> <span class="n">SemanticScholarEngine</span><span class="p">,</span>
-                <span class="s2">&quot;arXiv&quot;</span><span class="p">:</span> <span class="n">ArXivEngine</span><span class="p">,</span>
+                <span class="s2">"URL"</span><span class="p">:</span> <span class="n">URLDOIEngine</span><span class="p">,</span>
+                <span class="s2">"CrossRef"</span><span class="p">:</span> <span class="n">CrossRefEngine</span><span class="p">,</span>
+                <span class="s2">"CrossRefLocal"</span><span class="p">:</span> <span class="n">CrossRefLocalEngine</span><span class="p">,</span>
+                <span class="s2">"OpenAlex"</span><span class="p">:</span> <span class="n">OpenAlexEngine</span><span class="p">,</span>
+                <span class="s2">"OpenAlexLocal"</span><span class="p">:</span> <span class="n">OpenAlexLocalEngine</span><span class="p">,</span>
+                <span class="s2">"PubMed"</span><span class="p">:</span> <span class="n">PubMedEngine</span><span class="p">,</span>
+                <span class="s2">"Semantic_Scholar"</span><span class="p">:</span> <span class="n">SemanticScholarEngine</span><span class="p">,</span>
+                <span class="s2">"arXiv"</span><span class="p">:</span> <span class="n">ArXivEngine</span><span class="p">,</span>
             <span class="p">}</span>
             <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">engine_classes</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;url_doi_engine&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"url_doi_engine"</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_engine_instances</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">engine_classes</span><span class="p">[</span><span class="n">name</span><span class="p">]()</span>
-                <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;CrossRefLocal&quot;</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"CrossRefLocal"</span><span class="p">:</span>
                     <span class="c1"># Get API URL from config (supports SCITEX_SCHOLAR_CROSSREF_API_URL env var)</span>
                     <span class="n">api_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span>
-                        <span class="s2">&quot;crossref_api_url&quot;</span><span class="p">,</span> <span class="s2">&quot;http://127.0.0.1:3333&quot;</span>
+                        <span class="s2">"crossref_api_url"</span><span class="p">,</span> <span class="s2">"http://127.0.0.1:3333"</span>
                     <span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_engine_instances</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">engine_classes</span><span class="p">[</span><span class="n">name</span><span class="p">](</span>
-                        <span class="s2">&quot;research@example.com&quot;</span><span class="p">,</span> <span class="n">api_url</span><span class="o">=</span><span class="n">api_url</span>
+                        <span class="s2">"research@example.com"</span><span class="p">,</span> <span class="n">api_url</span><span class="o">=</span><span class="n">api_url</span>
                     <span class="p">)</span>
-                <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;OpenAlexLocal&quot;</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"OpenAlexLocal"</span><span class="p">:</span>
                     <span class="c1"># Get API URL from config (supports SCITEX_SCHOLAR_OPENALEX_API_URL env var)</span>
                     <span class="n">api_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span>
-                        <span class="s2">&quot;openalex_api_url&quot;</span><span class="p">,</span> <span class="s2">&quot;http://127.0.0.1:31292&quot;</span>
+                        <span class="s2">"openalex_api_url"</span><span class="p">,</span> <span class="s2">"http://127.0.0.1:31292"</span>
                     <span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_engine_instances</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">engine_classes</span><span class="p">[</span><span class="n">name</span><span class="p">](</span>
-                        <span class="s2">&quot;research@example.com&quot;</span><span class="p">,</span> <span class="n">api_url</span><span class="o">=</span><span class="n">api_url</span>
+                        <span class="s2">"research@example.com"</span><span class="p">,</span> <span class="n">api_url</span><span class="o">=</span><span class="n">api_url</span>
                     <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_engine_instances</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">engine_classes</span><span class="p">[</span><span class="n">name</span><span class="p">](</span>
-                        <span class="s2">&quot;research@example.com&quot;</span>
+                        <span class="s2">"research@example.com"</span>
                     <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_engine_instances</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
@@ -809,7 +809,7 @@
         <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Search single engine with timeout.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Search single engine with timeout."""</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># Record attempt if rotation manager available</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation_manager</span><span class="p">:</span>
@@ -829,7 +829,7 @@
                 <span class="n">response_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">rotation_manager</span><span class="o">.</span><span class="n">record_attempt</span><span class="p">(</span>
                     <span class="n">engine_name</span><span class="p">,</span>
-                    <span class="p">{</span><span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">},</span>
+                    <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">},</span>
                     <span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                     <span class="n">response_time</span><span class="o">=</span><span class="n">response_time</span><span class="p">,</span>
                 <span class="p">)</span>
@@ -837,17 +837,17 @@
             <span class="k">return</span> <span class="n">result</span>
 
         <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Timeout from </span><span class="si">{</span><span class="n">engine_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Timeout from </span><span class="si">{</span><span class="n">engine_name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation_manager</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">rotation_manager</span><span class="o">.</span><span class="n">record_attempt</span><span class="p">(</span>
-                    <span class="n">engine_name</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">},</span> <span class="n">success</span><span class="o">=</span><span class="kc">False</span>
+                    <span class="n">engine_name</span><span class="p">,</span> <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">},</span> <span class="n">success</span><span class="o">=</span><span class="kc">False</span>
                 <span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error from </span><span class="si">{</span><span class="n">engine_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Error from </span><span class="si">{</span><span class="n">engine_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation_manager</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">rotation_manager</span><span class="o">.</span><span class="n">record_attempt</span><span class="p">(</span>
-                    <span class="n">engine_name</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">},</span> <span class="n">success</span><span class="o">=</span><span class="kc">False</span>
+                    <span class="n">engine_name</span><span class="p">,</span> <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">},</span> <span class="n">success</span><span class="o">=</span><span class="kc">False</span>
                 <span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span></div>
 
@@ -855,28 +855,28 @@
 <div class="viewcode-block" id="ScholarEngine._extract_identifiers">
 <a class="viewcode-back" href="../../../api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._extract_identifiers">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">_extract_identifiers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extract all identifiers from metadata.&quot;&quot;&quot;</span>
-        <span class="n">ids</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="p">{})</span>
+<span class="w">        </span><span class="sd">"""Extract all identifiers from metadata."""</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"id"</span><span class="p">,</span> <span class="p">{})</span>
         <span class="n">identifiers</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="c1"># Clean and normalize identifiers</span>
-        <span class="k">if</span> <span class="n">ids</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;doi&quot;</span><span class="p">):</span>
-            <span class="n">doi</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ids</span><span class="p">[</span><span class="s2">&quot;doi&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">doi</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">):</span>
-                <span class="n">doi</span> <span class="o">=</span> <span class="n">doi</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">doi</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">identifiers</span><span class="p">[</span><span class="s2">&quot;doi&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">doi</span>
+        <span class="k">if</span> <span class="n">ids</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"doi"</span><span class="p">):</span>
+            <span class="n">doi</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ids</span><span class="p">[</span><span class="s2">"doi"</span><span class="p">])</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">doi</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"http"</span><span class="p">):</span>
+                <span class="n">doi</span> <span class="o">=</span> <span class="n">doi</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s2">"/"</span> <span class="o">+</span> <span class="n">doi</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">identifiers</span><span class="p">[</span><span class="s2">"doi"</span><span class="p">]</span> <span class="o">=</span> <span class="n">doi</span>
 
-        <span class="k">if</span> <span class="n">ids</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pmid&quot;</span><span class="p">):</span>
-            <span class="n">identifiers</span><span class="p">[</span><span class="s2">&quot;pmid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ids</span><span class="p">[</span><span class="s2">&quot;pmid&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">ids</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"pmid"</span><span class="p">):</span>
+            <span class="n">identifiers</span><span class="p">[</span><span class="s2">"pmid"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ids</span><span class="p">[</span><span class="s2">"pmid"</span><span class="p">])</span>
 
-        <span class="k">if</span> <span class="n">ids</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;arxiv_id&quot;</span><span class="p">):</span>
-            <span class="n">identifiers</span><span class="p">[</span><span class="s2">&quot;arxiv_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ids</span><span class="p">[</span><span class="s2">&quot;arxiv_id&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">ids</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"arxiv_id"</span><span class="p">):</span>
+            <span class="n">identifiers</span><span class="p">[</span><span class="s2">"arxiv_id"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ids</span><span class="p">[</span><span class="s2">"arxiv_id"</span><span class="p">])</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="n">ids</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;corpus_id&quot;</span><span class="p">):</span>
-            <span class="n">identifiers</span><span class="p">[</span><span class="s2">&quot;corpus_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ids</span><span class="p">[</span><span class="s2">&quot;corpus_id&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">ids</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"corpus_id"</span><span class="p">):</span>
+            <span class="n">identifiers</span><span class="p">[</span><span class="s2">"corpus_id"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ids</span><span class="p">[</span><span class="s2">"corpus_id"</span><span class="p">])</span>
 
-        <span class="k">if</span> <span class="n">ids</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scholar_id&quot;</span><span class="p">):</span>
-            <span class="n">identifiers</span><span class="p">[</span><span class="s2">&quot;scholar_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ids</span><span class="p">[</span><span class="s2">&quot;scholar_id&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">ids</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"scholar_id"</span><span class="p">):</span>
+            <span class="n">identifiers</span><span class="p">[</span><span class="s2">"scholar_id"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ids</span><span class="p">[</span><span class="s2">"scholar_id"</span><span class="p">])</span>
 
         <span class="k">return</span> <span class="n">identifiers</span></div>
 
@@ -884,12 +884,12 @@
 <div class="viewcode-block" id="ScholarEngine._identifiers_match">
 <a class="viewcode-back" href="../../../api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._identifiers_match">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">_identifiers_match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids1</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">ids2</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if any identifiers match between two papers.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Check if any identifiers match between two papers."""</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">ids1</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">ids2</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
 
         <span class="c1"># Check each identifier type</span>
-        <span class="k">for</span> <span class="n">id_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;doi&quot;</span><span class="p">,</span> <span class="s2">&quot;pmid&quot;</span><span class="p">,</span> <span class="s2">&quot;arxiv_id&quot;</span><span class="p">,</span> <span class="s2">&quot;corpus_id&quot;</span><span class="p">,</span> <span class="s2">&quot;scholar_id&quot;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">id_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"doi"</span><span class="p">,</span> <span class="s2">"pmid"</span><span class="p">,</span> <span class="s2">"arxiv_id"</span><span class="p">,</span> <span class="s2">"corpus_id"</span><span class="p">,</span> <span class="s2">"scholar_id"</span><span class="p">]:</span>
             <span class="n">val1</span> <span class="o">=</span> <span class="n">ids1</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">id_type</span><span class="p">)</span>
             <span class="n">val2</span> <span class="o">=</span> <span class="n">ids2</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">id_type</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">val1</span> <span class="ow">and</span> <span class="n">val2</span> <span class="ow">and</span> <span class="n">val1</span> <span class="o">==</span> <span class="n">val2</span><span class="p">:</span>
@@ -901,27 +901,27 @@
 <div class="viewcode-block" id="ScholarEngine._validate_paper_consistency">
 <a class="viewcode-back" href="../../../api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._validate_paper_consistency">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">_validate_paper_consistency</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if all metadata refers to same paper by title, exact year, and first author.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Check if all metadata refers to same paper by title, exact year, and first author."""</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">metadata_list</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">metadata_list</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
 
         <span class="n">first</span> <span class="o">=</span> <span class="n">metadata_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">first_title</span> <span class="o">=</span> <span class="p">(</span><span class="n">first</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;basic&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-        <span class="n">first_year</span> <span class="o">=</span> <span class="n">first</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;basic&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;year&quot;</span><span class="p">)</span>
-        <span class="n">first_authors</span> <span class="o">=</span> <span class="n">first</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;basic&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;authors&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">first_title</span> <span class="o">=</span> <span class="p">(</span><span class="n">first</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"basic"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"title"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">first_year</span> <span class="o">=</span> <span class="n">first</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"basic"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"year"</span><span class="p">)</span>
+        <span class="n">first_authors</span> <span class="o">=</span> <span class="n">first</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"basic"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"authors"</span><span class="p">,</span> <span class="p">[])</span>
         <span class="n">first_author_surname</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">first_authors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">if</span> <span class="n">first_authors</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">first_authors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">if</span> <span class="n">first_authors</span> <span class="k">else</span> <span class="s2">""</span>
         <span class="p">)</span>
 
         <span class="k">for</span> <span class="n">metadata</span> <span class="ow">in</span> <span class="n">metadata_list</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
-            <span class="n">title</span> <span class="o">=</span> <span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;basic&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-            <span class="n">year</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;basic&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;year&quot;</span><span class="p">)</span>
-            <span class="n">authors</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;basic&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;authors&quot;</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"basic"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"title"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">year</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"basic"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"year"</span><span class="p">)</span>
+            <span class="n">authors</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"basic"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"authors"</span><span class="p">,</span> <span class="p">[])</span>
             <span class="n">first_author</span> <span class="o">=</span> <span class="n">authors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">first_author</span><span class="p">:</span>
-                <span class="n">author_surname</span> <span class="o">=</span> <span class="n">authors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">if</span> <span class="n">authors</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">author_surname</span> <span class="o">=</span> <span class="n">authors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">if</span> <span class="n">authors</span> <span class="k">else</span> <span class="s2">""</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">author_surname</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">author_surname</span> <span class="o">=</span> <span class="s2">""</span>
 
             <span class="c1"># Year must be exactly the same</span>
             <span class="k">if</span> <span class="n">first_year</span> <span class="o">!=</span> <span class="n">year</span><span class="p">:</span>
@@ -947,19 +947,19 @@
 <div class="viewcode-block" id="ScholarEngine._validate_against_query">
 <a class="viewcode-back" href="../../../api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._validate_against_query">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">_validate_against_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">query_title</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate metadata matches the original query with strict title matching.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Validate metadata matches the original query with strict title matching."""</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">query_title</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">metadata</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
 
-        <span class="n">paper_title</span> <span class="o">=</span> <span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;basic&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">paper_title</span> <span class="o">=</span> <span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"basic"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"title"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">paper_title</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
 
         <span class="n">query_title</span> <span class="o">=</span> <span class="n">query_title</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">normalize_title</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
-            <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[^\w\s]&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
-            <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">"[^\w\s]"</span><span class="p">,</span> <span class="s2">" "</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\s+"</span><span class="p">,</span> <span class="s2">" "</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">text</span>
 
         <span class="n">norm_query</span> <span class="o">=</span> <span class="n">normalize_title</span><span class="p">(</span><span class="n">query_title</span><span class="p">)</span>
@@ -994,11 +994,11 @@
 <div class="viewcode-block" id="ScholarEngine._combine_metadata">
 <a class="viewcode-back" href="../../../api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._combine_metadata">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">_combine_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">engine_results</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Combine metadata with query validation.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Combine metadata with query validation."""</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">engine_results</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-        <span class="n">query_title</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_last_query_title&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">query_title</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"_last_query_title"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">valid_engines</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">engine_name</span><span class="p">,</span> <span class="n">metadata</span> <span class="ow">in</span> <span class="n">engine_results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">metadata</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_against_query</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">query_title</span><span class="p">):</span>
@@ -1007,12 +1007,12 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">valid_engines</span><span class="p">:</span>
             <span class="c1"># Return all engine results without validation if nothing matches</span>
             <span class="c1"># This allows partial enrichment even if title validation fails</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No engines returned matching metadata, using all results&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"No engines returned matching metadata, using all results"</span><span class="p">)</span>
             <span class="n">valid_engines</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">engine_results</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span><span class="p">}</span>
 
         <span class="c1"># If still no valid engines, return empty structure</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">valid_engines</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No engine returned any metadata&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"No engine returned any metadata"</span><span class="p">)</span>
             <span class="k">return</span> <span class="p">{}</span>
 
         <span class="c1"># Start with the first valid engine as base</span>
@@ -1023,12 +1023,12 @@
             <span class="n">base_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_merge_metadata_structures</span><span class="p">(</span><span class="n">base_metadata</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
 
         <span class="c1"># Track all attempted searches</span>
-        <span class="k">if</span> <span class="s2">&quot;system&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">base_metadata</span><span class="p">:</span>
-            <span class="n">base_metadata</span><span class="p">[</span><span class="s2">&quot;system&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="s2">"system"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">base_metadata</span><span class="p">:</span>
+            <span class="n">base_metadata</span><span class="p">[</span><span class="s2">"system"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="k">for</span> <span class="n">engine_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">engines</span><span class="p">:</span>
-            <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;searched_by_</span><span class="si">{</span><span class="n">engine_name</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="n">base_metadata</span><span class="p">[</span><span class="s2">&quot;system&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">engine_name</span> <span class="ow">in</span> <span class="n">valid_engines</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"searched_by_</span><span class="si">{</span><span class="n">engine_name</span><span class="si">}</span><span class="s2">"</span>
+            <span class="n">base_metadata</span><span class="p">[</span><span class="s2">"system"</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">engine_name</span> <span class="ow">in</span> <span class="n">valid_engines</span>
 
         <span class="k">return</span> <span class="n">base_metadata</span></div>
 
@@ -1036,17 +1036,17 @@
 <div class="viewcode-block" id="ScholarEngine._merge_metadata_structures">
 <a class="viewcode-back" href="../../../api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._merge_metadata_structures">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">_merge_metadata_structures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">additional</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Merge two metadata structures with engine priority.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Merge two metadata structures with engine priority."""</span>
         <span class="n">merged</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">engine_priority</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;URL&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
-            <span class="s2">&quot;CrossRefLocal&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-            <span class="s2">&quot;OpenAlexLocal&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-            <span class="s2">&quot;CrossRef&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
-            <span class="s2">&quot;OpenAlex&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
-            <span class="s2">&quot;Semantic_Scholar&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-            <span class="s2">&quot;PubMed&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="s2">&quot;arXiv&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">"URL"</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+            <span class="s2">"CrossRefLocal"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+            <span class="s2">"OpenAlexLocal"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+            <span class="s2">"CrossRef"</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+            <span class="s2">"OpenAlex"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s2">"Semantic_Scholar"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">"PubMed"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">"arXiv"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
         <span class="p">}</span>
 
         <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">section_data</span> <span class="ow">in</span> <span class="n">additional</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -1055,12 +1055,12 @@
                 <span class="k">continue</span>
 
             <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">section_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;_engines&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"_engines"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">continue</span>
 
                 <span class="n">current_value</span> <span class="o">=</span> <span class="n">merged</span><span class="p">[</span><span class="n">section</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-                <span class="n">current_engines</span> <span class="o">=</span> <span class="n">merged</span><span class="p">[</span><span class="n">section</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_engines&quot;</span><span class="p">)</span>
-                <span class="n">new_engines</span> <span class="o">=</span> <span class="n">section_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_engines&quot;</span><span class="p">)</span>
+                <span class="n">current_engines</span> <span class="o">=</span> <span class="n">merged</span><span class="p">[</span><span class="n">section</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_engines"</span><span class="p">)</span>
+                <span class="n">new_engines</span> <span class="o">=</span> <span class="n">section_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_engines"</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_engines</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">new_engines</span><span class="p">:</span>
                     <span class="k">continue</span>
@@ -1068,7 +1068,7 @@
                 <span class="c1"># Initialize engine lists if needed</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">current_engines</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
                     <span class="n">current_engines</span> <span class="o">=</span> <span class="p">[</span><span class="n">current_engines</span><span class="p">]</span> <span class="k">if</span> <span class="n">current_engines</span> <span class="k">else</span> <span class="p">[]</span>
-                    <span class="n">merged</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_engines&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_engines</span>
+                    <span class="n">merged</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_engines"</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_engines</span>
 
                 <span class="c1"># Convert single engine to list</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_engines</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -1078,7 +1078,7 @@
                 <span class="k">if</span> <span class="n">current_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">should_replace</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="k">elif</span> <span class="n">engine_priority</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">new_engines</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">engine_priority</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-                    <span class="n">current_engines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">current_engines</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="mi">0</span>
+                    <span class="n">current_engines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">current_engines</span> <span class="k">else</span> <span class="s2">""</span><span class="p">,</span> <span class="mi">0</span>
                 <span class="p">):</span>
                     <span class="n">should_replace</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">current_value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
@@ -1090,7 +1090,7 @@
 
                 <span class="k">if</span> <span class="n">should_replace</span><span class="p">:</span>
                     <span class="n">merged</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
-                    <span class="n">merged</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_engines&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_engines</span>
+                    <span class="n">merged</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_engines"</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_engines</span>
                 <span class="k">elif</span> <span class="n">current_value</span> <span class="o">==</span> <span class="n">value</span><span class="p">:</span>
                     <span class="c1"># Add new engines to list if value is the same</span>
                     <span class="k">for</span> <span class="n">new_engine</span> <span class="ow">in</span> <span class="n">new_engines</span><span class="p">:</span>
@@ -1102,7 +1102,7 @@
 
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">pprint</span><span class="w"> </span><span class="kn">import</span> <span class="n">pprint</span>
 
@@ -1110,28 +1110,28 @@
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main_async</span><span class="p">():</span>
         <span class="c1"># Query</span>
-        <span class="n">TITLE</span> <span class="o">=</span> <span class="s2">&quot;Attention is All You Need&quot;</span>
-        <span class="n">TITLE</span> <span class="o">=</span> <span class="s2">&quot;Epileptic seizure forecasting with long short-term memory (LSTM) neural networks&quot;</span>
-        <span class="c1"># DOI = &quot;10.1038/nature14539&quot;</span>
+        <span class="n">TITLE</span> <span class="o">=</span> <span class="s2">"Attention is All You Need"</span>
+        <span class="n">TITLE</span> <span class="o">=</span> <span class="s2">"Epileptic seizure forecasting with long short-term memory (LSTM) neural networks"</span>
+        <span class="c1"># DOI = "10.1038/nature14539"</span>
 
         <span class="c1"># Example: Unified Engine</span>
         <span class="n">engine</span> <span class="o">=</span> <span class="n">ScholarEngine</span><span class="p">(</span><span class="n">use_cache</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">outputs</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="c1"># Search by Title</span>
-        <span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;metadata_by_title&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="k">await</span> <span class="n">engine</span><span class="o">.</span><span class="n">search_async</span><span class="p">(</span>
+        <span class="n">outputs</span><span class="p">[</span><span class="s2">"metadata_by_title"</span><span class="p">]</span> <span class="o">=</span> <span class="k">await</span> <span class="n">engine</span><span class="o">.</span><span class="n">search_async</span><span class="p">(</span>
             <span class="n">title</span><span class="o">=</span><span class="n">TITLE</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="c1"># # Search by DOI</span>
-        <span class="c1"># outputs[&quot;metadata_by_doi&quot;] = await engine.search_async(</span>
+        <span class="c1"># outputs["metadata_by_doi"] = await engine.search_async(</span>
         <span class="c1">#     doi=DOI,</span>
         <span class="c1"># )</span>
 
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">outputs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;----------------------------------------&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">"----------------------------------------"</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;----------------------------------------&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">"----------------------------------------"</span><span class="p">)</span>
             <span class="n">pprint</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
             <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 

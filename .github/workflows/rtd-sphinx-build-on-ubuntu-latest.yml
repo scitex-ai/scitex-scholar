@@ -44,6 +44,12 @@ jobs:
         run: |
           rm -rf src/scitex_scholar/_sphinx_html
           cp -rf docs/sphinx/_build/html src/scitex_scholar/_sphinx_html
+          # sphinx-build writes its internal cache to <outdir>/.doctrees, so the
+          # copy above drags it in. It is never served, it is many megabytes of
+          # pickles, and it embeds a verbatim mirror of CPython's own
+          # documentation inventory -- which reintroduces retired-engine
+          # vocabulary into the tree on every build. Drop it.
+          rm -rf src/scitex_scholar/_sphinx_html/.doctrees
           touch src/scitex_scholar/_sphinx_html/.nojekyll
 
       - name: Commit refreshed HTML if it changed (develop push only)

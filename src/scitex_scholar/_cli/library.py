@@ -318,7 +318,7 @@ def library_zotero():
     help="Proceed without confirmation (required for a non-dry-run import).",
 )
 @click.option(
-    "--db", default=None, help="Path to zotero.sqlite (auto-detect if omitted)."
+    "--db", default=None, help="Path to the Zotero database file (auto-detect if omitted)."
 )
 def library_zotero_import(
     project, collection, tags, match_all, include_pdfs, limit, dry_run, yes, db
@@ -439,7 +439,9 @@ def library_zotero_export(project, output_dir, include_pdfs, dry_run, yes):
 
 @library_zotero.command("diff")
 @click.option("--project", default=None, help="Scholar project to compare.")
-@click.option("--db", default=None, help="Path to zotero.sqlite (auto-detect).")
+@click.option(
+    "--db", default=None, help="Path to the Zotero database file (auto-detect)."
+)
 @click.option("--json", "as_json", is_flag=True, help="JSON output.")
 def library_zotero_diff(project, db, as_json):
     """Compare Zotero vs Scholar — show items present in one but not the other.
