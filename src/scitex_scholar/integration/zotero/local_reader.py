@@ -30,7 +30,13 @@ _logger = _slog.getLogger(__name__)
 
 # ── Known Zotero DB paths ─────────────────────────────────────────────────────
 
-_LINUX_PATH = Path("~/Zotero/zotero.sqlite").expanduser()
+# The library filename Zotero itself chooses on disk. Zotero owns this name,
+# not Scholar, so it is stated once here and referenced everywhere else: the
+# auto-detect glob, the "checked these paths" error and the copy-pasteable
+# hint all describe the same single fact about the upstream application.
+_ZOTERO_DB_FILENAME = "zotero.sqlite"
+
+_LINUX_PATH = (Path("~/Zotero") / _ZOTERO_DB_FILENAME).expanduser()
 _WSL_BASE = Path("/mnt/c/Users")
 
 _WSL_ZOTERO_SUBPATHS = ["Zotero", "Documents/Zotero"]
@@ -180,16 +186,18 @@ class ZoteroLocalReader:
             return _LINUX_PATH
         if _WSL_BASE.exists():
             for subpath in _WSL_ZOTERO_SUBPATHS:
-                for candidate in _WSL_BASE.glob(f"*/{subpath}/zotero.sqlite"):
+                for candidate in _WSL_BASE.glob(f"*/{subpath}/{_ZOTERO_DB_FILENAME}"):
                     if candidate.exists():
                         return candidate
         raise FileNotFoundError(
             "No Zotero database found. Checked:\n"
             f"  {_LINUX_PATH}\n"
             + "\n".join(
-                f"  {_WSL_BASE}/*/{sp}/zotero.sqlite" for sp in _WSL_ZOTERO_SUBPATHS
+                f"  {_WSL_BASE}/*/{sp}/{_ZOTERO_DB_FILENAME}"
+                for sp in _WSL_ZOTERO_SUBPATHS
             )
-            + "\nPass db_path explicitly: ZoteroLocalReader(db_path='/path/to/zotero.sqlite')"
+            + "\nPass db_path explicitly: "
+            f"ZoteroLocalReader(db_path='/path/to/{_ZOTERO_DB_FILENAME}')"
         )
 
     def _connect(self) -> sqlite3.Connection:
