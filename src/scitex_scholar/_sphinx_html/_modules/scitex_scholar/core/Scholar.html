@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scitex_scholar.core.Scholar &mdash; SciTeX Scholar v1.4.1</title>
+  <title>scitex_scholar.core.Scholar &mdash; SciTeX Scholar v1.9.0</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=350a9c04"></script>
+      <script src="../../../_static/documentation_options.js?v=c4cb232b"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -238,6 +238,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._save_to_cache"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._save_to_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_async"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_async()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_sync"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.refresh"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.ensure_loaded()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_source"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_source()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_issn"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_issn()</span></code></a></li>
@@ -251,13 +253,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.__init__"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.__init__()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_instance"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_instance()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._is_cache_valid"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._is_cache_valid()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._load_from_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._load_from_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._save_to_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._save_to_cache()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_async"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_async()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_sync"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.refresh"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.ensure_loaded()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_issn_l"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_issn_l()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.normalize"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.normalize()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_abbreviation"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_abbreviation()</span></code></a></li>
@@ -377,7 +378,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../api/citation_graph.html">scitex_scholar.citation_graph</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.__init__"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._auto_detect"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._auto_detect()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.build"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.build()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._create_paper_node"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._create_paper_node()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._build_citation_edges"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._build_citation_edges()</span></code></a></li>
@@ -502,10 +502,10 @@
              
   <h1>Source code for scitex_scholar.core.Scholar</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
-<span class="c1"># Timestamp: &quot;2026-01-24 (ywatanabe)&quot;</span>
+<span class="c1"># Timestamp: "2026-01-24 (ywatanabe)"</span>
 <span class="c1"># File: /home/ywatanabe/proj/scitex-python/src/scitex/scholar/core/Scholar.py</span>
 
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 <span class="sd">Unified Scholar class for scientific literature management.</span>
 
 <span class="sd">This is the main entry point for all scholar functionality, providing:</span>
@@ -513,7 +513,7 @@
 <span class="sd">- Smart defaults</span>
 <span class="sd">- Method chaining</span>
 <span class="sd">- Progressive disclosure of advanced features</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -554,7 +554,7 @@
     <span class="n">PipelineMixin</span><span class="p">,</span>
     <span class="n">ServiceMixin</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Main interface for SciTeX Scholar - scientific literature management made simple.</span>
 
 <span class="sd">    By default, papers are automatically enriched with:</span>
@@ -567,9 +567,9 @@
 <span class="sd">    Basic search with automatic enrichment::</span>
 
 <span class="sd">        scholar = Scholar()</span>
-<span class="sd">        papers = scholar.search(&quot;deep learning neuroscience&quot;)</span>
+<span class="sd">        papers = scholar.search("deep learning neuroscience")</span>
 <span class="sd">        # Papers now have impact_factor and citation_count populated</span>
-<span class="sd">        papers.save(&quot;my_pac.bib&quot;)</span>
+<span class="sd">        papers.save("my_pac.bib")</span>
 
 <span class="sd">    Disable automatic enrichment if needed::</span>
 
@@ -578,26 +578,26 @@
 
 <span class="sd">    Search a specific source::</span>
 
-<span class="sd">        papers = scholar.search(&quot;transformer models&quot;, sources=&#39;arxiv&#39;)</span>
+<span class="sd">        papers = scholar.search("transformer models", sources='arxiv')</span>
 
 <span class="sd">    Advanced workflow::</span>
 
 <span class="sd">        papers = (</span>
-<span class="sd">            scholar.search(&quot;transformer models&quot;, year_min=2020)</span>
+<span class="sd">            scholar.search("transformer models", year_min=2020)</span>
 <span class="sd">                   .filter(min_citations=50)</span>
-<span class="sd">                   .sort_by(&quot;impact_factor&quot;)</span>
-<span class="sd">                   .save(&quot;transformers.bib&quot;)</span>
+<span class="sd">                   .sort_by("impact_factor")</span>
+<span class="sd">                   .save("transformers.bib")</span>
 <span class="sd">        )</span>
 
 <span class="sd">    Local library::</span>
 
-<span class="sd">        scholar._index_local_pdfs(&quot;./my_papers&quot;)</span>
-<span class="sd">        local_papers = scholar.search_local(&quot;attention mechanism&quot;)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        scholar._index_local_pdfs("./my_papers")</span>
+<span class="sd">        local_papers = scholar.search_local("attention mechanism")</span>
+<span class="sd">    """</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Class name for logging.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Class name for logging."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
 
 <div class="viewcode-block" id="Scholar.__init__">
@@ -609,7 +609,7 @@
         <span class="n">project_description</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">browser_mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize Scholar with configuration.</span>
+<span class="w">        </span><span class="sd">"""Initialize Scholar with configuration.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -624,12 +624,12 @@
 <span class="sd">        project_description</span>
 <span class="sd">            Optional description for the project.</span>
 <span class="sd">        browser_mode</span>
-<span class="sd">            Browser mode (``&#39;stealth&#39;``, ``&#39;interactive&#39;``, ``&#39;manual&#39;``).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            Browser mode (``'stealth'``, ``'interactive'``, ``'manual'``).</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">browser_mode</span> <span class="o">=</span> <span class="n">browser_mode</span> <span class="ow">or</span> <span class="s2">&quot;stealth&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser_mode</span> <span class="o">=</span> <span class="n">browser_mode</span> <span class="ow">or</span> <span class="s2">"stealth"</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">project</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="s2">&quot;project&quot;</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">project</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="s2">"project"</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="s2">"default"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">workspace_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">path_manager</span><span class="o">.</span><span class="n">get_workspace_dir</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">project</span><span class="p">:</span>
@@ -639,105 +639,105 @@
         <span class="k">if</span> <span class="n">project</span><span class="p">:</span>
             <span class="n">project_path</span> <span class="o">=</span> <span class="n">library_path</span> <span class="o">/</span> <span class="n">project</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Scholar initialized with project &#39;</span><span class="si">{</span><span class="n">project</span><span class="si">}</span><span class="s2">&#39; at </span><span class="si">{</span><span class="n">project_path</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Scholar initialized with project '</span><span class="si">{</span><span class="n">project</span><span class="si">}</span><span class="s2">' at </span><span class="si">{</span><span class="n">project_path</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Scholar initialized (library: </span><span class="si">{</span><span class="n">library_path</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span></div>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Scholar initialized (library: </span><span class="si">{</span><span class="n">library_path</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span></div>
 </div>
 
 
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Scholar&quot;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Scholar"</span><span class="p">]</span>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">.Paper</span><span class="w"> </span><span class="kn">import</span> <span class="n">Paper</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">.Papers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Papers</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Demonstrate Scholar class usage - Clean API Demo.&quot;&quot;&quot;</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Scholar Module Demo - Clean API&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="sd">"""Demonstrate Scholar class usage - Clean API Demo."""</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Scholar Module Demo - Clean API"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="c1"># 1. Initialize Scholar</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;1. Initialize Scholar&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"1. Initialize Scholar"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"-"</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
         <span class="n">scholar</span> <span class="o">=</span> <span class="n">Scholar</span><span class="p">(</span>
-            <span class="n">project</span><span class="o">=</span><span class="s2">&quot;demo_project&quot;</span><span class="p">,</span>
-            <span class="n">project_description</span><span class="o">=</span><span class="s2">&quot;Demo project for testing Scholar API&quot;</span><span class="p">,</span>
+            <span class="n">project</span><span class="o">=</span><span class="s2">"demo_project"</span><span class="p">,</span>
+            <span class="n">project_description</span><span class="o">=</span><span class="s2">"Demo project for testing Scholar API"</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Scholar initialized&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Project: </span><span class="si">{</span><span class="n">scholar</span><span class="o">.</span><span class="n">project</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Scholar initialized"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Project: </span><span class="si">{</span><span class="n">scholar</span><span class="o">.</span><span class="n">project</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">()</span>
 
         <span class="c1"># 2. Project Management</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;2. Project Management:&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"2. Project Management:"</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">project_dir</span> <span class="o">=</span> <span class="n">scholar</span><span class="o">.</span><span class="n">_create_project_metadata</span><span class="p">(</span>
-                <span class="s2">&quot;neural_networks_2024&quot;</span><span class="p">,</span>
-                <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Collection of neural network papers from 2024&quot;</span><span class="p">,</span>
+                <span class="s2">"neural_networks_2024"</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="s2">"Collection of neural network papers from 2024"</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;   Created project: neural_networks_2024&quot;</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Project directory: </span><span class="si">{</span><span class="n">project_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">"   Created project: neural_networks_2024"</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Project directory: </span><span class="si">{</span><span class="n">project_dir</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
             <span class="n">projects</span> <span class="o">=</span> <span class="n">scholar</span><span class="o">.</span><span class="n">list_projects</span><span class="p">()</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Total projects in library: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">projects</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Total projects in library: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">projects</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="n">projects</span><span class="p">[:</span><span class="mi">3</span><span class="p">]:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;      - </span><span class="si">{</span><span class="n">proj</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">proj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;description&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;No desc&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"      - </span><span class="si">{</span><span class="n">proj</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">proj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'description'</span><span class="p">,</span><span class="w"> </span><span class="s1">'No desc'</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">projects</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;      ... and </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">projects</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">3</span><span class="si">}</span><span class="s2"> more&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"      ... and </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">projects</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">3</span><span class="si">}</span><span class="s2"> more"</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Project management demo skipped: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Project management demo skipped: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">()</span>
 
         <span class="c1"># 3. Library Statistics</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;3. Library Statistics:&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"3. Library Statistics:"</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">stats</span> <span class="o">=</span> <span class="n">scholar</span><span class="o">.</span><span class="n">get_library_statistics</span><span class="p">()</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Total projects: </span><span class="si">{</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;total_projects&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Total papers: </span><span class="si">{</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;total_papers&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Storage usage: </span><span class="si">{</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;storage_mb&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> MB&quot;</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Library path: </span><span class="si">{</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;library_path&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Total projects: </span><span class="si">{</span><span class="n">stats</span><span class="p">[</span><span class="s1">'total_projects'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Total papers: </span><span class="si">{</span><span class="n">stats</span><span class="p">[</span><span class="s1">'total_papers'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Storage usage: </span><span class="si">{</span><span class="n">stats</span><span class="p">[</span><span class="s1">'storage_mb'</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> MB"</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Library path: </span><span class="si">{</span><span class="n">stats</span><span class="p">[</span><span class="s1">'library_path'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Library statistics demo skipped: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Library statistics demo skipped: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">()</span>
 
         <span class="c1"># 4. Working with Papers</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;4. Working with Papers:&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"4. Working with Papers:"</span><span class="p">)</span>
         <span class="n">p1</span> <span class="o">=</span> <span class="n">Paper</span><span class="p">()</span>
-        <span class="n">p1</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Vision Transformer: An Image Is Worth 16x16 Words&quot;</span>
-        <span class="n">p1</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">authors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Dosovitskiy, Alexey&quot;</span><span class="p">,</span> <span class="s2">&quot;Beyer, Lucas&quot;</span><span class="p">]</span>
+        <span class="n">p1</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="s2">"Vision Transformer: An Image Is Worth 16x16 Words"</span>
+        <span class="n">p1</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">authors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Dosovitskiy, Alexey"</span><span class="p">,</span> <span class="s2">"Beyer, Lucas"</span><span class="p">]</span>
         <span class="n">p1</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">basic</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="mi">2021</span>
-        <span class="n">p1</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">publication</span><span class="o">.</span><span class="n">journal</span> <span class="o">=</span> <span class="s2">&quot;ICLR&quot;</span>
-        <span class="n">p1</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">set_doi</span><span class="p">(</span><span class="s2">&quot;10.48550/arXiv.2010.11929&quot;</span><span class="p">)</span>
+        <span class="n">p1</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">publication</span><span class="o">.</span><span class="n">journal</span> <span class="o">=</span> <span class="s2">"ICLR"</span>
+        <span class="n">p1</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">set_doi</span><span class="p">(</span><span class="s2">"10.48550/arXiv.2010.11929"</span><span class="p">)</span>
 
         <span class="n">sample_papers</span> <span class="o">=</span> <span class="p">[</span><span class="n">p1</span><span class="p">]</span>
         <span class="n">papers</span> <span class="o">=</span> <span class="n">Papers</span><span class="p">(</span>
             <span class="n">sample_papers</span><span class="p">,</span>
-            <span class="n">project</span><span class="o">=</span><span class="s2">&quot;neural_networks_2024&quot;</span><span class="p">,</span>
+            <span class="n">project</span><span class="o">=</span><span class="s2">"neural_networks_2024"</span><span class="p">,</span>
             <span class="n">config</span><span class="o">=</span><span class="n">scholar</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Created collection with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">papers</span><span class="p">)</span><span class="si">}</span><span class="s2"> papers&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Created collection with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">papers</span><span class="p">)</span><span class="si">}</span><span class="s2"> papers"</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">()</span>
 
         <span class="c1"># 5. Configuration</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;5. Configuration Management:&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Scholar directory: </span><span class="si">{</span><span class="n">scholar</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">scholar_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Library directory: </span><span class="si">{</span><span class="n">scholar</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_library_project_dir</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"5. Configuration Management:"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Scholar directory: </span><span class="si">{</span><span class="n">scholar</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">scholar_dir</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Library directory: </span><span class="si">{</span><span class="n">scholar</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_library_project_dir</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">()</span>
 
         <span class="c1"># 6. Service Components</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;6. Service Components (Internal):&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Scholar Engine: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">scholar</span><span class="o">.</span><span class="n">_scholar_engine</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Auth Manager: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">scholar</span><span class="o">.</span><span class="n">_auth_manager</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Browser Manager: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">scholar</span><span class="o">.</span><span class="n">_browser_manager</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Library Manager: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">scholar</span><span class="o">.</span><span class="n">_library_manager</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"6. Service Components (Internal):"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Scholar Engine: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">scholar</span><span class="o">.</span><span class="n">_scholar_engine</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Auth Manager: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">scholar</span><span class="o">.</span><span class="n">_auth_manager</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Browser Manager: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">scholar</span><span class="o">.</span><span class="n">_browser_manager</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Library Manager: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">scholar</span><span class="o">.</span><span class="n">_library_manager</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">()</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Scholar demo completed!&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Scholar demo completed!"</span><span class="p">)</span>
 
     <span class="n">main</span><span class="p">()</span>
 

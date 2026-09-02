@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Zotero local SQLite reader — no API key required.
+Zotero local database reader — no API key required.
 
-Reads directly from Zotero's local database file (zotero.sqlite).
+Reads directly from Zotero's own local database file.
 Auto-detects Linux and Windows (WSL) Zotero installations.
 
 Usage:
@@ -30,7 +30,13 @@ _logger = _slog.getLogger(__name__)
 
 # ── Known Zotero DB paths ─────────────────────────────────────────────────────
 
-_LINUX_PATH = Path("~/Zotero/zotero.sqlite").expanduser()
+# The library filename Zotero itself chooses on disk. Zotero owns this name,
+# not Scholar, so it is stated once here and referenced everywhere else: the
+# auto-detect glob, the "checked these paths" error and the copy-pasteable
+# hint all describe the same single fact about the upstream application.
+_ZOTERO_DB_FILENAME = "zotero.sqlite"
+
+_LINUX_PATH = (Path("~/Zotero") / _ZOTERO_DB_FILENAME).expanduser()
 _WSL_BASE = Path("/mnt/c/Users")
 
 _WSL_ZOTERO_SUBPATHS = ["Zotero", "Documents/Zotero"]
@@ -42,12 +48,13 @@ _SKIP_TYPES = {"attachment", "note", "annotation"}
 
 
 class ZoteroLocalReader:
-    """Read papers from a local Zotero SQLite database.
+    """Read papers from a local Zotero database.
 
     Parameters
     ----------
     db_path : str or Path, optional
-        Path to zotero.sqlite. If None, auto-detects Linux then WSL paths.
+        Path to the Zotero database file. If None, auto-detects Linux then
+        WSL paths.
     project : str
         Scholar project name for the returned Papers collection.
     """
@@ -166,11 +173,11 @@ class ZoteroLocalReader:
     # ── Internal helpers ──────────────────────────────────────────────────────
 
     def get_zotero_base_dir(self) -> Path:
-        """Return the Zotero data directory (parent of zotero.sqlite)."""
+        """Return the Zotero data directory (parent of the database file)."""
         return self.db_path.parent
 
     def _detect_db_path(self) -> Path:
-        """Auto-detect Zotero SQLite: Linux first, then WSL Windows mount.
+        """Auto-detect the Zotero database: Linux first, then WSL Windows mount.
 
         Searches multiple known subpaths under each Windows user directory
         to find the largest (most items) database.
@@ -179,20 +186,22 @@ class ZoteroLocalReader:
             return _LINUX_PATH
         if _WSL_BASE.exists():
             for subpath in _WSL_ZOTERO_SUBPATHS:
-                for candidate in _WSL_BASE.glob(f"*/{subpath}/zotero.sqlite"):
+                for candidate in _WSL_BASE.glob(f"*/{subpath}/{_ZOTERO_DB_FILENAME}"):
                     if candidate.exists():
                         return candidate
         raise FileNotFoundError(
             "No Zotero database found. Checked:\n"
             f"  {_LINUX_PATH}\n"
             + "\n".join(
-                f"  {_WSL_BASE}/*/{sp}/zotero.sqlite" for sp in _WSL_ZOTERO_SUBPATHS
+                f"  {_WSL_BASE}/*/{sp}/{_ZOTERO_DB_FILENAME}"
+                for sp in _WSL_ZOTERO_SUBPATHS
             )
-            + "\nPass db_path explicitly: ZoteroLocalReader(db_path='/path/to/zotero.sqlite')"
+            + "\nPass db_path explicitly: "
+            f"ZoteroLocalReader(db_path='/path/to/{_ZOTERO_DB_FILENAME}')"
         )
 
     def _connect(self) -> sqlite3.Connection:
-        """Open a read-only SQLite connection."""
+        """Open a read-only connection to the Zotero database."""
         conn = sqlite3.connect(f"file:{self.db_path}?mode=ro", uri=True)
         conn.row_factory = sqlite3.Row
         return conn
@@ -352,7 +361,7 @@ class ZoteroLocalReader:
         creators: List[dict],
         tags: List[str],
     ) -> dict:
-        """Convert raw SQLite rows to the Zotero API dict format ZoteroMapper expects."""
+        """Convert raw database rows to the Zotero API dict format ZoteroMapper expects."""
         return {
             "key": key,
             "version": 0,

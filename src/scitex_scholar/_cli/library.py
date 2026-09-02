@@ -22,7 +22,24 @@ from pathlib import Path
 
 import click
 
+from ._library_db import (
+    library_db,
+    library_db_audit,
+    library_db_build,
+    library_db_list,
+    library_db_lookup,
+)
+from ._library_shared import default_library_root as _default_library_root
 from ._scaffolding import CONTEXT_SETTINGS, _CategorizedGroup
+
+__all__ = [
+    "library",
+    "library_db",
+    "library_db_audit",
+    "library_db_build",
+    "library_db_list",
+    "library_db_lookup",
+]
 
 # ---------------------------------------------------------------------------
 # Group: library
@@ -221,138 +238,13 @@ def _do_dematerialize(path, target, dry_run, yes):
 
 
 # ----- library db ----------------------------------------------------------
+#
+# The group itself lives in `_library_db.py`. The five names are re-exported
+# here because `_cli_main.py` and `_cli/aliases.py` import them from this
+# module by name to keep the deprecated top-level `db` aliases dispatching to
+# a single implementation.
 
-
-@library.group("db", context_settings=CONTEXT_SETTINGS)
-def library_db() -> None:
-    """Manage the library SQLite index."""
-
-
-def _default_library_root() -> Path:
-    return Path("~/.scitex/scholar/library").expanduser().resolve()
-
-
-@library_db.command("build")
-@click.option("--library-root", default=None, type=click.Path(path_type=Path))
-@click.option("--verbose", is_flag=True)
-@click.option("--dry-run", is_flag=True, help="Print plan without rebuilding.")
-@click.option("--yes", "-y", is_flag=True)
-@click.option("--json", "as_json", is_flag=True)
-def library_db_build(library_root, verbose, dry_run, yes, as_json):
-    """(Re)build the index from MASTER metadata.
-
-    \b
-    Example:
-      $ scitex-scholar library db build --verbose
-    """
-    root = library_root or _default_library_root()
-    if dry_run:
-        click.echo(f"DRY RUN — would (re)build index at {root}")
-        return
-    from ..storage import _library_index as idx
-
-    n = idx.build(root, verbose=verbose)
-    if as_json:
-        click.echo(_json.dumps({"indexed": n, "db_path": str(idx.db_path(root))}))
-    else:
-        click.echo(f"{n} papers indexed at {idx.db_path(root)}")
-
-
-@library_db.command("migrate")
-@click.option("--library-root", default=None, type=click.Path(path_type=Path))
-@click.option("--dry-run", is_flag=True)
-@click.option("--yes", "-y", is_flag=True)
-def library_db_migrate(library_root, dry_run, yes):
-    """Apply pending schema migrations.
-
-    \b
-    Example:
-      $ scitex-scholar library db migrate
-    """
-    root = library_root or _default_library_root()
-    if dry_run:
-        click.echo(f"DRY RUN — would migrate index at {root}")
-        return
-    from ..storage import _library_index as idx
-
-    v = idx.migrate(root)
-    click.echo(f"Schema version: {v}")
-
-
-@library_db.command("lookup")
-@click.option("--library-root", default=None, type=click.Path(path_type=Path))
-@click.option("--doi", default=None)
-@click.option("--paper-id", default=None)
-@click.option("--json", "as_json", is_flag=True, help="JSON output.")
-def library_db_lookup(library_root, doi, paper_id, as_json):
-    """Fetch a paper by DOI or paper_id.
-
-    \b
-    Example:
-      $ scitex-scholar library db lookup --doi 10.1038/nature12373
-    """
-    if not doi and not paper_id:
-        raise click.UsageError("Provide --doi or --paper-id.")
-    if doi and paper_id:
-        raise click.UsageError("--doi and --paper-id are mutually exclusive.")
-
-    root = library_root or _default_library_root()
-    from ..storage import _library_index as idx
-
-    row = (
-        idx.lookup_by_doi(root, doi) if doi else idx.lookup_by_paper_id(root, paper_id)
-    )
-    if row is None:
-        raise click.ClickException("Not found")
-    click.echo(_json.dumps(row, indent=2, default=str))
-
-
-@library_db.command("list")
-@click.option("--library-root", default=None, type=click.Path(path_type=Path))
-@click.option("--limit", type=int, default=20, show_default=True)
-@click.option("--offset", type=int, default=0, show_default=True)
-@click.option("--json", "as_json", is_flag=True, help="JSON output.")
-def library_db_list(library_root, limit, offset, as_json):
-    """List indexed papers.
-
-    \b
-    Example:
-      $ scitex-scholar library db list --limit 5
-    """
-    root = library_root or _default_library_root()
-    from ..storage import _library_index as idx
-
-    rows = idx.list_all(root, limit=limit, offset=offset)
-    if as_json:
-        click.echo(_json.dumps(list(rows), indent=2, default=str))
-        return
-    for r in rows:
-        click.echo(
-            f"{r['paper_id']}\t{r.get('year') or ''}\t{(r.get('title') or '')[:80]}"
-        )
-
-
-@library_db.command("audit")
-@click.option("--library-root", default=None, type=click.Path(path_type=Path))
-@click.option("--json", "as_json", is_flag=True)
-@click.option("--strict", is_flag=True, help="Exit 1 when issues found.")
-def library_db_audit(library_root, as_json, strict):
-    """Report library anomalies (read-only).
-
-    \b
-    Example:
-      $ scitex-scholar library db audit --json
-    """
-    root = library_root or _default_library_root()
-    from ..storage._library_audit import audit, format_report
-
-    report = audit(root)
-    if as_json:
-        click.echo(_json.dumps(report.to_dict(), indent=2, default=str))
-    else:
-        click.echo(format_report(report))
-    if strict and report.has_issues:
-        sys.exit(1)
+library.add_command(library_db)
 
 
 # `reconcile-projects` / `refresh-symlinks` were folded into
@@ -390,7 +282,7 @@ def _save_project_metadata(library_root: Path, project: str, data: dict) -> None
 
 @library.group("zotero", context_settings=CONTEXT_SETTINGS)
 def library_zotero():
-    """Bidirectional Zotero migration (local SQLite, no API key).
+    """Bidirectional Zotero migration (reads the local Zotero library, no API key).
 
     \b
     Import:  Zotero -> Scholar  (papers + collections + tags + PDFs)
@@ -426,7 +318,7 @@ def library_zotero():
     help="Proceed without confirmation (required for a non-dry-run import).",
 )
 @click.option(
-    "--db", default=None, help="Path to zotero.sqlite (auto-detect if omitted)."
+    "--db", default=None, help="Path to the Zotero database file (auto-detect if omitted)."
 )
 def library_zotero_import(
     project, collection, tags, match_all, include_pdfs, limit, dry_run, yes, db
@@ -547,7 +439,9 @@ def library_zotero_export(project, output_dir, include_pdfs, dry_run, yes):
 
 @library_zotero.command("diff")
 @click.option("--project", default=None, help="Scholar project to compare.")
-@click.option("--db", default=None, help="Path to zotero.sqlite (auto-detect).")
+@click.option(
+    "--db", default=None, help="Path to the Zotero database file (auto-detect)."
+)
 @click.option("--json", "as_json", is_flag=True, help="JSON output.")
 def library_zotero_diff(project, db, as_json):
     """Compare Zotero vs Scholar — show items present in one but not the other.

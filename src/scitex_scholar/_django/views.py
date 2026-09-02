@@ -74,20 +74,20 @@ def _make_cache_key(prefix: str, doi: str, **kwargs) -> str:
     return f"cg:{hashlib.md5(':'.join(parts).encode()).hexdigest()}"
 
 
-def _db_path() -> Optional[str]:
-    """Resolve the CrossRef DB path from Django settings."""
-    return getattr(django_settings, "CROSSREF_DB_PATH", None)
+def _api_url() -> Optional[str]:
+    """Resolve the crossref-local HTTP endpoint from Django settings."""
+    return getattr(django_settings, "CROSSREF_API_URL", None)
 
 
 def _get_builder():
-    """Get or create CitationGraphBuilder for the configured DB."""
-    db_path = _db_path()
-    if not db_path:
+    """Get or create CitationGraphBuilder for the configured endpoint."""
+    api_url = _api_url()
+    if not api_url:
         return None
 
     from scitex_scholar.citation_graph import CitationGraphBuilder
 
-    return CitationGraphBuilder(db_path)
+    return CitationGraphBuilder(api_url=api_url)
 
 
 _search_engine = None
@@ -140,12 +140,12 @@ def index(request):
     favicon_href when given one) and drift from the rest of the fleet --
     which is what the removed `_favicon_href()` did.
     """
-    resolved_db = _db_path()
+    resolved_api = _api_url()
     html = render_to_string(
         "scholar/scholar.html",
         {
-            "db_available": resolved_db is not None,
-            "db_path": resolved_db or "Not found",
+            "api_available": resolved_api is not None,
+            "api_url": resolved_api or "Not configured",
             "stx_mount": mount_prefix(request),
             "app_label": _app_label("SciTeX Scholar"),
         },
@@ -156,13 +156,36 @@ def index(request):
 
 @require_GET
 def health(request):
-    """Health check for the Scholar GUI service."""
-    resolved_db = _db_path()
+    """Health check for the Scholar GUI service.
+
+    Reports ``version`` so "is this deployment running what we shipped?" is
+    answerable FROM OUTSIDE, over HTTP, without shell access to the host.
+
+    That question was previously unanswerable by inspection, and the reason is
+    worth recording: nothing scholar serves carried a version at all. Looking for
+    one in the rendered page on 2026-08-23 produced a FALSE POSITIVE instead --
+    the page matched "1.9.0", which turned out to be the substring inside a CDN
+    url for ``highlight.js/11.9.0``. A substring search for a version number will
+    find one on almost any page; it just will not be yours.
+
+    KNOWN LIMITATION, stated because a version that lies is worse than none.
+    ``__version__`` derives from ``importlib.metadata``, whose metadata is
+    written at INSTALL time. For an EDITABLE checkout it therefore reports
+    whatever ``pip install -e`` last recorded, not the code being served -- this
+    repo's own .venv reports 1.5.1 while importing 1.9.0 source. So this field is
+    trustworthy for a DEPLOYED (non-editable) install, which is the case it
+    exists to serve, and must not be trusted in a dev checkout. Verify a dev tree
+    by its import path, never by this number.
+    """
+    from scitex_scholar import __version__
+
+    resolved_api = _api_url()
     return JsonResponse(
         {
             "status": "ok",
-            "db_available": resolved_db is not None,
-            "db_path": resolved_db,
+            "version": __version__,
+            "api_available": resolved_api is not None,
+            "api_url": resolved_api,
         }
     )
 
@@ -203,7 +226,7 @@ def graph_network(request):
     # Build network
     builder = _get_builder()
     if not builder:
-        return JsonResponse({"error": "CrossRef database not configured"}, status=503)
+        return JsonResponse({"error": "CrossRef API not configured"}, status=503)
 
     try:
         graph = builder.build(
@@ -223,8 +246,6 @@ def graph_network(request):
         _cache_set(cache_key, result)
         return JsonResponse(result)
 
-    except FileNotFoundError:
-        return JsonResponse({"error": "CrossRef database not found"}, status=503)
     except Exception as e:
         logger.error(f"Error building network for {doi}: {e}", exc_info=True)
         return JsonResponse({"error": f"Failed to build network: {e}"}, status=500)
@@ -245,7 +266,7 @@ def graph_related(request):
 
     builder = _get_builder()
     if not builder:
-        return JsonResponse({"error": "CrossRef database not configured"}, status=503)
+        return JsonResponse({"error": "CrossRef API not configured"}, status=503)
 
     try:
         graph = builder.build(seed_doi=doi, top_n=limit)
@@ -274,7 +295,7 @@ def graph_paper(request):
 
     builder = _get_builder()
     if not builder:
-        return JsonResponse({"error": "CrossRef database not configured"}, status=503)
+        return JsonResponse({"error": "CrossRef API not configured"}, status=503)
 
     try:
         summary = builder.get_paper_summary(doi)
@@ -290,10 +311,10 @@ def graph_paper(request):
 @require_GET
 def graph_health(request):
     """Health check for citation graph service."""
-    db_path = _db_path()
-    if not db_path:
+    api_url = _api_url()
+    if not api_url:
         return JsonResponse(
-            {"status": "unhealthy", "error": "No database configured"}, status=503
+            {"status": "unhealthy", "error": "No CrossRef API configured"}, status=503
         )
 
     try:
@@ -302,15 +323,15 @@ def graph_health(request):
         return JsonResponse(
             {
                 "status": "healthy" if summary else "degraded",
-                "database": db_path,
-                "database_accessible": True,
+                "api_url": api_url,
+                "api_accessible": True,
             }
         )
     except Exception as e:
         return JsonResponse(
             {
                 "status": "unhealthy",
-                "database": db_path,
+                "api_url": api_url,
                 "error": str(e),
             },
             status=503,

@@ -87,8 +87,12 @@ def gui() -> None:
 @gui.command("open")
 @click.option("--port", default=DEFAULT_PORT, show_default=True, type=int)
 @click.option("--host", default=DEFAULT_HOST, show_default=True)
-@click.option("--db-path", default=None, help="Path to CrossRef SQLite database.")
-def gui_open(port: int, host: str, db_path: Optional[str]) -> None:
+@click.option(
+    "--api-url",
+    default=None,
+    help="crossref-local HTTP endpoint the citation graph queries.",
+)
+def gui_open(port: int, host: str, api_url: Optional[str]) -> None:
     """Open the Scholar GUI in a browser, auto-serving if not already running.
 
     \b
@@ -144,8 +148,8 @@ def gui_open(port: int, host: str, db_path: Optional[str]) -> None:
     log_path = state_path.with_name("gui-serve.log")
     log_path.parent.mkdir(parents=True, exist_ok=True)
     cmd = [sys.executable, "-m", "scitex_scholar", "gui", "serve", "--port", str(port), "--host", host]
-    if db_path:
-        cmd += ["--db-path", db_path]
+    if api_url:
+        cmd += ["--api-url", api_url]
     with open(log_path, "wb") as log_file:
         subprocess.Popen(
             cmd,
@@ -181,13 +185,17 @@ def gui_open(port: int, host: str, db_path: Optional[str]) -> None:
 @gui.command("serve")
 @click.option("--port", default=DEFAULT_PORT, show_default=True, type=int)
 @click.option("--host", default=DEFAULT_HOST, show_default=True)
-@click.option("--db-path", default=None, help="Path to CrossRef SQLite database.")
+@click.option(
+    "--api-url",
+    default=None,
+    help="crossref-local HTTP endpoint the citation graph queries.",
+)
 @click.option(
     "--force",
     is_flag=True,
     help="Stop a previous Scholar GUI -- recorded OR orphaned -- then serve here.",
 )
-def gui_serve(port: int, host: str, db_path: Optional[str], force: bool) -> None:
+def gui_serve(port: int, host: str, api_url: Optional[str], force: bool) -> None:
     """Run the Scholar GUI server in the foreground (headless; Ctrl-C to stop).
 
     \b
@@ -216,7 +224,7 @@ def gui_serve(port: int, host: str, db_path: Optional[str], force: bool) -> None
         host=host,
         force=force,
         run_server=partial(
-            _server.run, port=port, host=host, db_path=db_path, open_browser=False
+            _server.run, port=port, host=host, api_url=api_url, open_browser=False
         ),
         state_path=_state_path(),
     )

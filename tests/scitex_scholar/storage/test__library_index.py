@@ -1,10 +1,27 @@
 #!/usr/bin/env python3
-"""Tests for the library SQLite index."""
+"""Tests for the library index's derivation from MASTER metadata.
+
+WHAT THESE TESTS COVER, AND WHAT THEY DELIBERATELY DO NOT
+---------------------------------------------------------
+The index has two halves. One DERIVES rows from
+``MASTER/<paper_id>/metadata.json`` — identifier normalisation, field
+extraction, duplicate-DOI detection, ordering. The other WRITES those rows
+to :mod:`scitex_dev.store`. All of the logic is in the first half, and it
+is pure, so it is tested here directly.
+
+The store half is not tested here. ``host_store()`` resolves to the fleet
+PostgreSQL and deliberately has no local fallback, and this project's CI runs
+on GitHub-hosted ``ubuntu-latest`` runners that cannot reach it — a test
+touching the store would fail there for a reason that has nothing to do with
+the code under test. Rather than skip it (a skip that always skips reads as
+coverage and is not), the split is explicit: everything below runs
+everywhere, and the round-trip through the store is verified by hand against
+a live store when the index changes.
+"""
 
 from __future__ import annotations
 
 import json
-import sqlite3
 from pathlib import Path
 
 import pytest
@@ -45,373 +62,376 @@ def _write_entry(
     (entry / "metadata.json").write_text(json.dumps(md))
 
 
-def test_build_populates_papers_n_equals_n_2(tmp_path: Path):
+def _by_paper_id(rows: list[dict]) -> dict[str, dict]:
+    return {r["paper_id"]: r for r in rows}
+
+
+# ----- collect_rows --------------------------------------------------------
+
+
+def test_collect_rows_returns_one_row_per_master_entry(tmp_path: Path):
     # Arrange
     _write_entry(tmp_path, "AAA", doi="10.1/aaa", year=2023, title="Alpha")
     _write_entry(tmp_path, "BBB", pmid="123", year=2024, title="Beta")
     # Act
-    n = idx.build(tmp_path)
-    # Act
+    rows = idx.collect_rows(tmp_path)
     # Assert
-    assert n == 2
+    assert len(rows) == 2
 
 
-def test_build_populates_papers_idx_db_path_tmp_path_exists(tmp_path: Path):
-    # Arrange
-    _write_entry(tmp_path, "AAA", doi="10.1/aaa", year=2023, title="Alpha")
-    _write_entry(tmp_path, "BBB", pmid="123", year=2024, title="Beta")
-    # Act
-    n = idx.build(tmp_path)
-    # Act
-    # Assert
-    assert idx.db_path(tmp_path).exists()
-
-
-def test_build_populates_papers_rows_aaa_doi_10_1_aaa(tmp_path: Path):
-    # Arrange
-    _write_entry(tmp_path, "AAA", doi="10.1/aaa", year=2023, title="Alpha")
-    _write_entry(tmp_path, "BBB", pmid="123", year=2024, title="Beta")
-    n = idx.build(tmp_path)
-    conn = sqlite3.connect(idx.db_path(tmp_path))
-    conn.row_factory = sqlite3.Row
-    # Act
-    rows = {r["paper_id"]: dict(r) for r in conn.execute("SELECT * FROM papers")}
-    # Act
-    # Assert
-    assert rows["AAA"]["doi"] == "10.1/aaa"
-
-
-def test_build_populates_papers_rows_bbb_pmid_123(tmp_path: Path):
-    # Arrange
-    _write_entry(tmp_path, "AAA", doi="10.1/aaa", year=2023, title="Alpha")
-    _write_entry(tmp_path, "BBB", pmid="123", year=2024, title="Beta")
-    n = idx.build(tmp_path)
-    conn = sqlite3.connect(idx.db_path(tmp_path))
-    conn.row_factory = sqlite3.Row
-    # Act
-    rows = {r["paper_id"]: dict(r) for r in conn.execute("SELECT * FROM papers")}
-    # Act
-    # Assert
-    assert rows["BBB"]["pmid"] == "123"
-
-
-def test_build_populates_papers_rows_aaa_title_alpha(tmp_path: Path):
-    # Arrange
-    _write_entry(tmp_path, "AAA", doi="10.1/aaa", year=2023, title="Alpha")
-    _write_entry(tmp_path, "BBB", pmid="123", year=2024, title="Beta")
-    n = idx.build(tmp_path)
-    conn = sqlite3.connect(idx.db_path(tmp_path))
-    conn.row_factory = sqlite3.Row
-    # Act
-    rows = {r["paper_id"]: dict(r) for r in conn.execute("SELECT * FROM papers")}
-    # Act
-    # Assert
-    assert rows["AAA"]["title"] == "Alpha"
-
-
-
-
-def test_build_is_idempotent(tmp_path: Path):
-    # Arrange
-    _write_entry(tmp_path, "AAA", doi="10.1/aaa")
-    idx.build(tmp_path)
-    # Act
-    idx.build(tmp_path)  # rebuild, no error
-    # Assert
-    assert idx.lookup_by_doi(tmp_path, "10.1/aaa")["paper_id"] == "AAA"
-
-
-def test_lookup_by_doi_case_insensitive(tmp_path: Path):
+def test_collect_rows_carries_the_doi(tmp_path: Path):
     # Arrange
     _write_entry(tmp_path, "AAA", doi="10.1/aaa")
     # Act
-    idx.build(tmp_path)
+    rows = idx.collect_rows(tmp_path)
     # Assert
-    assert idx.lookup_by_doi(tmp_path, "10.1/AAA") is not None
+    assert _by_paper_id(rows)["AAA"]["doi"] == "10.1/aaa"
 
 
-def test_lookup_missing_returns_none_idx_lookup_by_doi_tmp_path_nope_is_none(tmp_path: Path):
+def test_collect_rows_carries_the_pmid(tmp_path: Path):
     # Arrange
-    _write_entry(tmp_path, "AAA", doi="10.1/aaa")
+    _write_entry(tmp_path, "BBB", pmid="123")
     # Act
-    idx.build(tmp_path)
-    # Act
+    rows = idx.collect_rows(tmp_path)
     # Assert
-    assert idx.lookup_by_doi(tmp_path, "nope") is None
+    assert _by_paper_id(rows)["BBB"]["pmid"] == "123"
 
 
-def test_lookup_missing_returns_none_idx_lookup_by_paper_id_tmp_path_zzz_is_none(tmp_path: Path):
+def test_collect_rows_carries_the_title(tmp_path: Path):
     # Arrange
-    _write_entry(tmp_path, "AAA", doi="10.1/aaa")
+    _write_entry(tmp_path, "AAA", title="Alpha")
     # Act
-    idx.build(tmp_path)
-    # Act
+    rows = idx.collect_rows(tmp_path)
     # Assert
-    assert idx.lookup_by_paper_id(tmp_path, "ZZZ") is None
+    assert _by_paper_id(rows)["AAA"]["title"] == "Alpha"
 
 
+def test_collect_rows_keys_every_row_by_the_resolved_library_root(tmp_path: Path):
+    """``library_root`` is half the record identity, so it must be canonical.
 
-
-def test_list_all_orders_by_year_desc(tmp_path: Path):
+    One store serves every library on the host. If two roots that are the
+    same directory reached by different paths produced different keys, the
+    same paper would occupy two rows and the second build would not replace
+    the first.
+    """
     # Arrange
-    _write_entry(tmp_path, "OLD", doi="10.1/old", year=2010, title="old")
-    _write_entry(tmp_path, "NEW", doi="10.1/new", year=2025, title="new")
-    idx.build(tmp_path)
+    _write_entry(tmp_path, "AAA")
+    indirect = tmp_path / "sub" / ".."
+    indirect.mkdir(parents=True, exist_ok=True)
     # Act
-    rows = idx.list_all(tmp_path)
+    direct_rows = idx.collect_rows(tmp_path)
+    indirect_rows = idx.collect_rows(indirect)
     # Assert
-    assert [r["paper_id"] for r in rows] == ["NEW", "OLD"]
+    assert direct_rows[0]["library_root"] == indirect_rows[0]["library_root"]
 
 
-def test_empty_string_doi_treated_as_null_n_equals_n_3(tmp_path: Path):
-    # Multiple entries with `doi=""` used to raise UNIQUE(doi) in SQLite
-    # (NULL is distinct per unique-index semantics, but empty string is a
-    # real value and collides). Empty should be normalized to NULL so the
-    # index treats "no DOI" consistently regardless of None-vs-"" source.
+def test_collect_rows_prefers_short_journal_for_venue(tmp_path: Path):
     # Arrange
-    _write_entry(tmp_path, "A", doi="", title="alpha")
-    _write_entry(tmp_path, "B", doi="", title="beta")
-    _write_entry(tmp_path, "C", doi="   ", title="whitespace-only")  # also empty
+    entry = tmp_path / "MASTER" / "AAA"
+    entry.mkdir(parents=True)
+    (entry / "metadata.json").write_text(
+        json.dumps(
+            {
+                "metadata": {
+                    "publication": {"journal": "Long Name", "short_journal": "LN"}
+                }
+            }
+        )
+    )
     # Act
-    n = idx.build(tmp_path)
-    # Act
+    rows = idx.collect_rows(tmp_path)
     # Assert
-    assert n == 3
+    assert rows[0]["venue"] == "LN"
 
 
-def test_empty_string_doi_treated_as_null_len_rows_is_3(tmp_path: Path):
-    # Multiple entries with `doi=""` used to raise UNIQUE(doi) in SQLite
-    # (NULL is distinct per unique-index semantics, but empty string is a
-    # real value and collides). Empty should be normalized to NULL so the
-    # index treats "no DOI" consistently regardless of None-vs-"" source.
+def test_collect_rows_skips_unreadable_metadata(tmp_path: Path):
     # Arrange
-    _write_entry(tmp_path, "A", doi="", title="alpha")
-    _write_entry(tmp_path, "B", doi="", title="beta")
-    _write_entry(tmp_path, "C", doi="   ", title="whitespace-only")  # also empty
-    n = idx.build(tmp_path)
+    _write_entry(tmp_path, "GOOD", doi="10.1/good")
+    broken = tmp_path / "MASTER" / "BROKEN"
+    broken.mkdir(parents=True)
+    (broken / "metadata.json").write_text("{not json")
     # Act
-    rows = idx.list_all(tmp_path)
+    rows = idx.collect_rows(tmp_path)
+    # Assert
+    assert [r["paper_id"] for r in rows] == ["GOOD"]
+
+
+def test_collect_rows_requires_master_dir(tmp_path: Path):
+    # Arrange
+    root = tmp_path  # no MASTER/ written
+
     # Act
+    def act():
+        idx.collect_rows(root)
+
+    # Assert
+    with pytest.raises(FileNotFoundError):
+        act()
+
+
+# ----- identifier normalisation -------------------------------------------
+
+
+def test_empty_string_doi_becomes_none(tmp_path: Path):
+    """`""` is not an identifier, and treating it as one merges papers.
+
+    Several library entries legitimately have no DOI. Carrying `""` through
+    makes every one of them look like the same paper.
+    """
+    # Arrange
+    _write_entry(tmp_path, "AAA", doi="")
+    # Act
+    rows = idx.collect_rows(tmp_path)
+    # Assert
+    assert rows[0]["doi"] is None
+
+
+def test_whitespace_only_arxiv_id_becomes_none(tmp_path: Path):
+    # Arrange
+    _write_entry(tmp_path, "AAA", arxiv_id="   ")
+    # Act
+    rows = idx.collect_rows(tmp_path)
+    # Assert
+    assert rows[0]["arxiv_id"] is None
+
+
+def test_several_empty_doi_entries_all_survive(tmp_path: Path):
+    # Arrange
+    _write_entry(tmp_path, "AAA", doi="")
+    _write_entry(tmp_path, "BBB", doi="")
+    _write_entry(tmp_path, "CCC", doi=None)
+    # Act
+    rows = idx.collect_rows(tmp_path)
     # Assert
     assert len(rows) == 3
 
 
-def test_empty_string_doi_treated_as_null_all_r_doi_is_none_for_r_in_rows(tmp_path: Path):
-    # Multiple entries with `doi=""` used to raise UNIQUE(doi) in SQLite
-    # (NULL is distinct per unique-index semantics, but empty string is a
-    # real value and collides). Empty should be normalized to NULL so the
-    # index treats "no DOI" consistently regardless of None-vs-"" source.
+def test_padded_doi_is_stripped(tmp_path: Path):
     # Arrange
-    _write_entry(tmp_path, "A", doi="", title="alpha")
-    _write_entry(tmp_path, "B", doi="", title="beta")
-    _write_entry(tmp_path, "C", doi="   ", title="whitespace-only")  # also empty
-    n = idx.build(tmp_path)
+    _write_entry(tmp_path, "AAA", doi="  10.1/aaa  ")
     # Act
-    rows = idx.list_all(tmp_path)
-    # Act
+    rows = idx.collect_rows(tmp_path)
     # Assert
-    assert all(r["doi"] is None for r in rows)
+    assert rows[0]["doi"] == "10.1/aaa"
 
 
+# ----- duplicate DOIs ------------------------------------------------------
+
+
+def _duplicate_doi_message(root: Path) -> str:
+    """Return the message ``collect_rows`` refuses a duplicated DOI with."""
+    try:
+        idx.collect_rows(root)
+    except ValueError as exc:
+        return str(exc)
+    return ""
 
 
 def test_duplicate_doi_raises(tmp_path: Path):
-    # Two MASTER entries sharing a DOI is library corruption; build() must
-    # fail loudly so the user can fix it, rather than silently drop a paper.
     # Arrange
-    _write_entry(tmp_path, "AAA", doi="10.1/same", title="first")
+    _write_entry(tmp_path, "AAA", doi="10.1/dup")
+    _write_entry(tmp_path, "BBB", doi="10.1/dup")
+
     # Act
-    _write_entry(tmp_path, "BBB", doi="10.1/same", title="second")
+    def act():
+        idx.collect_rows(tmp_path)
+
     # Assert
     with pytest.raises(ValueError, match="Duplicate DOIs"):
-        idx.build(tmp_path)
+        act()
 
 
-def test_duplicate_doi_preserves_existing_db_idx_lookup_by_doi_tmp_path_10_1_aaa_is_not_none(tmp_path: Path):
-    # If a prior build() succeeded and a new duplicate is introduced, the
-    # failing rebuild must not wipe the existing DB (atomic swap).
+def test_duplicate_doi_detection_is_case_insensitive(tmp_path: Path):
     # Arrange
-    _write_entry(tmp_path, "AAA", doi="10.1/aaa")
+    _write_entry(tmp_path, "AAA", doi="10.1/DUP")
+    _write_entry(tmp_path, "BBB", doi="10.1/dup")
+
     # Act
-    idx.build(tmp_path)
-    # Act
+    def act():
+        idx.collect_rows(tmp_path)
+
     # Assert
-    assert idx.lookup_by_doi(tmp_path, "10.1/aaa") is not None
+    with pytest.raises(ValueError, match="Duplicate DOIs"):
+        act()
 
 
-def test_duplicate_doi_preserves_existing_db_raises_valueerror(tmp_path: Path):
-    # If a prior build() succeeded and a new duplicate is introduced, the
-    # failing rebuild must not wipe the existing DB (atomic swap).
+def test_duplicate_doi_message_names_the_first_paper(tmp_path: Path):
     # Arrange
-    _write_entry(tmp_path, "AAA", doi="10.1/aaa")
-    idx.build(tmp_path)
+    _write_entry(tmp_path, "AAA", doi="10.1/dup")
+    _write_entry(tmp_path, "BBB", doi="10.1/dup")
     # Act
-    _write_entry(tmp_path, "BBB", doi="10.1/aaa")
-    # Act
+    message = _duplicate_doi_message(tmp_path)
     # Assert
-    with pytest.raises(ValueError):
-        idx.build(tmp_path)
+    assert "AAA" in message
 
 
-def test_duplicate_doi_preserves_existing_db_idx_lookup_by_doi_tmp_path_10_1_aaa_is_not_none(tmp_path: Path):
-    # If a prior build() succeeded and a new duplicate is introduced, the
-    # failing rebuild must not wipe the existing DB (atomic swap).
+def test_duplicate_doi_message_names_the_second_paper(tmp_path: Path):
     # Arrange
-    _write_entry(tmp_path, "AAA", doi="10.1/aaa")
-    idx.build(tmp_path)
+    _write_entry(tmp_path, "AAA", doi="10.1/dup")
+    _write_entry(tmp_path, "BBB", doi="10.1/dup")
     # Act
-    _write_entry(tmp_path, "BBB", doi="10.1/aaa")
-    # Act
+    message = _duplicate_doi_message(tmp_path)
     # Assert
-    assert idx.lookup_by_doi(tmp_path, "10.1/aaa") is not None
+    assert "BBB" in message
 
 
+def test_duplicate_doi_is_detected_before_any_row_is_written(tmp_path: Path):
+    """A corrupt library must not be able to damage rows already indexed.
 
-
-def test_build_populates_enriched_fields_row_is_not_none(tmp_path: Path):
+    ``build()`` calls ``collect_rows()`` first and only opens the store
+    afterwards, so this raising BEFORE returning any rows is what makes the
+    previous index survive a failed rebuild.
+    """
     # Arrange
-    _write_entry(
-        tmp_path,
-        "AAA",
-        doi="10.1/aaa",
-        authors=["Alice", "Bob"],
-        abstract="Summary text.",
-        citation_count=42,
-    )
-    idx.build(tmp_path)
+    _write_entry(tmp_path, "AAA", doi="10.1/dup")
+    _write_entry(tmp_path, "BBB", doi="10.1/dup")
     # Act
-    row = idx.lookup_by_doi(tmp_path, "10.1/aaa")
-    # Act
+    raised = None
+    try:
+        idx.collect_rows(tmp_path)
+    except ValueError as exc:
+        raised = exc
     # Assert
-    assert row is not None
+    assert raised is not None
 
 
-def test_build_populates_enriched_fields_json_loads_row_authors_json_alice_bob(tmp_path: Path):
+# ----- enriched fields -----------------------------------------------------
+
+
+def test_authors_round_trip_as_a_json_array(tmp_path: Path):
     # Arrange
-    _write_entry(
-        tmp_path,
-        "AAA",
-        doi="10.1/aaa",
-        authors=["Alice", "Bob"],
-        abstract="Summary text.",
-        citation_count=42,
-    )
-    idx.build(tmp_path)
+    _write_entry(tmp_path, "AAA", authors=["Alice", "Bob"])
     # Act
-    row = idx.lookup_by_doi(tmp_path, "10.1/aaa")
-    # Act
+    rows = idx.collect_rows(tmp_path)
     # Assert
-    assert json.loads(row["authors_json"]) == ["Alice", "Bob"]
+    assert json.loads(rows[0]["authors_json"]) == ["Alice", "Bob"]
 
 
-def test_build_populates_enriched_fields_row_abstract_summary_text(tmp_path: Path):
+def test_abstract_is_carried(tmp_path: Path):
     # Arrange
-    _write_entry(
-        tmp_path,
-        "AAA",
-        doi="10.1/aaa",
-        authors=["Alice", "Bob"],
-        abstract="Summary text.",
-        citation_count=42,
-    )
-    idx.build(tmp_path)
+    _write_entry(tmp_path, "AAA", abstract="An abstract.")
     # Act
-    row = idx.lookup_by_doi(tmp_path, "10.1/aaa")
-    # Act
+    rows = idx.collect_rows(tmp_path)
     # Assert
-    assert row["abstract"] == "Summary text."
+    assert rows[0]["abstract"] == "An abstract."
 
 
-def test_build_populates_enriched_fields_row_citation_count_42(tmp_path: Path):
+def test_citation_count_is_carried(tmp_path: Path):
     # Arrange
-    _write_entry(
-        tmp_path,
-        "AAA",
-        doi="10.1/aaa",
-        authors=["Alice", "Bob"],
-        abstract="Summary text.",
-        citation_count=42,
-    )
-    idx.build(tmp_path)
+    _write_entry(tmp_path, "AAA", citation_count=42)
     # Act
-    row = idx.lookup_by_doi(tmp_path, "10.1/aaa")
-    # Act
+    rows = idx.collect_rows(tmp_path)
     # Assert
-    assert row["citation_count"] == 42
+    assert rows[0]["citation_count"] == 42
 
 
-
-
-def test_build_null_enriched_fields_when_absent_row_is_not_none(tmp_path: Path):
+def test_authors_absent_yields_none(tmp_path: Path):
     # Arrange
-    _write_entry(tmp_path, "AAA", doi="10.1/aaa")
-    idx.build(tmp_path)
+    _write_entry(tmp_path, "AAA")
     # Act
-    row = idx.lookup_by_doi(tmp_path, "10.1/aaa")
-    # Act
+    rows = idx.collect_rows(tmp_path)
     # Assert
-    assert row is not None
+    assert rows[0]["authors_json"] is None
 
 
-def test_build_null_enriched_fields_when_absent_row_authors_json_is_none(tmp_path: Path):
+def test_abstract_absent_yields_none(tmp_path: Path):
     # Arrange
-    _write_entry(tmp_path, "AAA", doi="10.1/aaa")
-    idx.build(tmp_path)
+    _write_entry(tmp_path, "AAA")
     # Act
-    row = idx.lookup_by_doi(tmp_path, "10.1/aaa")
-    # Act
+    rows = idx.collect_rows(tmp_path)
     # Assert
-    assert row["authors_json"] is None
+    assert rows[0]["abstract"] is None
 
 
-def test_build_null_enriched_fields_when_absent_row_abstract_is_none(tmp_path: Path):
+def test_citation_count_absent_yields_none(tmp_path: Path):
     # Arrange
-    _write_entry(tmp_path, "AAA", doi="10.1/aaa")
-    idx.build(tmp_path)
+    _write_entry(tmp_path, "AAA")
     # Act
-    row = idx.lookup_by_doi(tmp_path, "10.1/aaa")
-    # Act
+    rows = idx.collect_rows(tmp_path)
     # Assert
-    assert row["abstract"] is None
+    assert rows[0]["citation_count"] is None
 
 
-def test_build_null_enriched_fields_when_absent_row_citation_count_is_none(tmp_path: Path):
+def test_is_oa_absent_yields_none_not_false(tmp_path: Path):
+    """"Unknown" and "not open access" are different answers."""
     # Arrange
-    _write_entry(tmp_path, "AAA", doi="10.1/aaa")
-    idx.build(tmp_path)
+    entry = tmp_path / "MASTER" / "AAA"
+    entry.mkdir(parents=True)
+    (entry / "metadata.json").write_text(json.dumps({"metadata": {"access": {}}}))
     # Act
-    row = idx.lookup_by_doi(tmp_path, "10.1/aaa")
-    # Act
+    rows = idx.collect_rows(tmp_path)
     # Assert
-    assert row["citation_count"] is None
+    assert rows[0]["is_oa"] is None
 
 
-
-
-def test_build_requires_master_dir(tmp_path: Path):
+def test_is_oa_true_becomes_one(tmp_path: Path):
     # Arrange
+    _write_entry(tmp_path, "AAA", is_oa=True)
     # Act
+    rows = idx.collect_rows(tmp_path)
     # Assert
-    with pytest.raises(FileNotFoundError):
-        idx.build(tmp_path)
+    assert rows[0]["is_oa"] == 1
 
 
-def test_migrate_on_fresh_db_creates_schema(tmp_path: Path):
+# ----- ordering ------------------------------------------------------------
+
+
+def test_sort_key_puts_the_newest_year_first():
     # Arrange
-    (tmp_path / "MASTER").mkdir()
+    rows = [{"year": 1999, "title": "old"}, {"year": 2024, "title": "new"}]
     # Act
-    v = idx.migrate(tmp_path)
+    ordered = sorted(rows, key=idx.sort_key)
     # Assert
-    assert v == idx.SCHEMA_VERSION
+    assert [r["title"] for r in ordered] == ["new", "old"]
 
 
-def test_schema_version_persisted(tmp_path: Path):
+def test_sort_key_breaks_year_ties_by_title():
     # Arrange
-    _write_entry(tmp_path, "AAA", doi="10.1/aaa")
-    idx.build(tmp_path)
-    conn = sqlite3.connect(idx.db_path(tmp_path))
-    v = conn.execute("SELECT value FROM meta WHERE key='schema_version'").fetchone()[0]
+    rows = [{"year": 2024, "title": "b"}, {"year": 2024, "title": "a"}]
     # Act
-    conn.close()
+    ordered = sorted(rows, key=idx.sort_key)
     # Assert
-    assert int(v) == idx.SCHEMA_VERSION
+    assert [r["title"] for r in ordered] == ["a", "b"]
+
+
+def test_sort_key_puts_an_unknown_year_last_not_first():
+    """An unknown year is not year zero."""
+    # Arrange
+    rows = [{"year": None, "title": "undated"}, {"year": 1900, "title": "ancient"}]
+    # Act
+    ordered = sorted(rows, key=idx.sort_key)
+    # Assert
+    assert [r["title"] for r in ordered] == ["ancient", "undated"]
+
+
+# ----- schema --------------------------------------------------------------
+
+
+def test_schema_declares_every_field_the_rows_carry(tmp_path: Path):
+    """A row field the schema does not declare is a hard error on write.
+
+    ``Store.put`` raises on an undeclared field rather than dropping it, so
+    a mismatch between what ``collect_rows`` produces and what ``schema()``
+    declares stops a rebuild outright. Catching it here is cheaper than
+    catching it against a live store.
+    """
+    # Arrange
+    pytest.importorskip("scitex_dev.store")
+    _write_entry(tmp_path, "AAA", doi="10.1/aaa", authors=["Alice"], abstract="a")
+    # Act
+    declared = set(idx.schema().fields)
+    produced = set(idx.collect_rows(tmp_path)[0])
+    # Assert
+    assert produced == declared
+
+
+def test_schema_identity_is_library_root_plus_paper_id():
+    # Arrange
+    pytest.importorskip("scitex_dev.store")
+    # Act
+    identity = list(idx.schema().identity_fields)
+    # Assert
+    assert identity == ["library_root", "paper_id"]
+
+
+# EOF

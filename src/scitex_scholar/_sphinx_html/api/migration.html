@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scitex_scholar.migration &mdash; SciTeX Scholar v1.4.1</title>
+  <title>scitex_scholar.migration &mdash; SciTeX Scholar v1.9.0</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=350a9c04"></script>
+      <script src="../_static/documentation_options.js?v=c4cb232b"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -241,6 +241,8 @@
 <li class="toctree-l3"><a class="reference internal" href="core.html#scitex_scholar.core.OASourcesCache._save_to_cache"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._save_to_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_async"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_async()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_sync"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core.html#scitex_scholar.core.OASourcesCache._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core.html#scitex_scholar.core.OASourcesCache.refresh"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="core.html#scitex_scholar.core.OASourcesCache.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.ensure_loaded()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="core.html#scitex_scholar.core.OASourcesCache.is_oa_source"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_source()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="core.html#scitex_scholar.core.OASourcesCache.is_oa_issn"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_issn()</span></code></a></li>
@@ -254,13 +256,12 @@
 <li class="toctree-l2"><a class="reference internal" href="core.html#scitex_scholar.core.JournalNormalizer"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="core.html#scitex_scholar.core.JournalNormalizer.__init__"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.__init__()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="core.html#scitex_scholar.core.JournalNormalizer.get_instance"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_instance()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="core.html#scitex_scholar.core.JournalNormalizer._is_cache_valid"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._is_cache_valid()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="core.html#scitex_scholar.core.JournalNormalizer._load_from_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._load_from_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="core.html#scitex_scholar.core.JournalNormalizer._save_to_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._save_to_cache()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_async"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_async()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_sync"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core.html#scitex_scholar.core.JournalNormalizer._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core.html#scitex_scholar.core.JournalNormalizer.refresh"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="core.html#scitex_scholar.core.JournalNormalizer.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.ensure_loaded()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="core.html#scitex_scholar.core.JournalNormalizer.get_issn_l"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_issn_l()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="core.html#scitex_scholar.core.JournalNormalizer.normalize"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.normalize()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="core.html#scitex_scholar.core.JournalNormalizer.get_abbreviation"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_abbreviation()</span></code></a></li>
@@ -380,7 +381,6 @@
 <li class="toctree-l1"><a class="reference internal" href="citation_graph.html">scitex_scholar.citation_graph</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.__init__"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._auto_detect"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._auto_detect()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.build"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.build()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._create_paper_node"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._create_paper_node()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._build_citation_edges"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._build_citation_edges()</span></code></a></li>
@@ -495,7 +495,7 @@
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">scitex_scholar.migration</li>
       <li class="wy-breadcrumbs-aside">
-              <a href="https://github.com/ywatanabe1989/scitex-scholar/blob/develop/docs/sphinx/api/migration.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/scitex-ai/scitex-scholar/blob/develop/docs/sphinx/api/migration.rst" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul>
   <hr/>
@@ -511,8 +511,8 @@ Export: Convert CitationGraph to BibTeX/JSON importable by CP web UI.</p>
 <p>Usage:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">scitex_scholar.migration</span><span class="w"> </span><span class="kn">import</span> <span class="n">from_connected_papers</span><span class="p">,</span> <span class="n">to_connected_papers</span>
 
-<span class="n">result</span> <span class="o">=</span> <span class="n">from_connected_papers</span><span class="p">(</span><span class="s2">&quot;649def34f8be52c8b66281af98ae884c09aef38b&quot;</span><span class="p">)</span>
-<span class="n">result</span> <span class="o">=</span> <span class="n">to_connected_papers</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s2">&quot;./export&quot;</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">from_connected_papers</span><span class="p">(</span><span class="s2">"649def34f8be52c8b66281af98ae884c09aef38b"</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">to_connected_papers</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s2">"./export"</span><span class="p">)</span>
 </pre></div>
 </div>
 <dl class="py function">
@@ -522,11 +522,11 @@ Export: Convert CitationGraph to BibTeX/JSON importable by CP web UI.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>paper_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Semantic Scholar paper ID (40-char SHA) for the seed paper.</p></li>
-<li><p><strong>cp_api_key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Connected Papers API key.</p></li>
-<li><p><strong>s2_api_key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Semantic Scholar API key for DOI resolution.</p></li>
-<li><p><strong>output_format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – “citation_graph” returns CitationGraph, “papers” returns Papers.</p></li>
-<li><p><strong>dry_run</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, fetch and report stats without creating objects.</p></li>
+<li><p><strong>paper_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Semantic Scholar paper ID (40-char SHA) for the seed paper.</p></li>
+<li><p><strong>cp_api_key</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>) – Connected Papers API key.</p></li>
+<li><p><strong>s2_api_key</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>) – Semantic Scholar API key for DOI resolution.</p></li>
+<li><p><strong>output_format</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – “citation_graph” returns CitationGraph, “papers” returns Papers.</p></li>
+<li><p><strong>dry_run</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – If True, fetch and report stats without creating objects.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -534,7 +534,7 @@ Export: Convert CitationGraph to BibTeX/JSON importable by CP web UI.</p>
 {success: False, error: str}.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -547,14 +547,14 @@ Export: Convert CitationGraph to BibTeX/JSON importable by CP web UI.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>graph</strong> (<a class="reference internal" href="citation_graph.html#scitex_scholar.citation_graph.CitationGraph" title="scitex_scholar.citation_graph.CitationGraph"><em>CitationGraph</em></a>) – Citation graph to export.</p></li>
-<li><p><strong>output</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> or </em><em>Path</em><em>, </em><em>optional</em>) – Output directory. Defaults to current directory.</p></li>
+<li><p><strong>output</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]</span>) – Output directory. Defaults to current directory.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>{success, bibtex_path, json_path, paper_count} or {success: False, error}.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
 </dd>
 </dl>
 </dd></dl>

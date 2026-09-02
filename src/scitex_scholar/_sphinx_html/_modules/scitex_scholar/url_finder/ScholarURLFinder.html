@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scitex_scholar.url_finder.ScholarURLFinder &mdash; SciTeX Scholar v1.4.1</title>
+  <title>scitex_scholar.url_finder.ScholarURLFinder &mdash; SciTeX Scholar v1.9.0</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=350a9c04"></script>
+      <script src="../../../_static/documentation_options.js?v=c4cb232b"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -238,6 +238,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._save_to_cache"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._save_to_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_async"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_async()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_sync"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.refresh"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.ensure_loaded()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_source"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_source()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_issn"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_issn()</span></code></a></li>
@@ -251,13 +253,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.__init__"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.__init__()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_instance"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_instance()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._is_cache_valid"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._is_cache_valid()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._load_from_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._load_from_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._save_to_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._save_to_cache()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_async"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_async()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_sync"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.refresh"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.ensure_loaded()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_issn_l"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_issn_l()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.normalize"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.normalize()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_abbreviation"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_abbreviation()</span></code></a></li>
@@ -377,7 +378,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../api/citation_graph.html">scitex_scholar.citation_graph</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.__init__"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._auto_detect"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._auto_detect()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.build"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.build()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._create_paper_node"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._create_paper_node()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._build_citation_edges"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._build_citation_edges()</span></code></a></li>
@@ -503,22 +503,22 @@
   <h1>Source code for scitex_scholar.url_finder.ScholarURLFinder</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="c1"># Timestamp: &quot;2025-10-26 17:04:54 (ywatanabe)&quot;</span>
+<span class="c1"># Timestamp: "2025-10-26 17:04:54 (ywatanabe)"</span>
 <span class="c1"># File: /home/ywatanabe/proj/scitex-code/src/scitex/scholar/url_finder/ScholarURLFinder.py</span>
 <span class="c1"># ----------------------------------------</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
-<span class="n">__FILE__</span> <span class="o">=</span> <span class="s2">&quot;./src/scitex/scholar/url_finder/ScholarURLFinder.py&quot;</span>
+<span class="n">__FILE__</span> <span class="o">=</span> <span class="s2">"./src/scitex/scholar/url_finder/ScholarURLFinder.py"</span>
 <span class="n">__DIR__</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__FILE__</span><span class="p">)</span>
 <span class="c1"># ----------------------------------------</span>
 
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 <span class="sd">ScholarURLFinder - Find PDF URLs from web pages.</span>
 
 <span class="sd">Simple, focused responsibility: Given a page or URL, find PDF URLs.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">asynccontextmanager</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
@@ -544,28 +544,28 @@
 <span class="n">STRATEGIES</span> <span class="o">=</span> <span class="p">[</span>
     <span class="c1"># 1. Zotero translators (most reliable)</span>
     <span class="p">{</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Python Zotero Translators&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;function&quot;</span><span class="p">:</span> <span class="n">find_pdf_urls_by_zotero_translators</span><span class="p">,</span>
-        <span class="s2">&quot;source_label&quot;</span><span class="p">:</span> <span class="s2">&quot;zotero_translator&quot;</span><span class="p">,</span>
+        <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Python Zotero Translators"</span><span class="p">,</span>
+        <span class="s2">"function"</span><span class="p">:</span> <span class="n">find_pdf_urls_by_zotero_translators</span><span class="p">,</span>
+        <span class="s2">"source_label"</span><span class="p">:</span> <span class="s2">"zotero_translator"</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="c1"># 2. Direct links (combined: href + dropdown)</span>
     <span class="p">{</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Direct Links&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;function&quot;</span><span class="p">:</span> <span class="n">find_pdf_urls_by_direct_links</span><span class="p">,</span>
-        <span class="s2">&quot;source_label&quot;</span><span class="p">:</span> <span class="s2">&quot;direct_link&quot;</span><span class="p">,</span>
+        <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Direct Links"</span><span class="p">,</span>
+        <span class="s2">"function"</span><span class="p">:</span> <span class="n">find_pdf_urls_by_direct_links</span><span class="p">,</span>
+        <span class="s2">"source_label"</span><span class="p">:</span> <span class="s2">"direct_link"</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="c1"># 3. Navigation (Elsevier only)</span>
     <span class="p">{</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Navigation&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;function&quot;</span><span class="p">:</span> <span class="n">find_pdf_urls_by_navigation</span><span class="p">,</span>
-        <span class="s2">&quot;source_label&quot;</span><span class="p">:</span> <span class="s2">&quot;navigation&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;publisher_filter&quot;</span><span class="p">:</span> <span class="s2">&quot;elsevier&quot;</span><span class="p">,</span>  <span class="c1"># Only for Elsevier domains</span>
+        <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Navigation"</span><span class="p">,</span>
+        <span class="s2">"function"</span><span class="p">:</span> <span class="n">find_pdf_urls_by_navigation</span><span class="p">,</span>
+        <span class="s2">"source_label"</span><span class="p">:</span> <span class="s2">"navigation"</span><span class="p">,</span>
+        <span class="s2">"publisher_filter"</span><span class="p">:</span> <span class="s2">"elsevier"</span><span class="p">,</span>  <span class="c1"># Only for Elsevier domains</span>
     <span class="p">},</span>
     <span class="c1"># 4. Publisher patterns (fallback)</span>
     <span class="p">{</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Publisher Patterns&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;function&quot;</span><span class="p">:</span> <span class="n">find_pdf_urls_by_publisher_patterns</span><span class="p">,</span>
-        <span class="s2">&quot;source_label&quot;</span><span class="p">:</span> <span class="s2">&quot;publisher_pattern&quot;</span><span class="p">,</span>
+        <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Publisher Patterns"</span><span class="p">,</span>
+        <span class="s2">"function"</span><span class="p">:</span> <span class="n">find_pdf_urls_by_publisher_patterns</span><span class="p">,</span>
+        <span class="s2">"source_label"</span><span class="p">:</span> <span class="s2">"publisher_pattern"</span><span class="p">,</span>
     <span class="p">},</span>
 <span class="p">]</span>
 
@@ -575,14 +575,14 @@
 <div class="viewcode-block" id="ScholarURLFinder">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.ScholarURLFinder">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ScholarURLFinder</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find PDF URLs from web pages.</span>
+<span class="w">    </span><span class="sd">"""Find PDF URLs from web pages.</span>
 
 <span class="sd">    Simple, focused responsibility:</span>
 <span class="sd">    - Input: Page or URL string</span>
 <span class="sd">    - Output: List of PDF URLs</span>
 
 <span class="sd">    Authentication/DOI resolution should be handled BEFORE calling this.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">PAGE_LOAD_TIMEOUT</span> <span class="o">=</span> <span class="mi">30_000</span>
 
@@ -608,15 +608,15 @@
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">find_pdf_urls</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">page_or_url</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Page</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">base_url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find PDF URLs from page or URL string.</span>
+<span class="w">        </span><span class="sd">"""Find PDF URLs from page or URL string.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            page_or_url: Playwright Page object or URL string</span>
 <span class="sd">            base_url: Optional base URL for the page</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            List of PDF URL dicts: [{&quot;url&quot;: &quot;...&quot;, &quot;source&quot;: &quot;zotero_translator&quot;}]</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            List of PDF URL dicts: [{"url": "...", "source": "zotero_translator"}]</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">page_or_url</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_from_url_string</span><span class="p">(</span><span class="n">page_or_url</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -632,40 +632,40 @@
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_find_pdf_urls_with_strategies</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">:</span> <span class="n">Page</span><span class="p">,</span> <span class="n">base_url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Try strategies in priority order.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Try strategies in priority order."""</span>
         <span class="n">base_url</span> <span class="o">=</span> <span class="n">base_url</span> <span class="ow">or</span> <span class="n">page</span><span class="o">.</span><span class="n">url</span>
         <span class="n">n_strategies</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">STRATEGIES</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">i_strategy</span><span class="p">,</span> <span class="n">strategy</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">STRATEGIES</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
             <span class="c1"># Check if strategy should run for this URL</span>
-            <span class="n">publisher_filter</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;publisher_filter&quot;</span><span class="p">)</span>
+            <span class="n">publisher_filter</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"publisher_filter"</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">publisher_filter</span> <span class="ow">and</span> <span class="n">publisher_filter</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">base_url</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
                 <span class="c1"># logger.debug(</span>
-                <span class="c1">#     f&quot;{self.name}: Skipping {strategy[&#39;name&#39;]} (filtered)&quot;</span>
+                <span class="c1">#     f"{self.name}: Skipping {strategy['name']} (filtered)"</span>
                 <span class="c1"># )</span>
                 <span class="k">continue</span>
 
             <span class="c1"># Log progress</span>
             <span class="k">await</span> <span class="n">browser_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
                 <span class="n">page</span><span class="p">,</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">i_strategy</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">n_strategies</span><span class="si">}</span><span class="s2"> Trying </span><span class="si">{</span><span class="n">strategy</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">i_strategy</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">n_strategies</span><span class="si">}</span><span class="s2"> Trying </span><span class="si">{</span><span class="n">strategy</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
             <span class="p">)</span>
 
             <span class="k">try</span><span class="p">:</span>
                 <span class="c1"># Execute strategy</span>
-                <span class="n">urls</span> <span class="o">=</span> <span class="k">await</span> <span class="n">strategy</span><span class="p">[</span><span class="s2">&quot;function&quot;</span><span class="p">](</span><span class="n">page</span><span class="p">,</span> <span class="n">base_url</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+                <span class="n">urls</span> <span class="o">=</span> <span class="k">await</span> <span class="n">strategy</span><span class="p">[</span><span class="s2">"function"</span><span class="p">](</span><span class="n">page</span><span class="p">,</span> <span class="n">base_url</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">urls</span><span class="p">:</span>
-                    <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_as_pdf_dicts</span><span class="p">(</span><span class="n">urls</span><span class="p">,</span> <span class="n">strategy</span><span class="p">[</span><span class="s2">&quot;source_label&quot;</span><span class="p">])</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_as_pdf_dicts</span><span class="p">(</span><span class="n">urls</span><span class="p">,</span> <span class="n">strategy</span><span class="p">[</span><span class="s2">"source_label"</span><span class="p">])</span>
                     <span class="k">await</span> <span class="n">browser_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
                         <span class="n">page</span><span class="p">,</span>
-                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: ✓ </span><span class="si">{</span><span class="n">strategy</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> URLs&quot;</span><span class="p">,</span>
+                        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: ✓ </span><span class="si">{</span><span class="n">strategy</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span><span class="si">}</span><span class="s2"> found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> URLs"</span><span class="p">,</span>
                     <span class="p">)</span>
                     <span class="k">return</span> <span class="n">result</span>
 
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="k">await</span> <span class="n">browser_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                    <span class="n">page</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">strategy</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="n">page</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">strategy</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span><span class="si">}</span><span class="s2"> failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span>
                 <span class="p">)</span>
                 <span class="k">continue</span>
 
@@ -675,7 +675,7 @@
 <div class="viewcode-block" id="ScholarURLFinder._extract_doi">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.ScholarURLFinder._extract_doi">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">_extract_doi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extract DOI from string if present.</span>
+<span class="w">        </span><span class="sd">"""Extract DOI from string if present.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            url: URL string or DOI</span>
@@ -684,33 +684,33 @@
 <span class="sd">            DOI string if found, None otherwise</span>
 
 <span class="sd">        Examples:</span>
-<span class="sd">            &gt;&gt;&gt; _extract_doi(&quot;10.1038/nature12345&quot;)</span>
-<span class="sd">            &quot;10.1038/nature12345&quot;</span>
-<span class="sd">            &gt;&gt;&gt; _extract_doi(&quot;doi:10.1038/nature12345&quot;)</span>
-<span class="sd">            &quot;10.1038/nature12345&quot;</span>
-<span class="sd">            &gt;&gt;&gt; _extract_doi(&quot;https://example.com&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; _extract_doi("10.1038/nature12345")</span>
+<span class="sd">            "10.1038/nature12345"</span>
+<span class="sd">            &gt;&gt;&gt; _extract_doi("doi:10.1038/nature12345")</span>
+<span class="sd">            "10.1038/nature12345"</span>
+<span class="sd">            &gt;&gt;&gt; _extract_doi("https://example.com")</span>
 <span class="sd">            None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 
         <span class="n">url</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
         <span class="c1"># Already a valid URL - not a DOI</span>
-        <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="s2">&quot;http://&quot;</span><span class="p">,</span> <span class="s2">&quot;https://&quot;</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="s2">"http://"</span><span class="p">,</span> <span class="s2">"https://"</span><span class="p">)):</span>
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="c1"># Remove common DOI prefixes</span>
-        <span class="n">doi_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;^(?:doi:\s*|DOI:\s*)?(.+)$&quot;</span>
+        <span class="n">doi_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">"^(?:doi:\s*|DOI:\s*)?(.+)$"</span>
         <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">doi_pattern</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
             <span class="n">potential_doi</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
             <span class="c1"># Check if it looks like a DOI (starts with 10.)</span>
-            <span class="k">if</span> <span class="n">potential_doi</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;10.&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">potential_doi</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"10."</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">potential_doi</span>
 
-        <span class="c1"># If it starts with 10., assume it&#39;s a DOI</span>
-        <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;10.&quot;</span><span class="p">):</span>
+        <span class="c1"># If it starts with 10., assume it's a DOI</span>
+        <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"10."</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">url</span>
 
         <span class="k">return</span> <span class="kc">None</span></div>
@@ -719,47 +719,47 @@
 <div class="viewcode-block" id="ScholarURLFinder._find_from_url_string">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.ScholarURLFinder._find_from_url_string">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_find_from_url_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find PDFs from URL string or DOI.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Find PDFs from URL string or DOI."""</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Browser context required&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Browser context required"</span><span class="p">)</span>
             <span class="k">return</span> <span class="p">[]</span>
 
         <span class="c1"># Check if input is a DOI and resolve it to publisher URL</span>
         <span class="n">doi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_doi</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">doi</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Detected DOI: </span><span class="si">{</span><span class="n">doi</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Detected DOI: </span><span class="si">{</span><span class="n">doi</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_managed_page</span><span class="p">()</span> <span class="k">as</span> <span class="n">page</span><span class="p">:</span>
                 <span class="n">resolved_url</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">openurl_resolver</span><span class="o">.</span><span class="n">resolve_doi</span><span class="p">(</span><span class="n">doi</span><span class="p">,</span> <span class="n">page</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">resolved_url</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Resolved DOI to: </span><span class="si">{</span><span class="n">resolved_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Resolved DOI to: </span><span class="si">{</span><span class="n">resolved_url</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
                     <span class="n">url</span> <span class="o">=</span> <span class="n">resolved_url</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="c1"># Fallback to direct DOI URL (works for open access papers like arXiv)</span>
-                    <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://doi.org/</span><span class="si">{</span><span class="n">doi</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"https://doi.org/</span><span class="si">{</span><span class="n">doi</span><span class="si">}</span><span class="s2">"</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: OpenURL failed, using direct DOI URL: </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: OpenURL failed, using direct DOI URL: </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">"</span>
                     <span class="p">)</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Finding PDFs from URL: </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Finding PDFs from URL: </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_managed_page</span><span class="p">()</span> <span class="k">as</span> <span class="n">page</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span>
                     <span class="n">url</span><span class="p">,</span>
-                    <span class="n">wait_until</span><span class="o">=</span><span class="s2">&quot;domcontentloaded&quot;</span><span class="p">,</span>
+                    <span class="n">wait_until</span><span class="o">=</span><span class="s2">"domcontentloaded"</span><span class="p">,</span>
                     <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">PAGE_LOAD_TIMEOUT</span><span class="p">,</span>
                 <span class="p">)</span>
                 <span class="n">pdfs</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_pdf_urls_with_strategies</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">pdfs</span><span class="p">:</span>
                     <span class="k">await</span> <span class="n">browser_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                        <span class="n">page</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: No PDFs from URL: </span><span class="si">{</span><span class="n">url</span><span class="p">[:</span><span class="mi">50</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="n">page</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: No PDFs from URL: </span><span class="si">{</span><span class="n">url</span><span class="p">[:</span><span class="mi">50</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
                     <span class="p">)</span>
 
                 <span class="k">return</span> <span class="n">pdfs</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="c1"># logger.warning(f&quot;{self.name}: Failed to load page: {e}&quot;)</span>
-                <span class="k">await</span> <span class="n">browser_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">page</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Navigation Error </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="c1"># logger.warning(f"{self.name}: Failed to load page: {e}")</span>
+                <span class="k">await</span> <span class="n">browser_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">page</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Navigation Error </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
                 <span class="k">return</span> <span class="p">[]</span></div>
 
 
@@ -768,17 +768,17 @@
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_find_from_page</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">:</span> <span class="n">Page</span><span class="p">,</span> <span class="n">base_url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find PDFs from existing page.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Find PDFs from existing page."""</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">pdfs</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_pdf_urls_with_strategies</span><span class="p">(</span><span class="n">page</span><span class="p">,</span> <span class="n">base_url</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="n">pdfs</span><span class="p">:</span>
-                <span class="k">await</span> <span class="n">browser_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">page</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: No PDFs on page&quot;</span><span class="p">)</span>
+                <span class="k">await</span> <span class="n">browser_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">page</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: No PDFs on page"</span><span class="p">)</span>
 
             <span class="k">return</span> <span class="n">pdfs</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="c1"># logger.error(f&quot;{self.name}: Error finding PDFs: {e}&quot;)</span>
-            <span class="k">await</span> <span class="n">browser_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">page</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: PDF Search Error </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># logger.error(f"{self.name}: Error finding PDFs: {e}")</span>
+            <span class="k">await</span> <span class="n">browser_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">page</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: PDF Search Error </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="k">return</span> <span class="p">[]</span></div>
 
 
@@ -790,7 +790,7 @@
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.ScholarURLFinder._managed_page">[docs]</a>
     <span class="nd">@asynccontextmanager</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_managed_page</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Context manager for page lifecycle.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Context manager for page lifecycle."""</span>
         <span class="n">page</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">new_page</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">yield</span> <span class="n">page</span>
@@ -799,15 +799,15 @@
                 <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;_managed_page: page.close() failed (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">)&quot;</span>
+                    <span class="sa">f</span><span class="s2">"_managed_page: page.close() failed (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">)"</span>
                 <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ScholarURLFinder._as_pdf_dicts">
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.ScholarURLFinder._as_pdf_dicts">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">_as_pdf_dicts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">urls</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert URL strings to dict format with source.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">[{</span><span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="n">url</span><span class="p">,</span> <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">source</span><span class="p">}</span> <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">urls</span><span class="p">]</span></div>
+<span class="w">        </span><span class="sd">"""Convert URL strings to dict format with source."""</span>
+        <span class="k">return</span> <span class="p">[{</span><span class="s2">"url"</span><span class="p">:</span> <span class="n">url</span><span class="p">,</span> <span class="s2">"source"</span><span class="p">:</span> <span class="n">source</span><span class="p">}</span> <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">urls</span><span class="p">]</span></div>
 </div>
 
 
@@ -818,27 +818,27 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">parse_args</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse CLI arguments.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Parse CLI arguments."""</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
 
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Find PDF URLs from a publisher page or DOI&quot;</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Find PDF URLs from a publisher page or DOI"</span>
     <span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s2">&quot;--url&quot;</span><span class="p">,</span>
+        <span class="s2">"--url"</span><span class="p">,</span>
         <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;URL or DOI to search for PDFs (e.g., &#39;https://...&#39; or &#39;10.1038/...&#39; or &#39;doi:10.1038/...&#39;)&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">"URL or DOI to search for PDFs (e.g., 'https://...' or '10.1038/...' or 'doi:10.1038/...')"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s2">&quot;--browser-mode&quot;</span><span class="p">,</span>
-        <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;interactive&quot;</span><span class="p">,</span> <span class="s2">&quot;stealth&quot;</span><span class="p">],</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;interactive&quot;</span><span class="p">,</span>
+        <span class="s2">"--browser-mode"</span><span class="p">,</span>
+        <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s2">"interactive"</span><span class="p">,</span> <span class="s2">"stealth"</span><span class="p">],</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"interactive"</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--chrome-profile&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;system_worker_0&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--chrome-profile"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">"system_worker_0"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main_async</span><span class="p">():</span>
@@ -862,38 +862,38 @@
         <span class="n">url_finder</span> <span class="o">=</span> <span class="n">ScholarURLFinder</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
         <span class="n">pdfs</span> <span class="o">=</span> <span class="k">await</span> <span class="n">url_finder</span><span class="o">.</span><span class="n">find_pdf_urls</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">pdfs</span><span class="p">)</span><span class="si">}</span><span class="s2"> PDF URLs:&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">pdfs</span><span class="p">)</span><span class="si">}</span><span class="s2"> PDF URLs:"</span><span class="p">)</span>
         <span class="n">pprint</span><span class="p">(</span><span class="n">pdfs</span><span class="p">)</span>
 
         <span class="k">await</span> <span class="n">browser_manager</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
     <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main_async</span><span class="p">())</span>
 
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 <span class="sd"># With URL</span>
 <span class="sd">python -m scitex_scholar.url_finder.ScholarURLFinder \</span>
-<span class="sd">	--url &quot;https://arxiv.org/abs/2308.09312&quot; \</span>
+<span class="sd">	--url "https://arxiv.org/abs/2308.09312" \</span>
 <span class="sd">	--browser-mode stealth</span>
 
 <span class="sd"># With DOI</span>
 <span class="sd">python -m scitex_scholar.url_finder.ScholarURLFinder \</span>
-<span class="sd">	--url &quot;10.1038/s41598-017-02626-y&quot; \</span>
+<span class="sd">	--url "10.1038/s41598-017-02626-y" \</span>
 <span class="sd">	--browser-mode stealth</span>
 
 <span class="sd"># With doi: prefix</span>
 <span class="sd">python -m scitex_scholar.url_finder.ScholarURLFinder \</span>
-<span class="sd">	--url &quot;doi:10.3389/fnins.2024.1472747&quot; \</span>
+<span class="sd">	--url "doi:10.3389/fnins.2024.1472747" \</span>
 <span class="sd">	--browser-mode stealth</span>
 
 <span class="sd"># No doi prefix</span>
 <span class="sd">python -m scitex_scholar.url_finder.ScholarURLFinder \</span>
-<span class="sd">	--url &quot;10.1016/j.clinph.2024.09.017&quot; \</span>
+<span class="sd">	--url "10.1016/j.clinph.2024.09.017" \</span>
 <span class="sd">	--browser-mode stealth</span>
 
 <span class="sd"># Found 1 PDF URLs:</span>
-<span class="sd"># [{&#39;source&#39;: &#39;zotero_translator&#39;,</span>
-<span class="sd">#   &#39;url&#39;: &#39;https://www.sciencedirect.com/science/article/pii/S1388245724002761/pdfft?download=true&#39;}]</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd"># [{'source': 'zotero_translator',</span>
+<span class="sd">#   'url': 'https://www.sciencedirect.com/science/article/pii/S1388245724002761/pdfft?download=true'}]</span>
+<span class="sd">"""</span>
 
 <span class="c1"># EOF</span>
 </pre></div>

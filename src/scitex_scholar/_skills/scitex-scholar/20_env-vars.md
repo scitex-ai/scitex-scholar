@@ -62,7 +62,6 @@ owning packages and only consumed read-only here.
 | `SCITEX_SCHOLAR_CROSSREF_API_KEY` | CrossRef API key (polite pool). | `—` | string |
 | `SCITEX_SCHOLAR_CROSSREF_API_URL` | CrossRef endpoint override. | api.crossref.org | URL |
 | `SCITEX_SCHOLAR_CROSSREF_EMAIL` | Mailto for CrossRef polite pool. | `—` | string |
-| `SCITEX_SCHOLAR_CROSSREF_DB` | Local crossref-local DB path. | `~/.scitex/scholar/crossref/works.db` | path |
 | `SCITEX_SCHOLAR_CROSSREF_LOCAL_API_URL` | crossref-local HTTP endpoint (citation graph). | http://localhost:8765 | URL |
 | `SCITEX_SCHOLAR_OPENALEX_API_URL` | OpenAlex endpoint override. | api.openalex.org | URL |
 | `SCITEX_SCHOLAR_PUBMED_API_KEY` | PubMed API key. | `—` | string |

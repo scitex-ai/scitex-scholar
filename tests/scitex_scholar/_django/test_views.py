@@ -7,11 +7,12 @@ existed under tests/scitex_scholar/gui/ beyond a smoke-import mirror, so
 this is new coverage written directly against the ported views):
 
   GET /               -> 200, title + favicon link present
-  GET /api/health      -> JSON {"status": "ok", "db_available", "db_path"}
-  GET /api/graph/network   -> 400 without ?doi=, 503 with no DB configured
-  GET /api/graph/related   -> 503 with no DB configured
-  GET /api/graph/paper     -> 503 with no DB configured
-  GET /api/graph/health    -> 503 with no DB configured
+  GET /api/health      -> JSON {"status": "ok", "version", "api_available",
+                                "api_url"}
+  GET /api/graph/network   -> 400 without ?doi=, 503 with no API configured
+  GET /api/graph/related   -> 503 with no API configured
+  GET /api/graph/paper     -> 503 with no API configured
+  GET /api/graph/health    -> 503 with no API configured
 
 Uses Django's `RequestFactory` directly against the view functions
 (bypasses URL routing, same approach as scitex-writer's precedent at
@@ -139,7 +140,11 @@ def test_health_response_shape():
     # Act
     data = json.loads(resp.content)
     # Assert
-    assert set(data.keys()) == {"status", "db_available", "db_path"}
+    # EXACT set, not a subset, on purpose: this is the response CONTRACT, so an
+    # accidentally-added field fails here rather than reaching callers. It did
+    # its job on 2026-08-23 -- adding "version" broke this test before it broke
+    # anyone else, which is the whole point of asserting equality.
+    assert set(data.keys()) == {"status", "version", "api_available", "api_url"}
 
 
 def test_graph_network_requires_doi_param():
@@ -152,8 +157,8 @@ def test_graph_network_requires_doi_param():
     assert resp.status_code == 400
 
 
-@override_settings(CROSSREF_DB_PATH=None)
-def test_graph_network_returns_503_with_no_db_configured():
+@override_settings(CROSSREF_API_URL=None)
+def test_graph_network_returns_503_with_no_api_configured():
     # Arrange
     rf = RequestFactory()
     request = rf.get("/api/graph/network?doi=10.1038/s41586-020-2008-3")
@@ -173,8 +178,8 @@ def test_graph_related_requires_doi_param():
     assert resp.status_code == 400
 
 
-@override_settings(CROSSREF_DB_PATH=None)
-def test_graph_related_returns_503_with_no_db_configured():
+@override_settings(CROSSREF_API_URL=None)
+def test_graph_related_returns_503_with_no_api_configured():
     # Arrange
     rf = RequestFactory()
     request = rf.get("/api/graph/related?doi=10.1038/s41586-020-2008-3")
@@ -194,8 +199,8 @@ def test_graph_paper_requires_doi_param():
     assert resp.status_code == 400
 
 
-@override_settings(CROSSREF_DB_PATH=None)
-def test_graph_paper_returns_503_with_no_db_configured():
+@override_settings(CROSSREF_API_URL=None)
+def test_graph_paper_returns_503_with_no_api_configured():
     # Arrange
     rf = RequestFactory()
     request = rf.get("/api/graph/paper?doi=10.1038/s41586-020-2008-3")
@@ -205,8 +210,8 @@ def test_graph_paper_returns_503_with_no_db_configured():
     assert resp.status_code == 503
 
 
-@override_settings(CROSSREF_DB_PATH=None)
-def test_graph_health_returns_503_with_no_db_configured():
+@override_settings(CROSSREF_API_URL=None)
+def test_graph_health_returns_503_with_no_api_configured():
     # Arrange
     rf = RequestFactory()
     request = rf.get("/api/graph/health")
@@ -621,6 +626,48 @@ def test_scholar_entry_point_reaches_a_partial_only_token():
 
     # Assert
     assert "--bg-monaco" in resolved and "--bg-monaco" not in entry_text
+
+
+# EOF
+
+
+# ---------------------------------------------------------------------------
+# /api/health must report the package version.
+#
+# WHY THIS EXISTS: "is this deployment running what we shipped?" had no answer
+# reachable over HTTP. On 2026-08-23 I tried to answer it by searching the
+# rendered page for a version and got a FALSE POSITIVE -- the match was the
+# substring inside a CDN url for `highlight.js/11.9.0`, not scholar's version at
+# all. A version must be SERVED deliberately, not scraped.
+# ---------------------------------------------------------------------------
+def test_health_reports_the_package_version():
+    # Arrange
+    from scitex_scholar import __version__
+
+    from scitex_scholar._django.views import health
+
+    request = RequestFactory().get("/api/health")
+    # Act
+    payload = json.loads(health(request).content)
+    # Assert
+    assert payload["version"] == __version__
+
+
+def test_health_version_is_not_a_placeholder():
+    """Control: the field must carry a real version, not an empty string.
+
+    `assert "version" in payload` would pass on `""` or `None`, and an empty
+    version reads as "unknown deployment" exactly when someone is trying to
+    establish which deployment they are looking at.
+    """
+    # Arrange
+    from scitex_scholar._django.views import health
+
+    request = RequestFactory().get("/api/health")
+    # Act
+    version = json.loads(health(request).content)["version"]
+    # Assert
+    assert version and version[0].isdigit(), f"unusable version field: {version!r}"
 
 
 # EOF

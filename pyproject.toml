@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "scitex-scholar"
-version = "1.9.0"
+version = "1.10.0"
 description = "Scientific paper search, enrichment, download, and management for the SciTeX ecosystem"
 readme = "README.md"
 license = "AGPL-3.0-only"
@@ -70,8 +70,13 @@ dependencies = [
     "pydantic>=2.0.0",
     "pyyaml>=6.0.0",
     "requests>=2.28.0",
-    "sql-manager>=1.0.0",
-    "sqlalchemy>=2.0.0",
+    # `scitex_dev.store` is the storage primitive for scholar's own derived
+    # state (the library index and the JCR journal table). It is a CORE
+    # dependency, not an extra: `storage/_library_index.py` and
+    # `impact_factor/jcr/*` import it on the path a plain `pip install
+    # scitex-scholar` exercises. `sql-manager` + `sqlalchemy` were the
+    # previous JCR backend and are gone with it.
+    "scitex-dev>=0.30.0",
     "tenacity>=8.0.0",
     "tqdm>=4.64.0",
 ]
@@ -107,11 +112,28 @@ server = [
     # gui_runtime (pid/port/host lifecycle bookkeeping for `scholar gui`)
     # shipped in scitex-dev 0.30.0 (2026-07-12).
     "scitex-dev>=0.30.0",
-    # Shared SciTeX branding partial (`scitex_ui/_branding_head.html`),
-    # included by scholar.html's <head>. 0.7.1 is the first release where
-    # branding is usable WITHOUT adopting the workspace shell -- scholar
-    # owns its own layout and deliberately does not extend that shell.
-    "scitex-ui>=0.16.0",
+    # scholar.html EXTENDS `scitex_ui/standalone_shell.html` (since 1.9.0), so
+    # the shell supplies our whole <html> document, not just a branding partial.
+    #
+    # >=0.19.0 because BELOW it that shell hardcodes `<html lang="en">` while the
+    # theme attribute beside it is already `{{ }}`-driven. That matters more than
+    # a wrong metadata field: `lang` is where a screen reader takes its
+    # PRONUNCIATION rules, so a non-English page served as lang="en" is read with
+    # English phonetics.
+    #
+    # Scholar does NOT call `shell_context()` -- views.py builds its own context
+    # and calls render_to_string directly -- so we depend specifically on the
+    # TEMPLATE-level `{{ shell_lang|default:'en' }}`, not on the function's
+    # default. Verified on a real HTTP response from the PUBLISHED wheels
+    # (scitex-scholar 1.9.0 + scitex-ui 0.19.0, isolated venv):
+    #     <html lang="en" data-theme-default="dark">
+    # i.e. present and correct rather than the empty lang a function-only default
+    # would have produced here.
+    #
+    # THE PREVIOUS COMMENT HERE WAS FALSE and worth naming: it said scholar
+    # "owns its own layout and deliberately does not extend that shell". True
+    # before 1.9.0, wrong after, and nothing failed when it went stale.
+    "scitex-ui>=0.19.0",
 ]
 watch = [
     "watchdog>=3.0.0",
@@ -133,7 +155,7 @@ dev = [
     # member of `[server]`), so the Django tests cannot even import
     # without it. NOT guarded with importorskip on purpose: a skip would
     # hide a genuinely broken GUI install behind a green run.
-    "scitex-ui>=0.16.0",
+    "scitex-ui>=0.19.0",
     "watchdog>=3.0.0",
     # tests/integration/test_clew_integration.py — used (with importorskip)
     # to exercise the optional scitex-clew provenance path in storage/PaperIO.
@@ -192,6 +214,20 @@ packages = ["src/scitex_scholar"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
+# THE PACKAGE UNDER TEST IS THIS CHECKOUT, NOT WHATEVER IS INSTALLED.
+#
+# `scitex_scholar` lives under src/, and pytest prepends only the ROOTDIR --
+# which holds no importable package. Without this line a bare `pytest` fell
+# through to the ambient interpreter's copy; in the agent container that is a
+# REAL, non-editable wheel in /opt/venv-sac/lib/python3.12/site-packages, and
+# it was TWO MINORS STALE (1.7.1 vs the tree's 1.9.0, 6 routes vs 7).
+#
+# Mine surfaced only because the stale copy made tests go RED. Equal-or-newer
+# goes GREEN against code the branch does not contain, and an edit-only change
+# leaves no tell whatsoever. CI cannot catch it -- CI installs the branch, so
+# it always resolves the right code. tests/conftest.py enforces the same thing
+# at session start, comparing module PATH rather than __version__.
+pythonpath = ["src"]
 # importlib mode avoids module-name collisions across test subdirs (e.g.
 # two `test_base.py` files in different packages) without requiring
 # `__init__.py` files everywhere.

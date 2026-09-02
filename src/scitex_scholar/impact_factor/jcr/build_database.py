@@ -13,22 +13,18 @@ __DIR__ = os.path.dirname(__FILE__)
 
 """
 Functionalities:
-  - Build SQLite database from JCR Excel files
+  - Load a JCR Excel export into the shared store
   - Parse JCR Excel exports
-  - Create indexed database for fast queries
   - Extract impact factors and quartiles
 
 Dependencies:
   - packages:
     - openpyxl
-    - sqlalchemy
-    - sql_manager
 
 IO:
   - input-files:
-    - ../../data/impact_factor/JCR_IF_YYYY.xlsx
-  - output-files:
-    - ../../data/impact_factor/JCR_IF_YYYY.db
+    - a JCR Excel export (JCR_IF_YYYY.xlsx), supplied by the user
+  - output: the ``scholar_impact_factor`` table in the shared store
 """
 
 """Imports"""
@@ -46,10 +42,6 @@ logger = logging.getLogger(__name__)
 # keep module-import umbrella-free per PA304.
 
 """Parameters"""
-# Data paths
-BASE_DIR = Path(__file__).resolve().parent.parent.parent  # scholar/
-DATA_DIR = BASE_DIR / "data" / "impact_factor"
-
 """Functions & Classes"""
 
 
@@ -140,71 +132,85 @@ def _parse_impact_factor(factor_str) -> Optional[float]:
         return None
 
 
-def build_database(excel_path: Path, output_db: Optional[Path] = None) -> Path:
+def jcr_year_of(excel_path: Path) -> str:
+    """The JCR edition an export belongs to, read from its filename.
+
+    Stored on every row so a later reader can say WHICH edition a number
+    came from. The previous code re-derived this from the database
+    filename at read time, which meant renaming the file changed the
+    reported year while the numbers stayed the same.
     """
-    Build SQLite database from JCR Excel file.
+    year = re.search(r"20\d{2}", excel_path.name)
+    return year.group() if year else "unknown"
 
-    Args:
-        excel_path: Path to JCR Excel file
-        output_db: Output database path (auto-generated if None)
 
-    Returns:
-        Path to created database
+def build_database(excel_path: Path, jcr_year: Optional[str] = None) -> int:
+    """Load a JCR Excel export into the shared store. Returns row count.
+
+    Rows are UPSERTED by journal title, so re-running with a newer export
+    updates the numbers in place and leaves journals absent from the new
+    export untouched rather than deleting them.
     """
-    from .ImpactFactorJCREngine import FactorData, FactorManager
+    from scitex_dev.store import ANY_REVISION
 
-    # Auto-generate output path
-    if output_db is None:
-        year = re.search(r"20\d{2}", excel_path.name)
-        year_str = year.group() if year else "2024"
-        output_db = DATA_DIR / f"JCR_IF_{year_str}.db"
+    from .ImpactFactorJCREngine import open_store, store_target
 
-    logger.info(f"Building database from {excel_path}")
-    logger.info(f"Output: {output_db}")
+    year = jcr_year or jcr_year_of(excel_path)
+    logger.info(f"Loading {excel_path} (JCR {year})")
+    logger.info(f"Into: {store_target().locator}")
 
-    # Create database
-    manager = FactorManager(str(output_db))
-
-    # Parse and insert data
     count = 0
-    for record in parse_jcr_excel(excel_path):
-        # Insert or update record
-        manager.session.merge(FactorData(**record))
-        count += 1
+    store = open_store()
+    try:
+        with store.batch():
+            for record in parse_jcr_excel(excel_path):
+                journal = record.get("journal")
+                if not journal:
+                    continue
+                store.put(
+                    {
+                        "journal": journal,
+                        "journal_abbr": record.get("journal_abbr"),
+                        "issn": record.get("issn"),
+                        "eissn": record.get("eissn"),
+                        "nlm_id": record.get("nlm_id"),
+                        "factor": record.get("factor"),
+                        "jcr": record.get("jcr"),
+                        "jcr_year": year,
+                    },
+                    expected_revision=ANY_REVISION,
+                )
+                count += 1
+                if count % 100 == 0:
+                    logger.info(f"Processed {count} journals...")
+    finally:
+        store.close()
 
-        if count % 100 == 0:
-            logger.info(f"Processed {count} journals...")
-
-    manager.session.commit()
-    logger.success(f"Database built: {count} journals")
-    logger.success(f"Saved to: {output_db}")
-
-    return output_db
+    logger.success(f"Loaded {count} journals (JCR {year})")
+    return count
 
 
 def main(args):
-    """Main function to build JCR database from Excel file."""
+    """Main function to load the JCR export into the store."""
     excel_path = Path(args.excel)
 
     if not excel_path.exists():
         logger.error(f"Excel file not found: {excel_path}")
         return 1
 
-    output_db = Path(args.output) if args.output else None
-
     try:
-        result_db = build_database(excel_path, output_db)
-        logger.success(f"Database successfully built: {result_db}")
+        count = build_database(excel_path, args.jcr_year)
+        logger.success(f"{count} journals loaded")
         return 0
     except Exception as e:
-        logger.error(f"Failed to build database: {e}")
+        logger.error(f"Failed to load JCR export: {e}")
         return 1
 
 
 def parse_args() -> argparse.Namespace:
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(
-        description="Build SQLite database from JCR Excel files"
+        description="Load a JCR Excel export into the scholar store"
     )
     parser.add_argument(
         "--excel",
@@ -214,11 +220,10 @@ def parse_args() -> argparse.Namespace:
         help="Path to JCR Excel file (e.g., JCR_IF_2021.xlsx)",
     )
     parser.add_argument(
-        "--output",
-        "-o",
+        "--jcr-year",
         type=str,
         default=None,
-        help="Output database path (auto-generated if not specified)",
+        help="JCR edition to stamp on every row (read from the filename if omitted)",
     )
     args = parser.parse_args()
     return args
@@ -262,8 +267,7 @@ if __name__ == "__main__":
 
 """
 python -m scitex_scholar.impact_factor.jcr.build_database \
-    -e ./data/scholar/impact_factor/JCR_IF_2024.xlsx \
-    -o ./data/scholar/impact_factor/JCR_IF_2024.db
+    -e ~/Downloads/JCR_IF_2024.xlsx
 """
 
 # EOF

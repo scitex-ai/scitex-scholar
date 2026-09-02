@@ -140,15 +140,30 @@ class EnricherMixin:
         -------
             Papers collection with impact factors added where available
         """
+        # THIS USED TO CALL `jcr_engine.enrich_papers(papers)`, A METHOD THAT
+        # HAS NEVER EXISTED. The AttributeError was caught by the handler
+        # below and logged as "JCR engine unavailable ... falling back to
+        # calculation method" -- a fallback that does not exist either -- so
+        # this whole path was dead and said so in a way that read like a
+        # deliberate degradation. It now does what its name says, mirroring
+        # `_single_steps._enrich_impact_factor`.
         try:
-            jcr_engine = ImpactFactorEngine()
-            papers = jcr_engine.enrich_papers(papers)
+            engine = ImpactFactorEngine()
+        except Exception as exc:
+            logger.debug(f"{self.name}: JCR engine unavailable: {exc}")
             return papers
-        except Exception as e:
-            logger.debug(
-                f"{self.name}: JCR engine unavailable: {e}, "
-                "falling back to calculation method"
-            )
+
+        for paper in papers:
+            publication = getattr(getattr(paper, "metadata", None), "publication", None)
+            if publication is None or publication.impact_factor:
+                continue
+            journal = publication.short_journal or publication.journal
+            if not journal:
+                continue
+            metrics = engine.get_metrics(journal)
+            if metrics and metrics.get("impact_factor"):
+                publication.impact_factor = metrics["impact_factor"]
+                publication.impact_factor_engines = [metrics.get("source", "JCR")]
         return papers
 
     def _merge_enrichment_data(self, paper: Paper, results: Dict) -> Paper:

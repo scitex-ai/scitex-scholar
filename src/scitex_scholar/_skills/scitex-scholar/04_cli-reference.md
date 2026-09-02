@@ -55,9 +55,9 @@ list-tools`, `library db list`, `library db lookup`, `library db audit`,
 | `library`                   | `materialize` / `dematerialize`                 | Symlink ↔ real-dir conversion (bib-filtered)           |
 | `library`                   | `sync HOST [--remote-path PATH]`                | rsync the library to/from a remote host                |
 | `library`                   | `export PROJECT --format FORMAT`                | Export as `bibtex`/`tarball`/`flat-pdfs`/`zotero`      |
-| `library`                   | `zotero {import, export, diff}`                 | Bidirectional Zotero migration (local SQLite)          |
+| `library`                   | `zotero {import, export, diff}`                 | Bidirectional Zotero migration (local library, no key) |
 | `library`                   | `audit-files`                                   | Verify recorded files vs disk (SHA-256, role-aware)    |
-| `library`                   | `db {build,migrate,lookup,list,audit}`          | Manage the library SQLite index                        |
+| `library`                   | `db {build,lookup,list,audit}`                  | Manage the library index                               |
 | `auth`                      | `status`, `login`, `logout`, `refresh`          | Institutional SSO session lifecycle                    |
 | `mcp`                       | `start`, `list-tools`, `doctor`, `install`      | MCP server commands                                    |
 | `skills`                    | `list`, `get`, `install`                        | Bundled skill leaves                                   |

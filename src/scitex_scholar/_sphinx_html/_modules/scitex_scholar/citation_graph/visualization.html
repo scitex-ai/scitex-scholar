@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scitex_scholar.citation_graph.visualization &mdash; SciTeX Scholar v1.4.1</title>
+  <title>scitex_scholar.citation_graph.visualization &mdash; SciTeX Scholar v1.9.0</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=350a9c04"></script>
+      <script src="../../../_static/documentation_options.js?v=c4cb232b"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -238,6 +238,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._save_to_cache"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._save_to_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_async"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_async()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_sync"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.refresh"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.ensure_loaded()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_source"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_source()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_issn"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_issn()</span></code></a></li>
@@ -251,13 +253,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.__init__"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.__init__()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_instance"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_instance()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._is_cache_valid"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._is_cache_valid()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._load_from_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._load_from_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._save_to_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._save_to_cache()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_async"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_async()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_sync"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.refresh"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.ensure_loaded()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_issn_l"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_issn_l()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.normalize"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.normalize()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_abbreviation"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_abbreviation()</span></code></a></li>
@@ -377,7 +378,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../api/citation_graph.html">scitex_scholar.citation_graph</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.__init__"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._auto_detect"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._auto_detect()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.build"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.build()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._create_paper_node"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._create_paper_node()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._build_citation_edges"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._build_citation_edges()</span></code></a></li>
@@ -501,7 +501,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for scitex_scholar.citation_graph.visualization</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Pluggable visualization for citation graphs.</span>
+<span></span><span class="sd">"""Pluggable visualization for citation graphs.</span>
 
 <span class="sd">Supports multiple rendering backends with automatic fallback:</span>
 <span class="sd">    figrecipe &gt; scitex.plt &gt; matplotlib &gt; pyvis</span>
@@ -509,11 +509,11 @@
 <span class="sd">Example</span>
 <span class="sd">-------</span>
 <span class="sd">    &gt;&gt;&gt; from scitex_scholar.citation_graph import CitationGraphBuilder, plot_citation_graph</span>
-<span class="sd">    &gt;&gt;&gt; builder = CitationGraphBuilder(&quot;/path/to/crossref.db&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; graph = builder.build(&quot;10.1038/s41586-020-2008-3&quot;, top_n=20)</span>
+<span class="sd">    &gt;&gt;&gt; builder = CitationGraphBuilder("/path/to/crossref.db")</span>
+<span class="sd">    &gt;&gt;&gt; graph = builder.build("10.1038/s41586-020-2008-3", top_n=20)</span>
 <span class="sd">    &gt;&gt;&gt; fig = plot_citation_graph(graph)                    # auto backend</span>
-<span class="sd">    &gt;&gt;&gt; fig = plot_citation_graph(graph, backend=&quot;pyvis&quot;, output=&quot;network.html&quot;)</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; fig = plot_citation_graph(graph, backend="pyvis", output="network.html")</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
 
@@ -521,8 +521,8 @@
 
 <span class="c1"># ── Backend availability flags ───────────────────────────────────────────────</span>
 
-<span class="n">_figrecipe</span> <span class="o">=</span> <span class="n">try_import_optional</span><span class="p">(</span><span class="s2">&quot;figrecipe&quot;</span><span class="p">)</span>
-<span class="n">_figrecipe_graph</span> <span class="o">=</span> <span class="n">try_import_optional</span><span class="p">(</span><span class="s2">&quot;figrecipe._graph&quot;</span><span class="p">)</span>
+<span class="n">_figrecipe</span> <span class="o">=</span> <span class="n">try_import_optional</span><span class="p">(</span><span class="s2">"figrecipe"</span><span class="p">)</span>
+<span class="n">_figrecipe_graph</span> <span class="o">=</span> <span class="n">try_import_optional</span><span class="p">(</span><span class="s2">"figrecipe._graph"</span><span class="p">)</span>
 <span class="n">_FIGRECIPE_AVAILABLE</span> <span class="o">=</span> <span class="n">_figrecipe</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">_figrecipe_graph</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 <span class="k">if</span> <span class="n">_FIGRECIPE_AVAILABLE</span><span class="p">:</span>
     <span class="n">_fr_get_preset</span> <span class="o">=</span> <span class="n">_figrecipe</span><span class="o">.</span><span class="n">get_graph_preset</span>
@@ -537,48 +537,48 @@
 <span class="n">_SCITEX_PLT_AVAILABLE</span> <span class="o">=</span> <span class="n">_FIGRECIPE_AVAILABLE</span>
 <span class="n">_stx_draw_graph</span> <span class="o">=</span> <span class="n">_fr_draw_graph</span> <span class="k">if</span> <span class="n">_FIGRECIPE_AVAILABLE</span> <span class="k">else</span> <span class="kc">None</span>
 
-<span class="n">_pyvis_network</span> <span class="o">=</span> <span class="n">try_import_optional</span><span class="p">(</span><span class="s2">&quot;pyvis.network&quot;</span><span class="p">)</span>
+<span class="n">_pyvis_network</span> <span class="o">=</span> <span class="n">try_import_optional</span><span class="p">(</span><span class="s2">"pyvis.network"</span><span class="p">)</span>
 <span class="n">_PYVIS_AVAILABLE</span> <span class="o">=</span> <span class="n">_pyvis_network</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 <span class="n">_PyvisNetwork</span> <span class="o">=</span> <span class="n">_pyvis_network</span><span class="o">.</span><span class="n">Network</span> <span class="k">if</span> <span class="n">_PYVIS_AVAILABLE</span> <span class="k">else</span> <span class="kc">None</span>
 
 <span class="n">_MATPLOTLIB_AVAILABLE</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># always available (core dependency)</span>
 
 <span class="c1"># Backend resolution order</span>
-<span class="n">_BACKEND_PRIORITY</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;figrecipe&quot;</span><span class="p">,</span> <span class="s2">&quot;scitex.plt&quot;</span><span class="p">,</span> <span class="s2">&quot;matplotlib&quot;</span><span class="p">,</span> <span class="s2">&quot;pyvis&quot;</span><span class="p">]</span>
+<span class="n">_BACKEND_PRIORITY</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"figrecipe"</span><span class="p">,</span> <span class="s2">"scitex.plt"</span><span class="p">,</span> <span class="s2">"matplotlib"</span><span class="p">,</span> <span class="s2">"pyvis"</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="list_backends">
 <a class="viewcode-back" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.list_backends">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">list_backends</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;List available visualization backends.</span>
+<span class="w">    </span><span class="sd">"""List available visualization backends.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dict</span>
 <span class="sd">        Mapping of backend name to availability.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;figrecipe&quot;</span><span class="p">:</span> <span class="n">_FIGRECIPE_AVAILABLE</span><span class="p">,</span>
-        <span class="s2">&quot;scitex.plt&quot;</span><span class="p">:</span> <span class="n">_SCITEX_PLT_AVAILABLE</span><span class="p">,</span>
-        <span class="s2">&quot;matplotlib&quot;</span><span class="p">:</span> <span class="n">_MATPLOTLIB_AVAILABLE</span><span class="p">,</span>
-        <span class="s2">&quot;pyvis&quot;</span><span class="p">:</span> <span class="n">_PYVIS_AVAILABLE</span><span class="p">,</span>
+        <span class="s2">"figrecipe"</span><span class="p">:</span> <span class="n">_FIGRECIPE_AVAILABLE</span><span class="p">,</span>
+        <span class="s2">"scitex.plt"</span><span class="p">:</span> <span class="n">_SCITEX_PLT_AVAILABLE</span><span class="p">,</span>
+        <span class="s2">"matplotlib"</span><span class="p">:</span> <span class="n">_MATPLOTLIB_AVAILABLE</span><span class="p">,</span>
+        <span class="s2">"pyvis"</span><span class="p">:</span> <span class="n">_PYVIS_AVAILABLE</span><span class="p">,</span>
     <span class="p">}</span></div>
 
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_backend</span><span class="p">(</span><span class="n">backend</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve &#39;auto&#39; to the best available backend.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">backend</span> <span class="o">!=</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Resolve 'auto' to the best available backend."""</span>
+    <span class="k">if</span> <span class="n">backend</span> <span class="o">!=</span> <span class="s2">"auto"</span><span class="p">:</span>
         <span class="n">available</span> <span class="o">=</span> <span class="n">list_backends</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">backend</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">available</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Unknown backend &#39;</span><span class="si">{</span><span class="n">backend</span><span class="si">}</span><span class="s2">&#39;. Available: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Unknown backend '</span><span class="si">{</span><span class="n">backend</span><span class="si">}</span><span class="s2">'. Available: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">available</span><span class="p">[</span><span class="n">backend</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Backend &#39;</span><span class="si">{</span><span class="n">backend</span><span class="si">}</span><span class="s2">&#39; is not available. &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Available backends: &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="p">[</span><span class="n">k</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">available</span><span class="o">.</span><span class="n">items</span><span class="p">()</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">v</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Backend '</span><span class="si">{</span><span class="n">backend</span><span class="si">}</span><span class="s2">' is not available. "</span>
+                <span class="sa">f</span><span class="s2">"Available backends: "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="p">[</span><span class="n">k</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">available</span><span class="o">.</span><span class="n">items</span><span class="p">()</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">v</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">backend</span>
 
@@ -586,40 +586,40 @@
         <span class="k">if</span> <span class="n">list_backends</span><span class="p">()[</span><span class="n">name</span><span class="p">]:</span>
             <span class="k">return</span> <span class="n">name</span>
 
-    <span class="k">return</span> <span class="s2">&quot;matplotlib&quot;</span>  <span class="c1"># fallback (always available)</span>
+    <span class="k">return</span> <span class="s2">"matplotlib"</span>  <span class="c1"># fallback (always available)</span>
 
 
 <span class="c1"># ── Backend implementations ──────────────────────────────────────────────────</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_plot_figrecipe</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Render with figrecipe (publication-quality static).&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Render with figrecipe (publication-quality static)."""</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-    <span class="n">preset</span> <span class="o">=</span> <span class="n">_fr_get_preset</span><span class="p">(</span><span class="s2">&quot;citation&quot;</span><span class="p">)</span>
+    <span class="n">preset</span> <span class="o">=</span> <span class="n">_fr_get_preset</span><span class="p">(</span><span class="s2">"citation"</span><span class="p">)</span>
     <span class="n">merged</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">preset</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">}</span>
 
-    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;figsize&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">)))</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"figsize"</span><span class="p">,</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">)))</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">_fr_draw_graph</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="o">**</span><span class="n">merged</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">output</span><span class="p">:</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dpi&quot;</span><span class="p">,</span> <span class="mi">150</span><span class="p">),</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"dpi"</span><span class="p">,</span> <span class="mi">150</span><span class="p">),</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">"tight"</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;fig&quot;</span><span class="p">:</span> <span class="n">fig</span><span class="p">,</span> <span class="s2">&quot;ax&quot;</span><span class="p">:</span> <span class="n">ax</span><span class="p">,</span> <span class="s2">&quot;pos&quot;</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;pos&quot;</span><span class="p">],</span> <span class="s2">&quot;backend&quot;</span><span class="p">:</span> <span class="s2">&quot;figrecipe&quot;</span><span class="p">}</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"fig"</span><span class="p">:</span> <span class="n">fig</span><span class="p">,</span> <span class="s2">"ax"</span><span class="p">:</span> <span class="n">ax</span><span class="p">,</span> <span class="s2">"pos"</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s2">"pos"</span><span class="p">],</span> <span class="s2">"backend"</span><span class="p">:</span> <span class="s2">"figrecipe"</span><span class="p">}</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_plot_scitex_plt</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Render with scitex.plt (AxisWrapper + CSV auto-export).&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Render with scitex.plt (AxisWrapper + CSV auto-export)."""</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">scitex_plt</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">stx_plt</span>
 
-    <span class="n">preset</span> <span class="o">=</span> <span class="n">_fr_get_preset</span><span class="p">(</span><span class="s2">&quot;citation&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">_FIGRECIPE_AVAILABLE</span> <span class="k">else</span> <span class="p">{}</span>
+    <span class="n">preset</span> <span class="o">=</span> <span class="n">_fr_get_preset</span><span class="p">(</span><span class="s2">"citation"</span><span class="p">)</span> <span class="k">if</span> <span class="n">_FIGRECIPE_AVAILABLE</span> <span class="k">else</span> <span class="p">{}</span>
     <span class="n">merged</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">preset</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">}</span>
 
     <span class="n">_subplot_result</span> <span class="o">=</span> <span class="n">stx_plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">_subplot_result</span>  <span class="c1"># type: ignore[misc]</span>
     <span class="k">if</span> <span class="n">_stx_draw_graph</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-            <span class="s2">&quot;figrecipe is not available; install figrecipe for this backend&quot;</span>
+            <span class="s2">"figrecipe is not available; install figrecipe for this backend"</span>
         <span class="p">)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">_stx_draw_graph</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="o">**</span><span class="n">merged</span><span class="p">)</span>
 
@@ -628,37 +628,37 @@
 
         <span class="n">scitex</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;fig&quot;</span><span class="p">:</span> <span class="n">fig</span><span class="p">,</span> <span class="s2">&quot;ax&quot;</span><span class="p">:</span> <span class="n">ax</span><span class="p">,</span> <span class="s2">&quot;pos&quot;</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;pos&quot;</span><span class="p">],</span> <span class="s2">&quot;backend&quot;</span><span class="p">:</span> <span class="s2">&quot;scitex.plt&quot;</span><span class="p">}</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"fig"</span><span class="p">:</span> <span class="n">fig</span><span class="p">,</span> <span class="s2">"ax"</span><span class="p">:</span> <span class="n">ax</span><span class="p">,</span> <span class="s2">"pos"</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s2">"pos"</span><span class="p">],</span> <span class="s2">"backend"</span><span class="p">:</span> <span class="s2">"scitex.plt"</span><span class="p">}</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_plot_matplotlib</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># noqa: C901</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Render with raw matplotlib + networkx (no external deps).&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Render with raw matplotlib + networkx (no external deps)."""</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">networkx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nx</span>
 
-    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;figsize&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">)))</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"figsize"</span><span class="p">,</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">)))</span>
 
-    <span class="n">layout</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;layout&quot;</span><span class="p">,</span> <span class="s2">&quot;spring&quot;</span><span class="p">)</span>
-    <span class="n">seed</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;seed&quot;</span><span class="p">,</span> <span class="mi">42</span><span class="p">)</span>
+    <span class="n">layout</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"layout"</span><span class="p">,</span> <span class="s2">"spring"</span><span class="p">)</span>
+    <span class="n">seed</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"seed"</span><span class="p">,</span> <span class="mi">42</span><span class="p">)</span>
 
     <span class="c1"># Compute layout</span>
     <span class="n">layout_funcs</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;spring&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">g</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">spring_layout</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">),</span>
-        <span class="s2">&quot;circular&quot;</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">circular_layout</span><span class="p">,</span>
-        <span class="s2">&quot;kamada_kawai&quot;</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">kamada_kawai_layout</span><span class="p">,</span>
-        <span class="s2">&quot;shell&quot;</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">shell_layout</span><span class="p">,</span>
-        <span class="s2">&quot;spectral&quot;</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">spectral_layout</span><span class="p">,</span>
+        <span class="s2">"spring"</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">g</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">spring_layout</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">),</span>
+        <span class="s2">"circular"</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">circular_layout</span><span class="p">,</span>
+        <span class="s2">"kamada_kawai"</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">kamada_kawai_layout</span><span class="p">,</span>
+        <span class="s2">"shell"</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">shell_layout</span><span class="p">,</span>
+        <span class="s2">"spectral"</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">spectral_layout</span><span class="p">,</span>
     <span class="p">}</span>
-    <span class="n">layout_fn</span> <span class="o">=</span> <span class="n">layout_funcs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">layout_funcs</span><span class="p">[</span><span class="s2">&quot;spring&quot;</span><span class="p">])</span>
+    <span class="n">layout_fn</span> <span class="o">=</span> <span class="n">layout_funcs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">layout_funcs</span><span class="p">[</span><span class="s2">"spring"</span><span class="p">])</span>
     <span class="n">pos</span> <span class="o">=</span> <span class="n">layout_fn</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
 
     <span class="c1"># Node sizing by citations</span>
-    <span class="n">citations</span> <span class="o">=</span> <span class="p">[</span><span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;citations&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">()]</span>
+    <span class="n">citations</span> <span class="o">=</span> <span class="p">[</span><span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"citations"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">()]</span>
     <span class="n">max_c</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">citations</span><span class="p">)</span> <span class="k">if</span> <span class="n">citations</span> <span class="k">else</span> <span class="mi">1</span>
     <span class="n">sizes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">50</span> <span class="o">+</span> <span class="p">(</span><span class="n">c</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_c</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="mi">250</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">citations</span><span class="p">]</span>
 
     <span class="c1"># Node coloring by year</span>
-    <span class="n">years</span> <span class="o">=</span> <span class="p">[</span><span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;year&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">()]</span>
+    <span class="n">years</span> <span class="o">=</span> <span class="p">[</span><span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"year"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">()]</span>
 
     <span class="c1"># Draw</span>
     <span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx_edges</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
@@ -666,64 +666,64 @@
         <span class="n">G</span><span class="p">,</span>
         <span class="n">pos</span><span class="p">,</span>
         <span class="n">node_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">,</span>
-        <span class="n">node_color</span><span class="o">=</span><span class="n">years</span> <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">years</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;#3498db&quot;</span><span class="p">,</span>
+        <span class="n">node_color</span><span class="o">=</span><span class="n">years</span> <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">years</span><span class="p">)</span> <span class="k">else</span> <span class="s2">"#3498db"</span><span class="p">,</span>
         <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">viridis</span> <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">years</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
         <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="c1"># Labels: short titles</span>
-    <span class="n">labels</span> <span class="o">=</span> <span class="p">{</span><span class="n">n</span><span class="p">:</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;short_title&quot;</span><span class="p">,</span> <span class="n">n</span><span class="p">)[:</span><span class="mi">20</span><span class="p">]</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">()}</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="p">{</span><span class="n">n</span><span class="p">:</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"short_title"</span><span class="p">,</span> <span class="n">n</span><span class="p">)[:</span><span class="mi">20</span><span class="p">]</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">()}</span>
     <span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx_labels</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 
-    <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">"off"</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">output</span><span class="p">:</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dpi&quot;</span><span class="p">,</span> <span class="mi">150</span><span class="p">),</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"dpi"</span><span class="p">,</span> <span class="mi">150</span><span class="p">),</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">"tight"</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;fig&quot;</span><span class="p">:</span> <span class="n">fig</span><span class="p">,</span> <span class="s2">&quot;ax&quot;</span><span class="p">:</span> <span class="n">ax</span><span class="p">,</span> <span class="s2">&quot;pos&quot;</span><span class="p">:</span> <span class="n">pos</span><span class="p">,</span> <span class="s2">&quot;backend&quot;</span><span class="p">:</span> <span class="s2">&quot;matplotlib&quot;</span><span class="p">}</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"fig"</span><span class="p">:</span> <span class="n">fig</span><span class="p">,</span> <span class="s2">"ax"</span><span class="p">:</span> <span class="n">ax</span><span class="p">,</span> <span class="s2">"pos"</span><span class="p">:</span> <span class="n">pos</span><span class="p">,</span> <span class="s2">"backend"</span><span class="p">:</span> <span class="s2">"matplotlib"</span><span class="p">}</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_plot_pyvis</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Render as interactive HTML with pyvis.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Render as interactive HTML with pyvis."""</span>
     <span class="k">if</span> <span class="n">output</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;pyvis backend requires output path (HTML file)&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"pyvis backend requires output path (HTML file)"</span><span class="p">)</span>
 
     <span class="n">net</span> <span class="o">=</span> <span class="n">_PyvisNetwork</span><span class="p">(</span>
-        <span class="n">height</span><span class="o">=</span><span class="s2">&quot;750px&quot;</span><span class="p">,</span>
-        <span class="n">width</span><span class="o">=</span><span class="s2">&quot;100%&quot;</span><span class="p">,</span>
-        <span class="n">bgcolor</span><span class="o">=</span><span class="s2">&quot;#ffffff&quot;</span><span class="p">,</span>
-        <span class="n">font_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="s2">"750px"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="s2">"100%"</span><span class="p">,</span>
+        <span class="n">bgcolor</span><span class="o">=</span><span class="s2">"#ffffff"</span><span class="p">,</span>
+        <span class="n">font_color</span><span class="o">=</span><span class="s2">"black"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">net</span><span class="o">.</span><span class="n">barnes_hut</span><span class="p">()</span>
 
     <span class="k">for</span> <span class="n">node_id</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">():</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">]</span>
-        <span class="n">title</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">node_id</span><span class="p">))</span>
-        <span class="n">citations</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;citations&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="n">year</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;year&quot;</span><span class="p">,</span> <span class="s2">&quot;?&quot;</span><span class="p">)</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"title"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">node_id</span><span class="p">))</span>
+        <span class="n">citations</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"citations"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">year</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"year"</span><span class="p">,</span> <span class="s2">"?"</span><span class="p">)</span>
         <span class="n">size</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">+</span> <span class="nb">min</span><span class="p">(</span><span class="n">citations</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="mi">2</span>
 
         <span class="n">net</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span>
             <span class="n">node_id</span><span class="p">,</span>
-            <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">title</span><span class="p">[:</span><span class="mi">40</span><span class="p">]</span><span class="si">}</span><span class="s2">...</span><span class="se">\n</span><span class="s2">(</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
-            <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">node_id</span><span class="si">}</span><span class="se">\n</span><span class="s2">Citations: </span><span class="si">{</span><span class="n">citations</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">title</span><span class="p">[:</span><span class="mi">40</span><span class="p">]</span><span class="si">}</span><span class="s2">...</span><span class="se">\n</span><span class="s2">(</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">)"</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">node_id</span><span class="si">}</span><span class="se">\n</span><span class="s2">Citations: </span><span class="si">{</span><span class="n">citations</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
             <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span>
-            <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#3498db&quot;</span> <span class="k">if</span> <span class="n">citations</span> <span class="o">&gt;</span> <span class="mi">50</span> <span class="k">else</span> <span class="s2">&quot;#95a5a6&quot;</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="s2">"#3498db"</span> <span class="k">if</span> <span class="n">citations</span> <span class="o">&gt;</span> <span class="mi">50</span> <span class="k">else</span> <span class="s2">"#95a5a6"</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">edges</span><span class="p">():</span>
         <span class="n">net</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
 
     <span class="n">net</span><span class="o">.</span><span class="n">save_graph</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">output</span><span class="p">))</span>
-    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">output</span><span class="p">),</span> <span class="s2">&quot;backend&quot;</span><span class="p">:</span> <span class="s2">&quot;pyvis&quot;</span><span class="p">}</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"output"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">output</span><span class="p">),</span> <span class="s2">"backend"</span><span class="p">:</span> <span class="s2">"pyvis"</span><span class="p">}</span>
 
 
 <span class="n">_BACKEND_DISPATCH</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;figrecipe&quot;</span><span class="p">:</span> <span class="n">_plot_figrecipe</span><span class="p">,</span>
-    <span class="s2">&quot;scitex.plt&quot;</span><span class="p">:</span> <span class="n">_plot_scitex_plt</span><span class="p">,</span>
-    <span class="s2">&quot;matplotlib&quot;</span><span class="p">:</span> <span class="n">_plot_matplotlib</span><span class="p">,</span>
-    <span class="s2">&quot;pyvis&quot;</span><span class="p">:</span> <span class="n">_plot_pyvis</span><span class="p">,</span>
+    <span class="s2">"figrecipe"</span><span class="p">:</span> <span class="n">_plot_figrecipe</span><span class="p">,</span>
+    <span class="s2">"scitex.plt"</span><span class="p">:</span> <span class="n">_plot_scitex_plt</span><span class="p">,</span>
+    <span class="s2">"matplotlib"</span><span class="p">:</span> <span class="n">_plot_matplotlib</span><span class="p">,</span>
+    <span class="s2">"pyvis"</span><span class="p">:</span> <span class="n">_plot_pyvis</span><span class="p">,</span>
 <span class="p">}</span>
 
 
@@ -734,11 +734,11 @@
 <a class="viewcode-back" href="../../../api/index.html#scitex_scholar.citation_graph.plot_citation_graph">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_citation_graph</span><span class="p">(</span>
     <span class="n">graph</span><span class="p">,</span>
-    <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+    <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"auto"</span><span class="p">,</span>
     <span class="n">output</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Visualize a citation graph with pluggable backends.</span>
+<span class="w">    </span><span class="sd">"""Visualize a citation graph with pluggable backends.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -746,10 +746,10 @@
 <span class="sd">        Citation network to visualize. CitationGraph is auto-converted</span>
 <span class="sd">        via ``to_networkx()``.</span>
 <span class="sd">    backend : str</span>
-<span class="sd">        Rendering backend: &#39;auto&#39;, &#39;figrecipe&#39;, &#39;scitex.plt&#39;,</span>
-<span class="sd">        &#39;matplotlib&#39;, or &#39;pyvis&#39;. Default &#39;auto&#39; picks the best available.</span>
+<span class="sd">        Rendering backend: 'auto', 'figrecipe', 'scitex.plt',</span>
+<span class="sd">        'matplotlib', or 'pyvis'. Default 'auto' picks the best available.</span>
 <span class="sd">    output : str, optional</span>
-<span class="sd">        Output file path. Required for &#39;pyvis&#39; backend (HTML).</span>
+<span class="sd">        Output file path. Required for 'pyvis' backend (HTML).</span>
 <span class="sd">        For static backends, saves the figure to this path.</span>
 <span class="sd">    **kwargs</span>
 <span class="sd">        Backend-specific keyword arguments (layout, seed, figsize, etc.).</span>
@@ -758,9 +758,9 @@
 <span class="sd">    -------</span>
 <span class="sd">    dict</span>
 <span class="sd">        Backend-specific result. Static backends return</span>
-<span class="sd">        ``{&#39;fig&#39;, &#39;ax&#39;, &#39;pos&#39;, &#39;backend&#39;}``.</span>
-<span class="sd">        Pyvis returns ``{&#39;output&#39;, &#39;backend&#39;}``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        ``{'fig', 'ax', 'pos', 'backend'}``.</span>
+<span class="sd">        Pyvis returns ``{'output', 'backend'}``.</span>
+<span class="sd">    """</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">CitationGraph</span>
 
     <span class="c1"># Convert CitationGraph to NetworkX if needed</span>
@@ -774,7 +774,7 @@
 
 
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;plot_citation_graph&quot;</span><span class="p">,</span> <span class="s2">&quot;list_backends&quot;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"plot_citation_graph"</span><span class="p">,</span> <span class="s2">"list_backends"</span><span class="p">]</span>
 
 <span class="c1"># EOF</span>
 </pre></div>

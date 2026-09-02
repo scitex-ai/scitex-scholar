@@ -34,7 +34,7 @@ class ZoteroAttachmentResolver:
     Parameters
     ----------
     zotero_base_dir : Path
-        Zotero data directory (parent of zotero.sqlite, contains storage/).
+        Zotero data directory (parent of the Zotero database, contains storage/).
     """
 
     def __init__(self, zotero_base_dir: Path):
@@ -105,7 +105,7 @@ class ZoteroAttachmentResolver:
         item_ids : list of int
             Parent item IDs to find attachments for.
         conn : sqlite3.Connection
-            Open SQLite connection to Zotero database.
+            Open connection to the Zotero database.
         pdf_only : bool
             If True (default), only return PDF attachments.
 

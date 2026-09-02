@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Bidirectional local migration between Zotero and Scholar library.
 
-No API key required. Works entirely with local SQLite + file operations.
+No API key required. Works entirely with Zotero's local database + file
+operations.
 
 Usage:
     from scitex_scholar.integration.zotero import ZoteroLocalMigrator
@@ -35,12 +36,12 @@ from .migration_report import ExportPackage, MigrationReport, SyncDiff
 
 
 class ZoteroLocalMigrator:
-    """Bidirectional local migration between Zotero SQLite and Scholar library.
+    """Bidirectional local migration between the Zotero database and Scholar library.
 
     Parameters
     ----------
     db_path : str or Path, optional
-        Path to zotero.sqlite. Auto-detected if None.
+        Path to the Zotero database file. Auto-detected if None.
     project : str
         Scholar project name for imported papers.
     """

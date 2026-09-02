@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scitex_scholar.core.open_access &mdash; SciTeX Scholar v1.4.1</title>
+  <title>scitex_scholar.core.open_access &mdash; SciTeX Scholar v1.9.0</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=350a9c04"></script>
+      <script src="../../../_static/documentation_options.js?v=c4cb232b"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -238,6 +238,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._save_to_cache"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._save_to_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_async"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_async()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._fetch_oa_sources_sync"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._fetch_oa_sources_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">OASourcesCache._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.refresh"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.ensure_loaded()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_source"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_source()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.OASourcesCache.is_oa_issn"><code class="docutils literal notranslate"><span class="pre">OASourcesCache.is_oa_issn()</span></code></a></li>
@@ -251,13 +253,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.__init__"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.__init__()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_instance"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_instance()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._is_cache_valid"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._is_cache_valid()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._load_from_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._load_from_cache()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._save_to_cache"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._save_to_cache()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_async"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_async()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._fetch_journals_sync"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._fetch_journals_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._ensure_indexes"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._ensure_indexes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.refresh"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.refresh()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.ensure_loaded"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.ensure_loaded()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer._add_journal"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer._add_journal()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_issn_l"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_issn_l()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.normalize"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.normalize()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#scitex_scholar.core.JournalNormalizer.get_abbreviation"><code class="docutils literal notranslate"><span class="pre">JournalNormalizer.get_abbreviation()</span></code></a></li>
@@ -377,7 +378,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../api/citation_graph.html">scitex_scholar.citation_graph</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.__init__"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._auto_detect"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._auto_detect()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder.build"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder.build()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._create_paper_node"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._create_paper_node()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/citation_graph.html#scitex_scholar.citation_graph.CitationGraphBuilder._build_citation_edges"><code class="docutils literal notranslate"><span class="pre">CitationGraphBuilder._build_citation_edges()</span></code></a></li>
@@ -504,7 +504,7 @@
 <span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1"># File: /home/ywatanabe/proj/scitex-code/src/scitex/scholar/core/open_access.py</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 <span class="sd">Open Access Detection Module.</span>
 
 <span class="sd">Provides utilities for determining if a paper is open access based on:</span>
@@ -512,7 +512,7 @@
 <span class="sd">- Unpaywall API lookup</span>
 <span class="sd">- Publisher patterns</span>
 <span class="sd">- Journal DOAJ status</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -534,7 +534,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_get_config</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ScholarConfig</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get or create singleton config instance.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Get or create singleton config instance."""</span>
     <span class="k">global</span> <span class="n">_config</span>
     <span class="k">if</span> <span class="n">_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_config</span> <span class="o">=</span> <span class="n">ScholarConfig</span><span class="p">()</span>
@@ -542,36 +542,36 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_get_oa_sources</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">frozenset</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get OA sources from config (single source of truth).&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Get OA sources from config (single source of truth)."""</span>
     <span class="n">config</span> <span class="o">=</span> <span class="n">_get_config</span><span class="p">()</span>
-    <span class="n">sources</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;OPENACCESS_SOURCES&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
+    <span class="n">sources</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"OPENACCESS_SOURCES"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
     <span class="k">return</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_get_oa_journals</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get OA journal patterns from config (single source of truth).&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Get OA journal patterns from config (single source of truth)."""</span>
     <span class="n">config</span> <span class="o">=</span> <span class="n">_get_config</span><span class="p">()</span>
-    <span class="n">journals</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;OPENACCESS_JOURNALS&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
+    <span class="n">journals</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"OPENACCESS_JOURNALS"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
     <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">j</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">journals</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_get_unpaywall_email</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get Unpaywall API email from config.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Get Unpaywall API email from config."""</span>
     <span class="n">config</span> <span class="o">=</span> <span class="n">_get_config</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;unpaywall_email&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;research@scitex.io&quot;</span>
+    <span class="k">return</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"unpaywall_email"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">"research@scitex.io"</span>
 
 
 <div class="viewcode-block" id="OAStatus">
 <a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.OAStatus">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">OAStatus</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Open Access status categories (aligned with Unpaywall).&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Open Access status categories (aligned with Unpaywall)."""</span>
 
-    <span class="n">GOLD</span> <span class="o">=</span> <span class="s2">&quot;gold&quot;</span>  <span class="c1"># Published in OA journal (DOAJ listed)</span>
-    <span class="n">GREEN</span> <span class="o">=</span> <span class="s2">&quot;green&quot;</span>  <span class="c1"># Available in repository (arXiv, PMC, etc.)</span>
-    <span class="n">HYBRID</span> <span class="o">=</span> <span class="s2">&quot;hybrid&quot;</span>  <span class="c1"># OA article in subscription journal</span>
-    <span class="n">BRONZE</span> <span class="o">=</span> <span class="s2">&quot;bronze&quot;</span>  <span class="c1"># Free to read on publisher site, but no license</span>
-    <span class="n">CLOSED</span> <span class="o">=</span> <span class="s2">&quot;closed&quot;</span>  <span class="c1"># Paywalled</span>
-    <span class="n">UNKNOWN</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>  <span class="c1"># Status not determined</span></div>
+    <span class="n">GOLD</span> <span class="o">=</span> <span class="s2">"gold"</span>  <span class="c1"># Published in OA journal (DOAJ listed)</span>
+    <span class="n">GREEN</span> <span class="o">=</span> <span class="s2">"green"</span>  <span class="c1"># Available in repository (arXiv, PMC, etc.)</span>
+    <span class="n">HYBRID</span> <span class="o">=</span> <span class="s2">"hybrid"</span>  <span class="c1"># OA article in subscription journal</span>
+    <span class="n">BRONZE</span> <span class="o">=</span> <span class="s2">"bronze"</span>  <span class="c1"># Free to read on publisher site, but no license</span>
+    <span class="n">CLOSED</span> <span class="o">=</span> <span class="s2">"closed"</span>  <span class="c1"># Paywalled</span>
+    <span class="n">UNKNOWN</span> <span class="o">=</span> <span class="s2">"unknown"</span>  <span class="c1"># Status not determined</span></div>
 
 
 
@@ -579,7 +579,7 @@
 <a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.OAResult">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">OAResult</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Result of open access detection.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Result of open access detection."""</span>
 
     <span class="n">is_open_access</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="n">status</span><span class="p">:</span> <span class="n">OAStatus</span>
@@ -596,16 +596,16 @@
 
 <span class="c1"># arXiv ID patterns</span>
 <span class="n">ARXIV_PATTERNS</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^\d</span><span class="si">{4}</span><span class="s2">\.\d{4,5}(v\d+)?$&quot;</span><span class="p">),</span>  <span class="c1"># New format: 2301.12345</span>
-    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^[a-z-]+/\d</span><span class="si">{7}</span><span class="s2">(v\d+)?$&quot;</span><span class="p">),</span>  <span class="c1"># Old format: hep-th/9901001</span>
-    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^arxiv:\d</span><span class="si">{4}</span><span class="s2">\.\d{4,5}(v\d+)?$&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">),</span>
+    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"^\d</span><span class="si">{4}</span><span class="s2">\.\d{4,5}(v\d+)?$"</span><span class="p">),</span>  <span class="c1"># New format: 2301.12345</span>
+    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"^[a-z-]+/\d</span><span class="si">{7}</span><span class="s2">(v\d+)?$"</span><span class="p">),</span>  <span class="c1"># Old format: hep-th/9901001</span>
+    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"^arxiv:\d</span><span class="si">{4}</span><span class="s2">\.\d{4,5}(v\d+)?$"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">),</span>
 <span class="p">]</span>
 
 
 <div class="viewcode-block" id="is_arxiv_id">
 <a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.is_arxiv_id">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">is_arxiv_id</span><span class="p">(</span><span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if identifier looks like an arXiv ID.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Check if identifier looks like an arXiv ID."""</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">identifier</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="n">identifier</span> <span class="o">=</span> <span class="n">identifier</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
@@ -616,10 +616,10 @@
 <div class="viewcode-block" id="is_open_access_source">
 <a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.is_open_access_source">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">is_open_access_source</span><span class="p">(</span><span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if source is a known open access repository.</span>
+<span class="w">    </span><span class="sd">"""Check if source is a known open access repository.</span>
 
 <span class="sd">    Sources are loaded from config/default.yaml → OPENACCESS_SOURCES</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">source</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">return</span> <span class="n">source</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">_get_oa_sources</span><span class="p">()</span></div>
@@ -629,7 +629,7 @@
 <div class="viewcode-block" id="is_open_access_journal">
 <a class="viewcode-back" href="../../../api/core.html#scitex_scholar.core.is_open_access_journal">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">is_open_access_journal</span><span class="p">(</span><span class="n">journal_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if journal is a known open access journal.</span>
+<span class="w">    </span><span class="sd">"""Check if journal is a known open access journal.</span>
 
 <span class="sd">    Uses three-tier lookup:</span>
 <span class="sd">    1. Fast check against config/default.yaml → OPENACCESS_JOURNALS (pattern matching)</span>
@@ -642,7 +642,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        True if journal is known to be Open Access</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">journal_name</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
 
@@ -683,7 +683,7 @@
     <span class="n">journal</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">is_open_access_flag</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OAResult</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Detect open access status from paper identifiers without API calls.</span>
 
 <span class="sd">    This is fast but may miss some OA papers (e.g., hybrid articles).</span>
@@ -699,13 +699,13 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        OAResult with detection results</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># If we already have an OA flag from a reliable source, trust it</span>
     <span class="k">if</span> <span class="n">is_open_access_flag</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">OAResult</span><span class="p">(</span>
             <span class="n">is_open_access</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">status</span><span class="o">=</span><span class="n">OAStatus</span><span class="o">.</span><span class="n">UNKNOWN</span><span class="p">,</span>  <span class="c1"># We don&#39;t know the specific type</span>
-            <span class="n">source</span><span class="o">=</span><span class="s2">&quot;api_flag&quot;</span><span class="p">,</span>
+            <span class="n">status</span><span class="o">=</span><span class="n">OAStatus</span><span class="o">.</span><span class="n">UNKNOWN</span><span class="p">,</span>  <span class="c1"># We don't know the specific type</span>
+            <span class="n">source</span><span class="o">=</span><span class="s2">"api_flag"</span><span class="p">,</span>
             <span class="n">confidence</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -714,19 +714,19 @@
         <span class="k">return</span> <span class="n">OAResult</span><span class="p">(</span>
             <span class="n">is_open_access</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">status</span><span class="o">=</span><span class="n">OAStatus</span><span class="o">.</span><span class="n">GREEN</span><span class="p">,</span>
-            <span class="n">oa_url</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;https://arxiv.org/pdf/</span><span class="si">{</span><span class="n">arxiv_id</span><span class="si">}</span><span class="s2">.pdf&quot;</span><span class="p">,</span>
-            <span class="n">source</span><span class="o">=</span><span class="s2">&quot;arxiv&quot;</span><span class="p">,</span>
+            <span class="n">oa_url</span><span class="o">=</span><span class="sa">f</span><span class="s2">"https://arxiv.org/pdf/</span><span class="si">{</span><span class="n">arxiv_id</span><span class="si">}</span><span class="s2">.pdf"</span><span class="p">,</span>
+            <span class="n">source</span><span class="o">=</span><span class="s2">"arxiv"</span><span class="p">,</span>
             <span class="n">confidence</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="c1"># PMC - always open access (GREEN)</span>
-    <span class="k">if</span> <span class="n">pmcid</span> <span class="ow">and</span> <span class="n">pmcid</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;PMC&quot;</span><span class="p">):</span>
-        <span class="n">pmc_num</span> <span class="o">=</span> <span class="n">pmcid</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span> <span class="k">if</span> <span class="n">pmcid</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;PMC&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">pmcid</span>
+    <span class="k">if</span> <span class="n">pmcid</span> <span class="ow">and</span> <span class="n">pmcid</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"PMC"</span><span class="p">):</span>
+        <span class="n">pmc_num</span> <span class="o">=</span> <span class="n">pmcid</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span> <span class="k">if</span> <span class="n">pmcid</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"PMC"</span><span class="p">)</span> <span class="k">else</span> <span class="n">pmcid</span>
         <span class="k">return</span> <span class="n">OAResult</span><span class="p">(</span>
             <span class="n">is_open_access</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">status</span><span class="o">=</span><span class="n">OAStatus</span><span class="o">.</span><span class="n">GREEN</span><span class="p">,</span>
-            <span class="n">oa_url</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;https://www.ncbi.nlm.nih.gov/pmc/articles/PMC</span><span class="si">{</span><span class="n">pmc_num</span><span class="si">}</span><span class="s2">/pdf/&quot;</span><span class="p">,</span>
-            <span class="n">source</span><span class="o">=</span><span class="s2">&quot;pmc&quot;</span><span class="p">,</span>
+            <span class="n">oa_url</span><span class="o">=</span><span class="sa">f</span><span class="s2">"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC</span><span class="si">{</span><span class="n">pmc_num</span><span class="si">}</span><span class="s2">/pdf/"</span><span class="p">,</span>
+            <span class="n">source</span><span class="o">=</span><span class="s2">"pmc"</span><span class="p">,</span>
             <span class="n">confidence</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -736,10 +736,10 @@
             <span class="n">is_open_access</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">status</span><span class="o">=</span><span class="p">(</span>
                 <span class="n">OAStatus</span><span class="o">.</span><span class="n">GREEN</span>
-                <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;arxiv&quot;</span><span class="p">,</span> <span class="s2">&quot;pmc&quot;</span><span class="p">,</span> <span class="s2">&quot;biorxiv&quot;</span><span class="p">,</span> <span class="s2">&quot;medrxiv&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"arxiv"</span><span class="p">,</span> <span class="s2">"pmc"</span><span class="p">,</span> <span class="s2">"biorxiv"</span><span class="p">,</span> <span class="s2">"medrxiv"</span><span class="p">]</span>
                 <span class="k">else</span> <span class="n">OAStatus</span><span class="o">.</span><span class="n">GOLD</span>
             <span class="p">),</span>
-            <span class="n">source</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;source_</span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">source</span><span class="o">=</span><span class="sa">f</span><span class="s2">"source_</span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
             <span class="n">confidence</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -748,16 +748,16 @@
         <span class="k">return</span> <span class="n">OAResult</span><span class="p">(</span>
             <span class="n">is_open_access</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">status</span><span class="o">=</span><span class="n">OAStatus</span><span class="o">.</span><span class="n">GOLD</span><span class="p">,</span>
-            <span class="n">source</span><span class="o">=</span><span class="s2">&quot;oa_journal&quot;</span><span class="p">,</span>
+            <span class="n">source</span><span class="o">=</span><span class="s2">"oa_journal"</span><span class="p">,</span>
             <span class="n">confidence</span><span class="o">=</span><span class="mf">0.85</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="c1"># If we have a DOI but no other OA indicators, it&#39;s likely paywalled</span>
+    <span class="c1"># If we have a DOI but no other OA indicators, it's likely paywalled</span>
     <span class="k">if</span> <span class="n">doi</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">arxiv_id</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">pmcid</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">OAResult</span><span class="p">(</span>
             <span class="n">is_open_access</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">status</span><span class="o">=</span><span class="n">OAStatus</span><span class="o">.</span><span class="n">UNKNOWN</span><span class="p">,</span>  <span class="c1"># Could be hybrid OA, need Unpaywall to confirm</span>
-            <span class="n">source</span><span class="o">=</span><span class="s2">&quot;no_oa_indicators&quot;</span><span class="p">,</span>
+            <span class="n">source</span><span class="o">=</span><span class="s2">"no_oa_indicators"</span><span class="p">,</span>
             <span class="n">confidence</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>  <span class="c1"># Low confidence - could be hybrid OA</span>
         <span class="p">)</span>
 
@@ -765,7 +765,7 @@
     <span class="k">return</span> <span class="n">OAResult</span><span class="p">(</span>
         <span class="n">is_open_access</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">status</span><span class="o">=</span><span class="n">OAStatus</span><span class="o">.</span><span class="n">UNKNOWN</span><span class="p">,</span>
-        <span class="n">source</span><span class="o">=</span><span class="s2">&quot;unknown&quot;</span><span class="p">,</span>
+        <span class="n">source</span><span class="o">=</span><span class="s2">"unknown"</span><span class="p">,</span>
         <span class="n">confidence</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
     <span class="p">)</span></div>
 
@@ -776,7 +776,7 @@
     <span class="n">email</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OAResult</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Check open access status via Unpaywall API.</span>
 
 <span class="sd">    Unpaywall is the authoritative source for OA status detection.</span>
@@ -789,12 +789,12 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        OAResult with comprehensive OA information</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">doi</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">OAResult</span><span class="p">(</span>
             <span class="n">is_open_access</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">status</span><span class="o">=</span><span class="n">OAStatus</span><span class="o">.</span><span class="n">UNKNOWN</span><span class="p">,</span>
-            <span class="n">source</span><span class="o">=</span><span class="s2">&quot;no_doi&quot;</span><span class="p">,</span>
+            <span class="n">source</span><span class="o">=</span><span class="s2">"no_doi"</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="c1"># Use config email if not provided</span>
@@ -803,12 +803,12 @@
 
     <span class="c1"># Clean DOI</span>
     <span class="n">doi</span> <span class="o">=</span> <span class="n">doi</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">doi</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;https://doi.org/&quot;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">doi</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"https://doi.org/"</span><span class="p">):</span>
         <span class="n">doi</span> <span class="o">=</span> <span class="n">doi</span><span class="p">[</span><span class="mi">16</span><span class="p">:]</span>
-    <span class="k">elif</span> <span class="n">doi</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;doi:&quot;</span><span class="p">):</span>
+    <span class="k">elif</span> <span class="n">doi</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"doi:"</span><span class="p">):</span>
         <span class="n">doi</span> <span class="o">=</span> <span class="n">doi</span><span class="p">[</span><span class="mi">4</span><span class="p">:]</span>
 
-    <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://api.unpaywall.org/v2/</span><span class="si">{</span><span class="n">doi</span><span class="si">}</span><span class="s2">?email=</span><span class="si">{</span><span class="n">email</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"https://api.unpaywall.org/v2/</span><span class="si">{</span><span class="n">doi</span><span class="si">}</span><span class="s2">?email=</span><span class="si">{</span><span class="n">email</span><span class="si">}</span><span class="s2">"</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="k">async</span> <span class="k">with</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
@@ -819,65 +819,65 @@
                     <span class="k">return</span> <span class="n">OAResult</span><span class="p">(</span>
                         <span class="n">is_open_access</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                         <span class="n">status</span><span class="o">=</span><span class="n">OAStatus</span><span class="o">.</span><span class="n">UNKNOWN</span><span class="p">,</span>
-                        <span class="n">source</span><span class="o">=</span><span class="s2">&quot;unpaywall_not_found&quot;</span><span class="p">,</span>
+                        <span class="n">source</span><span class="o">=</span><span class="s2">"unpaywall_not_found"</span><span class="p">,</span>
                         <span class="n">confidence</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
                     <span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">resp</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unpaywall API error: </span><span class="si">{</span><span class="n">resp</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unpaywall API error: </span><span class="si">{</span><span class="n">resp</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
                     <span class="k">return</span> <span class="n">OAResult</span><span class="p">(</span>
                         <span class="n">is_open_access</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                         <span class="n">status</span><span class="o">=</span><span class="n">OAStatus</span><span class="o">.</span><span class="n">UNKNOWN</span><span class="p">,</span>
-                        <span class="n">source</span><span class="o">=</span><span class="s2">&quot;unpaywall_error&quot;</span><span class="p">,</span>
+                        <span class="n">source</span><span class="o">=</span><span class="s2">"unpaywall_error"</span><span class="p">,</span>
                         <span class="n">confidence</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
                     <span class="p">)</span>
 
                 <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 
-                <span class="n">is_oa</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;is_oa&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-                <span class="n">oa_status_str</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;oa_status&quot;</span><span class="p">,</span> <span class="s2">&quot;closed&quot;</span><span class="p">)</span>
+                <span class="n">is_oa</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"is_oa"</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+                <span class="n">oa_status_str</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"oa_status"</span><span class="p">,</span> <span class="s2">"closed"</span><span class="p">)</span>
 
                 <span class="c1"># Map Unpaywall status to our enum</span>
                 <span class="n">status_map</span> <span class="o">=</span> <span class="p">{</span>
-                    <span class="s2">&quot;gold&quot;</span><span class="p">:</span> <span class="n">OAStatus</span><span class="o">.</span><span class="n">GOLD</span><span class="p">,</span>
-                    <span class="s2">&quot;green&quot;</span><span class="p">:</span> <span class="n">OAStatus</span><span class="o">.</span><span class="n">GREEN</span><span class="p">,</span>
-                    <span class="s2">&quot;hybrid&quot;</span><span class="p">:</span> <span class="n">OAStatus</span><span class="o">.</span><span class="n">HYBRID</span><span class="p">,</span>
-                    <span class="s2">&quot;bronze&quot;</span><span class="p">:</span> <span class="n">OAStatus</span><span class="o">.</span><span class="n">BRONZE</span><span class="p">,</span>
-                    <span class="s2">&quot;closed&quot;</span><span class="p">:</span> <span class="n">OAStatus</span><span class="o">.</span><span class="n">CLOSED</span><span class="p">,</span>
+                    <span class="s2">"gold"</span><span class="p">:</span> <span class="n">OAStatus</span><span class="o">.</span><span class="n">GOLD</span><span class="p">,</span>
+                    <span class="s2">"green"</span><span class="p">:</span> <span class="n">OAStatus</span><span class="o">.</span><span class="n">GREEN</span><span class="p">,</span>
+                    <span class="s2">"hybrid"</span><span class="p">:</span> <span class="n">OAStatus</span><span class="o">.</span><span class="n">HYBRID</span><span class="p">,</span>
+                    <span class="s2">"bronze"</span><span class="p">:</span> <span class="n">OAStatus</span><span class="o">.</span><span class="n">BRONZE</span><span class="p">,</span>
+                    <span class="s2">"closed"</span><span class="p">:</span> <span class="n">OAStatus</span><span class="o">.</span><span class="n">CLOSED</span><span class="p">,</span>
                 <span class="p">}</span>
                 <span class="n">status</span> <span class="o">=</span> <span class="n">status_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">oa_status_str</span><span class="p">,</span> <span class="n">OAStatus</span><span class="o">.</span><span class="n">UNKNOWN</span><span class="p">)</span>
 
                 <span class="c1"># Get best OA location</span>
                 <span class="n">oa_url</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="n">license_str</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="n">best_oa</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;best_oa_location&quot;</span><span class="p">)</span>
+                <span class="n">best_oa</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"best_oa_location"</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">best_oa</span><span class="p">:</span>
-                    <span class="n">oa_url</span> <span class="o">=</span> <span class="n">best_oa</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;url_for_pdf&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">best_oa</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">)</span>
-                    <span class="n">license_str</span> <span class="o">=</span> <span class="n">best_oa</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;license&quot;</span><span class="p">)</span>
+                    <span class="n">oa_url</span> <span class="o">=</span> <span class="n">best_oa</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"url_for_pdf"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">best_oa</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"url"</span><span class="p">)</span>
+                    <span class="n">license_str</span> <span class="o">=</span> <span class="n">best_oa</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"license"</span><span class="p">)</span>
 
                 <span class="k">return</span> <span class="n">OAResult</span><span class="p">(</span>
                     <span class="n">is_open_access</span><span class="o">=</span><span class="n">is_oa</span><span class="p">,</span>
                     <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="p">,</span>
                     <span class="n">oa_url</span><span class="o">=</span><span class="n">oa_url</span><span class="p">,</span>
-                    <span class="n">source</span><span class="o">=</span><span class="s2">&quot;unpaywall&quot;</span><span class="p">,</span>
+                    <span class="n">source</span><span class="o">=</span><span class="s2">"unpaywall"</span><span class="p">,</span>
                     <span class="n">license</span><span class="o">=</span><span class="n">license_str</span><span class="p">,</span>
                     <span class="n">confidence</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
                 <span class="p">)</span>
 
     <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unpaywall timeout for DOI: </span><span class="si">{</span><span class="n">doi</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unpaywall timeout for DOI: </span><span class="si">{</span><span class="n">doi</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">OAResult</span><span class="p">(</span>
             <span class="n">is_open_access</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">status</span><span class="o">=</span><span class="n">OAStatus</span><span class="o">.</span><span class="n">UNKNOWN</span><span class="p">,</span>
-            <span class="n">source</span><span class="o">=</span><span class="s2">&quot;unpaywall_timeout&quot;</span><span class="p">,</span>
+            <span class="n">source</span><span class="o">=</span><span class="s2">"unpaywall_timeout"</span><span class="p">,</span>
             <span class="n">confidence</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unpaywall API error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unpaywall API error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">OAResult</span><span class="p">(</span>
             <span class="n">is_open_access</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">status</span><span class="o">=</span><span class="n">OAStatus</span><span class="o">.</span><span class="n">UNKNOWN</span><span class="p">,</span>
-            <span class="n">source</span><span class="o">=</span><span class="s2">&quot;unpaywall_exception&quot;</span><span class="p">,</span>
+            <span class="n">source</span><span class="o">=</span><span class="s2">"unpaywall_exception"</span><span class="p">,</span>
             <span class="n">confidence</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -894,7 +894,7 @@
     <span class="n">use_unpaywall</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">unpaywall_email</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OAResult</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Comprehensive open access detection.</span>
 
 <span class="sd">    First tries fast local detection, then falls back to Unpaywall API</span>
@@ -912,7 +912,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        OAResult with best available OA information</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Try fast local detection first</span>
     <span class="n">local_result</span> <span class="o">=</span> <span class="n">detect_oa_from_identifiers</span><span class="p">(</span>
         <span class="n">doi</span><span class="o">=</span><span class="n">doi</span><span class="p">,</span>
@@ -923,7 +923,7 @@
         <span class="n">is_open_access_flag</span><span class="o">=</span><span class="n">is_open_access_flag</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="c1"># If we&#39;re confident, return immediately</span>
+    <span class="c1"># If we're confident, return immediately</span>
     <span class="k">if</span> <span class="n">local_result</span><span class="o">.</span><span class="n">confidence</span> <span class="o">&gt;=</span> <span class="mf">0.9</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">local_result</span>
 
@@ -953,12 +953,12 @@
     <span class="n">is_open_access_flag</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">use_unpaywall</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># Default to sync-safe behavior</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OAResult</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Synchronous wrapper for OA detection.</span>
 
 <span class="sd">    By default only uses local detection (no API calls).</span>
 <span class="sd">    Set use_unpaywall=True to use Unpaywall API (requires event loop).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">use_unpaywall</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span>

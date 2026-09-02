@@ -2,7 +2,7 @@
 """`scitex scholar link-project-tree` — symlink a project's
 `.scitex/scholar/library` to `~/.scitex/scholar/library/`.
 
-See docs/architecture/ADR-100-project-tree-link.md.
+See docs/adr/0100-project-tree-link.md.
 """
 
 from __future__ import annotations

@@ -16,21 +16,15 @@ from scitex_scholar.citation_graph import CitationGraphBuilder
 
 
 def main():
-    # Database path (adjust to your setup)
-    db_path = Path.home() / "proj/crossref_local/data/crossref.db"
-
-    if not db_path.exists():
-        print(f"❌ Database not found: {db_path}")
-        print("Please update the db_path in this script.")
-        return 1
-
     print("=" * 70)
     print("  Citation Graph Example")
     print("=" * 70)
-    print(f"\nDatabase: {db_path}")
 
-    # Initialize builder
-    builder = CitationGraphBuilder(str(db_path))
+    # Endpoint comes from SCITEX_SCHOLAR_CROSSREF_LOCAL_API_URL when set,
+    # otherwise crossref-local's own default. Requires a running
+    # crossref-local server.
+    builder = CitationGraphBuilder()
+    print(f"\nCrossRef API: {builder.api_url}")
 
     # Example DOI (a well-cited paper)
     seed_doi = "10.1001/2013.jamapsychiatry.4"
