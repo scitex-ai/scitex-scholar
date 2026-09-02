@@ -26,7 +26,15 @@ BASE_DIR = Path(__file__).resolve().parent
 
 # Fleet env-var convention is SCITEX_SCHOLAR_<X>.
 SECRET_KEY = os.environ.get("SCITEX_SCHOLAR_DJANGO_SECRET") or secrets.token_urlsafe(32)
-DEBUG = os.environ.get("DJANGO_DEBUG", "true").lower() == "true"
+# DEBUG DEFAULTS TO FALSE (2026-09-02). It defaulted to "true" until then, which
+# made the PERMISSIVE branch below the DEFAULT branch: every `gui serve` that
+# forgot to set DJANGO_DEBUG=false was ALLOWED_HOSTS="*" on an app with no
+# authentication of its own. The reason it was left that way -- DEBUG=False
+# stops `runserver` serving static files -- is answered in _standalone_urls.py,
+# which serves them through the staticfiles finders regardless of DEBUG.
+# Measured before flipping: under DJANGO_DEBUG=false the page returned 200 and
+# every /static/ asset returned 404; after the urlconf change, both are 200.
+DEBUG = os.environ.get("DJANGO_DEBUG", "false").lower() == "true"
 # ALLOWED_HOSTS SWITCHES ON DEBUG (operator ruling, 2026-08-23).
 #
 # THE BUG THIS REPLACES: the list used to be the hardcoded loopback-only
@@ -36,17 +44,16 @@ DEBUG = os.environ.get("DJANGO_DEBUG", "true").lower() == "true"
 # nothing in the banner to suggest ALLOWED_HOSTS was the reason. All four leaves
 # (storage / writer / figrecipe / scholar) carried the same copied list.
 #
-# DEBUG=True  -> "*". Development: reachable wherever you bind it.
-# DEBUG=False -> loopback + whatever is declared explicitly.
+# DEBUG=True  -> "*". Explicit opt-in for development only.
+# DEBUG=False -> loopback + whatever `--host` contributes (see _server.py:
+#                a specific address contributes itself; 0.0.0.0 contributes
+#                this machine's hostname and interface addresses, because
+#                binding every interface IS the statement that you intend to
+#                be reached on any of them) + SCITEX_SCHOLAR_ALLOWED_HOSTS.
 #
-# READ THIS BEFORE DEPLOYING. DJANGO_DEBUG defaults to "true" here, so the
-# permissive branch is the DEFAULT branch. That is fine on a workstation and
-# wrong anywhere else, because this app has NO authentication of its own --
-# there is no actor/identity API in the SDK yet -- so "*" plus no auth means any
-# reachable address is an unauthenticated reader. ANY DEPLOYMENT MUST SET
-# DJANGO_DEBUG=false. The default is not changed here because DEBUG=False also
-# stops `runserver` serving static files, which would break the GUI in a second,
-# less obvious way; flipping it needs the static-files question answered first.
+# Without the 0.0.0.0 rule the default flip would have REINTRODUCED the bug
+# this block replaced: `--host 0.0.0.0` bound fine and answered 400 to every
+# real address, measured 2026-09-02 on the published 1.9.0 wheel.
 if DEBUG:
     ALLOWED_HOSTS = ["*"]
 else:
