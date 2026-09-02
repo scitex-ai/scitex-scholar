@@ -7,6 +7,58 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-09-02
+
+MINOR, not patch. This release removes public API (`CitationGraphBuilder(db_path=)`,
+`library db migrate`), renames a CLI option (`--db-path` → `--api-url`) and two
+`/api/health` fields, moves the Django ORM to PostgreSQL, and flips the
+`DJANGO_DEBUG` default. None of that belongs in a patch. It follows this repo's
+precedent of shipping breaking surface changes in minors (the Flask→Django GUI
+went 1.7.x → 1.9.0); a strict reading would call it 2.0.0, and that reading was
+considered and not taken.
+
+### Security
+- **`DJANGO_DEBUG` now defaults to `"false"`** (#137). It defaulted to `"true"`,
+  which selected `ALLOWED_HOSTS="*"` on an app with no authentication for any
+  `gui serve` that forgot the env var. Flipping the default alone would have
+  reintroduced the 400 that #126 fixed for `--host 0.0.0.0` — a bind-all server
+  receives real interface addresses in the Host header, and `0.0.0.0` never
+  matches them — so `--host 0.0.0.0` now contributes this machine's hostname
+  and every interface IPv4 (read from the interfaces via `SIOCGIFADDR`, not from
+  name resolution, which resolved to the wrong address inside a container).
+  Standalone `/static/` is served through the staticfiles finders regardless of
+  `DEBUG`; `urls.py` (what hub mounts) is untouched. Verified live on three
+  arms; the interface-enumeration test derives its expected address by an
+  independent method so it is not the implementation checking itself.
+
+### Added
+- **`/api/health` reports `version`** (#132), so "is this deployment running
+  what we shipped?" is answerable over HTTP. Scholar served no version anywhere
+  before; scraping the page for one produced a false positive off a CDN URL
+  (`highlight.js/11.9.0`). Caveat carried in the docstring: the value comes from
+  `importlib.metadata`, which is frozen at install time, so it is trustworthy for
+  a deployed wheel and not for an editable dev checkout.
+- **Tests now guard the urlconf shape hub authenticates** (#129): every entry
+  must be a flat `URLPattern`, because hub gates the leaf by wrapping each
+  callback in `login_required`, and a nested `include()` would publish its
+  routes unauthenticated. Includes a positive control that builds an
+  `include()` and asserts the predicate rejects it.
+
+### Fixed
+- **The local test run tests THIS checkout** (#130). `pythonpath = ["src"]` in
+  pytest config plus a session-start guard that compares the imported module
+  PATH (never `__version__`) against the checkout and aborts (exit 3) on a
+  mismatch. Before this, a bare `pytest` imported whatever wheel the ambient
+  interpreter held — an older wheel went red and exposed it; an equal-or-newer
+  one would have gone green against code the branch did not contain. CI never
+  saw it and cannot: it installs the branch.
+- **`scitex-ui>=0.19.0`** (#131): the shared shell hardcoded `<html lang="en">`,
+  which is where a screen reader takes its pronunciation rules. Scholar does not
+  call `shell_context()`, so it depends on the template-level default; verified
+  on a real response from the published wheels. Two stale prose claims deleted
+  in the same change — one of them a pinned "verified against scitex_ui 0.17.0"
+  that had been quoted as a measurement while 0.18.0 was installed.
+
 ### Changed
 - **Scholar's own state moved off local database files and onto the shared
   store (`scitex_dev.store`).** Fleet ruling, 2026-08-29: storage is the
