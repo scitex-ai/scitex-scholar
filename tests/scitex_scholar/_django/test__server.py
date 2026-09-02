@@ -119,3 +119,83 @@ def test_degraded_path_names_the_remedy(degraded_run):
 
 
 # EOF
+
+
+# ---------------------------------------------------------------------------
+# _hosts_to_allow: what a --host bind contributes to ALLOWED_HOSTS.
+#
+# The 0.0.0.0 case is the one that makes DEBUG=False a safe DEFAULT. Measured
+# 2026-09-02 on the published 1.9.0 wheel: `--host 0.0.0.0` under
+# DJANGO_DEBUG=false answered 400 to every real interface address, because
+# "0.0.0.0" in ALLOWED_HOSTS never matches a Host header.
+# ---------------------------------------------------------------------------
+def test_hosts_to_allow_loopback_contributes_nothing():
+    # Arrange
+    from scitex_scholar._django._server import _hosts_to_allow
+
+    # Act
+    contributed = _hosts_to_allow("127.0.0.1")
+    # Assert
+    assert contributed == []
+
+
+def test_hosts_to_allow_specific_address_contributes_itself():
+    # Arrange
+    from scitex_scholar._django._server import _hosts_to_allow
+
+    # Act
+    contributed = _hosts_to_allow("100.64.0.4")
+    # Assert
+    assert contributed == ["100.64.0.4"]
+
+
+def test_hosts_to_allow_bind_all_contributes_this_machines_hostname():
+    # Arrange
+    import socket
+
+    from scitex_scholar._django._server import _hosts_to_allow
+
+    # Act
+    contributed = _hosts_to_allow("0.0.0.0")
+    # Assert
+    assert socket.gethostname() in contributed
+
+
+def test_hosts_to_allow_bind_all_never_contributes_the_literal_wildcard():
+    """Control: bind-all must widen to THIS machine, never to everything."""
+    # Arrange
+    from scitex_scholar._django._server import _hosts_to_allow
+
+    # Act
+    contributed = _hosts_to_allow("0.0.0.0")
+    # Assert
+    assert "*" not in contributed and "0.0.0.0" not in contributed
+
+
+# EOF
+
+
+def test_hosts_to_allow_bind_all_contributes_a_real_interface_address():
+    """The test that the first implementation could NOT fail.
+
+    It used getaddrinfo(gethostname()), passed the hostname assertion above,
+    and still answered 400 to the real LAN address in a live check. Derive the
+    expected address by an INDEPENDENT method -- the UDP-connect trick reads
+    the kernel's chosen source address without sending a packet -- so the
+    assertion is not the implementation checking itself.
+    """
+    # Arrange
+    import socket
+
+    from scitex_scholar._django._server import _hosts_to_allow
+
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+        s.connect(("10.255.255.255", 1))  # no packet is sent for UDP connect
+        expected = s.getsockname()[0]
+    # Act
+    contributed = _hosts_to_allow("0.0.0.0")
+    # Assert
+    assert expected in contributed, f"{expected!r} not in {contributed!r}"
+
+
+# EOF
