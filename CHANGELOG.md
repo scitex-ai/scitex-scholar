@@ -7,6 +7,22 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+- **`_server.py` imports `hosts_to_allow` from scitex-app (`>=0.11.0`)** instead of
+  carrying its own copy. Scholar wrote the first implementation (#137); it was
+  copied verbatim into scitex-app and became the fleet's single one, with a
+  public name from 0.11.0. The private copy and its five behaviour tests are
+  gone; what remains here is the wiring.
+
+### Removed
+- **The bare-Django fallback in `scitex-scholar gui serve`.** When scitex-app
+  was unimportable the launcher printed a note and ran plain `runserver` with
+  no workspace shell. With the ALLOWED_HOSTS derivation now living in scitex-app
+  too, that fallback would also silently drop the `0.0.0.0` handling — a second,
+  quieter way to break. scitex-app is a hard member of the `[server]` extra
+  (settings.py already hard-imports scitex_ui by the same reasoning), so a
+  missing install now fails at import, where the cause is legible.
+
 ## [1.10.0] - 2026-09-02
 
 MINOR, not patch. This release removes public API (`CitationGraphBuilder(db_path=)`,
