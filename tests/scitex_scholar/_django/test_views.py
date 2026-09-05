@@ -670,4 +670,69 @@ def test_health_version_is_not_a_placeholder():
     assert version and version[0].isdigit(), f"unusable version field: {version!r}"
 
 
+# --- refuse to serve without our app installed (hub prod 2026-09-05) ---------
+#
+# The guard runs at IMPORT of `views`, so each arm re-executes the module
+# via importlib.reload under a patched app registry, then restores it. The
+# registry itself is never mutated: only `is_installed` / `ready` are
+# patched on the singleton, and the fixture reloads once more with the
+# real registry so later tests see the genuine module state.
+
+
+@pytest.fixture
+def reload_views_after(monkeypatch):
+    import importlib
+
+    yield importlib
+    monkeypatch.undo()
+    importlib.reload(views)
+
+
+def test_views_refuse_to_import_when_app_is_not_installed(monkeypatch, reload_views_after):
+    """Negative arm: the host forgot ScholarEditorConfig -> named refusal."""
+    # Arrange
+    from django.apps import apps
+    from django.core.exceptions import ImproperlyConfigured
+
+    monkeypatch.setattr(apps, "is_installed", lambda name: False)
+    # Act / Assert
+    with pytest.raises(ImproperlyConfigured) as excinfo:
+        reload_views_after.reload(views)
+    assert views.APP_CONFIG_PATH in str(excinfo.value)
+    assert "INSTALLED_APPS" in str(excinfo.value)
+
+
+def test_views_import_when_app_is_installed(monkeypatch, reload_views_after):
+    """Positive control for the arm above: same reload path, installed -> fine."""
+    # Arrange
+    from django.apps import apps
+
+    monkeypatch.setattr(apps, "is_installed", lambda name: True)
+    # Act
+    module = reload_views_after.reload(views)
+    # Assert
+    assert module.index is not None
+
+
+def test_views_import_stays_silent_when_registry_is_not_ready(monkeypatch, reload_views_after):
+    """Unknown is not "not installed": an early importer must not be refused."""
+    # Arrange
+    from django.apps import apps
+
+    monkeypatch.setattr(apps, "is_installed", lambda name: False)
+    monkeypatch.setattr(apps, "ready", False)
+    # Act
+    module = reload_views_after.reload(views)
+    # Assert
+    assert module.index is not None
+
+
+def test_app_guard_checks_the_app_name_the_config_declares():
+    """The guard and apps.py must name the same app, or the guard lies."""
+    from scitex_scholar._django.apps import ScholarEditorConfig
+
+    assert views.APP_NAME == ScholarEditorConfig.name
+    assert views.APP_CONFIG_PATH.rsplit(".", 1)[1] == ScholarEditorConfig.__name__
+
+
 # EOF

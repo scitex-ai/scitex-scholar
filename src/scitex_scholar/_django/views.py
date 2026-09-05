@@ -27,6 +27,54 @@ from django.conf import settings as django_settings
 from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
 
+from django.apps import apps as _django_apps
+from django.core.exceptions import ImproperlyConfigured
+
+# The dotted INSTALLED_APPS entry a host must carry for these views to
+# work. Kept as ONE string so the refusal below and the docs name the
+# same thing (see apps.py for why the label is "scholar_editor").
+APP_NAME = "scitex_scholar._django"
+APP_CONFIG_PATH = "scitex_scholar._django.apps.ScholarEditorConfig"
+
+
+def _refuse_unless_app_installed() -> None:
+    """Fail at import when a host serves these views without our app.
+
+    scitex-hub mounts this module's views under its own urlconf. On
+    2026-09-05 prod did so WITHOUT adding `ScholarEditorConfig` to
+    INSTALLED_APPS, so Django's app_directories loader never saw
+    `scholar/scholar.html` and every logged-in request to /apps/scholar/v2/
+    answered 500 `TemplateDoesNotExist` from `index`. Anonymous requests
+    were redirected to login before reaching the view, so no curl probe
+    ever showed it, and nobody knows how long it stood.
+
+    Serving an app's views without installing the app is a declaration
+    the host cannot honour, and it must fail where the cause is legible
+    -- `manage.py check` and the host's urlconf import both import this
+    module -- rather than evaporate into a 500 behind a login wall.
+
+    Three-valued on purpose: the registry may not be READY when someone
+    imports this module early (a script, a doc build). That is UNKNOWN,
+    not "installed", and an import-time guard must not raise on unknown
+    -- it stays silent and the request path answers as before. So this
+    guard is a gate only where Django has finished loading apps, which
+    is every place that can actually serve a request.
+    """
+    if not _django_apps.ready:
+        return
+    if _django_apps.is_installed(APP_NAME):
+        return
+    raise ImproperlyConfigured(
+        f"{__name__} was imported, but '{APP_NAME}' is not in INSTALLED_APPS. "
+        "Django's template loader only searches installed apps, so every page "
+        "view here would answer 500 TemplateDoesNotExist (scholar/scholar.html). "
+        f"Add '{APP_CONFIG_PATH}' (label 'scholar_editor') to the host "
+        "project's INSTALLED_APPS next to the other mounted leaf apps."
+    )
+
+
+_refuse_unless_app_installed()
+
 # scitex-app >= 0.8.0. Scholar previously COPIED this derivation from
 # their 0.7.1 doc, with a comment claiming the copy kept the two from
 # drifting. Events disproved that: the published derivation was WRONG
