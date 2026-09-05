@@ -8,6 +8,15 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Changed
+- **The citation graph and the standalone GUI now read the crossref-local
+  endpoint from `SCITEX_SCHOLAR_CROSSREF_API_URL`**, the variable the metadata
+  engine, `config/default.yaml` and the documented env table already used for
+  the same endpoint. Before, the GUI/citation-graph path read a second name
+  (`SCITEX_SCHOLAR_CROSSREF_LOCAL_API_URL`), so setting the documented one
+  configured the metadata engine and left the citation graph unconfigured.
+  The env table's claim that the variable pointed at `api.crossref.org` was
+  wrong and is corrected: the public CrossRef REST URL is fixed in code.
+  `resolve_env` accepts several legacy spellings in precedence order.
 - **The crossref-local endpoint setting is now `SCITEX_SCHOLAR_CROSSREF_API_URL`**
   (was the bare `CROSSREF_API_URL`). A host such as scitex-hub defines this
   setting in its own settings module, where an un-namespaced name is one
@@ -16,6 +25,10 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   agree on one name. The standalone settings module defines only the new name.
 
 ### Deprecated
+- **`SCITEX_SCHOLAR_CROSSREF_LOCAL_API_URL`** (and the older
+  `CROSSREF_LOCAL_API_URL`), still read when `SCITEX_SCHOLAR_CROSSREF_API_URL`
+  is unset, with one warning per process per name. Removed together with the
+  other legacy env spellings (see `scholar-env-legacy-fallback-removal`).
 - **The bare `CROSSREF_API_URL` Django setting.** Still read when the
   namespaced one is unset, with one warning per process naming both spellings,
   and removed in 1.12.0. Set both during the window if you must support both

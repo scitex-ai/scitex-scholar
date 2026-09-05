@@ -25,6 +25,7 @@ from scitex_scholar._utils._env import resolve_env
 
 CANONICAL = "SCITEX_SCHOLAR_TEST_VALUE"
 LEGACY = "SCHOLAR_TEST_VALUE_LEGACY"
+LEGACY_OLDER = "SCHOLAR_TEST_VALUE_LEGACY_OLDER"
 
 
 @pytest.fixture
@@ -34,7 +35,7 @@ def env():
     Also clears the resolver's once-per-process warning registry, so each
     test observes the first-use warning rather than a neighbour's leftover.
     """
-    saved = {name: os.environ.get(name) for name in (CANONICAL, LEGACY)}
+    saved = {name: os.environ.get(name) for name in (CANONICAL, LEGACY, LEGACY_OLDER)}
     for name in saved:
         os.environ.pop(name, None)
     _env._warned.clear()
@@ -186,6 +187,61 @@ def test_no_legacy_argument_reads_only_the_canonical_name(env):
 
     # Assert
     assert resolved is None
+
+
+# --- several legacy spellings, in precedence order -------------------------
+
+
+def test_sequence_of_legacies_reads_the_first_one_set(env):
+    """With two old spellings, the earlier one in the sequence wins."""
+    # Arrange
+    env[LEGACY] = "from-legacy"
+    env[LEGACY_OLDER] = "from-older"
+
+    # Act
+    resolved = resolve_env(CANONICAL, legacy=(LEGACY, LEGACY_OLDER))
+
+    # Assert
+    assert resolved == "from-legacy"
+
+
+def test_sequence_of_legacies_falls_through_to_a_later_one(env):
+    """An older spelling still works when the newer old spelling is unset."""
+    # Arrange
+    env[LEGACY_OLDER] = "from-older"
+
+    # Act
+    resolved = resolve_env(CANONICAL, legacy=(LEGACY, LEGACY_OLDER))
+
+    # Assert
+    assert resolved == "from-older"
+
+
+def test_canonical_wins_over_every_legacy_in_the_sequence(env):
+    """The documented name beats all old spellings, not only the first."""
+    # Arrange
+    env[CANONICAL] = "from-canonical"
+    env[LEGACY] = "from-legacy"
+    env[LEGACY_OLDER] = "from-older"
+
+    # Act
+    resolved = resolve_env(CANONICAL, legacy=(LEGACY, LEGACY_OLDER))
+
+    # Assert
+    assert resolved == "from-canonical"
+
+
+def test_sequence_legacy_warning_names_the_spelling_actually_used(env, caplog):
+    """The warning must name the old spelling that was read, not a sibling."""
+    # Arrange
+    env[LEGACY_OLDER] = "from-older"
+
+    # Act
+    with caplog.at_level(logging.WARNING):
+        resolve_env(CANONICAL, legacy=(LEGACY, LEGACY_OLDER))
+
+    # Assert
+    assert LEGACY_OLDER in caplog.text
 
 
 # EOF

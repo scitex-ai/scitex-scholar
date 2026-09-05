@@ -14,7 +14,7 @@ Build and analyze citation networks for academic papers using CrossRef data.
 ```python
 from scitex_scholar.citation_graph import CitationGraphBuilder
 
-# Endpoint resolved from SCITEX_SCHOLAR_CROSSREF_LOCAL_API_URL, or pass
+# Endpoint resolved from SCITEX_SCHOLAR_CROSSREF_API_URL, or pass
 # api_url="http://localhost:31291" explicitly.
 builder = CitationGraphBuilder()
 

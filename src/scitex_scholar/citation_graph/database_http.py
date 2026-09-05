@@ -29,8 +29,10 @@ class CitationDatabaseHTTP:
 
         Args:
             api_url: URL of the crossref-local HTTP API server.
-                     If None, auto-detects from CROSSREF_LOCAL_API_URL env var
-                     or crossref_local config defaults.
+                     If None, auto-detects from SCITEX_SCHOLAR_CROSSREF_API_URL
+                     (legacy SCITEX_SCHOLAR_CROSSREF_LOCAL_API_URL /
+                     CROSSREF_LOCAL_API_URL, read loudly) or crossref_local
+                     config defaults.
         """
         from crossref_local.remote import RemoteClient
 
@@ -40,8 +42,8 @@ class CitationDatabaseHTTP:
             from crossref_local._core.config import DEFAULT_API_URL
 
             api_url = resolve_env(
-                "SCITEX_SCHOLAR_CROSSREF_LOCAL_API_URL",
-                legacy="CROSSREF_LOCAL_API_URL",
+                "SCITEX_SCHOLAR_CROSSREF_API_URL",
+                legacy=("SCITEX_SCHOLAR_CROSSREF_LOCAL_API_URL", "CROSSREF_LOCAL_API_URL"),
                 default=DEFAULT_API_URL,
             )
 
