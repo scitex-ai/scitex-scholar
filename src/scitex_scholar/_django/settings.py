@@ -9,7 +9,7 @@ Mirrors the `scitex_writer._django.settings` pattern: bare-minimum
 installed apps, optional `scitex_ui` for the shared workspace shell, and
 the fleet PostgreSQL so any future models work out of the box.
 
-`CROSSREF_API_URL` is resolved ONCE here at settings-load time (mirroring
+`SCITEX_SCHOLAR_CROSSREF_API_URL` is resolved ONCE here at settings-load time (mirroring
 how the Flask `create_app()` resolved its backend once too) so `views.py`
 reads a plain setting instead of re-probing on every request.
 """
@@ -142,6 +142,6 @@ USE_TZ = True
 
 # Resolved once here (mirrors the Flask create_app() resolve-once
 # behaviour); views.py reads this setting rather than re-probing.
-CROSSREF_API_URL = find_crossref_api_url()
+SCITEX_SCHOLAR_CROSSREF_API_URL = find_crossref_api_url()
 
 # EOF

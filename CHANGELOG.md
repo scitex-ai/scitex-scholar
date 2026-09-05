@@ -7,6 +7,20 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+- **The crossref-local endpoint setting is now `SCITEX_SCHOLAR_CROSSREF_API_URL`**
+  (was the bare `CROSSREF_API_URL`). A host such as scitex-hub defines this
+  setting in its own settings module, where an un-namespaced name is one
+  collision away from meaning something else; the new spelling is also the
+  env-var name hub already exports for the same endpoint, so host and leaf
+  agree on one name. The standalone settings module defines only the new name.
+
+### Deprecated
+- **The bare `CROSSREF_API_URL` Django setting.** Still read when the
+  namespaced one is unset, with one warning per process naming both spellings,
+  and removed in 1.12.0. Set both during the window if you must support both
+  releases; the namespaced name wins when both are present.
+
 ### Added
 - **`scitex_scholar._django.views` refuses to import when the app is not in
   the host's `INSTALLED_APPS`**, raising `ImproperlyConfigured` that names the
