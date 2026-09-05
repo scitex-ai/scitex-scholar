@@ -157,7 +157,7 @@ def test_graph_network_requires_doi_param():
     assert resp.status_code == 400
 
 
-@override_settings(CROSSREF_API_URL=None)
+@override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL=None)
 def test_graph_network_returns_503_with_no_api_configured():
     # Arrange
     rf = RequestFactory()
@@ -178,7 +178,7 @@ def test_graph_related_requires_doi_param():
     assert resp.status_code == 400
 
 
-@override_settings(CROSSREF_API_URL=None)
+@override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL=None)
 def test_graph_related_returns_503_with_no_api_configured():
     # Arrange
     rf = RequestFactory()
@@ -199,7 +199,7 @@ def test_graph_paper_requires_doi_param():
     assert resp.status_code == 400
 
 
-@override_settings(CROSSREF_API_URL=None)
+@override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL=None)
 def test_graph_paper_returns_503_with_no_api_configured():
     # Arrange
     rf = RequestFactory()
@@ -210,7 +210,7 @@ def test_graph_paper_returns_503_with_no_api_configured():
     assert resp.status_code == 503
 
 
-@override_settings(CROSSREF_API_URL=None)
+@override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL=None)
 def test_graph_health_returns_503_with_no_api_configured():
     # Arrange
     rf = RequestFactory()
@@ -764,6 +764,81 @@ def test_app_guard_checks_the_app_name_the_config_declares():
     actual = (views.APP_NAME, views.APP_CONFIG_PATH.rsplit(".", 1)[1])
     # Assert
     assert actual == expected
+
+
+# --- the crossref endpoint setting is namespaced; bare name is a loud alias --
+#
+# A host (scitex-hub) defines this setting in ITS settings module, so the
+# leaf's name must be namespaced. The bare spelling is honoured for one
+# release and warns once per process. `override_settings` is Django's own
+# test-time settings mechanism, not a mock: the view reads the real settings
+# object, and each test restores it on exit.
+
+
+def test_api_url_reads_the_namespaced_setting():
+    """The documented name works on its own."""
+    # Arrange
+    from django.test import override_settings
+
+    with override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL="http://ns.example:3333"):
+        # Act
+        resolved = views._api_url()
+    # Assert
+    assert resolved == "http://ns.example:3333"
+
+
+def test_api_url_honours_the_deprecated_bare_setting_for_one_release():
+    """A host still on the pre-1.11 spelling keeps working during the window."""
+    # Arrange
+    from django.test import override_settings
+
+    with override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL=None, CROSSREF_API_URL="http://bare.example:3333"):
+        # Act
+        resolved = views._api_url()
+    # Assert
+    assert resolved == "http://bare.example:3333"
+
+
+def test_api_url_prefers_the_namespaced_setting_when_both_are_set():
+    """Precedence: the documented name must be the one that wins."""
+    # Arrange
+    from django.test import override_settings
+
+    with override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL="http://ns.example:3333", CROSSREF_API_URL="http://bare.example:3333"):
+        # Act
+        resolved = views._api_url()
+    # Assert
+    assert resolved == "http://ns.example:3333"
+
+
+def test_api_url_warns_when_the_deprecated_bare_setting_is_used(caplog):
+    """The alias is LOUD: one warning naming both spellings and the removal release."""
+    # Arrange
+    import logging
+
+    from django.test import override_settings
+
+    views._warned_deprecated_setting = False
+    caplog.set_level(logging.WARNING, logger=views.__name__)
+    with override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL=None, CROSSREF_API_URL="http://bare.example:3333"):
+        # Act
+        views._api_url()
+    # Assert
+    assert all(
+        token in caplog.text
+        for token in ("CROSSREF_API_URL", "SCITEX_SCHOLAR_CROSSREF_API_URL", "deprecated", views._CROSSREF_ALIAS_REMOVAL)
+    ), caplog.text
+
+
+def test_standalone_settings_define_only_the_namespaced_name():
+    """The leaf's own settings module must not keep the alias alive."""
+    # Arrange
+    from django.conf import settings
+
+    # Act
+    defined = (hasattr(settings, "SCITEX_SCHOLAR_CROSSREF_API_URL"), hasattr(settings, "CROSSREF_API_URL"))
+    # Assert
+    assert defined == (True, False)
 
 
 # EOF

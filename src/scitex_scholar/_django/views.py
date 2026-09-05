@@ -122,9 +122,49 @@ def _make_cache_key(prefix: str, doi: str, **kwargs) -> str:
     return f"cg:{hashlib.md5(':'.join(parts).encode()).hexdigest()}"
 
 
+# The Django setting that names crossref-local's HTTP endpoint. Namespaced,
+# because a host (scitex-hub) defines it in ITS settings module, where a bare
+# `CROSSREF_API_URL` is one collision away from meaning something else.
+# Hub already exports the same spelling as an env var, so host and leaf now
+# agree on one name (hub request, 2026-09-05).
+CROSSREF_API_URL_SETTING = "SCITEX_SCHOLAR_CROSSREF_API_URL"
+
+# Pre-1.11 spelling. Honoured for ONE release so hosts can migrate, and LOUD
+# when used: a silent alias would leave the host believing the old name is
+# still a supported one right up to the release that deletes it.
+CROSSREF_API_URL_SETTING_DEPRECATED = "CROSSREF_API_URL"
+_CROSSREF_ALIAS_REMOVAL = "1.12.0"
+_warned_deprecated_setting = False
+
+
 def _api_url() -> Optional[str]:
-    """Resolve the crossref-local HTTP endpoint from Django settings."""
-    return getattr(django_settings, "CROSSREF_API_URL", None)
+    """Resolve the crossref-local HTTP endpoint from Django settings.
+
+    Reads ``SCITEX_SCHOLAR_CROSSREF_API_URL`` first; it always wins when
+    both spellings are set. The bare ``CROSSREF_API_URL`` is read second,
+    once per process with a warning naming both spellings. ``None`` under
+    either name means "not configured", never "fall through".
+    """
+    global _warned_deprecated_setting
+
+    value = getattr(django_settings, CROSSREF_API_URL_SETTING, None)
+    if value is not None:
+        return value
+    legacy = getattr(django_settings, CROSSREF_API_URL_SETTING_DEPRECATED, None)
+    if legacy is not None:
+        if not _warned_deprecated_setting:
+            _warned_deprecated_setting = True
+            logger.warning(
+                "Django setting %s is deprecated and will be removed in "
+                "scitex-scholar %s; define %s instead. Using the value from "
+                "%s for now.",
+                CROSSREF_API_URL_SETTING_DEPRECATED,
+                _CROSSREF_ALIAS_REMOVAL,
+                CROSSREF_API_URL_SETTING,
+                CROSSREF_API_URL_SETTING_DEPRECATED,
+            )
+        return legacy
+    return None
 
 
 def _get_builder():
