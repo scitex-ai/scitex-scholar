@@ -7,6 +7,17 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- **`scitex_scholar._django.views` refuses to import when the app is not in
+  the host's `INSTALLED_APPS`**, raising `ImproperlyConfigured` that names the
+  entry to add (`scitex_scholar._django.apps.ScholarEditorConfig`). On
+  2026-09-05 prod mounted the views without the app, Django's template loader
+  could not see `scholar/scholar.html`, and every logged-in request answered
+  500 while anonymous probes were redirected to login and saw nothing. The
+  refusal fires where the host's urlconf and `manage.py check` import the
+  module. It is silent when the app registry is not yet ready (an early
+  importer is unknown, not misconfigured).
+
 ### Changed
 - **`_server.py` imports `hosts_to_allow` from scitex-app (`>=0.11.0`)** instead of
   carrying its own copy. Scholar wrote the first implementation (#137); it was

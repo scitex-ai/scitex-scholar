@@ -670,4 +670,100 @@ def test_health_version_is_not_a_placeholder():
     assert version and version[0].isdigit(), f"unusable version field: {version!r}"
 
 
+# --- refuse to serve without our app installed (hub prod 2026-09-05) ---------
+#
+# The guard runs at IMPORT of `views` against the REAL app registry, so each
+# arm is a fresh interpreter that configures a genuine host project and
+# imports the module -- no fixture patching, the same shape hub runs. The
+# child gets PYTHONPATH pointed at the checkout under test, so it exercises
+# the same source the provenance guard in tests/conftest.py verified.
+
+_HOST_TEMPLATE = """
+import django
+from django.conf import settings
+settings.configure(
+    SECRET_KEY="test-only",
+    INSTALLED_APPS={installed_apps!r},
+    TEMPLATES=[{{"BACKEND": "django.template.backends.django.DjangoTemplates", "APP_DIRS": True}}],
+    STATIC_URL="/static/",
+)
+if {setup!r}:
+    django.setup()
+import scitex_scholar._django.views as views
+print("IMPORTED", views.APP_NAME)
+"""
+
+_HOST_APPS = ["django.contrib.contenttypes", "django.contrib.staticfiles", "scitex_ui"]
+
+
+def _import_views_in_host(installed_apps, setup=True):
+    """Run a throwaway host project that imports our views; return the result."""
+    import os
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    import scitex_scholar
+
+    src_dir = str(Path(scitex_scholar.__file__).resolve().parent.parent)
+    env = {**os.environ, "PYTHONPATH": src_dir}
+    env.pop("DJANGO_SETTINGS_MODULE", None)
+    code = _HOST_TEMPLATE.format(installed_apps=list(installed_apps), setup=setup)
+    return subprocess.run(
+        [sys.executable, "-c", code], env=env, capture_output=True, text=True, timeout=120
+    )
+
+
+def test_views_refuse_to_import_when_host_omits_our_app():
+    """Negative arm: the host forgot ScholarEditorConfig -> named refusal."""
+    # Arrange
+    host_apps = _HOST_APPS
+    # Act
+    result = _import_views_in_host(host_apps)
+    # Assert
+    assert (result.returncode != 0 and views.APP_CONFIG_PATH in result.stderr), result.stderr[-800:]
+
+
+def test_views_refusal_names_installed_apps_as_the_place_to_fix():
+    """The refusal must say WHERE to add the entry, not only that it is missing."""
+    # Arrange
+    host_apps = _HOST_APPS
+    # Act
+    result = _import_views_in_host(host_apps)
+    # Assert
+    assert "INSTALLED_APPS" in result.stderr, result.stderr[-800:]
+
+
+def test_views_import_when_host_installs_our_app():
+    """Positive control for the arms above: same host, app installed -> imports."""
+    # Arrange
+    host_apps = [*_HOST_APPS, views.APP_CONFIG_PATH]
+    # Act
+    result = _import_views_in_host(host_apps)
+    # Assert
+    assert result.returncode == 0 and "IMPORTED" in result.stdout, result.stderr[-800:]
+
+
+def test_views_import_stays_silent_when_registry_is_not_ready():
+    """Unknown is not "not installed": an importer that runs before django.setup() is not refused."""
+    # Arrange
+    host_apps = _HOST_APPS
+    # Act
+    result = _import_views_in_host(host_apps, setup=False)
+    # Assert
+    assert result.returncode == 0 and "IMPORTED" in result.stdout, result.stderr[-800:]
+
+
+def test_app_guard_checks_the_app_name_the_config_declares():
+    """The guard and apps.py must name the same app, or the guard lies."""
+    # Arrange
+    from scitex_scholar._django.apps import ScholarEditorConfig
+
+    expected = (ScholarEditorConfig.name, ScholarEditorConfig.__name__)
+    # Act
+    actual = (views.APP_NAME, views.APP_CONFIG_PATH.rsplit(".", 1)[1])
+    # Assert
+    assert actual == expected
+
+
 # EOF
