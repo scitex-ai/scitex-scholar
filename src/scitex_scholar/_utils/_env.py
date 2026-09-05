@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import logging
 import os
+from typing import Sequence
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +36,7 @@ _warned: set[str] = set()
 
 def resolve_env(
     canonical: str,
-    legacy: str | None = None,
+    legacy: str | Sequence[str] | None = None,
     default: str | None = None,
 ) -> str | None:
     """Return the value of ``canonical``, falling back to ``legacy`` loudly.
@@ -46,8 +47,10 @@ def resolve_env(
         The ``SCITEX_SCHOLAR_*`` name. Always read first, and always wins
         when both are set — the documented name must be the one that works.
     legacy
-        A pre-convention spelling still honoured for back-compat. Using it
-        emits a warning naming both spellings, once per process per variable.
+        A pre-convention spelling still honoured for back-compat, or several
+        of them in precedence order (the first one set wins). Using any of
+        them emits a warning naming it and the canonical spelling, once per
+        process per legacy name.
     default
         Returned when neither name is set.
 
@@ -60,17 +63,18 @@ def resolve_env(
     if value is not None:
         return value
 
-    if legacy:
-        legacy_value = os.environ.get(legacy)
+    legacy_names = (legacy,) if isinstance(legacy, str) else tuple(legacy or ())
+    for name in legacy_names:
+        legacy_value = os.environ.get(name)
         if legacy_value is not None:
-            if legacy not in _warned:
-                _warned.add(legacy)
+            if name not in _warned:
+                _warned.add(name)
                 logger.warning(
                     "%s is deprecated and will be removed; set %s instead. "
                     "Using the value from %s for now.",
-                    legacy,
+                    name,
                     canonical,
-                    legacy,
+                    name,
                 )
             return legacy_value
 

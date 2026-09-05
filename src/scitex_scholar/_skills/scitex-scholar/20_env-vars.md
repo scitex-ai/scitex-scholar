@@ -60,9 +60,9 @@ owning packages and only consumed read-only here.
 | Variable | Purpose | Default | Type |
 |---|---|---|---|
 | `SCITEX_SCHOLAR_CROSSREF_API_KEY` | CrossRef API key (polite pool). | `—` | string |
-| `SCITEX_SCHOLAR_CROSSREF_API_URL` | CrossRef endpoint override. | api.crossref.org | URL |
+| `SCITEX_SCHOLAR_CROSSREF_API_URL` | crossref-local HTTP endpoint (metadata engine AND citation graph / GUI). Not the public api.crossref.org, which is fixed in code. | http://127.0.0.1:3333 | URL |
 | `SCITEX_SCHOLAR_CROSSREF_EMAIL` | Mailto for CrossRef polite pool. | `—` | string |
-| `SCITEX_SCHOLAR_CROSSREF_LOCAL_API_URL` | crossref-local HTTP endpoint (citation graph). | http://localhost:8765 | URL |
+| `SCITEX_SCHOLAR_CROSSREF_LOCAL_API_URL` | DEPRECATED alias of `SCITEX_SCHOLAR_CROSSREF_API_URL` (read loudly; removed with the other legacy spellings). | — | URL |
 | `SCITEX_SCHOLAR_OPENALEX_API_URL` | OpenAlex endpoint override. | api.openalex.org | URL |
 | `SCITEX_SCHOLAR_PUBMED_API_KEY` | PubMed API key. | `—` | string |
 | `SCITEX_SCHOLAR_PUBMED_EMAIL` | PubMed mailto. | `—` | string |

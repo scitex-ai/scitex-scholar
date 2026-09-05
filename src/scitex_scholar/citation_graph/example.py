@@ -20,7 +20,7 @@ def main():
     print("  Citation Graph Example")
     print("=" * 70)
 
-    # Endpoint comes from SCITEX_SCHOLAR_CROSSREF_LOCAL_API_URL when set,
+    # Endpoint comes from SCITEX_SCHOLAR_CROSSREF_API_URL when set,
     # otherwise crossref-local's own default. Requires a running
     # crossref-local server.
     builder = CitationGraphBuilder()

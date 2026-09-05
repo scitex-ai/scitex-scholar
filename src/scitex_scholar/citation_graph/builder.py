@@ -33,9 +33,10 @@ class CitationGraphBuilder:
 
         Args:
             api_url: URL of the crossref-local HTTP API. When None, resolved
-                from ``SCITEX_SCHOLAR_CROSSREF_LOCAL_API_URL`` (legacy
-                ``CROSSREF_LOCAL_API_URL``), falling back to crossref-local's
-                own default endpoint.
+                from ``SCITEX_SCHOLAR_CROSSREF_API_URL`` (legacy
+                ``SCITEX_SCHOLAR_CROSSREF_LOCAL_API_URL`` / ``CROSSREF_LOCAL_API_URL``,
+                read loudly), falling back to crossref-local's own default
+                endpoint.
         """
         from .database_http import CitationDatabaseHTTP
 

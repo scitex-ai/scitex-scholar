@@ -7,9 +7,11 @@ HTTP API, which is the package that owns that corpus. This module resolves
 the endpoint ONCE (settings-load time) so `views.py` reads a plain setting
 instead of re-probing on every request.
 
-Resolution order: explicit arg, then `SCITEX_SCHOLAR_CROSSREF_LOCAL_API_URL`
-(legacy `CROSSREF_LOCAL_API_URL`), then crossref-local's own default
-endpoint. Returns None when crossref-local is not installed and no endpoint
+Resolution order: explicit arg, then `SCITEX_SCHOLAR_CROSSREF_API_URL` --
+the same variable the metadata engine and the documented env table use for
+this endpoint (the older `SCITEX_SCHOLAR_CROSSREF_LOCAL_API_URL` and
+`CROSSREF_LOCAL_API_URL` are still read, loudly, as legacy spellings) -- then
+crossref-local's own default endpoint. Returns None when crossref-local is not installed and no endpoint
 was configured -- the GUI then reports the citation-graph routes as
 unavailable rather than failing a request at a time.
 """
@@ -31,7 +33,8 @@ def find_crossref_api_url(api_url: Optional[str] = None) -> Optional[str]:
         return api_url
 
     env_url = resolve_env(
-        "SCITEX_SCHOLAR_CROSSREF_LOCAL_API_URL", legacy="CROSSREF_LOCAL_API_URL"
+        "SCITEX_SCHOLAR_CROSSREF_API_URL",
+        legacy=("SCITEX_SCHOLAR_CROSSREF_LOCAL_API_URL", "CROSSREF_LOCAL_API_URL"),
     )
     if env_url:
         return env_url

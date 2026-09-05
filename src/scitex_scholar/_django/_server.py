@@ -54,7 +54,7 @@ def run(
     """
     if api_url:
         # Write the canonical name; resolve_env reads this one first.
-        os.environ["SCITEX_SCHOLAR_CROSSREF_LOCAL_API_URL"] = api_url
+        os.environ["SCITEX_SCHOLAR_CROSSREF_API_URL"] = api_url
 
     # Serving on a non-loopback address requires that address in ALLOWED_HOSTS,
     # or Django answers 400 to every request while the startup banner still
