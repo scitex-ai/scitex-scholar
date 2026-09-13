@@ -803,3 +803,12 @@ Old and new forms route to the same handler, so behaviour is identical.
 - Hidden `metadata_engines/.combined-SemanticScholarSource/` backup directory.
 
 [1.1.0]: https://github.com/scitex-ai/scitex-scholar/compare/v1.0.1...v1.1.0
+
+### Fixed
+- **#94 — search placeholder is now example-driven.** The database-search
+  field showed the generic "Enter keywords…", which did not tell a researcher
+  whether to type a title, author, DOI, or concept. It now leads with a
+  concrete example ("e.g. graph neural networks for molecular property
+  prediction"), matching the in-repo convention the DOI field already uses
+  ("e.g. 10.1038/s41586-020-2008-3"). Guarded by
+  `test_search_placeholder_is_clear_and_example_driven`.
