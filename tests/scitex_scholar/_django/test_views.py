@@ -1151,6 +1151,28 @@ def test_search_input_has_a_44px_touch_target():
     assert token_declared and token_referenced and no_raw_fallback
 
 
+# --- item 94: the search placeholder must tell the user WHAT to type --------
+#
+# "Enter keywords…" is generic — a researcher does not know whether to type a
+# title, an author, a DOI, or a concept. The placeholder now leads with a
+# concrete example ("e.g. <a real query>") that models the intended input,
+# matching the in-repo convention already used by the DOI field
+# ("e.g. 10.1038/s41586-020-2008-3"). Guard the clearer text so it cannot
+# silently regress back to the generic label.
+# ---------------------------------------------------------------------------
+
+
+def test_search_placeholder_is_clear_and_example_driven():
+    # Arrange
+    body = _compass_index_body()
+    # Act
+    has_example = 'placeholder="e.g. ' in body
+    no_generic = 'Enter keywords' not in body
+    # Assert -- the placeholder models a concrete query and the generic
+    # "Enter keywords…" label is gone.
+    assert has_example and no_generic
+
+
 # --- item 116/115/114: "Search" must say WHERE it searches ------------------
 #
 # Compass 2026-09-10: a bare "Search" label does not tell a researcher whether
