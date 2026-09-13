@@ -208,9 +208,17 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         const text = await file.text();
         const params = new URLSearchParams({ format: "bibtex", bibtex: text });
+        // CSRF: the mounted hub enables CsrfViewMiddleware, so the Import POST
+        // must carry the token. Read it from the hidden input rendered by the
+        // {% csrf_token %} tag (populated by the middleware when enabled;
+        // empty/inert standalone).
+        const csrfInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
+        const csrf = csrfInput ? csrfInput.value : "";
+        const headers = { "Content-Type": "application/x-www-form-urlencoded" };
+        if (csrf) headers["X-CSRFToken"] = csrf;
         const resp = await fetch(`${STX_MOUNT}/api/library/import`, {
           method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          headers,
           body: params.toString(),
         });
         const data = await resp.json();

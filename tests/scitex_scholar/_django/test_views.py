@@ -1300,13 +1300,16 @@ def _library_env(root: Path):
 
 def _seed_library(root: Path, paper_id: str = "PID1",
                   doi: str = "10.1/example", title: str = "A paper",
-                  year: int = 2024, abstract: str = None) -> Path:
+                  year: int = 2024, abstract: str = None,
+                  authors: list = None) -> Path:
     """Create one master entry; return its metadata.json path."""
     entry = root / "MASTER" / paper_id
     entry.mkdir(parents=True, exist_ok=True)
     basic = {"title": title, "year": year}
     if abstract is not None:
         basic["abstract"] = abstract
+    if authors is not None:
+        basic["authors"] = authors
     meta = {"metadata": {"id": {"doi": doi}, "basic": basic}}
     path = entry / "metadata.json"
     path.write_text(_json.dumps(meta))
@@ -1534,6 +1537,177 @@ def test_library_template_has_import_export_controls():
     js_wires_both = "api/library/export" in js and "api/library/import" in js
     # Assert
     assert has_controls and js_wires_both
+
+
+# --- #162 review fixes: author fidelity, import path-safety, user isolation --
+
+_AUTHORS = ["Jane Importer", "John Second"]
+
+
+def test_library_export_carries_authors_in_every_format(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="AUTH1", doi="10.4/authors",
+                      title="Authored Paper", year=2022, authors=list(_AUTHORS))
+        rf = RequestFactory()
+    # Act
+    out = {}
+    with _library_env(tmp_path):
+        for fmt in ("bibtex", "ris", "endnote"):
+            resp = views.library_export(rf.get("/api/library/export", {"format": fmt}))
+            out[fmt] = resp.content.decode()
+    # Assert -- the exact author names must appear in EVERY supported format
+    # (BibTeX joins with " and "; RIS/EndNote split it into separate lines, so
+    # each name is present verbatim in all three).
+    assert all("Jane Importer" in b and "John Second" in b for b in out.values()), out
+
+
+def test_library_import_parses_payloads_as_content_not_paths(tmp_path):
+    # Arrange
+    secret = tmp_path / "secret.txt"
+    secret.write_text("TOP-SECRET-FILE-CONTENT-MUST-NOT-APPEAR")
+    # Payloads that papers_from_bibtex's auto-detection would misread as paths
+    # (a slash, a backslash, a path-like token) but are valid BibTeX content.
+    payloads = [
+        "@article{a,\n title={S1},\n url={http://x/y/z}\n}\n",
+        "@article{b,\n title={B1},\n doi={10.9/back\\\\slash}\n}\n",
+        "@article{c,\n title={P1},\n doi={10.9/./rel}\n}\n",
+    ]
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        # Act
+        results = []
+        for bib in payloads:
+            resp = views.library_import(
+                rf.post("/api/library/import", {"format": "bibtex", "bibtex": bib})
+            )
+            results.append(_json.loads(resp.content))
+        blob = _json.dumps(_json.loads(views.library_list(rf.get("/api/library")).content))
+    # Assert -- all three parsed as content, 3 papers total, and the secret
+    # server file was never read into the import.
+    assert (
+        all(r["imported"] == 1 for r in results)
+        and sum(r["imported"] for r in results) == 3
+        and "TOP-SECRET-FILE-CONTENT-MUST-NOT-APPEAR" not in blob
+        and str(secret) not in blob
+    ), results
+
+
+def test_library_isolated_between_two_mounted_users(tmp_path):
+    # Arrange
+    root_a, root_b = tmp_path / "user_a", tmp_path / "user_b"
+    rf = RequestFactory()
+
+    class _User:
+        def __init__(self, name):
+            self.username = name
+            self.is_authenticated = True
+            self.is_anonymous = lambda: False
+
+    def _req(path, data=None, user_root=None):
+        # POST when a body is supplied, otherwise GET.
+        r = rf.post(path, data or {}) if data else rf.get(path)
+        if user_root is not None:
+            r.user = _User(user_root.name)
+            r.scholar_library_root = str(user_root)
+        return r
+
+    # Act
+    a_root = views._library_root_for(_req("/api/library", user_root=root_a))
+    b_root = views._library_root_for(_req("/api/library", user_root=root_b))
+    # Bound roots drive both save (PaperIO at root/MASTER) and read (collect_rows),
+    # so no global env is needed -- this is the real mounted-user flow.
+    views.library_import(
+        _req("/api/library/import",
+             {"format": "bibtex",
+              "bibtex": "@article{aa,\n title={A only},\n doi={10.a/1}\n}\n"},
+             user_root=root_a))
+    a_papers = _json.loads(views.library_list(_req("/api/library", user_root=root_a)).content)["papers"]
+    a_exp = views.library_export(_req("/api/library/export?format=bibtex", user_root=root_a)).content.decode()
+    b_papers = _json.loads(views.library_list(_req("/api/library", user_root=root_b)).content)["papers"]
+    b_exp = views.library_export(_req("/api/library/export?format=bibtex", user_root=root_b)).content.decode()
+    # Assert -- user A's paper is invisible to user B (list + export isolation).
+    a_has = any(p["title"] == "A only" for p in a_papers)
+    b_has = any(p["title"] == "A only" for p in b_papers)
+    assert (
+        a_root != b_root
+        and a_root.name == "user_a"
+        and b_root.name == "user_b"
+        and a_has
+        and not b_has
+        and "A only" in a_exp
+        and "A only" not in b_exp
+    ), (a_root, b_root, a_papers, b_papers)
+
+
+def test_assert_safe_library_id_rejects_unsafe_components():
+    # Arrange
+    bad = ["../escape", "a/b", "a\\b", "a\x00b", "..", ".", ""]
+
+    def _rejects(x):
+        try:
+            views._assert_safe_library_id(x)
+            return False
+        except ValueError:
+            return True
+
+    # Act
+    rejected = [x for x in bad if _rejects(x)]
+    accepted = views._assert_safe_library_id("AB12CD34")
+    # Assert
+    assert rejected == bad and accepted == "AB12CD34"
+
+
+def test_library_import_view_is_not_csrf_exempt():
+    # Arrange
+    # Act
+    exempt = getattr(views.library_import, "csrf_exempt", False)
+    # Assert -- the view must NOT opt out of CSRF (that would weaken the
+    # mounted route); protection comes from the host's CsrfViewMiddleware.
+    assert exempt is False
+
+
+def test_library_import_is_csrf_protected_but_token_path_works(tmp_path):
+    # Arrange
+    # Model the mounted Hub: add CsrfViewMiddleware (the standalone settings
+    # carry none, so a token-less POST would otherwise pass) and use a Client
+    # that enforces CSRF. Render the index to obtain the csrftoken cookie --
+    # the {% csrf_token %} tag in scholar.html now pulls it, which is exactly
+    # the value the Library Import JS will send back as X-CSRFToken.
+    from django.conf import settings as _s
+    from django.test import Client
+
+    mw = list(_s.MIDDLEWARE)
+    if "django.middleware.csrf.CsrfViewMiddleware" not in mw:
+        if "django.middleware.security.SecurityMiddleware" in mw:
+            mw.insert(mw.index("django.middleware.security.SecurityMiddleware") + 1,
+                      "django.middleware.csrf.CsrfViewMiddleware")
+        else:
+            mw.insert(0, "django.middleware.csrf.CsrfViewMiddleware")
+
+    with _library_env(tmp_path / "user"), override_settings(MIDDLEWARE=mw):
+        csrf_client = Client(enforce_csrf_checks=True)
+        csrf_client.get("/")  # index renders {% csrf_token %} -> sets cookie
+        cookie = csrf_client.cookies.get("csrftoken")
+        token = cookie.value if cookie else ""
+        bibtex = "@article{c,\n title={CSRF Test},\n doi={10.5/csrf}\n}\n"
+        # Act
+        no_token = csrf_client.post(
+            "/api/library/import", {"format": "bibtex", "bibtex": bibtex}
+        )
+        with_token = csrf_client.post(
+            "/api/library/import",
+            {"format": "bibtex", "bibtex": bibtex},
+            HTTP_X_CSRFTOKEN=token,
+        )
+    # Assert -- cookie set, token-less POST rejected (CSRF intact), token POST
+    # succeeds and imports the paper.
+    assert (
+        bool(cookie)
+        and no_token.status_code == 403
+        and with_token.status_code == 200
+        and _json.loads(with_token.content)["imported"] == 1
+    ), (no_token.status_code, with_token.status_code, with_token.content)
 
 
 # EOF

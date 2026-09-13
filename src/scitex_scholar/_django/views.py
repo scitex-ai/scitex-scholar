@@ -532,13 +532,76 @@ def search(request):
 
 
 def _library_root() -> Path:
-    """The library root this view serves. Default: the user's home library."""
+    """The library root for the STANDALONE local user (or the server-side env
+    override used in tests). Default: the user's home library."""
     override = os.environ.get("SCITEX_SCHOLAR_LIBRARY_ROOT")
     if override:
         return Path(override).expanduser().resolve()
     from scitex_scholar._cli._library_shared import default_library_root
 
     return default_library_root()
+
+
+def _safe_username(user) -> str:
+    """A request user reduced to a single safe path component."""
+    name = str(getattr(user, "username", None) or getattr(user, "pk", "") or "user")
+    # Only keep alnum / underscore / hyphen; collapse the rest so the result
+    # can never escape its parent directory (no separators, no dot, no NUL).
+    name = "".join(ch if (ch.isalnum() or ch in "_-") else "_" for ch in name)
+    return name or "user"
+
+
+def _mounted_user_root(user) -> Path:
+    """Per-request-user library root for a MOUNTED (hub) deployment.
+
+    The hub runs one server process (a service account), so the process-global
+    home library must NOT be shared across authenticated users. Scope each user
+    to their own directory. The base is set by the host via
+    SCITEX_SCHOLAR_MOUNTED_LIBRARY_BASE (the explicit integration seam the hub
+    configures); a safe default keeps it contained if unset.
+    """
+    base = os.environ.get("SCITEX_SCHOLAR_MOUNTED_LIBRARY_BASE")
+    if not base:
+        base = str(Path.home() / ".scitex" / "scholar" / "mounted")
+    return Path(base) / _safe_username(user)
+
+
+def _library_root_for(request) -> Path:
+    """Resolve the library root a request operates on, per user.
+
+    Precedence:
+      1. Explicit integration seam: a mounted host (or a test) binds the
+         request's root by setting ``request.scholar_library_root``. This is the
+         seam the hub uses to give each authenticated user their own library.
+      2. Authenticated hub user (and no explicit binding): a per-user scoped
+         root, so the shared service-account home is never exposed to everyone.
+      3. Standalone local user: the home library (or the server-side
+         SCITEX_SCHOLAR_LIBRARY_ROOT env override used in tests).
+    """
+    bound = getattr(request, "scholar_library_root", None)
+    if bound:
+        return Path(bound).expanduser().resolve()
+    user = getattr(request, "user", None)
+    if (
+        user is not None
+        and getattr(user, "is_authenticated", False)
+        and not getattr(user, "is_anonymous", lambda: True)()
+    ):
+        return _mounted_user_root(user)
+    return _library_root()
+
+
+def _assert_safe_library_id(library_id: str) -> str:
+    """A persisted library_id is a single path component under MASTER/.
+
+    It must not contain a path separator, NUL, or be a traversal token --
+    otherwise ``MASTER/<library_id>`` could escape the library root.
+    """
+    if not library_id or "/" in library_id or "\\" in library_id or "\x00" in library_id:
+        raise ValueError(f"unsafe library_id: {library_id!r}")
+    if library_id in (".", ".."):
+        raise ValueError("unsafe library_id: traversal token")
+    return library_id
 
 
 def _load_library_paper(root: Path, paper_id: str):
@@ -565,10 +628,13 @@ def _save_library_paper(paper, root: Path) -> Path:
     store is keyed by the running user, and rebuilding it here would couple the
     GUI to a store the app may not own. Reading back is done straight from the
     master files (see library_list), which is the same user-scope guarantee.
+
+    The library_id is validated to be a single safe path component BEFORE any
+    write, so MASTER/<library_id> can never escape the library root.
     """
     from scitex_scholar.storage.PaperIO import PaperIO
 
-    paper_id = paper.container.library_id
+    library_id = _assert_safe_library_id(paper.container.library_id)
     io = PaperIO(paper, base_dir=root / "MASTER")
     return io.save_metadata()
 
@@ -578,12 +644,12 @@ def library_list(request):
     """List the user's local library papers.
 
     Returns {papers: [...], count, library_root}. Reads the user's MASTER
-    metadata files directly (``collect_rows`` -- "no store involved"), so the
-    list is scoped to this user's local library and never depends on a shared
-    relational index. An empty or missing library is an empty list, not an
-    error.
+    metadata files directly (``collect_rows`` -- "no store involved"), scoped
+    to the request's user (see ``_library_root_for``), so a mounted hub never
+    exposes one shared service-account library to every user. An empty or
+    missing library is an empty list, not an error.
     """
-    root = _library_root()
+    root = _library_root_for(request)
     from scitex_scholar.storage import _library_index as idx
 
     try:
@@ -630,7 +696,7 @@ def library_enrich(request, _pipeline=None):
         return JsonResponse({"error": "paper_id required"}, status=400)
     force = (request.POST.get("force") or "").lower() in ("1", "true", "yes")
 
-    root = _library_root()
+    root = _library_root_for(request)
     meta_path = root / "MASTER" / paper_id / "metadata.json"
     if not meta_path.is_file():
         return JsonResponse({"error": f"library paper not found: {paper_id}"}, status=404)
@@ -684,7 +750,13 @@ LIBRARY_IMPORT_FORMATS = ("bibtex",)
 
 
 def _row_to_formatting_dict(row: dict) -> dict:
-    """Map a library index row to the dict shape papers_to_format expects."""
+    """Map a library index row to the dict shape papers_to_format expects.
+
+    The bibtex/ris/endnote formatters read ``authors_str`` (a joined name
+    string) -- NOT the ``authors`` list -- so both are supplied: ``authors``
+    for consumers that want the structured list and ``authors_str`` so the
+    export actually carries the author names (defect: it used to drop them).
+    """
     import json as _json
 
     authors = row.get("authors_json")
@@ -693,9 +765,17 @@ def _row_to_formatting_dict(row: dict) -> dict:
             authors = _json.loads(authors)
         except (ValueError, TypeError):
             authors = []
+    if not isinstance(authors, list):
+        authors = []
+    # The stored author is a name string (or {"name": ...}); join with " and "
+    # -- the separator to_ris/to_endnote split on -- so multi-author exports
+    # keep every author as a distinct entry.
+    names = [a.get("name") if isinstance(a, dict) else str(a) for a in authors if a]
+    authors_str = " and ".join(names)
     return {
         "title": row.get("title") or "",
-        "authors": authors or [],
+        "authors": names,
+        "authors_str": authors_str,
         "year": row.get("year"),
         "journal": row.get("venue"),
         "doi": row.get("doi"),
@@ -720,7 +800,7 @@ def library_export(request):
             status=400,
         )
 
-    root = _library_root()
+    root = _library_root_for(request)
     from scitex_scholar.formatting import papers_to_format
     from scitex_scholar.storage import _library_index as idx
 
@@ -785,14 +865,21 @@ def library_import(request):
     if not bibtex_text:
         return JsonResponse({"error": "bibtex field required"}, status=400)
 
-    root = _library_root()
+    root = _library_root_for(request)
     try:
-        # Use the library's configured BibTeX handler (it carries project/
-        # config, which the bare handler lacks -- measured: a no-arg
-        # BibTeXHandler() parses 0 papers, the configured one parses them).
-        from scitex_scholar.storage.ScholarLibrary import ScholarLibrary
+        # Parse the POST body as BibTeX CONTENT, never as a file path. The
+        # public papers_from_bibtex auto-detects path-vs-content and would READ
+        # A SERVER FILE if the (untrusted) payload contained "/", "\\", "~",
+        # or a leading "." -- so we call the text parser directly, bypassing
+        # that detection. Importing ScholarLibrary registers the scitex_io
+        # BibTeX loader the parser needs (a bare BibTeXHandler otherwise
+        # parses 0 entries); the handler itself is config-independent for text.
+        # (Defect 2.) The regression test (slash/backslash/path-like payloads)
+        # proves no server file is read.
+        import scitex_scholar.storage.ScholarLibrary  # noqa: F401 -- registers loader
+        from scitex_scholar.storage.BibTeXHandler import BibTeXHandler
 
-        papers = ScholarLibrary(root).papers_from_bibtex(bibtex_text)
+        papers = BibTeXHandler()._papers_from_bibtex_text(bibtex_text)
         if not papers:
             return JsonResponse(
                 {"error": "No papers found in the provided BibTeX", "imported": 0},
@@ -801,9 +888,12 @@ def library_import(request):
 
         imported = []
         for paper in papers:
-            paper.container.library_id = _derived_library_id(paper)
+            # Validate the id is a single safe path component BEFORE persisting,
+            # so MASTER/<library_id> can never escape the library root.
+            library_id = _assert_safe_library_id(_derived_library_id(paper))
+            paper.container.library_id = library_id
             _save_library_paper(paper, root)
-            imported.append(paper.container.library_id)
+            imported.append(library_id)
 
         return JsonResponse({"ok": True, "imported": len(imported), "paper_ids": imported})
     except Exception as e:

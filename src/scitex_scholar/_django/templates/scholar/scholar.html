@@ -273,6 +273,13 @@ API infrastructure.
                                     <button type="button" id="libraryImportBtn" class="btn-control-library">Import BibTeX</button>
                                 </div>
                                 <div id="libraryIoStatus" class="library-io__status"></div>
+                                <!-- CSRF: emitted by the standard {% csrf_token %}
+                                     tag. Inert standalone (no CsrfViewMiddleware,
+                                     value empty); when the mounted hub enables
+                                     CSRF, it carries the real token that the
+                                     Library Import POST sends as X-CSRFToken. We
+                                     deliberately do NOT @csrf_exempt the view. -->
+                                {% csrf_token %}
                                 <div id="libraryLoading" class="graph-loading hidden">
                                     <div class="loading-spinner">
                                         <div class="spinner-ring"></div>

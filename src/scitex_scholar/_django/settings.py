@@ -105,6 +105,11 @@ TEMPLATES = [
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.request",
+                # Required for the {% csrf_token %} tag in scholar.html
+                # (the Library Import POST). Inert standalone (no CSRF
+                # middleware); emits the real token when the host -- the
+                # mounted hub -- enables CsrfViewMiddleware.
+                "django.template.context_processors.csrf",
             ],
         },
     },
