@@ -582,11 +582,15 @@ def _library_root_for(request) -> Path:
     if bound:
         return Path(bound).expanduser().resolve()
     user = getattr(request, "user", None)
-    if (
-        user is not None
-        and getattr(user, "is_authenticated", False)
-        and not getattr(user, "is_anonymous", lambda: True)()
-    ):
+    # is_anonymous is a BOOL property on a real Django user (AbstractBaseUser),
+    # not a method -- calling it (the old `getattr(user, 'is_anonymous',
+    # lambda: True)()`) raised TypeError for every authenticated hub user and
+    # 500'd all three library endpoints on the live /v2/ route. Read it as a
+    # value, tolerating a callable only for non-Django mocks.
+    is_anon = getattr(user, "is_anonymous", True)
+    if callable(is_anon):
+        is_anon = is_anon()
+    if user is not None and getattr(user, "is_authenticated", False) and not is_anon:
         return _mounted_user_root(user)
     return _library_root()
 

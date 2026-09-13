@@ -1602,7 +1602,10 @@ def test_library_isolated_between_two_mounted_users(tmp_path):
         def __init__(self, name):
             self.username = name
             self.is_authenticated = True
-            self.is_anonymous = lambda: False
+            # Plain bool, matching a real Django user model (AbstractBaseUser
+            # exposes is_anonymous as a bool property, NOT a method). The old
+            # `lambda: False` mock made it callable and masked the live 500.
+            self.is_anonymous = False
 
     def _req(path, data=None, user_root=None):
         # POST when a body is supplied, otherwise GET.
@@ -1708,6 +1711,62 @@ def test_library_import_is_csrf_protected_but_token_path_works(tmp_path):
         and with_token.status_code == 200
         and _json.loads(with_token.content)["imported"] == 1
     ), (no_token.status_code, with_token.status_code, with_token.content)
+
+
+# --- #163 live regression: is_anonymous is a BOOL on a real Django user -------
+#
+# The merged #163 _library_root_for did `getattr(user, 'is_anonymous',
+# lambda: True)()` -- CALLING is_anonymous. On a real Django user model that is
+# a bool PROPERTY, so every authenticated /v2/ user raised
+# TypeError: 'bool' object is not callable -> 500 on all three library
+# endpoints. The earlier isolation test masked this by mocking
+# `is_anonymous = lambda: False` (callable) AND binding seam-1, so seam-2 never
+# ran against a genuine user. This test exercises seam-2 (authenticated user,
+# NO request.scholar_library_root) with a real-shape user (bool is_anonymous)
+# so the class of defect is caught in CI.
+# ---------------------------------------------------------------------------
+
+
+def test_library_root_for_authenticated_user_with_bool_is_anonymous(tmp_path):
+    # Arrange
+    # A real-shape user: is_anonymous is a plain bool (AbstractBaseUser),
+    # is_authenticated True, NO callable. Seam-2: no scholar_library_root set.
+    class _RealUser:
+        username = "alice"
+        is_authenticated = True
+        is_anonymous = False
+
+    rf = RequestFactory()
+    req = rf.get("/api/library")
+    req.user = _RealUser()
+    # Act
+    with _library_env(tmp_path):
+        root = views._library_root_for(req)
+        home = views._library_root()
+    # Assert: seam-2 must produce a per-user mounted root (named after the
+    # user), not the standalone home.
+    assert root != home and root.name == _RealUser.username
+
+
+def test_library_root_for_anonymous_user_uses_standalone(tmp_path):
+    # Arrange
+    # Anonymous user (bool is_anonymous True) must fall through to the
+    # standalone home library, not the mounted per-user root.
+    class _Anon:
+        username = None
+        is_authenticated = False
+        is_anonymous = True
+
+    rf = RequestFactory()
+    req = rf.get("/api/library")
+    req.user = _Anon()
+    # Act
+    with _library_env(tmp_path):
+        root = views._library_root_for(req)
+        home = views._library_root()
+    # Assert: anonymous user falls through to the standalone home library
+    # (same root the env override defines), not a per-user mounted root.
+    assert root == home
 
 
 # EOF
