@@ -1769,4 +1769,49 @@ def test_library_root_for_anonymous_user_uses_standalone(tmp_path):
     assert root == home
 
 
+# --- UI226: scholar surface tokens must follow the light/dark theme ----------
+#
+# The six --bg-* / --accent-hover / --edge-color surfaces are scholar-owned but
+# MUST be theme-aware: pinned to dark literals in :root alone, they render
+# dark-on-dark in light mode (the approved dark screenshot was fine; the light
+# one was broken). theme.css flips its own tokens via [data-theme="dark"], so
+# scholar mirrors that: light values in :root, dark values under
+# [data-theme="dark"]. These guards pin both states so the regression cannot
+# return silently.
+# ---------------------------------------------------------------------------
+
+
+def test_base_css_declares_light_surfaces_in_root():
+    # Arrange
+    base = (COMPASS_CSS_DIR / "_base.css").read_text()
+    # Act
+    has_root_block = ":root {" in base
+    light_bg_primary = "--bg-primary: #f5f4f2" in base  # shell light surface
+    # Assert -- :root (the light default) carries light, not dark, surfaces.
+    assert has_root_block and light_bg_primary
+
+
+def test_base_css_declares_dark_surfaces_under_data_theme_dark():
+    # Arrange
+    base = (COMPASS_CSS_DIR / "_base.css").read_text()
+    # Act
+    has_dark_block = '[data-theme="dark"] {' in base
+    dark_bg_primary = "--bg-primary: #0d0d0d" in base  # scholar's original dark
+    # Assert -- a [data-theme="dark"] override restores the approved dark
+    # surfaces, so dark mode is unchanged while light mode is fixed.
+    assert has_dark_block and dark_bg_primary
+
+
+def test_base_css_light_and_dark_surfaces_differ():
+    # Arrange
+    base = (COMPASS_CSS_DIR / "_base.css").read_text()
+    # Act
+    # Both a light and a dark value for --bg-primary must be present, and they
+    # must be different tokens (a single pinned value is the original bug).
+    has_light = "--bg-primary: #f5f4f2" in base
+    has_dark = "--bg-primary: #0d0d0d" in base
+    # Assert
+    assert has_light and has_dark
+
+
 # EOF
