@@ -119,3 +119,24 @@
   border-color: var(--accent);
   color: var(--accent);
 }
+
+/*
+ * Mobile search form (768px and below): the form-row groups must stretch to
+ * the full card width. The desktop rule above (`.graph-form .form-row {
+ * align-items: flex-end }`) wins the cascade over `_layout.css`'s
+ * `.form-row { align-items: stretch }` — this file loads last in
+ * scholar.css's @import chain, and both selectors have equal specificity
+ * (0,2,0) — so without this override the stacked form-groups right-align at
+ * their intrinsic width (~207px in a 324px form), and the query input
+ * inherits that 207px and its placeholder truncates. This block restores the
+ * stretch at matching specificity and source order.
+ */
+@media (max-width: 768px) {
+  .graph-form .form-row {
+    align-items: stretch;
+  }
+  .graph-form .form-row .form-group--doi,
+  .graph-form .form-row .form-group--options {
+    width: 100%;
+  }
+}

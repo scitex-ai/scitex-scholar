@@ -812,3 +812,19 @@ Old and new forms route to the same handler, so behaviour is identical.
   prediction"), matching the in-repo convention the DOI field already uses
   ("e.g. 10.1038/s41586-020-2008-3"). Guarded by
   `test_search_placeholder_is_clear_and_example_driven`.
+
+### Fixed
+- **Mobile search form: query input and "Search databases" button now stack
+  full-width on a 390px viewport.** The input + button shared a flex *row*
+  inside `.input-wrapper`, leaving the query input ~182px wide with its
+  placeholder visibly truncated; the stacked `.form-group` also right-aligned
+  at intrinsic width (~207px) because `_forms.css`'s desktop
+  `.graph-form .form-row { align-items: flex-end }` won the cascade over
+  `_layout.css`'s mobile `.form-row { align-items: stretch }` (equal
+  specificity, `_forms.css` loads last in the `@import` chain). The fix:
+  below 768px the `.input-wrapper` stacks vertically (input full-width,
+  button full-width beneath it) and a matching-specificity `.graph-form
+  .form-row { align-items: stretch }` override in `_forms.css` makes the form
+  groups fill the card width. Desktop is unchanged (825px input, button on
+  the same row). Guards: `test_search_input_button_stack_vertically_on_mobile`
+  + `test_mobile_form_row_stretches_groups_full_width`.

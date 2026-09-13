@@ -134,6 +134,19 @@
   }
   .input-wrapper {
     width: 100%;
+    /*
+     * The input + "Search databases" button share a flex row on desktop.
+     * On a 390px viewport that row leaves the input only ~182px wide with
+     * its placeholder visibly truncated. Stack the wrapper vertically so the
+     * input gets the full card width and the button sits below it at full
+     * width — readable placeholder, comfortable tap target.
+     */
+    flex-direction: column;
+    gap: 10px;
+  }
+  .input-wrapper .btn-build {
+    width: 100%;
+    justify-content: center;
   }
   .form-input,
   .form-select {
