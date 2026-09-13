@@ -1282,6 +1282,59 @@ def test_search_form_row_stacks_on_mobile():
     assert in_mobile_block and stacks_form_row and input_can_shrink
 
 
+def test_search_input_button_stack_vertically_on_mobile():
+    # Arrange
+    # The input + "Search databases" button share a flex ROW inside
+    # .input-wrapper. On a 390px viewport that row leaves the input only
+    # ~182px wide with its placeholder truncated. Below the breakpoint the
+    # wrapper must stack vertically (input full-width, button full-width under
+    # it) so the placeholder reads and the button stays tappable.
+    layout_css = (COMPASS_CSS_DIR / "_layout.css").read_text()
+    # Act
+    # Isolate the @media (max-width: 768px) block and assert the wrapper rule
+    # and the button rule both live INSIDE it (not just anywhere in the file).
+    media = layout_css.split("@media (max-width: 768px)", 1)
+    in_mobile = len(media) == 2
+    block = media[1] if in_mobile else ""
+    # The .input-wrapper rule must set flex-direction: column inside the block.
+    wrapper_rule = re.search(
+        r"\.input-wrapper\s*{[^}]*flex-direction:\s*column[^}]*}", block
+    )
+    # The .btn-build inside the wrapper must go full-width inside the block.
+    button_rule = re.search(
+        r"\.input-wrapper\s+\.btn-build\s*{[^}]*width:\s*100%[^}]*}", block
+    )
+    # Assert
+    assert in_mobile and wrapper_rule and button_rule
+
+
+def test_mobile_form_row_stretches_groups_full_width():
+    # Arrange
+    # Root cause of the 182px-truncated-placeholder defect: `_forms.css` loads
+    # AFTER `_layout.css` in scholar.css's @import chain, so the desktop rule
+    # `.graph-form .form-row { align-items: flex-end }` (specificity 0,2,0)
+    # overrode `_layout.css`'s mobile `.form-row { align-items: stretch }`
+    # (specificity 0,1,0). Stacked form-groups then right-aligned at intrinsic
+    # width (~207px), and the input inherited that. The guard requires a
+    # matching-specificity mobile override in _forms.css that stretches the
+    # row and the groups to full width.
+    forms_css = (COMPASS_CSS_DIR / "_forms.css").read_text()
+    # Act
+    media = forms_css.split("@media (max-width: 768px)", 1)
+    in_mobile = len(media) == 2
+    block = media[1] if in_mobile else ""
+    stretch = re.search(
+        r"\.graph-form\s+\.form-row\s*{[^}]*align-items:\s*stretch[^}]*}", block
+    )
+    full_width_groups = re.search(
+        r"\.graph-form\s+\.form-row\s+\.form-group--doi\s*,?\s*\n?\s*"
+        r"\.graph-form\s+\.form-row\s+\.form-group--options\s*{[^}]*width:\s*100%[^}]*}",
+        block,
+    )
+    # Assert
+    assert in_mobile and stretch and full_width_groups
+
+
 # ---------------------------------------------------------------------------
 # #106: metadata enrichment as a contextual Library operation.
 #
