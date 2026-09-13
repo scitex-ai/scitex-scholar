@@ -7,6 +7,17 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+- **Scholar standalone GUI now follows the light/dark theme** (UI226). The
+  scholar-owned surface tokens (`--bg-*`, `--accent-hover`, `--edge-color`)
+  were pinned to DARK literals in `:root` with no `[data-theme="dark"]`
+  override, while the seven shadowed text/border tokens are theme-aware — so
+  in light mode the shell/sidebar/search panel stayed near-black with dark
+  text on them (dark-on-dark, low contrast) over a white shell body. The fix
+  mirrors scitex-ui `theme.css`'s own pattern: light values in `:root` (the
+  shell's own light surfaces) and the original dark literals under
+  `[data-theme="dark"]`, so dark mode is unchanged and light mode is coherent.
+
 ### Added
 - **Metadata enrichment is now a contextual Library operation** (product
   compass #106). The Library tab lists the user's local library and each paper

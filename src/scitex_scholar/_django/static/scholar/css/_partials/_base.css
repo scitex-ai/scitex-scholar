@@ -19,19 +19,31 @@
  * scitex-ui so the whole product moves together — that is the entire reason
  * for consuming the shared token rather than copying its value.
  *
- * The six below are KEPT DELIBERATELY: shell/theme.css does not declare them.
- * (It offers --workspace-bg-* equivalents for the backgrounds, but hub's
- * ruling was theme.css only, one link, so scholar keeps its own surfaces.)
- * Deleting these would resolve them to nothing and the page would lose every
- * background — silently, because an undefined custom property is not an error.
+ * The six below are KEPT DELIBERATELY: shell/theme.css does not declare
+ * --bg-* / --accent-hover / --edge-color (it offers --workspace-bg-*
+ * equivalents, but hub's ruling was theme.css only, one link, so scholar
+ * keeps its own surfaces). Deleting these would resolve them to nothing and
+ * the page would lose every background — silently, because an undefined
+ * custom property is not an error.
+ *
+ * UI226 (2026-09-13): these surfaces MUST follow the theme. The old code
+ * pinned them to DARK literals in :root with no [data-theme="dark"] block,
+ * while the seven shadowed text/border tokens ARE theme-aware -- so in light
+ * mode the panels stayed #0d0d0d-class black with dark text on them
+ * (dark-on-dark) over a white shell body. The fix mirrors theme.css's own
+ * pattern: light values in :root, dark values under [data-theme="dark"], so
+ * every theme state is coherent. The dark values are scholar's original
+ * literals (dark mode stays visually unchanged); the light values are the
+ * shell's own light surfaces (theme.css --workspace-bg-*) so scholar matches
+ * the shell it renders inside.
  */
 :root {
-  --bg-primary: #0d0d0d;
-  --bg-secondary: #151515;
-  --bg-tertiary: #1a1a1a;
-  --bg-monaco: #1e1e1e;
-  --accent-hover: #047857;
-  --edge-color: #3a3a3a;
+  --bg-primary: #f5f4f2;
+  --bg-secondary: #efeeed;
+  --bg-tertiary: #e8e7e5;
+  --bg-monaco: #fdfcfa;
+  --accent-hover: #059669;
+  --edge-color: #c0bfbd;
   /*
    * #93: the database-search input is the app's primary control, so it is
    * sized up from the standard control height. Declared HERE (scholar's own
@@ -45,6 +57,20 @@
    * scitex-ui colours the template must not redeclare (see test_views.py).
    */
   --scholar-search-height: 48px;
+}
+
+/*
+ * Dark surfaces under [data-theme="dark"] -- mirrors scitex-ui theme.css's own
+ * light-in-:root / dark-in-[data-theme="dark"] split. Values are scholar's
+ * ORIGINAL dark literals, so the approved dark screenshot is unchanged.
+ */
+[data-theme="dark"] {
+  --bg-primary: #0d0d0d;
+  --bg-secondary: #151515;
+  --bg-tertiary: #1a1a1a;
+  --bg-monaco: #1e1e1e;
+  --accent-hover: #047857;
+  --edge-color: #3a3a3a;
 }
 
 /* ── Reset & Base ──────────────────────────────────────────── */
