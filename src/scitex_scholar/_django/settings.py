@@ -90,10 +90,25 @@ INSTALLED_APPS.append("scitex_ui")
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     # Alt+I / Ctrl+I visual debugging overlay.
     "scitex_ui.middleware.ElementInspectorMiddleware",
 ]
+
+# i18n (operator directive 2026-09-14: EN default, full JA translation).
+# LocaleMiddleware is BEFORE CommonMiddleware so the language is resolved
+# per-request. Mounted in the hub: follows Django's active language
+# (django_language cookie). Standalone: falls back to the browser locale via
+# CommonMiddleware + USE_I18N (LANGUAGE_CODE is the final default).
+LANGUAGE_CODE = "en"
+LANGUAGES = [
+    ("en", "English"),
+    ("ja", "日本語"),
+]
+USE_I18N = True
+USE_L10N = True
+LOCALE_PATHS = [BASE_DIR.parent / "locale"]  # src/scitex_scholar/locale/
 
 ROOT_URLCONF = "scitex_scholar._django._standalone_urls"
 
