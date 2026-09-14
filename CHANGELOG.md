@@ -849,3 +849,19 @@ Old and new forms route to the same handler, so behaviour is identical.
   `.btn-primary` so the full-width stacked layout on 390px is preserved.
   Guards: `test_search_primary_distinct_from_build_graph` (negative control —
   fails on the pre-change template) + `test_btn_primary_uses_accent_token_and_44px_minimum`.
+
+### Fixed
+- **Citation-graph service status now explains what is limited and what to do
+  (TODO 150-152, hub live audit 2026-09-14).** The sidebar showed
+  "Service limited / Unknown" with no explanation or next step. `/api/graph/
+  health` now returns a user-facing `{status, error, detail, fix}` for every
+  limited state: the not-configured 503, the unreachable 503 (previously leaked
+  the raw exception string), and the **degraded** state (endpoint up but the
+  canary probe returned no data — previously fell through to a bare
+  "Service limited / Unknown" because the client never handled it). The label
+  names the capability ("Citation Graph: …") so the user knows what is
+  affected.
+- **The internal crossref-local endpoint URL is no longer shown to users.**
+  The Advanced panel printed the raw `{{ api_url }}` (e.g.
+  `http://127.0.0.1:8000`) and the health endpoint body carried `api_url`;
+  both are removed. The UI keeps the Configured / Not-configured state label.

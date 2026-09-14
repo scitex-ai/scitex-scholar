@@ -931,6 +931,73 @@ def test_graph_health_keeps_its_status_field_alongside_the_fix():
     assert body.get("status") == expected
 
 
+# --- item 150-152 (hub live audit 2026-09-14) ---------------------------------
+#
+# 3. The Advanced panel printed the raw crossref-local endpoint URL
+#    (http://127.0.0.1:8000) to the user, and the health endpoint leaked
+#    `api_url` in its body. Server infrastructure is not a user concern; the
+#    UI must show state (Configured / Not configured) without the address.
+# 2. "Service limited / Unknown" said WHAT was wrong and not WHAT TO DO.
+#    Limited states now carry a label naming the capability, an explanation,
+#    and a next step.
+# ---------------------------------------------------------------------------
+
+
+def test_template_does_not_render_the_crossref_endpoint_url():
+    # Arrange — the not-configured render (default test settings) must show the
+    # state label without the endpoint address or the old explanation line.
+    body = _compass_index_body()
+    # Act
+    url_var_removed = "{{ api_url }}" not in body
+    old_line_removed = "No crossref-local endpoint detected" not in body
+    shows_state = "Not configured" in body
+    # Assert
+    assert shows_state and url_var_removed and old_line_removed
+
+
+def test_configured_template_states_configured_without_leaking_the_url():
+    # Arrange — a configured endpoint: the UI must say "Configured" but must
+    # NOT print the address (item 3: server infrastructure is not user-facing).
+    with override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL="http://crossref-local.internal:3000"):
+        # Act
+        configured_body = _compass_index_body()
+    # Assert
+    assert "Configured" in configured_body and "crossref-local.internal" not in configured_body
+
+
+def test_graph_health_endpoint_does_not_leak_api_url():
+    # Arrange — configured but unreachable (a closed port), so the except
+    # branch runs and the old code would have put `api_url` in the body.
+    with override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL="http://127.0.0.1:1"):
+        request = RequestFactory().get("/api/graph/health")
+        response = views.graph_health(request)
+    # Act
+    body = json.loads(response.content)
+    # Assert — no endpoint address anywhere in the limited-state body, and the
+    # user-facing answer (label + explanation + next step) is present.
+    no_leak = "api_url" not in body and "127.0.0.1:1" not in json.dumps(body)
+    has_answer = all(k in body for k in ("error", "detail", "fix"))
+    assert no_leak and has_answer, body
+
+
+def test_graph_health_degraded_state_explains_and_does_not_leak():
+    # Arrange — the view returns _degraded_payload() verbatim when a reachable
+    # endpoint answers with no data for the canary DOI; test the pure payload
+    # (no network mock) so the limited-state contract is pinned.
+    # Act
+    body = views._degraded_payload()
+    # Assert — names the capability, explains the limit, gives a next step,
+    # and carries no endpoint address.
+    assert (
+        body.get("status") == "degraded"
+        and body.get("error", "").startswith("Citation Graph")
+        and "detail" in body
+        and "fix" in body
+        and "api_url" not in body
+        and not any("://" in str(v) for v in body.values())
+    ), body
+
+
 def test_the_four_routes_give_one_explanation_not_four():
     """One shared payload: four routes must not drift into four stories."""
     # Arrange

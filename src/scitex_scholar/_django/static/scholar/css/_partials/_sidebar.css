@@ -54,3 +54,12 @@
   font-size: 11px;
   color: var(--text-muted);
 }
+
+/* item 150-152: the "next step" line under a limited status — slightly more
+   prominent than .status-detail (it is the action the user can take). */
+.status-fix {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}

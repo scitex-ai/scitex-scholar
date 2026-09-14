@@ -47,22 +47,30 @@ class CitationGraphManager {
     const el = document.getElementById("serviceStatus");
     if (!el) return;
 
+    // Render helper: a status dot + label, and (when limited) the explanation
+    // of what is limited and what the user can DO. The health endpoint returns
+    // {status, error, detail, fix}; `detail`/`fix` are the answer, `error` the
+    // one-line label (item 150-152, hub live audit 2026-09-14).
+    const set = (cls, label, detail, fix) => {
+      let html =
+        '<span class="status-indicator ' + cls + '">&#9679; ' + label + "</span>";
+      if (detail) html += '<small class="status-detail">' + detail + "</small>";
+      if (fix) html += '<small class="status-fix">' + fix + "</small>";
+      el.innerHTML = html;
+    };
+
     try {
       const resp = await fetch(STX_MOUNT + "/api/graph/health");
       const data = await resp.json();
       if (data.status === "healthy") {
-        el.innerHTML =
-          '<span class="status-indicator status-healthy">&#9679; Service available</span>';
+        set("status-healthy", "Service available");
+      } else if (data.status === "degraded") {
+        set("status-warning", data.error || "Service limited", data.detail, data.fix);
       } else {
-        el.innerHTML =
-          '<span class="status-indicator status-warning">&#9679; Service limited</span>' +
-          '<small class="status-detail">' +
-          (data.error || "Unknown") +
-          "</small>";
+        set("status-error", data.error || "Service unavailable", data.detail, data.fix);
       }
     } catch {
-      el.innerHTML =
-        '<span class="status-indicator status-error">&#9679; Service unavailable</span>';
+      set("status-error", "Service unavailable");
     }
   }
 
