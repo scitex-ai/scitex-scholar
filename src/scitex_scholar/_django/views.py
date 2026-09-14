@@ -437,7 +437,14 @@ def graph_paper(request):
 
 @require_GET
 def graph_health(request):
-    """Health check for citation graph service."""
+    """Health check for citation graph service.
+
+    The response is the ANSWER, not the diagnosis: it says which capability
+    is affected, what is limited, and what the user can DO (item 150-152,
+    hub live audit 2026-09-14). It deliberately does NOT expose the internal
+    crossref-local endpoint URL — that is server infrastructure, not a user
+    concern (the previous body leaked `http://127.0.0.1:8000` to the UI).
+    """
     api_url = _api_url()
     if not api_url:
         return JsonResponse(
@@ -447,22 +454,53 @@ def graph_health(request):
     try:
         builder = _get_builder()
         summary = builder.get_paper_summary("10.1038/s41586-020-2008-3")
-        return JsonResponse(
-            {
-                "status": "healthy" if summary else "degraded",
-                "api_url": api_url,
-                "api_accessible": True,
-            }
-        )
-    except Exception as e:
+        if summary:
+            return JsonResponse({"status": "healthy"})
+        # Configured and reachable but the canary probe returned no data — the
+        # capability is limited, not broken (previously fell through to a bare
+        # "Service limited / Unknown" because the client never handled it).
+        return JsonResponse(_degraded_payload(), status=200)
+    except Exception:
+        # Configured but unreachable/errored — limited with the cause and the
+        # fix, instead of the raw exception string (which can name internal
+        # hosts).
         return JsonResponse(
             {
                 "status": "unhealthy",
-                "api_url": api_url,
-                "error": str(e),
+                "error": "Citation Graph: unavailable",
+                "detail": (
+                    "The crossref-local endpoint is configured but could not "
+                    "be reached right now, so citation graphs cannot be built."
+                ),
+                "fix": (
+                    "Verify the crossref-local service is running and that "
+                    "the endpoint is reachable, then retry."
+                ),
             },
             status=503,
         )
+
+
+def _degraded_payload() -> dict:
+    """The limited-state body for a reachable-but-empty canary probe.
+
+    Built as a pure helper so the degraded branch is testable without mocking
+    the network: the view returns ``_degraded_payload()`` verbatim when the
+    builder answers with no data for the canary DOI.
+    """
+    return {
+        "status": "degraded",
+        "error": "Citation Graph: limited",
+        "detail": (
+            "The crossref-local endpoint is configured and reachable, but the "
+            "probe returned no data for the canary paper. Citation graphs may "
+            "be incomplete."
+        ),
+        "fix": (
+            "Check that the crossref-local endpoint is serving the corpus you "
+            "expect; the citation graph depends on it."
+        ),
+    }
 
 
 @require_GET
