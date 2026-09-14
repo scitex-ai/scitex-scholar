@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function formatAuthors(paper) {
     const authors = paper.authors || [];
-    if (!authors.length) return "Unknown authors";
+    if (!authors.length) return scholarT("Unknown authors");
     const names = authors.map((a) =>
       typeof a === "string" ? a : a.name || "",
     );
@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const title = document.createElement("div");
     title.className = "search-result__title";
     // textContent, not innerHTML: titles and abstracts are third-party data.
-    title.textContent = paper.title || "Untitled";
+    title.textContent = paper.title || scholarT("Untitled");
     item.appendChild(title);
 
     const meta = document.createElement("div");
@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const graphBtn = document.createElement("button");
       graphBtn.type = "button";
       graphBtn.className = "search-result__graph-btn";
-      graphBtn.textContent = "Build citation graph";
+      graphBtn.textContent = scholarT("Build citation graph");
       graphBtn.addEventListener("click", () => buildGraphFromDoi(paper.doi));
       doiLine.appendChild(graphBtn);
 

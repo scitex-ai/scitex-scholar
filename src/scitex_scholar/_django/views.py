@@ -32,6 +32,7 @@ from django.template.loader import render_to_string
 
 from django.apps import apps as _django_apps
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.translation import gettext as _i18n  # noqa: N816  (JS string dict)
 
 # The dotted INSTALLED_APPS entry a host must carry for these views to
 # work. Kept as ONE string so the refusal below and the docs name the
@@ -266,6 +267,14 @@ def index(request):
             "api_url": resolved_api or "Not configured",
             "stx_mount": mount_prefix(request),
             "app_label": _app_label("SciTeX Scholar"),
+            # i18n (operator directive 2026-09-14): the whole page flips via
+            # LocaleMiddleware; this carries the strings that live ONLY in
+            # JS, translated server-side for the current request language so
+            # the client never hardcodes a language. Pre-serialized JSON
+            # (ensure_ascii=False so Japanese stays readable, not \uXXXX).
+            # Rendered into <script type="application/json" id="SCHOLAR_I18N">;
+            # the client reads it via JSON.parse (see scholarT in stx-mount.js).
+            "scholar_i18n_json": json.dumps(_js_i18n_dict(), ensure_ascii=False),
             # The scitex-ui workspace shell renders three side panes
             # (Console/Chat, Files, Viewer) around the app content. Scholar
             # has no content for them, and because the template extends the
@@ -279,6 +288,44 @@ def index(request):
         request=request,
     )
     return HttpResponse(html)
+
+
+def _js_i18n_dict() -> dict:
+    """The JS-only strings, translated for the CURRENT request language.
+
+    Built once per render so the active language (django_language cookie on
+    the hub; browser locale standalone) is honoured. Keys are the English
+    source strings; the client looks them up in window["SCHOLAR_I18N"]. A
+    key with `%(name)s` is interpolated client-side (scholarT).
+    """
+    return {
+        "Build citation graph": _i18n("Build citation graph"),
+        "Build Graph": _i18n("Build Graph"),
+        "Enrich": _i18n("Enrich"),
+        "Graph Controls": _i18n("Graph Controls"),
+        "Ignore cache": _i18n("Ignore cache"),
+        "Unknown authors": _i18n("Unknown authors"),
+        "Untitled": _i18n("Untitled"),
+        "Service available": _i18n("Service available"),
+        "Service limited": _i18n("Service limited"),
+        "Service unavailable": _i18n("Service unavailable"),
+        "Unknown": _i18n("Unknown"),
+        "Checking...": _i18n("Checking..."),
+        "Related papers": _i18n("Related papers"),
+        "Papers": _i18n("Papers"),
+        "Paper": _i18n("Paper"),
+        "char abstract": _i18n("char abstract"),
+        "citations": _i18n("citations"),
+        "Enriched: %(parts)s": _i18n("Enriched: %(parts)s"),
+        "Enriching…": _i18n("Enriching…"),
+        "Enrichment failed": _i18n("Enrichment failed"),
+        "Enrichment failed (HTTP %(status)s)": _i18n("Enrichment failed (HTTP %(status)s)"),
+        "Your library is empty. Save papers from Search or Import, then Enrich them here.": _i18n(
+            "Your library is empty. Save papers from Search or Import, then Enrich them here."
+        ),
+        "Imported %(n)s paper from %(file)s": _i18n("Imported %(n)s paper from %(file)s"),
+        "Imported %(n)s papers from %(file)s": _i18n("Imported %(n)s papers from %(file)s"),
+    }
 
 
 @require_GET

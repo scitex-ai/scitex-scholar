@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const parts = [];
       if (paper.abstract) parts.push("abstract");
       if (paper.citation_count) parts.push(`${paper.citation_count} citations`);
-      status.textContent = `Enriched: ${parts.join(", ")}`;
+      status.textContent = scholarT("Enriched: %(parts)s", { parts: parts.join(", ") });
     }
     main.appendChild(status);
 
@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const enrichBtn = document.createElement("button");
     enrichBtn.type = "button";
     enrichBtn.className = "library-enrich-btn";
-    enrichBtn.textContent = "Enrich";
+    enrichBtn.textContent = scholarT("Enrich");
     enrichBtn.addEventListener("click", () =>
       enrich(paper, enrichBtn, status),
     );
@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function enrich(paper, btn, statusEl) {
     btn.disabled = true;
-    btn.textContent = "Enriching\u2026";
+    btn.textContent = scholarT("Enriching…");
     statusEl.textContent = "";
     try {
       const params = new URLSearchParams({ paper_id: paper.paper_id });
@@ -109,22 +109,27 @@ document.addEventListener("DOMContentLoaded", () => {
         body: params.toString(),
       });
       const data = await resp.json();
-      if (!resp.ok) throw new Error(data.error || `Enrichment failed (${resp.status})`);
+      if (!resp.ok) throw new Error(data.error || scholarT("Enrichment failed (HTTP %(status)s)", { status: resp.status }));
       // Reflect the fresh metadata on the row without a full reload.
       if (data.abstract_chars) {
-        statusEl.textContent = `Enriched: ${data.abstract_chars}-char abstract` +
-          (data.citation_count ? `, ${data.citation_count} citations` : "");
+        const parts = [
+          data.abstract_chars + " " + scholarT("char abstract"),
+        ];
+        if (data.citation_count) {
+          parts.push(data.citation_count + " " + scholarT("citations"));
+        }
+        statusEl.textContent = scholarT("Enriched: %(parts)s", { parts: parts.join(", ") });
       }
       if (data.title) {
         const t = btn.closest(".library-item").querySelector(".library-item__title");
         if (t) t.textContent = data.title;
       }
     } catch (err) {
-      statusEl.textContent = `Enrichment failed: ${err.message}`;
+      statusEl.textContent = scholarT("Enrichment failed") + ": " + err.message;
       statusEl.classList.add("library-item__enrich-status--error");
     } finally {
       btn.disabled = false;
-      btn.textContent = "Enrich";
+      btn.textContent = scholarT("Enrich");
     }
   }
 
@@ -139,12 +144,16 @@ document.addEventListener("DOMContentLoaded", () => {
       hide(loadingEl);
       listEl.replaceChildren();
       const papers = data.papers || [];
-      if (statsEl) statsEl.textContent = `${papers.length} paper${papers.length === 1 ? "" : "s"}`;
+      if (statsEl) {
+        const n = papers.length;
+        statsEl.textContent = n + " " + scholarT(n === 1 ? "Paper" : "Papers");
+      }
       if (!papers.length) {
         const empty = document.createElement("div");
         empty.className = "empty-message";
-        empty.textContent =
-          "Your library is empty. Save papers from Search or Import, then Enrich them here.";
+        empty.textContent = scholarT(
+          "Your library is empty. Save papers from Search or Import, then Enrich them here.",
+        );
         listEl.appendChild(empty);
       } else {
         papers.forEach((p) => listEl.appendChild(makeRow(p)));
@@ -223,7 +232,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || `Import failed (${resp.status})`);
-        setIoStatus(`Imported ${data.imported} paper${data.imported === 1 ? "" : "s"} from ${file.name}.`);
+        setIoStatus(scholarT(`Imported ${data.imported} paper${data.imported === 1 ? "" : "s"} from ${file.name}.`));
         importFile.value = "";
         loadLibrary(true); // refresh the list to show the imported papers
       } catch (err) {

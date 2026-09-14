@@ -38,3 +38,20 @@ if (!_stxMountEl) {
   );
 }
 const STX_MOUNT = _stxMountEl.content;
+
+// i18n: translated-string lookup for JS. The server renders a
+// <script type="application/json" id="SCHOLAR_I18N"> block (LocaleMiddleware-
+// driven, whole page flips together — no EN/JA mix). scholarT(key) returns the
+// translated string, or the key itself if missing (so a forgotten key is
+// visibly wrong, not silently English). scholarT(key, {n}) supports %(n)s.
+let _scholarI18n = null;
+function scholarT(key, vars) {
+  if (!_scholarI18n) {
+    const el = document.getElementById("SCHOLAR_I18N");
+    _scholarI18n = el ? JSON.parse(el.textContent) : {};
+  }
+  let s = _scholarI18n[key];
+  if (s == null) return key;
+  if (vars) for (const k of Object.keys(vars)) s = s.replace("%(" + k + ")s", String(vars[k]));
+  return s;
+}

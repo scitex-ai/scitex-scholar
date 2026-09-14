@@ -63,14 +63,14 @@ class CitationGraphManager {
       const resp = await fetch(STX_MOUNT + "/api/graph/health");
       const data = await resp.json();
       if (data.status === "healthy") {
-        set("status-healthy", "Service available");
+        set("status-healthy", scholarT("Service available"));
       } else if (data.status === "degraded") {
-        set("status-warning", data.error || "Service limited", data.detail, data.fix);
+        set("status-warning", data.error || scholarT("Service limited"), data.detail, data.fix);
       } else {
-        set("status-error", data.error || "Service unavailable", data.detail, data.fix);
+        set("status-error", data.error || scholarT("Service unavailable"), data.detail, data.fix);
       }
     } catch {
-      set("status-error", "Service unavailable");
+      set("status-error", scholarT("Service unavailable"));
     }
   }
 
