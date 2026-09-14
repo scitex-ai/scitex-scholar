@@ -407,7 +407,8 @@ API infrastructure.
              type="application/json" id="SCHOLAR_I18N"> block; the client reads
              it via window["SCHOLAR_I18N"] (see scholarT in stx-mount.js). The
              whole page flips together, so there is never an EN/JA mix. -->
-        <script type="application/json" id="SCHOLAR_I18N">{{ scholar_i18n_json }}</script>
+        <!-- json_script, not a plain variable: autoescape turns " into &quot;, which a script body never decodes. -->
+        {{ scholar_i18n|json_script:"SCHOLAR_I18N" }}
         <script src="{% static 'scholar/js/stx-mount.js' %}"></script>
         <script src="{% static 'scholar/js/app.js' %}"></script>
 <script src="{% static 'scholar/js/search.js' %}"></script>
