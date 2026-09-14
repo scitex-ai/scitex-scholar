@@ -95,6 +95,38 @@
 .btn-build:hover {
   background: var(--accent-hover);
 }
+/*
+ * #95: the database-search submit is the app's PRIMARY action, distinct from
+ * the secondary .btn-build (Build Graph / per-row actions). It carries the
+ * scitex-ui --accent token (theme-aware: light + dark both resolve from
+ * theme.css) and a 44px touch-target minimum so it reads as primary AND stays
+ * tappable on mobile. Same background token as .btn-build so light/dark stay
+ * coherent; the distinction is semantic (the class), not a recolour.
+ */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 20px;
+  background: var(--accent);
+  border: none;
+  border-radius: 6px;
+  color: var(--text-inverse);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+.btn-primary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
 
 .graph-controls {
   display: flex;

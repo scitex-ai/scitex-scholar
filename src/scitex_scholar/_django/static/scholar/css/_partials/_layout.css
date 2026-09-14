@@ -144,7 +144,8 @@
     flex-direction: column;
     gap: 10px;
   }
-  .input-wrapper .btn-build {
+  .input-wrapper .btn-build,
+  .input-wrapper .btn-primary {
     width: 100%;
     justify-content: center;
   }
