@@ -865,3 +865,20 @@ Old and new forms route to the same handler, so behaviour is identical.
   The Advanced panel printed the raw `{{ api_url }}` (e.g.
   `http://127.0.0.1:8000`) and the health endpoint body carried `api_url`;
   both are removed. The UI keeps the Configured / Not-configured state label.
+
+### Added
+- **i18n: English default + full Japanese translation (TODO 152, operator
+  directive 2026-09-14).** Django gettext for the server templates (all 50
+  user-facing strings in `scholar.html` wrapped), `LocaleMiddleware` +
+  `LANGUAGES` in settings, and a Japanese catalog
+  (`src/scitex_scholar/locale/ja/LC_MESSAGES/django.po` + compiled `.mo`, 67
+  msgids — proper nouns like DOI/CrossRef API/format names stay in Latin).
+  Mounted in the hub the page follows Django's active language
+  (`django_language` cookie); standalone follows the browser locale.
+  Client-rendered strings use a server-rendered per-language JSON dict
+  (`<script id="SCHOLAR_I18N">` + `scholarT()` in `stx-mount.js`) — an interim
+  mechanism, to be replaced by scitex-ui's shared shell-i18n primitive
+  (`scitex-ui-shell-i18n-en-ja-20260914`) when it publishes.
+  Guards: 4 tests (EN default render; JA render not byte-identical to EN; JA
+  render has no untranslated labels; catalog translates every msgid).
+  147 `_django` pass (143 + 4); audit 0 unmasked.

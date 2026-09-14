@@ -1,5 +1,5 @@
 {% extends "scitex_ui/standalone_shell.html" %}
-{% load static %}
+{% load static i18n %}
 {% comment %}
 Extends scitex-ui's shared workspace shell, so scholar renders inside the same
 frame as every other leaf (scitex-storage, scitex-writer, figrecipe) instead of
@@ -73,8 +73,8 @@ API infrastructure.
 {% block app_content %}
         <!-- Header -->
         <header class="app-header">
-            <h1>SciTeX Scholar</h1>
-            <span class="subtitle">Scientific Literature Management</span>
+            <h1>{% trans "SciTeX Scholar" %}</h1>
+            <span class="subtitle">{% trans "Scientific Literature Management" %}</span>
         </header>
         <div class="app-container">
             <!-- Sidebar -->
@@ -82,18 +82,18 @@ API infrastructure.
                 <!-- Service Status -->
                 <div class="sidebar-section">
                     <div class="sidebar-section__header">
-                        <span class="sidebar-section__title">Service Status</span>
+                        <span class="sidebar-section__title">{% trans "Service Status" %}</span>
                     </div>
                     <div class="sidebar-section__content">
                         <div id="serviceStatus">
-                            <span class="status-indicator status-checking">&#9679; Checking...</span>
+                            <span class="status-indicator status-checking">&#9679; {% trans "Checking..." %}</span>
                         </div>
                     </div>
                 </div>
                 <!-- Controls (graph interaction, shown only while the Graph tab is active) -->
                 <div class="sidebar-section graph-controls-hint" data-graph-hint>
                     <div class="sidebar-section__header">
-                        <span class="sidebar-section__title">Graph Controls</span>
+                        <span class="sidebar-section__title">{% trans "Graph Controls" %}</span>
                     </div>
                     <div class="sidebar-section__content"
                          style="font-size: 11px;
@@ -102,19 +102,19 @@ API infrastructure.
                             <kbd style="background: var(--bg-tertiary);
                                         border: 1px solid var(--border-default);
                                         padding: 1px 4px;
-                                        font-size: 10px">Scroll</kbd> Zoom
+                                        font-size: 10px">{% trans "Scroll" %}</kbd> {% trans "Zoom" %}
                         </div>
                         <div style="margin-bottom: 6px;">
                             <kbd style="background: var(--bg-tertiary);
                                         border: 1px solid var(--border-default);
                                         padding: 1px 4px;
-                                        font-size: 10px">Drag</kbd> Pan
+                                        font-size: 10px">{% trans "Drag" %}</kbd> {% trans "Pan" %}
                         </div>
                         <div>
                             <kbd style="background: var(--bg-tertiary);
                                         border: 1px solid var(--border-default);
                                         padding: 1px 4px;
-                                        font-size: 10px">Click</kbd> Select node
+                                        font-size: 10px">{% trans "Click" %}</kbd> {% trans "Select node" %}
                         </div>
                     </div>
                 </div>
@@ -128,9 +128,9 @@ API infrastructure.
             <main class="app-main">
                 <!-- Tab Navigation: Search is the primary, default action. -->
                 <nav class="tab-nav">
-                    <button class="tab-btn active" data-tab="search">Search databases</button>
-                    <button class="tab-btn" data-tab="library">Library</button>
-                    <button class="tab-btn" data-tab="graph">Citation Graph</button>
+                    <button class="tab-btn active" data-tab="search">{% trans "Search databases" %}</button>
+                    <button class="tab-btn" data-tab="library">{% trans "Library" %}</button>
+                    <button class="tab-btn" data-tab="graph">{% trans "Citation Graph" %}</button>
                 </nav>
                 <!-- Search Tab (default) -->
                 <div id="tab-search" class="tab-panel active">
@@ -138,29 +138,29 @@ API infrastructure.
                         <!-- Input Form -->
                         <div class="graph-card">
                             <div class="graph-card__header">
-                                <span class="graph-card__title">Search Papers</span>
+                                <span class="graph-card__title">{% trans "Search Papers" %}</span>
                             </div>
                             <div class="graph-card__body">
                                 <p class="graph-description">
-                                    Search academic databases (OpenAlex, Crossref, PubMed,
+                                    {% blocktrans %}Search academic databases (OpenAlex, Crossref, PubMed,
                                     Semantic Scholar, &#8230;) by keyword. This searches
                                     <strong>external databases</strong>, not your Library
-                                    (a separate tab).
+                                    (a separate tab).{% endblocktrans %}
                                 </p>
                                 <form id="searchForm" class="graph-form">
                                     <div class="form-row">
                                         <div class="form-group--doi">
-                                            <label class="form-label" for="searchInput">Query</label>
+                                            <label class="form-label" for="searchInput">{% trans "Query" %}</label>
                                             <div class="input-wrapper">
                                                 <input type="text"
                                                        id="searchInput"
                                                        class="form-input"
                                                        placeholder="e.g. graph neural networks for molecular property prediction">
-                                                <button type="submit" class="btn-primary">Search databases</button>
+                                                <button type="submit" class="btn-primary">{% trans "Search databases" %}</button>
                                             </div>
                                         </div>
                                         <div class="form-group--options">
-                                            <label class="form-label" for="searchMaxResults">Results</label>
+                                            <label class="form-label" for="searchMaxResults">{% trans "Results" %}</label>
                                             <select id="searchMaxResults" class="form-select">
                                                 <option value="10">10</option>
                                                 <option value="20" selected>20</option>
@@ -178,34 +178,34 @@ API infrastructure.
                                     need on the first screen (compass L653).
                                 -->
                                 <details class="search-advanced">
-                                    <summary class="search-advanced__summary">Advanced</summary>
+                                    <summary class="search-advanced__summary">{% trans "Advanced" %}</summary>
                                     <div class="search-advanced__body">
                                         <p class="search-advanced__syntax">
-                                            Query syntax:
+                                            {% blocktrans %}Query syntax:
                                             <code>-word</code> excludes a term,
                                             <code>year:2020-2024</code> bounds the
                                             publication year,
-                                            <code>if:&gt;5</code> filters by impact factor.
+                                            <code>if:&gt;5</code> filters by impact factor.{% endblocktrans %}
                                         </p>
                                         <div class="search-advanced__row">
-                                            <label class="form-label" for="searchMode">Search source</label>
+                                            <label class="form-label" for="searchMode">{% trans "Search source" %}</label>
                                             <select id="searchMode" class="form-select">
-                                                <option value="parallel" selected>All sources (parallel)</option>
-                                                <option value="single">Single source</option>
+                                                <option value="parallel" selected>{% trans "All sources (parallel)" %}</option>
+                                                <option value="single">{% trans "Single source" %}</option>
                                             </select>
                                         </div>
                                         <div class="search-advanced__row">
                                             <label class="search-advanced__check">
                                                 <input type="checkbox" id="searchNoCache">
-                                                Ignore cache
+                                                {% trans "Ignore cache" %}
                                             </label>
                                         </div>
                                         <div class="search-advanced__row search-advanced__api">
-                                            <span class="form-label">CrossRef API</span>
+                                            <span class="form-label">{% trans "CrossRef API" %}</span>
                                             {% if api_available %}
-                                                <span style="color: var(--accent);">&#9679;</span> Configured
+                                                <span style="color: var(--accent);">&#9679;</span> {% trans "Configured" %}
                                             {% else %}
-                                                <span style="color: var(--status-error);">&#9679;</span> Not configured
+                                                <span style="color: var(--status-error);">&#9679;</span> {% trans "Not configured" %}
                                             {% endif %}
                                         </div>
                                     </div>
@@ -219,14 +219,14 @@ API infrastructure.
                                 <div class="spinner-ring"></div>
                                 <div class="spinner-ring"></div>
                             </div>
-                            <div class="loading-text">Searching databases... This may take a moment.</div>
+                            <div class="loading-text">{% trans "Searching databases... This may take a moment." %}</div>
                         </div>
                         <!-- Error -->
                         <div id="searchError" class="graph-error hidden">
-                            <p id="searchErrorMessage">An error occurred</p>
+                            <p id="searchErrorMessage">{% trans "An error occurred" %}</p>
                             <button class="btn-build"
                                     onclick="document.getElementById('searchError').classList.add('hidden')">
-                                Dismiss
+                                {% trans "Dismiss" %}
                             </button>
                         </div>
                         <!-- Results -->
@@ -234,7 +234,7 @@ API infrastructure.
                             <div class="graph-card">
                                 <div class="graph-card__header">
                                     <span class="graph-card__title">
-                                        Results
+                                        {% trans "Results" %}
                                         <small id="searchStats" class="card-subtitle"></small>
                                     </span>
                                 </div>
@@ -251,32 +251,32 @@ API infrastructure.
                     <div class="citation-graph-container">
                         <div class="graph-card">
                             <div class="graph-card__header">
-                                <span class="graph-card__title">Library</span>
+                                <span class="graph-card__title">{% trans "Library" %}</span>
                                 <small id="libraryStats" class="card-subtitle"></small>
                             </div>
                             <div class="graph-card__body">
                                 <p class="graph-description">
-                                    Your papers, stored locally. Use <strong>Enrich</strong>
+                                    {% blocktrans %}Your papers, stored locally. Use <strong>Enrich</strong>
                                     to fill in metadata (abstract, citations, impact
                                     factor) from the databases, or
                                     <strong>Import</strong> BibTeX and
-                                    <strong>Export</strong> your library.
+                                    <strong>Export</strong> your library.{% endblocktrans %}
                                 </p>
                                 <!-- Import / Export (#106 / L327): library-level
                                      operations, thin wrappers over the package's
                                      BibTeX handler + formatter. -->
                                 <div class="library-io">
-                                    <label class="library-io__label" for="libraryExportFormat">Export</label>
+                                    <label class="library-io__label" for="libraryExportFormat">{% trans "Export" %}</label>
                                     <select id="libraryExportFormat" class="form-select library-io__select">
-                                        <option value="bibtex" selected>BibTeX (.bib)</option>
-                                        <option value="ris">RIS (.ris)</option>
-                                        <option value="endnote">EndNote (.enw)</option>
+                                        <option value="bibtex" selected">{% trans "BibTeX (.bib)" %}</option>
+                                        <option value="ris">{% trans "RIS (.ris)" %}</option>
+                                        <option value="endnote">{% trans "EndNote (.enw)" %}</option>
                                     </select>
-                                    <button type="button" id="libraryExportBtn" class="btn-control-library">Export</button>
+                                    <button type="button" id="libraryExportBtn" class="btn-control-library">{% trans "Export" %}</button>
                                     <span class="library-io__sep"></span>
                                     <input type="file" id="libraryImportFile" class="library-io__file"
                                            accept=".bib,.bibtex,.txt" hidden>
-                                    <button type="button" id="libraryImportBtn" class="btn-control-library">Import BibTeX</button>
+                                    <button type="button" id="libraryImportBtn" class="btn-control-library">{% trans "Import BibTeX" %}</button>
                                 </div>
                                 <div id="libraryIoStatus" class="library-io__status"></div>
                                 <!-- CSRF: emitted by the standard {% csrf_token %}
@@ -292,13 +292,13 @@ API infrastructure.
                                         <div class="spinner-ring"></div>
                                         <div class="spinner-ring"></div>
                                     </div>
-                                    <div class="loading-text">Loading your library...</div>
+                                    <div class="loading-text">{% trans "Loading your library..." %}</div>
                                 </div>
                                 <div id="libraryError" class="graph-error hidden">
-                                    <p id="libraryErrorMessage">An error occurred</p>
+                                    <p id="libraryErrorMessage">{% trans "An error occurred" %}</p>
                                     <button class="btn-build"
                                             onclick="document.getElementById('libraryError').classList.add('hidden')">
-                                        Dismiss
+                                        {% trans "Dismiss" %}
                                     </button>
                                 </div>
                                 <div id="libraryList" class="library-list"></div>
@@ -312,28 +312,27 @@ API infrastructure.
                         <!-- Input Form -->
                         <div class="graph-card">
                             <div class="graph-card__header">
-                                <span class="graph-card__title">Build Citation Network</span>
+                                <span class="graph-card__title">{% trans "Build Citation Network" %}</span>
                             </div>
                             <div class="graph-card__body">
                                 <p class="graph-description">
-                                    Enter a DOI to build an interactive citation network. The graph shows
-                                    related papers based on bibliographic coupling, co-citation, and direct citations.
+                                    {% trans "Enter a DOI to build an interactive citation network. The graph shows related papers based on bibliographic coupling, co-citation, and direct citations." %}
                                 </p>
                                 <form id="graphForm" class="graph-form">
                                     <div class="form-row">
                                         <div class="form-group--doi">
-                                            <label class="form-label" for="doiInput">DOI</label>
+                                            <label class="form-label" for="doiInput">{% trans "DOI" %}</label>
                                             <div class="input-wrapper">
                                                 <input type="text"
                                                        id="doiInput"
                                                        class="form-input"
                                                        placeholder="e.g. 10.1038/s41586-020-2008-3"
                                                        value="10.1038/s41586-020-2008-3">
-                                                <button type="submit" class="btn-build">Build Graph</button>
+                                                <button type="submit" class="btn-build">{% trans "Build Graph" %}</button>
                                             </div>
                                         </div>
                                         <div class="form-group--options">
-                                            <label class="form-label" for="topN">Papers</label>
+                                            <label class="form-label" for="topN">{% trans "Papers" %}</label>
                                             <select id="topN" class="form-select">
                                                 <option value="10">10</option>
                                                 <option value="20" selected>20</option>
@@ -352,14 +351,14 @@ API infrastructure.
                                 <div class="spinner-ring"></div>
                                 <div class="spinner-ring"></div>
                             </div>
-                            <div class="loading-text">Building citation network... This may take a moment.</div>
+                            <div class="loading-text">{% trans "Building citation network... This may take a moment." %}</div>
                         </div>
                         <!-- Error -->
                         <div id="graphError" class="graph-error hidden">
-                            <p id="graphErrorMessage">An error occurred</p>
+                            <p id="graphErrorMessage">{% trans "An error occurred" %}</p>
                             <button class="btn-build"
                                     onclick="document.getElementById('graphError').classList.add('hidden')">
-                                Dismiss
+                                {% trans "Dismiss" %}
                             </button>
                         </div>
                         <!-- Visualization -->
@@ -367,16 +366,16 @@ API infrastructure.
                             <div class="graph-card graph-card--full">
                                 <div class="graph-card__header">
                                     <span class="graph-card__title">
-                                        <span id="graphTitle">Citation Network</span>
+                                        <span id="graphTitle">{% trans "Citation Network" %}</span>
                                         <small id="graphStats"
                                                style="font-weight: 400;
                                                       color: var(--text-muted);
                                                       margin-left: 12px"></small>
                                     </span>
                                     <div class="graph-controls">
-                                        <button id="fitViewBtn" class="btn-control" title="Fit to view">&#8689;</button>
-                                        <button id="resetZoomBtn" class="btn-control" title="Reset zoom">&#8634;</button>
-                                        <button id="downloadSvgBtn" class="btn-control" title="Download SVG">&#8681;</button>
+                                        <button id="fitViewBtn" class="btn-control" title="{% trans "Fit to view" %}">&#8689;</button>
+                                        <button id="resetZoomBtn" class="btn-control" title="{% trans "Reset zoom" %}">&#8634;</button>
+                                        <button id="downloadSvgBtn" class="btn-control" title="{% trans "Download SVG" %}">&#8681;</button>
                                     </div>
                                 </div>
                                 <div class="graph-card__body" style="padding: 0; position: relative;">
@@ -389,7 +388,7 @@ API infrastructure.
                         <div id="relatedPapersList" class="hidden related-papers-section">
                             <div class="graph-card">
                                 <div class="graph-card__header">
-                                    <span class="graph-card__title">Related Papers</span>
+                                    <span class="graph-card__title">{% trans "Related Papers" %}</span>
                                 </div>
                                 <div class="graph-card__body" id="relatedPapersContent"></div>
                             </div>
@@ -403,6 +402,12 @@ API infrastructure.
 
 {% block extra_js %}
         <!-- Must load FIRST: declares STX_MOUNT, which every other script uses. -->
+                <!-- i18n: the JS-only strings, translated server-side for the current
+             request language (LocaleMiddleware). Rendered as a <script
+             type="application/json" id="SCHOLAR_I18N"> block; the client reads
+             it via window["SCHOLAR_I18N"] (see scholarT in stx-mount.js). The
+             whole page flips together, so there is never an EN/JA mix. -->
+        <script type="application/json" id="SCHOLAR_I18N">{{ scholar_i18n_json }}</script>
         <script src="{% static 'scholar/js/stx-mount.js' %}"></script>
         <script src="{% static 'scholar/js/app.js' %}"></script>
 <script src="{% static 'scholar/js/search.js' %}"></script>
