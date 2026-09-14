@@ -107,6 +107,11 @@ data/*
 **/*.pdf
 **/*.pkl
 **/*.png
+
+# Force-track the Scholar PWA brand icons (small, generated).
+# Overrides the **/*.png LargeFiles rule above (same pattern as
+# the docs branding icons at the top of this file).
+!src/scitex_scholar/_django/static/scholar/pwa/*.png
 **/*.pth
 **/*.pt
 **/*.chk
