@@ -2107,9 +2107,13 @@ def test_main_page_ja_render_has_no_untranslated_labels():
 
 def test_ja_catalog_translates_every_msgid():
     # Arrange
-    po_path = (
-        Path(views.__file__).parent.parent / "locale" / "ja" / "LC_MESSAGES" / "django.po"
-    )
+    # The catalog lives at the APP path's locale dir (src/scitex_scholar/_django/
+    # locale/...), which is where Django discovers it for every installed app —
+    # hub AND standalone, no LOCALE_PATHS. views.__file__ is _django/views.py,
+    # so Path(...).parent is the _django app dir.
+    app_locale = Path(views.__file__).parent / "locale" / "ja" / "LC_MESSAGES"
+    po_path = app_locale / "django.po"
+    mo_path = app_locale / "django.mo"
     # Proper nouns / format labels that stay in Latin in Japanese UI (translating
     # them would be wrong, not a missed translation).
     proper_nouns = {
@@ -2128,6 +2132,22 @@ def test_ja_catalog_translates_every_msgid():
     assert (
         any("科学文献管理" in m for _, m in pairs) and not untranslated
     )
+
+
+def test_ja_compiled_mo_exists_at_app_locale_path():
+    # Arrange
+    # The hub mounts ScholarEditorConfig (app path .../_django) and Django only
+    # discovers <app path>/locale — so the COMPILED catalog must exist there,
+    # not one level up. Without the .mo the page silently renders EN on the
+    # mount (the defect hub measured: gettext("Search databases") -> unchanged).
+    mo_path = (
+        Path(views.__file__).parent / "locale" / "ja" / "LC_MESSAGES" / "django.mo"
+    )
+    # Act
+    exists = mo_path.exists()
+    size_ok = exists and mo_path.stat().st_size > 0
+    # Assert
+    assert size_ok
 
 
 # EOF

@@ -108,7 +108,14 @@ LANGUAGES = [
 ]
 USE_I18N = True
 USE_L10N = True
-LOCALE_PATHS = [BASE_DIR.parent / "locale"]  # src/scitex_scholar/locale/
+# No LOCALE_PATHS: the catalog lives at the app's own <app path>/locale
+# (src/scitex_scholar/_django/locale/), which Django discovers by default for
+# EVERY installed app. This is why the mounted hub (which installs
+# ScholarEditorConfig but does not know scholar's source tree) and the
+# standalone server both find it without a path override. A LOCALE_PATHS
+# pointing at src/scitex_scholar/locale/ (one level up) would only mask the
+# discovery in standalone and leave the hub untranslated — the exact defect
+# the catalog move fixes.
 
 ROOT_URLCONF = "scitex_scholar._django._standalone_urls"
 

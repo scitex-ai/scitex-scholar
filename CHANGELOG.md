@@ -882,3 +882,15 @@ Old and new forms route to the same handler, so behaviour is identical.
   Guards: 4 tests (EN default render; JA render not byte-identical to EN; JA
   render has no untranslated labels; catalog translates every msgid).
   147 `_django` pass (143 + 4); audit 0 unmasked.
+
+### Fixed
+- **JA translations now load when mounted in the hub.** The catalog was at
+  `src/scitex_scholar/locale/` (one level above the app path); Django only
+  discovers `<app path>/locale`, and the hub installs `ScholarEditorConfig`
+  (app path `src/scitex_scholar/_django`) without knowing scholar's source
+  tree — so `gettext("Search databases")` stayed English on the mount while
+  standalone (which had a `LOCALE_PATHS` override) worked. The catalog is now
+  at `src/scitex_scholar/_django/locale/ja/LC_MESSAGES/` (Django's default app
+  discovery) and the `LOCALE_PATHS` override is removed, so both mounts use the
+  same mechanism. The compiled `.mo` is force-tracked at the new path.
+  Guard: `test_ja_compiled_mo_exists_at_app_locale_path`.

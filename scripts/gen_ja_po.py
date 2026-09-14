@@ -14,7 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]  # worktree root (scripts/ is one level under)
 TEMPLATE = ROOT / "src/scitex_scholar/_django/templates/scholar/scholar.html"
 VIEWS = ROOT / "src/scitex_scholar/_django/views.py"
-LOCALE_DIR = ROOT / "src/scitex_scholar/locale/ja/LC_MESSAGES"
+LOCALE_DIR = ROOT / "src/scitex_scholar/_django/locale/ja/LC_MESSAGES"
 
 def template_msgids() -> list[str]:
     t = TEMPLATE.read_text()
