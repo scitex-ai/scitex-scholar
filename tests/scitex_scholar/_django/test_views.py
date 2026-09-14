@@ -2086,6 +2086,59 @@ def test_main_page_renders_in_english_by_default():
     assert "Scientific Literature Management" in en and "SCHOLAR_I18N" in en
 
 
+def _i18n_script_body(page: str) -> str:
+    # A real HTML parser: the template's own HTML comment also mentions the tag.
+    from html.parser import HTMLParser
+
+    class ScriptBodyReader(HTMLParser):
+        def __init__(self):
+            super().__init__(convert_charrefs=False)
+            self.inside = False
+            self.body = None
+
+        def handle_starttag(self, tag, attrs):
+            self.inside = tag == "script" and ("id", "SCHOLAR_I18N") in attrs
+
+        def handle_endtag(self, tag):
+            self.inside = False
+
+        def handle_data(self, data):
+            if self.inside:
+                self.body = data
+
+    reader = ScriptBodyReader()
+    reader.feed(page)
+    return reader.body
+
+
+def test_i18n_script_body_is_not_html_escaped():
+    # Regression (site-audit D1): &quot; broke JSON.parse on every Search/Library render.
+    # Arrange
+    page = _render_index_in("en")
+    # Act
+    body = _i18n_script_body(page)
+    # Assert
+    assert "&quot;" not in body
+
+
+def test_i18n_script_body_parses_as_the_js_string_dict():
+    # Arrange
+    page = _render_index_in("en")
+    # Act
+    parsed = json.loads(_i18n_script_body(page))
+    # Assert
+    assert parsed == views._js_i18n_dict()
+
+
+def test_i18n_script_body_parses_in_japanese():
+    # Arrange
+    page = _render_index_in("ja")
+    # Act
+    parsed = json.loads(_i18n_script_body(page))
+    # Assert
+    assert parsed["Untitled"] != "Untitled"
+
+
 def test_main_page_ja_render_is_not_byte_identical_to_en():
     # Arrange
     # Act

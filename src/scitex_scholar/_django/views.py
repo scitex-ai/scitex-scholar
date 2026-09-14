@@ -270,11 +270,10 @@ def index(request):
             # i18n (operator directive 2026-09-14): the whole page flips via
             # LocaleMiddleware; this carries the strings that live ONLY in
             # JS, translated server-side for the current request language so
-            # the client never hardcodes a language. Pre-serialized JSON
-            # (ensure_ascii=False so Japanese stays readable, not \uXXXX).
-            # Rendered into <script type="application/json" id="SCHOLAR_I18N">;
+            # the client never hardcodes a language. Serialized by the
+            # template's json_script filter into <script id="SCHOLAR_I18N">;
             # the client reads it via JSON.parse (see scholarT in stx-mount.js).
-            "scholar_i18n_json": json.dumps(_js_i18n_dict(), ensure_ascii=False),
+            "scholar_i18n": _js_i18n_dict(),
             # The scitex-ui workspace shell renders three side panes
             # (Console/Chat, Files, Viewer) around the app content. Scholar
             # has no content for them, and because the template extends the
