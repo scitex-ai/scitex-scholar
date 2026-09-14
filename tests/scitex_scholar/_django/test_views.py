@@ -2059,4 +2059,75 @@ def test_template_declares_pwa_head_meta():
     assert has_manifest_link and has_theme_color and has_apple_icon
 
 
+# --- i18n (operator directive 2026-09-14): EN default + full JA translation ---
+#
+# Contract: EN default, full JA, no mixed EN/JA on a page. The whole page
+# flips via LocaleMiddleware; these tests render the main page in each
+# language and assert the JA render is a genuine translation (not byte-
+# identical to EN, not an English leak) and that every msgid in the catalog
+# has a non-empty, non-source JA msgstr (no untranslated labels).
+# ---------------------------------------------------------------------------
+
+
+def _render_index_in(lang: str) -> str:
+    from django.utils import translation
+
+    translation.activate(lang)
+    body = _compass_index_body()
+    translation.activate("en")
+    return body
+
+
+def test_main_page_renders_in_english_by_default():
+    # Arrange
+    # Act
+    en = _render_index_in("en")
+    # Assert -- the EN default carries the English header and the i18n JS dict.
+    assert "Scientific Literature Management" in en and "SCHOLAR_I18N" in en
+
+
+def test_main_page_ja_render_is_not_byte_identical_to_en():
+    # Arrange
+    # Act
+    en = _render_index_in("en")
+    ja = _render_index_in("ja")
+    # Assert -- the hub's measured defect was byte-identity; a real
+    # translation changes the output.
+    assert en != ja
+
+
+def test_main_page_ja_render_has_no_untranslated_labels():
+    # Arrange
+    # Act
+    ja = _render_index_in("ja")
+    # Assert -- the EN source of the page header is absent (replaced by JA) and
+    # the JA catalog produced Japanese text on the page.
+    assert "Scientific Literature Management" not in ja and "科学文献管理" in ja
+
+
+def test_ja_catalog_translates_every_msgid():
+    # Arrange
+    po_path = (
+        Path(views.__file__).parent.parent / "locale" / "ja" / "LC_MESSAGES" / "django.po"
+    )
+    # Proper nouns / format labels that stay in Latin in Japanese UI (translating
+    # them would be wrong, not a missed translation).
+    proper_nouns = {
+        "SciTeX Scholar", "DOI", "CrossRef API",
+        "BibTeX (.bib)", "RIS (.ris)", "EndNote (.enw)",
+    }
+    # Act
+    po = po_path.read_text(encoding="utf-8")
+    pairs = re.findall(r'^msgid "((?:[^"\\]|\\.)*)"\nmsgstr "((?:[^"\\]|\\.)*)"', po, re.M)
+    untranslated = [
+        (i, m) for i, m in pairs
+        if i != "" and i not in proper_nouns and (m == "" or m == i)
+    ]
+    # Assert -- at least one msgid (the header, known JA) and zero untranslated
+    # (proper nouns excluded by the explicit list above).
+    assert (
+        any("科学文献管理" in m for _, m in pairs) and not untranslated
+    )
+
+
 # EOF

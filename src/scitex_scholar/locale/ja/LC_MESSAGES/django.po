@@ -1,0 +1,212 @@
+# Scholar JA translations (operator directive 2026-09-14: EN default, full JA).
+# English is the source; these JA translations are drafted by scitex-scholar
+# and will be reviewed. Generated msgids match Django's i18n extractor.
+msgid ""
+msgstr ""
+"Project-Id-Version: scitex-scholar\n"
+"Language: ja\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+PO-Revision-Date: 2026-09-14 00:00+0900\n"
+Last-Translator: scitex-scholar <agent@scitex.ai>\n"
+
+msgid "Advanced"
+msgstr "詳細"
+
+msgid "All sources (parallel)"
+msgstr "すべてのソース（並列）"
+
+msgid "An error occurred"
+msgstr "エラーが発生しました"
+
+msgid "BibTeX (.bib)"
+msgstr "BibTeX (.bib)"
+
+msgid "Build Citation Network"
+msgstr "引用ネットワークを構築"
+
+msgid "Build Graph"
+msgstr "グラフを構築"
+
+msgid "Building citation network... This may take a moment."
+msgstr "引用ネットワークを構築中。少し時間がかかる場合があります。"
+
+msgid "Checking..."
+msgstr "確認中…"
+
+msgid "Citation Graph"
+msgstr "引用グラフ"
+
+msgid "Citation Network"
+msgstr "引用ネットワーク"
+
+msgid "Click"
+msgstr "クリック"
+
+msgid "Configured"
+msgstr "設定済み"
+
+msgid "CrossRef API"
+msgstr "CrossRef API"
+
+msgid "DOI"
+msgstr "DOI"
+
+msgid "Dismiss"
+msgstr "閉じる"
+
+msgid "Download SVG"
+msgstr "SVG をダウンロード"
+
+msgid "Drag"
+msgstr "ドラッグ"
+
+msgid "EndNote (.enw)"
+msgstr "EndNote (.enw)"
+
+msgid "Enter a DOI to build an interactive citation network. The graph shows related papers based on bibliographic coupling, co-citation, and direct citations."
+msgstr "DOI を入力すると対話的な引用ネットワークを構築します。グラフは書誌的結合、共被引用、直接引用に基づいた関連論文を表示します。"
+
+msgid "Export"
+msgstr "エクスポート"
+
+msgid "Fit to view"
+msgstr "画面に合わせる"
+
+msgid "Graph Controls"
+msgstr "グラフ操作"
+
+msgid "Ignore cache"
+msgstr "キャッシュを無視"
+
+msgid "Import BibTeX"
+msgstr "BibTeX をインポート"
+
+msgid "Library"
+msgstr "ライブラリ"
+
+msgid "Loading your library..."
+msgstr "ライブラリを読み込み中…"
+
+msgid "Not configured"
+msgstr "未設定"
+
+msgid "Pan"
+msgstr "パン"
+
+msgid "Papers"
+msgstr "論文"
+
+msgid "Query"
+msgstr "クエリ"
+
+msgid "Query syntax: -word excludes a term, year:2020-2024 bounds the publication year, if:>5 filters by impact factor."
+msgstr "クエリ構文：-word で用語を除外、year:2020-2024 で発行年を指定、if:>5 でインパクトファクターで絞り込みます。"
+
+msgid "RIS (.ris)"
+msgstr "RIS (.ris)"
+
+msgid "Related Papers"
+msgstr "関連論文"
+
+msgid "Reset zoom"
+msgstr "ズームをリセット"
+
+msgid "Results"
+msgstr "結果"
+
+msgid "SciTeX Scholar"
+msgstr "SciTeX Scholar"
+
+msgid "Scientific Literature Management"
+msgstr "科学文献管理"
+
+msgid "Scroll"
+msgstr "スクロール"
+
+msgid "Search Papers"
+msgstr "論文を検索"
+
+msgid "Search academic databases (OpenAlex, Crossref, PubMed, Semantic Scholar, …) by keyword. This searches external databases, not your Library (a separate tab)."
+msgstr "キーワードで学術データベース（OpenAlex、Crossref、PubMed、Semantic Scholar など）を検索します。これは外部データベースを検索するもので、ライブラリ（別のタブ）ではありません。"
+
+msgid "Search databases"
+msgstr "データベースを検索"
+
+msgid "Search source"
+msgstr "検索ソース"
+
+msgid "Searching databases... This may take a moment."
+msgstr "データベースを検索中。少し時間がかかる場合があります。"
+
+msgid "Select node"
+msgstr "ノードを選択"
+
+msgid "Service Status"
+msgstr "サービス状態"
+
+msgid "Single source"
+msgstr "単一ソース"
+
+msgid "Your papers, stored locally. Use Enrich to fill in metadata (abstract, citations, impact factor) from the databases, or Import BibTeX and Export your library."
+msgstr "ローカルに保存された論文です。Enrich でデータベースからメタデータ（抄録、被引用数、インパクトファクター）を入力するか、BibTeX をインポートしてライブラリをエクスポートできます。"
+
+msgid "Zoom"
+msgstr "ズーム"
+
+msgid "Build citation graph"
+msgstr "引用グラフを構築"
+
+msgid "Enrich"
+msgstr "補完"
+
+msgid "Enriched: %(parts)s"
+msgstr "補完済み：%(parts)s"
+
+msgid "Enriching…"
+msgstr "補完中…"
+
+msgid "Enrichment failed"
+msgstr "補完に失敗"
+
+msgid "Enrichment failed (HTTP %(status)s)"
+msgstr "補完に失敗（HTTP %(status)s）"
+
+msgid "Imported %(n)s paper from %(file)s"
+msgstr "%(file)s から %(n)s 件の論文をインポートしました"
+
+msgid "Imported %(n)s papers from %(file)s"
+msgstr "%(file)s から %(n)s 件の論文をインポートしました"
+
+msgid "Paper"
+msgstr "論文"
+
+msgid "Related papers"
+msgstr "関連論文"
+
+msgid "Service available"
+msgstr "サービス利用可能"
+
+msgid "Service limited"
+msgstr "サービス制限あり"
+
+msgid "Service unavailable"
+msgstr "サービス利用不可"
+
+msgid "Unknown"
+msgstr "不明"
+
+msgid "Unknown authors"
+msgstr "著者不明"
+
+msgid "Untitled"
+msgstr "無題"
+
+msgid "Your library is empty. Save papers from Search or Import, then Enrich them here."
+msgstr "ライブラリは空です。検索から論文を保存するかインポートし、ここで補完してください。"
+
+msgid "char abstract"
+msgstr "文字の抄録"
+
+msgid "citations"
+msgstr "被引用"

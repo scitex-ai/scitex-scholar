@@ -210,6 +210,11 @@ cover/
 
 # Translations
 *.mo
+
+# Force-track the compiled Scholar JA catalog (runtime needs the .mo;
+# overrides the *.mo rule above — same pattern as the PWA .png and
+# docs branding exceptions). Regenerate with scripts/gen_ja_po.py.
+!src/scitex_scholar/locale/ja/LC_MESSAGES/*.mo
 *.pot
 
 # Django stuff:
