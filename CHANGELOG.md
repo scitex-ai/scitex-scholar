@@ -836,3 +836,16 @@ Old and new forms route to the same handler, so behaviour is identical.
   desktop and mobile. No service worker — the app is stateless; offline
   caching is a separate product decision. No shared-shell change; Scholar
   declares its own PWA head in its template.
+
+### Changed
+- **#95 — Search submit is now a visually distinct primary action.** The
+  "Search databases" button previously shared `class="btn-build"` with the
+  "Build Graph" button (and per-row actions), so the primary action had no
+  visual distinction. It now carries its own `.btn-primary` class: the
+  scitex-ui `--accent` token (theme-aware — light + dark both resolve from
+  `theme.css`), a 44px touch-target minimum, and slightly heavier weight/padding
+  than the secondary `.btn-build`. No shared-shell change; no service worker.
+  The mobile media rule (`.input-wrapper .btn-build`) now also covers
+  `.btn-primary` so the full-width stacked layout on 390px is preserved.
+  Guards: `test_search_primary_distinct_from_build_graph` (negative control —
+  fails on the pre-change template) + `test_btn_primary_uses_accent_token_and_44px_minimum`.

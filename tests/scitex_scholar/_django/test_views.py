@@ -1188,9 +1188,51 @@ def test_search_tab_and_button_are_labelled_databases():
     body = _compass_index_body()
     # Act
     tab_label = 'class="tab-btn active" data-tab="search">Search databases<' in body
-    button_label = 'class="btn-build">Search databases<' in body
+    # #95: the search submit is the PRIMARY action, so it carries btn-primary
+    # (NOT btn-build, which is the secondary Build Graph / per-row class).
+    button_label = 'class="btn-primary">Search databases<' in body
     # Assert
     assert tab_label and button_label
+
+
+# --- #95: Search submit is visually PRIMARY, distinct from Build Graph -------
+#
+# The rendered Search button shared class="btn-build" with "Build Graph"
+# (scholar.html:159 and :336 pre-fix), so the primary action had no visual
+# distinction. #95 gives the Search submit its own .btn-primary (scitex-ui
+# --accent token, 44px touch minimum, distinct from secondary .btn-build).
+# Negative control: on the pre-change template the Search submit is
+# btn-build, so test_search_primary_distinct_from_build_graph fails.
+# ---------------------------------------------------------------------------
+
+
+def test_search_primary_distinct_from_build_graph():
+    # Arrange
+    body = _compass_index_body()
+    # Act
+    # The Search submit is btn-primary; the Build Graph submit stays btn-build.
+    search_is_primary = 'class="btn-primary">Search databases<' in body
+    build_graph_stays_secondary = 'class="btn-build">Build Graph<' in body
+    # Negative control: the search button is NOT also btn-build (that was the
+    # pre-fix state — a single shared class with no visual distinction).
+    search_not_btn_build = 'class="btn-build">Search databases<' not in body
+    # Assert
+    assert search_is_primary and build_graph_stays_secondary and search_not_btn_build
+
+
+def test_btn_primary_uses_accent_token_and_44px_minimum():
+    # Arrange
+    forms_css = (COMPASS_CSS_DIR / "_forms.css").read_text()
+    # Act
+    # .btn-primary must be present and use the shared scitex-ui --accent token
+    # (theme-aware: light + dark both resolve from theme.css) with a 44px
+    # touch-target minimum, so it reads as primary AND stays tappable on
+    # mobile without hardcoding a colour or a sub-44px height.
+    has_btn_primary = ".btn-primary {" in forms_css
+    uses_accent = "background: var(--accent)" in forms_css
+    touch_44 = "min-height: 44px" in forms_css
+    # Assert
+    assert has_btn_primary and uses_accent and touch_44
 
 
 def test_search_description_clarifies_external_databases_not_library():
@@ -1300,9 +1342,10 @@ def test_search_input_button_stack_vertically_on_mobile():
     wrapper_rule = re.search(
         r"\.input-wrapper\s*{[^}]*flex-direction:\s*column[^}]*}", block
     )
-    # The .btn-build inside the wrapper must go full-width inside the block.
+    # The .btn-build (and, post-#95, .btn-primary) inside the wrapper must
+    # go full-width inside the block.
     button_rule = re.search(
-        r"\.input-wrapper\s+\.btn-build\s*{[^}]*width:\s*100%[^}]*}", block
+        r"\.input-wrapper\s+\.btn-build(?:\s*,\s*\.input-wrapper\s+\.btn-primary)?\s*{[^}]*width:\s*100%[^}]*}", block
     )
     # Assert
     assert in_mobile and wrapper_rule and button_rule
