@@ -1889,4 +1889,64 @@ def test_base_css_light_and_dark_surfaces_differ():
     assert has_light and has_dark
 
 
+# --- PWA: the standalone app must be installable -----------------------------
+#
+# No shared-shell change: every leaf declares its own name/icons, so Scholar's
+# own template + static carries the manifest, theme-color, and iOS icon. A
+# service worker is deliberately omitted (stateless app; offline caching is a
+# separate product decision).
+# ---------------------------------------------------------------------------
+
+COMPASS_PWA_DIR = Path(views.__file__).parent / "static" / "scholar" / "pwa"
+
+
+def test_pwa_manifest_present_and_valid():
+    # Arrange
+    manifest_path = COMPASS_PWA_DIR / "manifest.json"
+    # Act -- parse the manifest; the single assertion below checks every field
+    # Chrome's installability requires in one semantically-precise expression
+    # (STX-TQ007: one assertion per test).
+    exists = manifest_path.exists()
+    data = _json.loads(manifest_path.read_text()) if exists else {}
+    icons = data.get("icons") or []
+    has_192 = any("192" in (i.get("sizes") or "") for i in icons)
+    has_512 = any("512" in (i.get("sizes") or "") for i in icons)
+    # Assert -- present, and every installability field is correct.
+    assert (
+        exists
+        and data.get("name")
+        and data.get("short_name")
+        and data.get("start_url")
+        and data.get("scope")
+        and data.get("display") in ("standalone", "fullscreen", "minimal-ui")
+        and has_192
+        and has_512
+    )
+
+
+def test_pwa_manifest_icons_exist_on_disk():
+    # Arrange
+    manifest = _json.loads((COMPASS_PWA_DIR / "manifest.json").read_text())
+    # Act -- every icon src named in the manifest must exist on disk, plus the
+    # iOS apple-touch-icon; one combined assertion (STX-TQ007).
+    missing = [
+        i["src"] for i in manifest.get("icons", [])
+        if not (COMPASS_PWA_DIR / i["src"]).exists()
+    ]
+    apple_ok = (COMPASS_PWA_DIR / "apple-touch-icon.png").exists()
+    # Assert -- no missing manifest icons AND the apple-touch-icon is present.
+    assert not missing and apple_ok
+
+
+def test_template_declares_pwa_head_meta():
+    # Arrange
+    body = _compass_index_body()
+    # Act
+    has_manifest_link = 'rel="manifest"' in body and "scholar/pwa/manifest.json" in body
+    has_theme_color = 'name="theme-color"' in body
+    has_apple_icon = 'rel="apple-touch-icon"' in body and "apple-touch-icon.png" in body
+    # Assert
+    assert has_manifest_link and has_theme_color and has_apple_icon
+
+
 # EOF

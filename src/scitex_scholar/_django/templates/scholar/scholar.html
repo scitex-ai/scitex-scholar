@@ -57,6 +57,16 @@ API infrastructure.
         operator saw it in the browser before any test did.
         {% endcomment %}
     <meta name="stx-mount" content="{{ stx_mount }}">
+    {% comment %}
+    PWA (installable): scholar's own manifest + theme + iOS icon. The shared
+    shell deliberately stays PWA-agnostic (every leaf has its own name/icons),
+    so the app declares its own. No service worker: the standalone app is
+    stateless and a cache layer would risk stale-data surprises — installable
+    is the goal here, offline is a separate decision.
+    {% endcomment %}
+    <link rel="manifest" href="{% static 'scholar/pwa/manifest.json' %}">
+    <meta name="theme-color" content="#0d0d0d">
+    <link rel="apple-touch-icon" href="{% static 'scholar/pwa/apple-touch-icon.png' %}">
     <link rel="stylesheet" href="{% static 'scholar/css/scholar.css' %}">
 {% endblock %}
 

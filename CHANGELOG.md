@@ -828,3 +828,11 @@ Old and new forms route to the same handler, so behaviour is identical.
   groups fill the card width. Desktop is unchanged (825px input, button on
   the same row). Guards: `test_search_input_button_stack_vertically_on_mobile`
   + `test_mobile_form_row_stretches_groups_full_width`.
+
+### Added
+- **PWA installability for the standalone Scholar app.** A Web App Manifest
+  (`scholar/pwa/manifest.json`), theme-color meta, apple-touch-icon, and
+  generated brand icons (192px, 512px, 180px) so the app is installable on
+  desktop and mobile. No service worker — the app is stateless; offline
+  caching is a separate product decision. No shared-shell change; Scholar
+  declares its own PWA head in its template.
