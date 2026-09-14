@@ -894,3 +894,15 @@ Old and new forms route to the same handler, so behaviour is identical.
   discovery) and the `LOCALE_PATHS` override is removed, so both mounts use the
   same mechanism. The compiled `.mo` is force-tracked at the new path.
   Guard: `test_ja_compiled_mo_exists_at_app_locale_path`.
+
+### Fixed
+- **JA translations for the three `{% blocktrans %}` sentences** (search
+  description, query-syntax help, library description). Django's blocktrans
+  msgid is the RAW block text (newlines + indentation, tags kept); the earlier
+  catalog generator collapsed whitespace, so those msgids mismatched the
+  runtime gettext lookup and the sentences silently rendered English in JA —
+  a mixed-language page that violated the operator's no-mix contract and left
+  a stray `>Export<` (hub-measured). The generator now keys the catalog on the
+  exact raw msgids (verified by instrumenting gettext on a live render) and
+  escapes newlines correctly for `.po`. Verified: all three sentences render in
+  Japanese, no English label leaks into the JA render, JA ≠ EN.

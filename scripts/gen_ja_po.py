@@ -1,49 +1,60 @@
 #!/usr/bin/env python3
-"""Generate src/scitex_scholar/locale/ja/LC_MESSAGES/django.po for Scholar i18n.
+"""Generate src/scitex_scholar/_django/locale/ja/LC_MESSAGES/django.po for Scholar i18n.
 
-Extracts the msgids exactly as Django's i18n machinery would:
-  - {% trans "X" %} and {% blocktrans %}...{% endblocktrans %} in templates
-    (blocktrans: strip inner tags, collapse whitespace to single spaces, strip
-    the surrounding whitespace)
-  - the gettext calls in views._js_i18n_dict (the JS-only string dict)
-Then applies the JA translation table and compiles with msgfmt.
+Extracts the msgids exactly as Django's i18n machinery looks them up at RUNTIME:
+  - {% trans "X" %}  -> the literal X
+  - {% blocktrans %}...{% endblocktrans %}  -> the RAW block text, verbatim
+    (newlines and indentation preserved, tags and entities as-is). Django does
+    NOT collapse whitespace unless the template says "blocktrans trimmed".
+    Keying the .po on anything other than the exact raw string makes gettext
+    fall back to the msgid (English) at runtime — a silent mixed-language page.
+  - the gettext values in views._js_i18n_dict (the JS-only string dict).
+
+Then applies the JA translation table and compiles the .mo via babel (msgfmt is
+not on PATH in this container).
 """
 import re
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]  # worktree root (scripts/ is one level under)
+ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE = ROOT / "src/scitex_scholar/_django/templates/scholar/scholar.html"
 VIEWS = ROOT / "src/scitex_scholar/_django/views.py"
 LOCALE_DIR = ROOT / "src/scitex_scholar/_django/locale/ja/LC_MESSAGES"
 
-def template_msgids() -> list[str]:
+
+def single_line_trans_ids() -> list:
     t = TEMPLATE.read_text()
     t = re.sub(r"\{%\s*comment\s*%\}.*?\{%\s*endcomment\s*%\}", "", t, flags=re.S)
-    ids = set()
-    for m in re.finditer(r"\{%\s*trans\s+\"([^\"]+)\"\s*%\}", t):
-        ids.add(m.group(1))
-    for m in re.finditer(r"\{%\s*blocktrans\s*%\}([\s\S]*?){%\s*endblocktrans\s*%\}", t):
-        raw = m.group(1)
-        # strip inner tags
-        raw = re.sub(r"<[^>]+>", "", raw)
-        # decode the common entities Django leaves for the translator
-        raw = raw.replace("&#8230;", "…").replace("&gt;", ">").replace("&amp;", "&")
-        # collapse whitespace
-        raw = re.sub(r"\s+", " ", raw).strip()
-        ids.add(raw)
-    return sorted(ids)
+    return [m.group(1) for m in re.finditer(r'\{%\s*trans\s+"([^"]+)"\s*%\}', t)]
 
-def views_msgids() -> list[str]:
-    """The gettext calls in _js_i18n_dict. Read the whole function body to its
-    closing `}` line (some entries span multiple lines), and take every string
-    literal inside a _i18n(...) call — those are the translatable values."""
+
+# The three {% blocktrans %} messages, keyed on the EXACT raw block text Django
+# passes to gettext at runtime (verified by instrumenting gettext on a live
+# render). Newlines/indentation are literal.
+BLOCKTRANS_MSGIDS = [
+    "Search academic databases (OpenAlex, Crossref, PubMed,\n"
+    "                                    Semantic Scholar, &#8230;) by keyword. This searches\n"
+    "                                    <strong>external databases</strong>, not your Library\n"
+    "                                    (a separate tab).",
+    "Query syntax:\n"
+    "                                            <code>-word</code> excludes a term,\n"
+    "                                            <code>year:2020-2024</code> bounds the\n"
+    "                                            publication year,\n"
+    "                                            <code>if:&gt;5</code> filters by impact factor.",
+    "Your papers, stored locally. Use <strong>Enrich</strong>\n"
+    "                                    to fill in metadata (abstract, citations, impact\n"
+    "                                    factor) from the databases, or\n"
+    "                                    <strong>Import</strong> BibTeX and\n"
+    "                                    <strong>Export</strong> your library.",
+]
+
+
+def views_msgids() -> list:
     v = VIEWS.read_text()
     m = re.search(r"def _js_i18n_dict\(\)[\s\S]*?\n    \}\n", v)
     body = m.group(0) if m else ""
-    ids = set()
-    for mm in re.finditer(r'_i18n\(\s*"([^"]+)"', body):
-        ids.add(mm.group(1))
-    return sorted(ids)
+    return [mm.group(1) for mm in re.finditer(r'_i18n\(\s*"([^"]+)"', body)]
+
 
 JA = {
     # --- Header / shell ---
@@ -53,25 +64,25 @@ JA = {
     "Service Status": "サービス状態",
     "Checking...": "確認中…",
     "Graph Controls": "グラフ操作",
-    "Scroll": "スクロール",
-    "Zoom": "ズーム",
-    "Drag": "ドラッグ",
-    "Pan": "パン",
-    "Click": "クリック",
-    "Select node": "ノードを選択",
+    "Scroll": "スクロール", "Zoom": "ズーム", "Drag": "ドラッグ", "Pan": "パン",
+    "Click": "クリック", "Select node": "ノードを選択",
     # --- Tabs ---
     "Search databases": "データベースを検索",
     "Library": "ライブラリ",
     "Citation Graph": "引用グラフ",
     # --- Search tab ---
     "Search Papers": "論文を検索",
-    "Search academic databases (OpenAlex, Crossref, PubMed, Semantic Scholar, …) by keyword. This searches external databases, not your Library (a separate tab).":
-        "キーワードで学術データベース（OpenAlex、Crossref、PubMed、Semantic Scholar など）を検索します。これは外部データベースを検索するもので、ライブラリ（別のタブ）ではありません。",
+    BLOCKTRANS_MSGIDS[0]: (
+        "キーワードで学術データベース（OpenAlex、Crossref、PubMed、Semantic Scholar など）を検索します。"
+        "これは<strong>外部データベース</strong>を検索するもので、ライブラリ（別のタブ）ではありません。"
+    ),
     "Query": "クエリ",
     "Results": "結果",
     "Advanced": "詳細",
-    "Query syntax: -word excludes a term, year:2020-2024 bounds the publication year, if:>5 filters by impact factor.":
-        "クエリ構文：-word で用語を除外、year:2020-2024 で発行年を指定、if:>5 でインパクトファクターで絞り込みます。",
+    BLOCKTRANS_MSGIDS[1]: (
+        "クエリ構文：<code>-word</code> で用語を除外、<code>year:2020-2024</code> で発行年を指定、"
+        "<code>if:&gt;5</code> でインパクトファクターで絞り込みます。"
+    ),
     "Search source": "検索ソース",
     "All sources (parallel)": "すべてのソース（並列）",
     "Single source": "単一ソース",
@@ -83,8 +94,11 @@ JA = {
     "An error occurred": "エラーが発生しました",
     "Dismiss": "閉じる",
     # --- Library tab ---
-    "Your papers, stored locally. Use Enrich to fill in metadata (abstract, citations, impact factor) from the databases, or Import BibTeX and Export your library.":
-        "ローカルに保存された論文です。Enrich でデータベースからメタデータ（抄録、被引用数、インパクトファクター）を入力するか、BibTeX をインポートしてライブラリをエクスポートできます。",
+    BLOCKTRANS_MSGIDS[2]: (
+        "ローカルに保存された論文です。<strong>補完</strong> でデータベースからメタデータ"
+        "（抄録、被引用数、インパクトファクター）を入力するか、<strong>インポート</strong> で "
+        "BibTeX をインポートしてライブラリを<strong>エクスポート</strong>できます。"
+    ),
     "Export": "エクスポート",
     "BibTeX (.bib)": "BibTeX (.bib)",
     "RIS (.ris)": "RIS (.ris)",
@@ -127,8 +141,17 @@ JA = {
     "Imported %(n)s papers from %(file)s": "%(file)s から %(n)s 件の論文をインポートしました",
 }
 
+
+def q(s: str) -> str:
+    """A .po string literal: double-quoted, with backslash, double-quote, and
+    newline escaped. (A raw newline inside a quoted .po string would be an
+    implicit concatenation / format error, so it must become \\n.)"""
+    out = s.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
+    return '"' + out + '"'
+
+
 def main() -> None:
-    ids = list(dict.fromkeys(template_msgids() + views_msgids()))
+    ids = list(dict.fromkeys(single_line_trans_ids() + BLOCKTRANS_MSGIDS + views_msgids()))
     missing = [i for i in ids if i not in JA]
     if missing:
         print("WARNING: no JA translation for:")
@@ -136,29 +159,24 @@ def main() -> None:
             print("   ", repr(m))
     LOCALE_DIR.mkdir(parents=True, exist_ok=True)
     po = LOCALE_DIR / "django.po"
-
-    def q(s: str) -> str:
-        # .po string literal: double-quoted, escape backslash and double quote.
-        return '"' + s.replace("\\", "\\\\").replace('"', '\\"') + '"'
-
     lines = [
         "# Scholar JA translations (operator directive 2026-09-14: EN default, full JA).",
         "# English is the source; these JA translations are drafted by scitex-scholar",
-        "# and will be reviewed. Generated msgids match Django's i18n extractor.",
-        "msgid \"\"",
-        "msgstr \"\"",
-        "\"Project-Id-Version: scitex-scholar\\n\"",
-        "\"Language: ja\\n\"",
-        "\"Content-Type: text/plain; charset=UTF-8\\n\"",
-        "\"Content-Transfer-Encoding: 8bit\\n\"",
-        "PO-Revision-Date: 2026-09-14 00:00+0900\\n\"",
-        "Last-Translator: scitex-scholar <agent@scitex.ai>\\n\"",
+        "# and will be reviewed. msgids match Django's runtime gettext lookup exactly:",
+        "# {% trans %} literals verbatim; {% blocktrans %} RAW block text (newlines kept).",
+        'msgid ""',
+        'msgstr ""',
+        '"Project-Id-Version: scitex-scholar\\n"',
+        '"Language: ja\\n"',
+        '"Content-Type: text/plain; charset=UTF-8\\n"',
+        '"Content-Transfer-Encoding: 8bit\\n"',
+        '"PO-Revision-Date: 2026-09-14 00:00+0900\\n"',
+        '"Last-Translator: scitex-scholar <agent@scitex.ai>\\n"',
         "",
     ]
     for i in ids:
-        j = JA.get(i, i)
         lines.append(f"msgid {q(i)}")
-        lines.append(f"msgstr {q(j)}")
+        lines.append(f"msgstr {q(JA.get(i, i))}")
         lines.append("")
     po.write_text("\n".join(lines), encoding="utf-8")
     print(f"wrote {po} with {len(ids)} msgids")
@@ -170,6 +188,7 @@ def main() -> None:
     with open(LOCALE_DIR / "django.mo", "wb") as f:
         write_mo(f, cat)
     print("compiled django.mo OK")
+
 
 if __name__ == "__main__":
     main()
