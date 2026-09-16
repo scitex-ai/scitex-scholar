@@ -151,9 +151,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!papers.length) {
         const empty = document.createElement("div");
         empty.className = "empty-message";
-        empty.textContent = scholarT(
-          "Your library is empty. Save papers from Search or Import, then Enrich them here.",
-        );
+        empty.textContent = data.filtered
+          ? scholarT("No papers match the current filters. Clear filters to see your Library.")
+          : scholarT("Your library is empty. Use Import BibTeX above, or save a paper from Search.");
         listEl.appendChild(empty);
       } else {
         papers.forEach((p) => listEl.appendChild(makeRow(p)));

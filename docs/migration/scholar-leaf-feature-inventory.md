@@ -24,6 +24,7 @@ This inventory treats `scitex-scholar` as the single source of truth for Scholar
 5. Both package config surfaces pin local Crossref/OpenAlex before the online API fallback tier.
 6. Desktop and 390px contracts are executable tests, including a wrapping full-width mobile picker.
 7. This slice does **not** authorize deletion of the Hub reference or claim full UI/search migration.
+8. Operator screenshot acceptance: Library empty and filtered-empty states must be distinct and name visible actions; Citation Graph must start with DOI guidance, an empty required seed, and a visibly labelled/accessible maximum-paper control at desktop and 390px.
 
 ## Remaining migration work
 

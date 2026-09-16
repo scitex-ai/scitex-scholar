@@ -2347,4 +2347,40 @@ def test_shared_picker_has_44px_390px_touch_target():
     assert target is not None
 
 
+def test_library_empty_state_names_visible_actions_and_filtered_empty():
+    # Arrange
+    script = (Path(views.__file__).parent / "static" / "scholar" / "js" / "library.js").read_text()
+    # Act
+    contracts = ["Import BibTeX above", "No papers match the current filters"]
+    # Assert
+    assert all(text in script for text in contracts)
+
+
+def test_graph_initial_state_explains_seed_and_library_workflow():
+    # Arrange
+    html = views.index(RequestFactory().get("/")).content.decode()
+    # Act
+    expected = ["Start with a DOI", "Search or your Library", "Max papers in graph"]
+    # Assert
+    assert all(text in html for text in expected)
+
+
+def test_graph_seed_is_required_and_not_prefilled():
+    # Arrange
+    html = views.index(RequestFactory().get("/")).content.decode()
+    # Act
+    input_tag = re.search(r'<input[^>]+id="doiInput"[^>]*>', html).group(0)
+    # Assert
+    assert "required" in input_tag and "value=" not in input_tag
+
+
+def test_graph_limit_has_visible_and_accessible_meaning():
+    # Arrange
+    html = views.index(RequestFactory().get("/")).content.decode()
+    # Act
+    select_tag = re.search(r'<select[^>]+id="topN"[^>]*>', html).group(0)
+    # Assert
+    assert 'aria-label="Maximum papers in citation graph"' in select_tag
+
+
 # EOF

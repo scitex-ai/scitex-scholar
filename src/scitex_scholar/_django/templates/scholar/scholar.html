@@ -321,7 +321,7 @@ API infrastructure.
                             </div>
                             <div class="graph-card__body">
                                 <p class="graph-description">
-                                    {% trans "Enter a DOI to build an interactive citation network. The graph shows related papers based on bibliographic coupling, co-citation, and direct citations." %}
+                                    {% trans "Start with a DOI. Find one by title, topic, or keywords in Search or your Library, then build an interactive citation graph of related papers." %}
                                 </p>
                                 <form id="graphForm" class="graph-form">
                                     <div class="form-row">
@@ -331,14 +331,16 @@ API infrastructure.
                                                 <input type="text"
                                                        id="doiInput"
                                                        class="form-input"
-                                                       placeholder="e.g. 10.1038/s41586-020-2008-3"
-                                                       value="10.1038/s41586-020-2008-3">
+                                                       required
+                                                       aria-describedby="graphSeedHelp"
+                                                       placeholder="e.g. 10.1038/s41586-020-2008-3">
                                                 <button type="submit" class="btn-build">{% trans "Build Graph" %}</button>
                                             </div>
+                                            <small id="graphSeedHelp">{% trans "Paste the DOI for one seed paper; titles and keywords belong in Search." %}</small>
                                         </div>
                                         <div class="form-group--options">
-                                            <label class="form-label" for="topN">{% trans "Papers" %}</label>
-                                            <select id="topN" class="form-select">
+                                            <label class="form-label" for="topN">{% trans "Max papers in graph" %}</label>
+                                            <select id="topN" class="form-select" aria-label="Maximum papers in citation graph">
                                                 <option value="10">10</option>
                                                 <option value="20" selected>20</option>
                                                 <option value="30">30</option>
