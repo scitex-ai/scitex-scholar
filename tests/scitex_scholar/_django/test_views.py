@@ -22,14 +22,17 @@ bootstrap via conftest.py (bare `django.setup()`, no pytest-django dep).
 
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 import re
 from pathlib import Path
 
 import pytest
-
+import scitex_ui
+import tomllib
 from django.test import RequestFactory, override_settings
+from scitex_ui.project_scope import LocalProjectProvider
 
 from scitex_scholar._django import views
 
@@ -644,7 +647,6 @@ def test_scholar_entry_point_reaches_a_partial_only_token():
 def test_health_reports_the_package_version():
     # Arrange
     from scitex_scholar import __version__
-
     from scitex_scholar._django.views import health
 
     request = RequestFactory().get("/api/health")
@@ -1457,7 +1459,6 @@ def test_mobile_form_row_stretches_groups_full_width():
 # the monkeypatch fixture). No network, no user data.
 # ---------------------------------------------------------------------------
 
-import contextlib
 import json as _json
 
 
@@ -2201,6 +2202,149 @@ def test_ja_compiled_mo_exists_at_app_locale_path():
     size_ok = exists and mo_path.stat().st_size > 0
     # Assert
     assert size_ok
+
+
+# --- first leaf-migration slice: canonical app header + project picker -------
+
+_PROJECT_SELECTOR_CSS = (
+    Path(scitex_ui.__file__).parent
+    / "static" / "scitex_ui" / "css" / "app" / "project-selector.css"
+)
+
+
+@contextlib.contextmanager
+def _project_root_env(root: Path):
+    old = os.environ.get("SCITEX_SCHOLAR_PROJECTS_DIR")
+    os.environ["SCITEX_SCHOLAR_PROJECTS_DIR"] = str(root)
+    try:
+        yield
+    finally:
+        if old is None:
+            os.environ.pop("SCITEX_SCHOLAR_PROJECTS_DIR", None)
+        else:
+            os.environ["SCITEX_SCHOLAR_PROJECTS_DIR"] = old
+
+
+def test_standalone_uses_scitex_ui_local_project_provider(tmp_path):
+    # Arrange
+    request = RequestFactory().get("/")
+    # Act
+    with _project_root_env(tmp_path), override_settings(SCITEX_PROJECT_PROVIDER=""):
+        provider = views._project_provider(request)
+    # Assert
+    assert type(provider) is LocalProjectProvider
+
+
+def test_standalone_project_endpoint_lists_local_projects(tmp_path):
+    # Arrange
+    (tmp_path / "Alpha").mkdir()
+    (tmp_path / "Beta").mkdir()
+    request = RequestFactory().get("/api/projects")
+    # Act
+    with _project_root_env(tmp_path), override_settings(SCITEX_PROJECT_PROVIDER=""):
+        payload = json.loads(views.project_scope(request).content)
+    # Assert
+    assert [project["id"] for project in payload["projects"]] == ["Alpha", "Beta"]
+
+
+def test_index_renders_one_picker_in_canonical_scholar_header(tmp_path):
+    # Arrange
+    (tmp_path / "Alpha").mkdir()
+    settings_override = override_settings(
+        SCITEX_PROJECT_PROVIDER="", SCITEX_PROJECT_PROVIDER_URL="/api/projects"
+    )
+    # Act
+    with _project_root_env(tmp_path), settings_override:
+        html = views.index(RequestFactory().get("/?project=Alpha")).content.decode()
+    # Assert
+    assert html.count("data-stx-project-picker") == 1
+
+
+def test_index_picker_navigates_with_project_query(tmp_path):
+    # Arrange
+    (tmp_path / "Alpha").mkdir()
+    settings_override = override_settings(
+        SCITEX_PROJECT_PROVIDER="", SCITEX_PROJECT_PROVIDER_URL="/api/projects"
+    )
+    # Act
+    with _project_root_env(tmp_path), settings_override:
+        html = views.index(RequestFactory().get("/?project=Alpha")).content.decode()
+    # Assert
+    assert 'data-current="Alpha" data-navigate="?project={id}"' in html
+
+
+def test_host_mount_supplies_picker_provider_url(tmp_path):
+    # Arrange
+    settings_override = override_settings(
+        SCITEX_PROJECT_PROVIDER="",
+        SCITEX_PROJECT_PROVIDER_URL="/host/api/project-scope/",
+    )
+    # Act
+    with _project_root_env(tmp_path), settings_override:
+        html = views.index(RequestFactory().get("/")).content.decode()
+    # Assert
+    assert 'data-provider-url="/host/api/project-scope/"' in html
+
+
+def test_header_source_places_picker_after_identity_before_content():
+    # Arrange
+    source = TEMPLATE.read_text()
+    # Act
+    positions = [
+        source.index('class="stx-app-header__identity"'),
+        source.index('class="stx-app-header__slot--project-selector"'),
+        source.index('class="app-container"'),
+    ]
+    # Assert
+    assert positions == sorted(positions)
+
+
+def test_manifest_declares_project_scope():
+    # Arrange
+    manifest_path = Path(views.__file__).parent / "manifest.json"
+    # Act
+    manifest = json.loads(manifest_path.read_text())
+    # Assert
+    assert manifest["scope"] == "project"
+
+
+def test_server_extra_requires_header_slot_capable_scitex_ui():
+    # Arrange
+    repo_root = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").is_file())
+    # Act
+    requirements = tomllib.loads((repo_root / "pyproject.toml").read_text())["project"]["optional-dependencies"]["server"]
+    # Assert
+    assert "scitex-ui>=0.22.0" in requirements
+
+
+def test_390px_header_wraps_picker_without_horizontal_overflow():
+    # Arrange
+    css = (CSS_DIR / "_partials" / "_layout.css").read_text()
+    # Act
+    mobile = css.split("@media (max-width: 600px)", 1)[1]
+    wraps = re.search(r"\.stx-app-header\s*\{[^}]*flex-wrap:\s*wrap", mobile)
+    full_width = re.search(r"\.stx-app-header__slot--project-selector\s*\{[^}]*width:\s*100%", mobile)
+    # Assert
+    assert wraps is not None and full_width is not None
+
+
+def test_shared_desktop_slot_pins_picker_left_before_actions():
+    # Arrange
+    css = _PROJECT_SELECTOR_CSS.read_text()
+    # Act
+    slot = re.search(r"\.stx-app-header__slot--project-selector\s*\{[^}]*order:\s*1[^}]*margin-left:\s*0[^}]*margin-right:\s*auto", css)
+    # Assert
+    assert slot is not None
+
+
+def test_shared_picker_has_44px_390px_touch_target():
+    # Arrange
+    css = _PROJECT_SELECTOR_CSS.read_text()
+    # Act
+    mobile = css.split("@media (max-width: 600px), (pointer: coarse)", 1)[1]
+    target = re.search(r"\.stx-app-project-selector__trigger[^}]*height:\s*44px", mobile)
+    # Assert
+    assert target is not None
 
 
 # EOF
