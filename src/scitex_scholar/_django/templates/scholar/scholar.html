@@ -1,5 +1,5 @@
 {% extends "scitex_ui/standalone_shell.html" %}
-{% load static i18n %}
+{% load static i18n scitex_project_picker %}
 {% comment %}
 Extends scitex-ui's shared workspace shell, so scholar renders inside the same
 frame as every other leaf (scitex-storage, scitex-writer, figrecipe) instead of
@@ -71,10 +71,15 @@ API infrastructure.
 {% endblock %}
 
 {% block app_content %}
-        <!-- Header -->
-        <header class="app-header">
-            <h1>{% trans "SciTeX Scholar" %}</h1>
-            <span class="subtitle">{% trans "Scientific Literature Management" %}</span>
+        <!-- Scholar owns its app header; scitex-ui owns the picker primitive. -->
+        <header class="stx-app-header">
+            <div class="stx-app-header__identity">
+                <h1 class="stx-app-header__title">{% trans "SciTeX Scholar" %}</h1>
+                <span class="stx-app-header__subtitle">{% trans "Scientific Literature Management" %}</span>
+            </div>
+            <div class="stx-app-header__slot--project-selector">
+                {% scitex_project_picker scope="project" current=current_project %}
+            </div>
         </header>
         <div class="app-container">
             <!-- Sidebar -->

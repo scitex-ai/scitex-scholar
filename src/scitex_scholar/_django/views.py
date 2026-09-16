@@ -26,13 +26,20 @@ import time
 from pathlib import Path
 from typing import Dict, Optional
 
+from django.apps import apps as _django_apps
 from django.conf import settings as django_settings
+from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
-
-from django.apps import apps as _django_apps
-from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext as _i18n  # noqa: N816  (JS string dict)
+from django.views.decorators.http import require_GET, require_POST
+from scitex_app.embed import mount_prefix
+from scitex_ui.project_scope import (
+    LocalProjectProvider,
+    host_project_provider,
+    project_listing_view,
+    resolve_project,
+)
 
 # The dotted INSTALLED_APPS entry a host must carry for these views to
 # work. Kept as ONE string so the refusal below and the docs name the
@@ -91,8 +98,6 @@ _refuse_unless_app_installed()
 # registered at path("", ...). IF SCHOLAR EVER ADDS A NON-ROOT VIEW
 # THAT EMITS THE MARKER, pass that view's route here; the function
 # raises MountPrefixMismatch rather than guessing.
-from scitex_app.embed import mount_prefix
-from django.views.decorators.http import require_GET, require_POST
 
 logger = logging.getLogger(__name__)
 
@@ -250,6 +255,29 @@ def _app_label(base: str) -> str:
     return f"{base} (hub)" if mode == "hub" else base
 
 
+def _standalone_projects_root() -> Path:
+    """Return the folder the standalone scitex-ui provider lists."""
+    explicit = os.environ.get("SCITEX_SCHOLAR_PROJECTS_DIR")
+    if explicit:
+        return Path(explicit).expanduser()
+    library_root = os.environ.get("SCITEX_SCHOLAR_LIBRARY_ROOT")
+    if library_root:
+        return Path(library_root).expanduser()
+    scitex_root = Path(os.environ.get("SCITEX_DIR", "~/.scitex")).expanduser()
+    return scitex_root / "scholar" / "library"
+
+
+def _project_provider(request):
+    """Use the mounted host provider, or scitex-ui's local provider standalone."""
+    return host_project_provider() or LocalProjectProvider(_standalone_projects_root())
+
+
+# Shared scitex-ui GET-list / POST-remember endpoint. The provider factory is
+# request-time so mounted hosts remain authoritative for permissions and
+# project identity; Scholar contains no Hub model or authorization logic.
+project_scope = project_listing_view(_project_provider)
+
+
 def index(request):
     """Serve the Scholar SPA shell page.
 
@@ -260,6 +288,12 @@ def index(request):
     which is what the removed `_favicon_href()` did.
     """
     resolved_api = _api_url()
+    provider = _project_provider(request)
+    current_project = resolve_project(
+        request,
+        provider,
+        explicit=request.GET.get("project"),
+    )
     html = render_to_string(
         "scholar/scholar.html",
         {
@@ -267,6 +301,8 @@ def index(request):
             "api_url": resolved_api or "Not configured",
             "stx_mount": mount_prefix(request),
             "app_label": _app_label("SciTeX Scholar"),
+            "app_scope": "project",
+            "current_project": current_project,
             # i18n (operator directive 2026-09-14): the whole page flips via
             # LocaleMiddleware; this carries the strings that live ONLY in
             # JS, translated server-side for the current request language so

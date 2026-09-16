@@ -23,6 +23,16 @@ engines:
   - PubMed
   - arXiv
 
+# Corpus source policy consumed by leaf surfaces. Local package adapters are
+# primary; public network APIs are the last fallback for the same corpora.
+source_tiers:
+  primary:
+    - CrossRefLocal
+    - OpenAlexLocal
+  online_fallback:
+    - CrossRef
+    - OpenAlex
+
 default_search_limit: 20
 max_workers: 4
 verify_ssl: true
