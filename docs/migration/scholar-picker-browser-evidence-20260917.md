@@ -88,7 +88,52 @@ Screenshots (kept in shared scratch, not committed — binary):
 - Verification is against a seeded real storage root, not a user's live library,
   and the **hub-mounted** render (`/apps/scholar/v2/`) is still unverified here —
   no hub/docker runtime exists on this node.
-- Environment: the Hermes browser tool could not start in this session
-  ("Chromium browser is missing" despite Chrome being installed and launching),
-  so Chrome was driven directly; that is why the evidence is screenshots + DOM
-  dumps + the commands above rather than a browser-tool trace.
+## 5. Operator acceptance gate 8 — the states, driven in a real browser
+
+Gate 8 (from `scholar-leaf-feature-inventory.md`) asks for two things that
+source-level tests cannot show: Library empty and filtered-empty must be
+**distinct and name visible actions**, and the Citation Graph must start with
+DOI guidance, an empty required seed, and a visibly labelled/accessible
+maximum-paper control — all at desktop and 390px.
+
+These states are interactive (the Library tab is lazy-loaded and the filter runs
+client-side), so they were reached by driving Chrome over CDP —
+`cdp_gate8_evidence.py`, kept beside the screenshots. Both an empty library root
+and a seeded one (1 paper) were used, at 1440x900 and 390x844:
+
+| State | Rendered text | Rendered action(s) | Counter |
+| --- | --- | --- | --- |
+| Library, empty library | "Your library is empty. Import a BibTeX file to add papers." | **Import BibTeX** button | `0 Papers` |
+| Library, filter matches nothing (library has 1 paper) | "No papers match the current filters." | **Clear filters** (in the empty block and beside the field) | `0 of 1 Papers` |
+| Citation Graph, initial | "Start with a DOI. Find one by title, topic, or keywords in Search or your Library, then build an interactive citation graph of related papers." | seed input `required=true`, `value=""`, help "Paste the DOI for one seed paper; titles and keywords belong in Search." | limit label "MAX PAPERS IN GRAPH", accessible name "Maximum papers in citation graph", value 20 |
+
+The two Library states are distinct in BOTH copy and offered action, the empty
+state's action is one that exists (it opens the same Import control the panel
+already ships), and the filtered state proves the `filtered`/`total` semantics
+live: the counter keeps the library's real size (`0 of 1`) instead of claiming
+the library is empty. Identical results at 390x844.
+
+Screenshots: `screenshots/library-{desktop,mobile}-{empty,seeded}.png`,
+`library-filtered-*`, `graph-*` in this directory.
+
+### Nits observed while capturing (recorded, not fixed here)
+
+- In the filtered state the **"Clear filters" control appears twice** (beside
+  the filter field and inside the empty block). Both work; showing both is
+  redundant. Left as-is so the captured evidence matches the committed code.
+- The Library helper sentence colours *Enrich* / *Import BibTeX* / *Export* like
+  links although they are plain text, and on an empty library no Enrich control
+  exists at all (Enrich is per-row).
+- The Export format `<select>`'s label and the Export button are both named
+  "Export", which reads redundantly.
+- Sidebar remediation prose wraps so that "Set" is orphaned from the env-var
+  name, which is not styled as code. Pre-existing, untouched by this slice.
+
+## 6. Environment note
+
+The Hermes browser tool could not start in this session ("Chromium browser is
+missing" although Chrome is installed and launches), so Chrome was driven
+directly: `--headless --screenshot/--dump-dom` for the static passes and CDP
+(websockets) for the interactive ones. That is why this evidence is commands +
+screenshots + DOM dumps rather than a browser-tool trace.
+
