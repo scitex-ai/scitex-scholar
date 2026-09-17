@@ -176,6 +176,9 @@ msgstr "サービス制限あり"
 msgid "Service unavailable"
 msgstr "サービス利用不可"
 
+msgid "Not checked yet"
+msgstr "未確認"
+
 msgid "Unknown"
 msgstr "不明"
 
