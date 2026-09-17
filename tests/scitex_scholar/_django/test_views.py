@@ -12,7 +12,9 @@ this is new coverage written directly against the ported views):
   GET /api/graph/network   -> 400 without ?doi=, 503 with no API configured
   GET /api/graph/related   -> 503 with no API configured
   GET /api/graph/paper     -> 503 with no API configured
-  GET /api/graph/health    -> 503 with no API configured
+  GET /api/graph/health    -> 200 capability report, never 5xx: unconfigured /
+                                configured (no probe) / healthy / degraded /
+                                unavailable from ?probe=1
 
 Uses Django's `RequestFactory` directly against the view functions
 (bypasses URL routing, same approach as scitex-writer's precedent at
@@ -212,14 +214,111 @@ def test_graph_paper_returns_503_with_no_api_configured():
 
 
 @override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL=None)
-def test_graph_health_returns_503_with_no_api_configured():
+def test_graph_health_reports_unconfigured_without_a_5xx():
+    """The initial-load path must never emit a same-origin 5xx (2026-09-17)."""
     # Arrange
     rf = RequestFactory()
     request = rf.get("/api/graph/health")
     # Act
     resp = views.graph_health(request)
     # Assert
-    assert resp.status_code == 503
+    assert resp.status_code == 200
+
+
+@override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL=None)
+def test_graph_health_unconfigured_body_still_carries_the_truth_and_the_fix():
+    # Arrange
+    request = RequestFactory().get("/api/graph/health")
+    # Act
+    body = json.loads(views.graph_health(request).content)
+    # Assert
+    assert (body["status"], body["probed"]) == ("unconfigured", False)
+
+
+@override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL="http://127.0.0.1:1")
+def test_graph_health_initial_load_does_not_probe_the_backend():
+    """Configured-but-unprobed is its own state, and the load path is cheap.
+
+    The endpoint points at a CLOSED PORT, so if the default path probed the
+    backend the status would be `unavailable`; `configured` proves no probe ran
+    without needing a mock or a spy.
+    """
+    # Arrange
+    request = RequestFactory().get("/api/graph/health")
+    # Act
+    body = json.loads(views.graph_health(request).content)
+    # Assert
+    assert (body["status"], body["probed"]) == ("configured", False)
+
+
+@override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL="http://127.0.0.1:1")
+def test_graph_health_probe_reports_an_unreachable_backend_as_unavailable():
+    """A genuine failure must not be masked: the probe says unavailable."""
+    # Arrange
+    request = RequestFactory().get("/api/graph/health", {"probe": "1"})
+    # Act
+    body = json.loads(views.graph_health(request).content)
+    # Assert
+    assert (body["status"], body["probed"]) == ("unavailable", True)
+
+
+@override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL="http://127.0.0.1:1")
+def test_graph_health_probe_answers_200_even_when_the_backend_fails():
+    """Not a failed request: the capability report itself always succeeds."""
+    # Arrange
+    request = RequestFactory().get("/api/graph/health", {"probe": "1"})
+    # Act
+    resp = views.graph_health(request)
+    # Assert
+    assert resp.status_code == 200
+
+
+def test_initial_load_checks_configuration_without_probing():
+    """The initial-load path asks the server for CONFIGURATION only."""
+    # Arrange
+    script = (
+        Path(views.__file__).parent / "static" / "scholar" / "js" / "graph"
+        / "citation-graph.js"
+    ).read_text()
+    # Act
+    initial = "this.checkServiceHealth(false);" in script
+    # Assert
+    assert initial
+
+
+def test_live_probe_is_bound_to_opening_the_graph_tab():
+    """The backend is asked when the feature is opened, not on every load."""
+    # Arrange
+    script = (
+        Path(views.__file__).parent / "static" / "scholar" / "js" / "graph"
+        / "citation-graph.js"
+    ).read_text()
+    # Act
+    lazy = 'bindLazyHealthProbe' in script and '?probe=1' in script
+    # Assert
+    assert lazy
+
+
+def test_client_distinguishes_configured_from_ready():
+    """`configured` must render as its own state, never as available."""
+    # Arrange
+    script = (
+        Path(views.__file__).parent / "static" / "scholar" / "js" / "graph"
+        / "citation-graph.js"
+    ).read_text()
+    # Act
+    handled = 'data.status === "configured"' in script
+    # Assert
+    assert handled
+
+
+def test_not_checked_label_is_translatable():
+    # Arrange
+    keys = views._js_i18n_dict()
+    # Act
+    present = "Not checked yet" in keys
+    # Assert
+    assert present
 
 
 def test_search_requires_q_param():
@@ -877,6 +976,11 @@ GRAPH_ROUTES_THAT_NEED_AN_ENDPOINT = (
     ("graph_health", "/api/graph/health", {}),
 )
 
+# The three routes that BUILD a graph: user-initiated actions, whose failure is
+# truthfully a 5xx. `graph_health` is deliberately NOT in this tuple -- it is on
+# the normal initial-load path, and a capability report is not a failed request.
+GRAPH_BUILD_ROUTES_THAT_NEED_AN_ENDPOINT = GRAPH_ROUTES_THAT_NEED_AN_ENDPOINT[:3]
+
 
 def _unconfigured_response(view_name: str, path: str, params: dict):
     """Call one graph view with no endpoint configured; return its parsed body."""
@@ -910,9 +1014,13 @@ def test_unconfigured_graph_route_says_what_to_do_next(view_name, path, params):
     assert required_keys <= set(body), body
 
 
-@pytest.mark.parametrize("view_name,path,params", GRAPH_ROUTES_THAT_NEED_AN_ENDPOINT)
+@pytest.mark.parametrize("view_name,path,params", GRAPH_BUILD_ROUTES_THAT_NEED_AN_ENDPOINT)
 def test_unconfigured_graph_route_still_answers_503(view_name, path, params):
-    """The status code is the contract consumers branch on; it must not move."""
+    """A user-initiated BUILD action that cannot run is truthfully a 5xx.
+
+    Only the three build routes: the health route is on the initial-load path
+    and answers 200 with the same truth in its body.
+    """
     # Arrange
     expected = 503
     # Act
@@ -924,11 +1032,78 @@ def test_unconfigured_graph_route_still_answers_503(view_name, path, params):
 def test_graph_health_keeps_its_status_field_alongside_the_fix():
     """graph_health's own shape survives: callers read `status`, not `error`."""
     # Arrange
-    expected = "unhealthy"
+    expected = "unconfigured"
     # Act
     _, body = _unconfigured_response("graph_health", "/api/graph/health", {})
     # Assert
     assert body.get("status") == expected
+
+
+# --- item 150-152 (hub live audit 2026-09-14) ---------------------------------
+#
+# 3. The Advanced panel printed the raw crossref-local endpoint URL
+#    (http://127.0.0.1:8000) to the user, and the health endpoint leaked
+#    `api_url` in its body. Server infrastructure is not a user concern; the
+#    UI must show state (Configured / Not configured) without the address.
+# 2. "Service limited / Unknown" said WHAT was wrong and not WHAT TO DO.
+#    Limited states now carry a label naming the capability, an explanation,
+#    and a next step.
+# ---------------------------------------------------------------------------
+
+
+def test_template_does_not_render_the_crossref_endpoint_url():
+    # Arrange — the not-configured render (default test settings) must show the
+    # state label without the endpoint address or the old explanation line.
+    body = _compass_index_body()
+    # Act
+    url_var_removed = "{{ api_url }}" not in body
+    old_line_removed = "No crossref-local endpoint detected" not in body
+    shows_state = "Not configured" in body
+    # Assert
+    assert shows_state and url_var_removed and old_line_removed
+
+
+def test_configured_template_states_configured_without_leaking_the_url():
+    # Arrange — a configured endpoint: the UI must say "Configured" but must
+    # NOT print the address (item 3: server infrastructure is not user-facing).
+    with override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL="http://crossref-local.internal:3000"):
+        # Act
+        configured_body = _compass_index_body()
+    # Assert
+    assert "Configured" in configured_body and "crossref-local.internal" not in configured_body
+
+
+def test_graph_health_endpoint_does_not_leak_api_url():
+    # Arrange — configured but unreachable (a closed port), so the except
+    # branch runs and the old code would have put `api_url` in the body.
+    with override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL="http://127.0.0.1:1"):
+        request = RequestFactory().get("/api/graph/health")
+        response = views.graph_health(request)
+    # Act
+    body = json.loads(response.content)
+    # Assert — no endpoint address anywhere in the limited-state body, and the
+    # user-facing answer (label + explanation + next step) is present.
+    no_leak = "api_url" not in body and "127.0.0.1:1" not in json.dumps(body)
+    has_answer = all(k in body for k in ("error", "detail", "fix"))
+    assert no_leak and has_answer, body
+
+
+def test_graph_health_degraded_state_explains_and_does_not_leak():
+    # Arrange — the view returns _degraded_payload() verbatim when a reachable
+    # endpoint answers with no data for the canary DOI; test the pure payload
+    # (no network mock) so the limited-state contract is pinned.
+    # Act
+    body = views._degraded_payload()
+    # Assert — names the capability, explains the limit, gives a next step,
+    # and carries no endpoint address.
+    assert (
+        body.get("status") == "degraded"
+        and body.get("error", "").startswith("Citation Graph")
+        and "detail" in body
+        and "fix" in body
+        and "api_url" not in body
+        and not any("://" in str(v) for v in body.values())
+    ), body
 
 
 def test_the_four_routes_give_one_explanation_not_four():
@@ -1007,6 +1182,1133 @@ def test_host_subprocess_inherits_an_existing_pythonpath(tmp_path):
         os.environ.pop("SCITEX_TEST_MARKER", None)
     # Assert
     assert result.returncode == 0, result.stderr[-800:]
+
+
+# ---------------------------------------------------------------------------
+# Compass 2026-09-10, Scholar search-UX structure.
+#
+# Regression guards for the search-first rework of the standalone Django GUI
+# (compass-impl-scitex-scholar-20260910). They assert STRUCTURE, not pixels:
+# render the template via views.index or read the shipped CSS/JS directly and
+# pin the DOM the page ships, so a future edit that reintroduces the old
+# layout fails here. One assertion per test, AAA-marked, matching this file's
+# convention (and the PA-307 §3 audit rule).
+#
+#   L303 Search is the primary, default tab; 44px touch target on the input.
+#   L653 Advanced query syntax collapsed; cache + source + CrossRef status out
+#        of the always-visible sidebar into a collapsed "Advanced" section.
+#   L316 Placeholder tabs share the same container as content tabs (no jump).
+#   L345 Each search result with a DOI offers "Build citation graph".
+# ---------------------------------------------------------------------------
+
+COMPASS_CSS_DIR = Path(views.__file__).parent / "static" / "scholar" / "css" / "_partials"
+COMPASS_SEARCH_JS = Path(views.__file__).parent / "static" / "scholar" / "js" / "search.js"
+COMPASS_TEMPLATE = TEMPLATE
+
+
+def _compass_index_body() -> str:
+    """Render the standalone index; the browser's HTML is the thing under test."""
+    return views.index(RequestFactory().get("/")).content.decode()
+
+
+def test_search_is_the_default_active_tab():
+    # Arrange
+    body = _compass_index_body()
+    # Act
+    search_default = 'class="tab-btn active" data-tab="search"' in body
+    search_panel_active = 'id="tab-search" class="tab-panel active"' in body
+    # Assert
+    assert search_default and search_panel_active
+
+
+def test_graph_tab_is_not_default_but_still_present():
+    # Arrange
+    body = _compass_index_body()
+    # Act
+    graph_present = 'data-tab="graph"' in body
+    graph_not_default = 'class="tab-btn active" data-tab="graph"' not in body
+    graph_panel_not_active = 'id="tab-graph" class="tab-panel active"' not in body
+    # Assert
+    assert graph_present and graph_not_default and graph_panel_not_active
+
+
+def test_advanced_section_is_collapsed_by_default():
+    # Arrange
+    body = _compass_index_body()
+    # Act
+    present = "search-advanced" in body
+    closed_on_load = '<details class="search-advanced">' in body  # no open attr
+    # Assert
+    assert present and closed_on_load
+
+
+def test_advanced_hides_query_syntax_until_requested():
+    # Arrange
+    body = _compass_index_body()
+    # Act
+    syntax_block = "search-advanced__syntax" in body
+    impact_factor_syntax = "if:&gt;5" in body  # escaped in the template
+    # Assert
+    assert syntax_block and impact_factor_syntax
+
+
+def test_ignore_cache_and_source_are_wired_to_the_api():
+    # Arrange
+    body = _compass_index_body()
+    js = COMPASS_SEARCH_JS.read_text()
+    # Act
+    checkbox_present = 'id="searchNoCache"' in body
+    forwards_no_cache = 'params.set("no_cache", "true")' in js
+    forwards_mode = 'params.set("mode", modeSelect.value)' in js
+    # Assert
+    assert checkbox_present and forwards_no_cache and forwards_mode
+
+
+def test_crossref_api_status_moved_out_of_the_sidebar():
+    # Arrange
+    body = _compass_index_body()
+    # Act
+    in_advanced = "search-advanced__api" in body
+    not_a_sidebar_section = 'sidebar-section__title">CrossRef API</span>' not in body
+    # Assert
+    assert in_advanced and not_a_sidebar_section
+
+
+def test_search_and_library_content_share_one_container_class():
+    # Arrange
+    # #101: "keep primary content/header geometry stable when moving between
+    # Search and Library." The two tabs render different inner content (a
+    # search form vs a centered placeholder), but they must be inset by the
+    # SAME wrapper so their left edge, width and top origin match. That is what
+    # the real browser measured (search card and library placeholder both at
+    # x=256/w=1168 desktop, x=16/w=358 mobile) — both are children of a
+    # .citation-graph-container. This pins that shared-wrapper contract for
+    # BOTH tabs, not just the placeholder.
+    tpl = COMPASS_TEMPLATE.read_text()
+    # Act
+    def _panel_wraps_container(panel_id: str) -> bool:
+        start = tpl.index(f'id="{panel_id}"')
+        # next panel boundary (or end of file)
+        nxt = [tpl.index(f'id="tab-{t}"') for t in ("search", "library", "graph")
+               if f'id="tab-{t}"' != panel_id and tpl.find(f'id="tab-{t}"') > start]
+        end = min(nxt) if nxt else len(tpl)
+        region = tpl[start:end]
+        return "citation-graph-container" in region
+    search_wraps = _panel_wraps_container('tab-search')
+    library_wraps = _panel_wraps_container('tab-library')
+    # Assert
+    assert search_wraps and library_wraps
+
+
+def test_search_results_offer_build_citation_graph():
+    # Arrange
+    js = COMPASS_SEARCH_JS.read_text()
+    css = (COMPASS_CSS_DIR / "_search.css").read_text()
+    # Act
+    action_in_js = "Build citation graph" in js
+    styled = ".search-result__graph-btn" in css
+    # Assert
+    assert action_in_js and styled
+
+
+def test_search_input_has_a_44px_touch_target():
+    # Arrange
+    forms_css = (COMPASS_CSS_DIR / "_forms.css").read_text()
+    base_css = (COMPASS_CSS_DIR / "_base.css").read_text()
+    # Act
+    # #93: the search input is sized via a scholar-owned token (declared in
+    # _base.css, always linked) rather than a raw px or an unlinked scitex-ui
+    # --input-height fallback. The token must be declared AND referenced.
+    token_declared = "--scholar-search-height" in base_css
+    token_referenced = "min-height: var(--scholar-search-height)" in forms_css
+    no_raw_fallback = "var(--input-height, 44px)" not in forms_css
+    # Assert
+    assert token_declared and token_referenced and no_raw_fallback
+
+
+# --- item 94: the search placeholder must tell the user WHAT to type --------
+#
+# "Enter keywords…" is generic — a researcher does not know whether to type a
+# title, an author, a DOI, or a concept. The placeholder now leads with a
+# concrete example ("e.g. <a real query>") that models the intended input,
+# matching the in-repo convention already used by the DOI field
+# ("e.g. 10.1038/s41586-020-2008-3"). Guard the clearer text so it cannot
+# silently regress back to the generic label.
+# ---------------------------------------------------------------------------
+
+
+def test_search_placeholder_is_clear_and_example_driven():
+    # Arrange
+    body = _compass_index_body()
+    # Act
+    has_example = 'placeholder="e.g. ' in body
+    no_generic = 'Enter keywords' not in body
+    # Assert -- the placeholder models a concrete query and the generic
+    # "Enter keywords…" label is gone.
+    assert has_example and no_generic
+
+
+# --- item 116/115/114: "Search" must say WHERE it searches ------------------
+#
+# Compass 2026-09-10: a bare "Search" label does not tell a researcher whether
+# they are querying the external databases or their own library -- and the
+# library does not exist yet. The tab and the submit button now read
+# "Search databases" and the description names the external databases and
+# contrasts them with the Library tab.
+# ---------------------------------------------------------------------------
+
+
+def test_search_tab_and_button_are_labelled_databases():
+    # Arrange
+    body = _compass_index_body()
+    # Act
+    tab_label = 'class="tab-btn active" data-tab="search">Search databases<' in body
+    # #95: the search submit is the PRIMARY action, so it carries btn-primary
+    # (NOT btn-build, which is the secondary Build Graph / per-row class).
+    button_label = 'class="btn-primary">Search databases<' in body
+    # Assert
+    assert tab_label and button_label
+
+
+# --- #95: Search submit is visually PRIMARY, distinct from Build Graph -------
+#
+# The rendered Search button shared class="btn-build" with "Build Graph"
+# (scholar.html:159 and :336 pre-fix), so the primary action had no visual
+# distinction. #95 gives the Search submit its own .btn-primary (scitex-ui
+# --accent token, 44px touch minimum, distinct from secondary .btn-build).
+# Negative control: on the pre-change template the Search submit is
+# btn-build, so test_search_primary_distinct_from_build_graph fails.
+# ---------------------------------------------------------------------------
+
+
+def test_search_primary_distinct_from_build_graph():
+    # Arrange
+    body = _compass_index_body()
+    # Act
+    # The Search submit is btn-primary; the Build Graph submit stays btn-build.
+    search_is_primary = 'class="btn-primary">Search databases<' in body
+    build_graph_stays_secondary = 'class="btn-build">Build Graph<' in body
+    # Negative control: the search button is NOT also btn-build (that was the
+    # pre-fix state — a single shared class with no visual distinction).
+    search_not_btn_build = 'class="btn-build">Search databases<' not in body
+    # Assert
+    assert search_is_primary and build_graph_stays_secondary and search_not_btn_build
+
+
+def test_btn_primary_uses_accent_token_and_44px_minimum():
+    # Arrange
+    forms_css = (COMPASS_CSS_DIR / "_forms.css").read_text()
+    # Act
+    # .btn-primary must be present and use the shared scitex-ui --accent token
+    # (theme-aware: light + dark both resolve from theme.css) with a 44px
+    # touch-target minimum, so it reads as primary AND stays tappable on
+    # mobile without hardcoding a colour or a sub-44px height.
+    has_btn_primary = ".btn-primary {" in forms_css
+    uses_accent = "background: var(--accent)" in forms_css
+    touch_44 = "min-height: 44px" in forms_css
+    # Assert
+    assert has_btn_primary and uses_accent and touch_44
+
+
+def test_search_description_clarifies_external_databases_not_library():
+    # Arrange
+    body = _compass_index_body()
+    # Act
+    # The description must both name the external databases and contrast them
+    # with the Library so the two surfaces are not confused.
+    names_external = "external databases" in body
+    contrasts_library = "not your Library" in body
+    # Assert
+    assert names_external and contrasts_library
+
+
+# --- TODO 105 / L337: Metadata Enrichment is no longer a top-level tab -------
+#
+# Small operations must not be promoted to top-level navigation; enrichment
+# moves inside the Library surface (TODO 106, a separate, Library-dependent
+# build). This pins the absence so a future edit that re-adds the tab fails
+# here rather than silently regressing.
+# ---------------------------------------------------------------------------
+
+
+def test_enrichment_is_not_a_top_level_tab():
+    # Arrange
+    body = _compass_index_body()
+    # Act
+    no_button = 'data-tab="enrichment"' not in body
+    no_panel = 'id="tab-enrichment"' not in body
+    no_placeholder_heading = "Metadata Enrichment" not in body
+    # Assert
+    assert no_button and no_panel and no_placeholder_heading
+
+
+def test_scholar_tab_bar_has_exactly_three_tabs():
+    # Arrange
+    body = _compass_index_body()
+    # Act
+    tab_count = body.count('class="tab-btn')
+    # Assert
+    assert tab_count == 3
+
+
+# --- responsive fix (MONITOR-1731): shell side panes + mobile collapse -------
+#
+# The scitex-ui workspace shell renders Console/Files/Viewer side panes around
+# the app content. Scholar has no content for them; leaving them enabled
+# produced the empty desktop left gutter and the broken mobile reflow (the
+# shell reflows its panes, which then collide with scholar's own two-column
+# .app-container). The fix has two halves: declare the panes unused in
+# views.index, and collapse scholar's .app-container to one column below 768px.
+# ---------------------------------------------------------------------------
+
+
+def test_index_declares_shell_side_panes_unused():
+    # Arrange
+    from scitex_scholar._django.views import index
+
+    # Act
+    rendered = index(RequestFactory().get("/")).content.decode()
+    # The unused panes carry the shell's `ws-pane-unused` class; all three
+    # (AI/Console, Files, Viewer) must be present so the shell hides them.
+    declares_unused = rendered.count("ws-pane-unused") >= 3
+    # Assert
+    assert declares_unused
+
+
+def test_layout_css_collapses_to_one_column_on_mobile():
+    # Arrange
+    layout_css = (COMPASS_CSS_DIR / "_layout.css").read_text()
+    # Act
+    has_breakpoint = "@media (max-width: 768px)" in layout_css
+    stacks_container = ".app-container" in layout_css and "flex-direction: column" in layout_css
+    hides_sidebar = ".app-sidebar" in layout_css and "display: none" in layout_css
+    # Assert
+    assert has_breakpoint and stacks_container and hides_sidebar
+
+
+def test_search_form_row_stacks_on_mobile():
+    # Arrange
+    # #93: a larger search input makes the input + button + results row overflow
+    # a 390px viewport, so the row must stack vertically below the breakpoint.
+    layout_css = (COMPASS_CSS_DIR / "_layout.css").read_text()
+    # Act
+    in_mobile_block = "@media (max-width: 768px)" in layout_css
+    stacks_form_row = ".form-row" in layout_css and "flex-direction: column" in layout_css
+    input_can_shrink = "min-width: 0" in layout_css
+    # Assert
+    assert in_mobile_block and stacks_form_row and input_can_shrink
+
+
+def test_search_input_button_stack_vertically_on_mobile():
+    # Arrange
+    # The input + "Search databases" button share a flex ROW inside
+    # .input-wrapper. On a 390px viewport that row leaves the input only
+    # ~182px wide with its placeholder truncated. Below the breakpoint the
+    # wrapper must stack vertically (input full-width, button full-width under
+    # it) so the placeholder reads and the button stays tappable.
+    layout_css = (COMPASS_CSS_DIR / "_layout.css").read_text()
+    # Act
+    # Isolate the @media (max-width: 768px) block and assert the wrapper rule
+    # and the button rule both live INSIDE it (not just anywhere in the file).
+    media = layout_css.split("@media (max-width: 768px)", 1)
+    in_mobile = len(media) == 2
+    block = media[1] if in_mobile else ""
+    # The .input-wrapper rule must set flex-direction: column inside the block.
+    wrapper_rule = re.search(
+        r"\.input-wrapper\s*{[^}]*flex-direction:\s*column[^}]*}", block
+    )
+    # The .btn-build (and, post-#95, .btn-primary) inside the wrapper must
+    # go full-width inside the block.
+    button_rule = re.search(
+        r"\.input-wrapper\s+\.btn-build(?:\s*,\s*\.input-wrapper\s+\.btn-primary)?\s*{[^}]*width:\s*100%[^}]*}", block
+    )
+    # Assert
+    assert in_mobile and wrapper_rule and button_rule
+
+
+def test_mobile_form_row_stretches_groups_full_width():
+    # Arrange
+    # Root cause of the 182px-truncated-placeholder defect: `_forms.css` loads
+    # AFTER `_layout.css` in scholar.css's @import chain, so the desktop rule
+    # `.graph-form .form-row { align-items: flex-end }` (specificity 0,2,0)
+    # overrode `_layout.css`'s mobile `.form-row { align-items: stretch }`
+    # (specificity 0,1,0). Stacked form-groups then right-aligned at intrinsic
+    # width (~207px), and the input inherited that. The guard requires a
+    # matching-specificity mobile override in _forms.css that stretches the
+    # row and the groups to full width.
+    forms_css = (COMPASS_CSS_DIR / "_forms.css").read_text()
+    # Act
+    media = forms_css.split("@media (max-width: 768px)", 1)
+    in_mobile = len(media) == 2
+    block = media[1] if in_mobile else ""
+    stretch = re.search(
+        r"\.graph-form\s+\.form-row\s*{[^}]*align-items:\s*stretch[^}]*}", block
+    )
+    full_width_groups = re.search(
+        r"\.graph-form\s+\.form-row\s+\.form-group--doi\s*,?\s*\n?\s*"
+        r"\.graph-form\s+\.form-row\s+\.form-group--options\s*{[^}]*width:\s*100%[^}]*}",
+        block,
+    )
+    # Assert
+    assert in_mobile and stretch and full_width_groups
+
+
+# ---------------------------------------------------------------------------
+# #106: metadata enrichment as a contextual Library operation.
+#
+# Enrichment is an action ON a library item (a per-row button in the Library
+# tab), NOT a top-level tab (#105 kept it off the nav). The two API routes are
+# thin adapters over the package's own storage + enrichment layer; the tests
+# below exercise them end-to-end against a temporary, user-scoped library with
+# a deterministic offline enrichment fake (PA-306: the pipeline is a
+# parameter, not a monkeypatch; the env var is set/restored by hand, not via
+# the monkeypatch fixture). No network, no user data.
+# ---------------------------------------------------------------------------
+
+import contextlib
+import json as _json
+
+
+@contextlib.contextmanager
+def _library_env(root: Path):
+    """Point the view's library (and its backing store) at a temp root,
+    restoring both on exit. The sanctioned env-var yield pattern, not
+    monkeypatch."""
+    old_dir = os.environ.get("SCITEX_DIR")
+    old_root = os.environ.get("SCITEX_SCHOLAR_LIBRARY_ROOT")
+    os.environ["SCITEX_DIR"] = str(root / ".scitex")
+    os.environ["SCITEX_SCHOLAR_LIBRARY_ROOT"] = str(root)
+    try:
+        yield
+    finally:
+        if old_dir is None:
+            os.environ.pop("SCITEX_DIR", None)
+        else:
+            os.environ["SCITEX_DIR"] = old_dir
+        if old_root is None:
+            os.environ.pop("SCITEX_SCHOLAR_LIBRARY_ROOT", None)
+        else:
+            os.environ["SCITEX_SCHOLAR_LIBRARY_ROOT"] = old_root
+
+
+def _seed_library(root: Path, paper_id: str = "PID1",
+                  doi: str = "10.1/example", title: str = "A paper",
+                  year: int = 2024, abstract: str = None,
+                  authors: list = None) -> Path:
+    """Create one master entry; return its metadata.json path."""
+    entry = root / "MASTER" / paper_id
+    entry.mkdir(parents=True, exist_ok=True)
+    basic = {"title": title, "year": year}
+    if abstract is not None:
+        basic["abstract"] = abstract
+    if authors is not None:
+        basic["authors"] = authors
+    meta = {"metadata": {"id": {"doi": doi}, "basic": basic}}
+    path = entry / "metadata.json"
+    path.write_text(_json.dumps(meta))
+    return path
+
+
+class _OfflineEnrich:
+    """Deterministic offline enrichment fake (hand-rolled, no network).
+
+    Sets a fixed abstract + citation count so the persistence assertion is
+    exact. Stands in for ScholarPipelineMetadataSingle via the view's
+    `_pipeline` injection seam."""
+
+    async def enrich_paper_async(self, paper, force: bool = False):
+        paper.metadata.basic.abstract = "OFFLINE FAKE ABSTRACT"
+        paper.metadata.citation_count.total = 7
+        return paper
+
+
+def test_library_list_returns_user_papers(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        meta = _seed_library(tmp_path, abstract=None)
+        rf = RequestFactory()
+        # Act
+        resp = views.library_list(rf.get("/api/library"))
+        data = _json.loads(resp.content)
+        # Assert
+        listed = data["papers"]
+        assert (
+            data["count"] == 1
+            and listed[0]["paper_id"] == "PID1"
+            and listed[0]["doi"] == "10.1/example"
+            and listed[0]["title"] == "A paper"
+            and meta.is_file()
+        )
+
+
+def test_library_list_empty_when_no_master(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        # Act
+        data = _json.loads(views.library_list(rf.get("/api/library")).content)
+        # Assert
+        assert data["papers"] == [] and data["count"] == 0
+
+
+def test_library_enrich_persists_metadata(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        meta_path = _seed_library(tmp_path, abstract=None)
+        rf = RequestFactory()
+        req = rf.post("/api/library/enrich", {"paper_id": "PID1"})
+        # Act — inject the deterministic offline pipeline (no network).
+        resp = views.library_enrich(req, _pipeline=_OfflineEnrich())
+        data = _json.loads(resp.content)
+        reloaded = _json.loads(meta_path.read_text())["metadata"]["basic"]
+        # Assert — the enriched metadata is written back to the SAME user-scope
+        # master record (abstract now present, citation count persisted).
+        assert (
+            data["ok"] is True
+            and data["abstract_chars"] == len("OFFLINE FAKE ABSTRACT")
+            and reloaded["abstract"] == "OFFLINE FAKE ABSTRACT"
+        )
+
+
+def test_library_enrich_requires_paper_id(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        # Act
+        resp = views.library_enrich(rf.post("/api/library/enrich", {}))
+        # Assert
+        assert resp.status_code == 400
+
+
+def test_library_enrich_404_for_unknown_paper(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="KNOWN")
+        rf = RequestFactory()
+        # Act
+        resp = views.library_enrich(rf.post("/api/library/enrich", {"paper_id": "MISSING"}))
+        # Assert
+        assert resp.status_code == 404
+
+
+def test_enrichment_is_a_contextual_library_action_not_a_tab():
+    # Arrange
+    # #106 + #105: enrichment is a per-row action inside the Library tab, never
+    # a top-level tab. The tab bar is unchanged (3 tabs), the Library panel
+    # carries the list + Enrich wiring, and the JS posts to the enrich route.
+    body = _compass_index_body()
+    tpl = COMPASS_TEMPLATE.read_text()
+    js = (COMPASS_SEARCH_JS.parent / "library.js").read_text()
+    # Act
+    no_enrich_tab = 'data-tab="enrichment"' not in body
+    library_has_list = 'id="libraryList"' in tpl and 'class="library-list"' in tpl
+    js_wires_enrich = "api/library/enrich" in js and 'method: "POST"' in js
+    # Assert
+    assert no_enrich_tab and library_has_list and js_wires_enrich
+
+
+def test_library_api_routes_are_registered():
+    # Arrange
+    from django.urls import resolve
+    # Act
+    listed = resolve("/api/library").func.__name__
+    enriched = resolve("/api/library/enrich").func.__name__
+    exported = resolve("/api/library/export").func.__name__
+    imported = resolve("/api/library/import").func.__name__
+    # Assert
+    assert (
+        listed == "library_list"
+        and enriched == "library_enrich"
+        and exported == "library_export"
+        and imported == "library_import"
+    )
+
+
+# --- #106 / L327: Library Import / Export -----------------------------------
+#
+# Thin adapters over the package's own BibTeX handler + formatter. Export
+# serializes the user's local library (bibtex/ris/endnote); import parses
+# BibTeX and persists it to the same MASTER/<id>/metadata.json the list route
+# reads. Offline: no network, user-scoped via the env-seam temp root.
+# ---------------------------------------------------------------------------
+
+
+_SAMPLE_BIB = (
+    "@article{imp1,\n"
+    " title = {Imported Paper Title},\n"
+    " author = {Jane Importer and John Second},\n"
+    " year = {2022},\n"
+    " journal = {Journal of Imports},\n"
+    " doi = {10.9/imported}\n"
+    "}\n"
+)
+
+
+def test_library_export_bibtex_round_trips_the_library(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="XP1", doi="10.2/exported",
+                      title="Exported Paper Title", year=2021)
+        rf = RequestFactory()
+    # Act
+    with _library_env(tmp_path):
+        resp = views.library_export(rf.get("/api/library/export", {"format": "bibtex"}))
+        body = resp.content.decode()
+    # Assert
+    assert resp.status_code == 200 and "Exported Paper Title" in body and "10.2/exported" in body
+
+
+def test_library_export_ris_format(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="XR1", doi="10.3/ris",
+                      title="RIS Paper Title", year=2020)
+        rf = RequestFactory()
+    # Act
+    with _library_env(tmp_path):
+        resp = views.library_export(rf.get("/api/library/export", {"format": "ris"}))
+        body = resp.content.decode()
+    # Assert
+    assert resp.status_code == 200 and "RIS Paper Title" in body
+
+
+def test_library_export_rejects_unsupported_format(tmp_path):
+    # Arrange
+    rf = RequestFactory()
+    # Act
+    with _library_env(tmp_path):
+        resp = views.library_export(rf.get("/api/library/export", {"format": "csljson"}))
+    # Assert
+    assert resp.status_code == 400
+
+
+def test_library_import_bibtex_makes_paper_visible(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        # Act — import a BibTeX entry, then list the library.
+        imported = _json.loads(views.library_import(rf.post(
+            "/api/library/import", {"format": "bibtex", "bibtex": _SAMPLE_BIB}
+        )).content)
+        listed = _json.loads(views.library_list(rf.get("/api/library")).content)
+        titles = [p.get("title") for p in listed["papers"]]
+    # Assert — the imported paper is parsed, persisted, and listed.
+    assert imported["ok"] is True and imported["imported"] == 1 and "Imported Paper Title" in titles
+
+
+def test_library_import_requires_bibtex_body(tmp_path):
+    # Arrange
+    rf = RequestFactory()
+    # Act
+    with _library_env(tmp_path):
+        resp = views.library_import(rf.post("/api/library/import", {"format": "bibtex"}))
+    # Assert
+    assert resp.status_code == 400
+
+
+def test_library_import_rejects_unsupported_format(tmp_path):
+    # Arrange
+    rf = RequestFactory()
+    # Act
+    with _library_env(tmp_path):
+        resp = views.library_import(rf.post("/api/library/import",
+                                            {"format": "ris", "bibtex": _SAMPLE_BIB}))
+    # Assert
+    assert resp.status_code == 400
+
+
+def test_library_template_has_import_export_controls():
+    # Arrange
+    tpl = COMPASS_TEMPLATE.read_text()
+    js = (COMPASS_SEARCH_JS.parent / "library.js").read_text()
+    # Act
+    has_controls = (
+        'id="libraryExportBtn"' in tpl
+        and 'id="libraryImportBtn"' in tpl
+        and 'id="libraryExportFormat"' in tpl
+    )
+    js_wires_both = "api/library/export" in js and "api/library/import" in js
+    # Assert
+    assert has_controls and js_wires_both
+
+
+# --- #162 review fixes: author fidelity, import path-safety, user isolation --
+
+_AUTHORS = ["Jane Importer", "John Second"]
+
+
+def test_library_export_carries_authors_in_every_format(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="AUTH1", doi="10.4/authors",
+                      title="Authored Paper", year=2022, authors=list(_AUTHORS))
+        rf = RequestFactory()
+    # Act
+    out = {}
+    with _library_env(tmp_path):
+        for fmt in ("bibtex", "ris", "endnote"):
+            resp = views.library_export(rf.get("/api/library/export", {"format": fmt}))
+            out[fmt] = resp.content.decode()
+    # Assert -- the exact author names must appear in EVERY supported format
+    # (BibTeX joins with " and "; RIS/EndNote split it into separate lines, so
+    # each name is present verbatim in all three).
+    assert all("Jane Importer" in b and "John Second" in b for b in out.values()), out
+
+
+def test_library_import_parses_payloads_as_content_not_paths(tmp_path):
+    # Arrange
+    secret = tmp_path / "secret.txt"
+    secret.write_text("TOP-SECRET-FILE-CONTENT-MUST-NOT-APPEAR")
+    # Payloads that papers_from_bibtex's auto-detection would misread as paths
+    # (a slash, a backslash, a path-like token) but are valid BibTeX content.
+    payloads = [
+        "@article{a,\n title={S1},\n url={http://x/y/z}\n}\n",
+        "@article{b,\n title={B1},\n doi={10.9/back\\\\slash}\n}\n",
+        "@article{c,\n title={P1},\n doi={10.9/./rel}\n}\n",
+    ]
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        # Act
+        results = []
+        for bib in payloads:
+            resp = views.library_import(
+                rf.post("/api/library/import", {"format": "bibtex", "bibtex": bib})
+            )
+            results.append(_json.loads(resp.content))
+        blob = _json.dumps(_json.loads(views.library_list(rf.get("/api/library")).content))
+    # Assert -- all three parsed as content, 3 papers total, and the secret
+    # server file was never read into the import.
+    assert (
+        all(r["imported"] == 1 for r in results)
+        and sum(r["imported"] for r in results) == 3
+        and "TOP-SECRET-FILE-CONTENT-MUST-NOT-APPEAR" not in blob
+        and str(secret) not in blob
+    ), results
+
+
+def test_library_isolated_between_two_mounted_users(tmp_path):
+    # Arrange
+    root_a, root_b = tmp_path / "user_a", tmp_path / "user_b"
+    rf = RequestFactory()
+
+    class _User:
+        def __init__(self, name):
+            self.username = name
+            self.is_authenticated = True
+            # Plain bool, matching a real Django user model (AbstractBaseUser
+            # exposes is_anonymous as a bool property, NOT a method). The old
+            # `lambda: False` mock made it callable and masked the live 500.
+            self.is_anonymous = False
+
+    def _req(path, data=None, user_root=None):
+        # POST when a body is supplied, otherwise GET.
+        r = rf.post(path, data or {}) if data else rf.get(path)
+        if user_root is not None:
+            r.user = _User(user_root.name)
+            r.scholar_library_root = str(user_root)
+        return r
+
+    # Act
+    a_root = views._library_root_for(_req("/api/library", user_root=root_a))
+    b_root = views._library_root_for(_req("/api/library", user_root=root_b))
+    # Bound roots drive both save (PaperIO at root/MASTER) and read (collect_rows),
+    # so no global env is needed -- this is the real mounted-user flow.
+    views.library_import(
+        _req("/api/library/import",
+             {"format": "bibtex",
+              "bibtex": "@article{aa,\n title={A only},\n doi={10.a/1}\n}\n"},
+             user_root=root_a))
+    a_papers = _json.loads(views.library_list(_req("/api/library", user_root=root_a)).content)["papers"]
+    a_exp = views.library_export(_req("/api/library/export?format=bibtex", user_root=root_a)).content.decode()
+    b_papers = _json.loads(views.library_list(_req("/api/library", user_root=root_b)).content)["papers"]
+    b_exp = views.library_export(_req("/api/library/export?format=bibtex", user_root=root_b)).content.decode()
+    # Assert -- user A's paper is invisible to user B (list + export isolation).
+    a_has = any(p["title"] == "A only" for p in a_papers)
+    b_has = any(p["title"] == "A only" for p in b_papers)
+    assert (
+        a_root != b_root
+        and a_root.name == "user_a"
+        and b_root.name == "user_b"
+        and a_has
+        and not b_has
+        and "A only" in a_exp
+        and "A only" not in b_exp
+    ), (a_root, b_root, a_papers, b_papers)
+
+
+def test_assert_safe_library_id_rejects_unsafe_components():
+    # Arrange
+    bad = ["../escape", "a/b", "a\\b", "a\x00b", "..", ".", ""]
+
+    def _rejects(x):
+        try:
+            views._assert_safe_library_id(x)
+            return False
+        except ValueError:
+            return True
+
+    # Act
+    rejected = [x for x in bad if _rejects(x)]
+    accepted = views._assert_safe_library_id("AB12CD34")
+    # Assert
+    assert rejected == bad and accepted == "AB12CD34"
+
+
+def test_library_import_view_is_not_csrf_exempt():
+    # Arrange
+    # Act
+    exempt = getattr(views.library_import, "csrf_exempt", False)
+    # Assert -- the view must NOT opt out of CSRF (that would weaken the
+    # mounted route); protection comes from the host's CsrfViewMiddleware.
+    assert exempt is False
+
+
+def test_library_import_is_csrf_protected_but_token_path_works(tmp_path):
+    # Arrange
+    # Model the mounted Hub: add CsrfViewMiddleware (the standalone settings
+    # carry none, so a token-less POST would otherwise pass) and use a Client
+    # that enforces CSRF. Render the index to obtain the csrftoken cookie --
+    # the {% csrf_token %} tag in scholar.html now pulls it, which is exactly
+    # the value the Library Import JS will send back as X-CSRFToken.
+    from django.conf import settings as _s
+    from django.test import Client
+
+    mw = list(_s.MIDDLEWARE)
+    if "django.middleware.csrf.CsrfViewMiddleware" not in mw:
+        if "django.middleware.security.SecurityMiddleware" in mw:
+            mw.insert(mw.index("django.middleware.security.SecurityMiddleware") + 1,
+                      "django.middleware.csrf.CsrfViewMiddleware")
+        else:
+            mw.insert(0, "django.middleware.csrf.CsrfViewMiddleware")
+
+    with _library_env(tmp_path / "user"), override_settings(MIDDLEWARE=mw):
+        csrf_client = Client(enforce_csrf_checks=True)
+        csrf_client.get("/")  # index renders {% csrf_token %} -> sets cookie
+        cookie = csrf_client.cookies.get("csrftoken")
+        token = cookie.value if cookie else ""
+        bibtex = "@article{c,\n title={CSRF Test},\n doi={10.5/csrf}\n}\n"
+        # Act
+        no_token = csrf_client.post(
+            "/api/library/import", {"format": "bibtex", "bibtex": bibtex}
+        )
+        with_token = csrf_client.post(
+            "/api/library/import",
+            {"format": "bibtex", "bibtex": bibtex},
+            HTTP_X_CSRFTOKEN=token,
+        )
+    # Assert -- cookie set, token-less POST rejected (CSRF intact), token POST
+    # succeeds and imports the paper.
+    assert (
+        bool(cookie)
+        and no_token.status_code == 403
+        and with_token.status_code == 200
+        and _json.loads(with_token.content)["imported"] == 1
+    ), (no_token.status_code, with_token.status_code, with_token.content)
+
+
+# --- #163 live regression: is_anonymous is a BOOL on a real Django user -------
+#
+# The merged #163 _library_root_for did `getattr(user, 'is_anonymous',
+# lambda: True)()` -- CALLING is_anonymous. On a real Django user model that is
+# a bool PROPERTY, so every authenticated /v2/ user raised
+# TypeError: 'bool' object is not callable -> 500 on all three library
+# endpoints. The earlier isolation test masked this by mocking
+# `is_anonymous = lambda: False` (callable) AND binding seam-1, so seam-2 never
+# ran against a genuine user. This test exercises seam-2 (authenticated user,
+# NO request.scholar_library_root) with a real-shape user (bool is_anonymous)
+# so the class of defect is caught in CI.
+# ---------------------------------------------------------------------------
+
+
+def test_library_root_for_authenticated_user_with_bool_is_anonymous(tmp_path):
+    # Arrange
+    # A real-shape user: is_anonymous is a plain bool (AbstractBaseUser),
+    # is_authenticated True, NO callable. Seam-2: no scholar_library_root set.
+    class _RealUser:
+        username = "alice"
+        is_authenticated = True
+        is_anonymous = False
+
+    rf = RequestFactory()
+    req = rf.get("/api/library")
+    req.user = _RealUser()
+    # Act
+    with _library_env(tmp_path):
+        root = views._library_root_for(req)
+        home = views._library_root()
+    # Assert: seam-2 must produce a per-user mounted root (named after the
+    # user), not the standalone home.
+    assert root != home and root.name == _RealUser.username
+
+
+def test_library_root_for_anonymous_user_uses_standalone(tmp_path):
+    # Arrange
+    # Anonymous user (bool is_anonymous True) must fall through to the
+    # standalone home library, not the mounted per-user root.
+    class _Anon:
+        username = None
+        is_authenticated = False
+        is_anonymous = True
+
+    rf = RequestFactory()
+    req = rf.get("/api/library")
+    req.user = _Anon()
+    # Act
+    with _library_env(tmp_path):
+        root = views._library_root_for(req)
+        home = views._library_root()
+    # Assert: anonymous user falls through to the standalone home library
+    # (same root the env override defines), not a per-user mounted root.
+    assert root == home
+
+
+# --- UI226: scholar surface tokens must follow the light/dark theme ----------
+#
+# The six --bg-* / --accent-hover / --edge-color surfaces are scholar-owned but
+# MUST be theme-aware: pinned to dark literals in :root alone, they render
+# dark-on-dark in light mode (the approved dark screenshot was fine; the light
+# one was broken). theme.css flips its own tokens via [data-theme="dark"], so
+# scholar mirrors that: light values in :root, dark values under
+# [data-theme="dark"]. These guards pin both states so the regression cannot
+# return silently.
+# ---------------------------------------------------------------------------
+
+
+def test_base_css_declares_light_surfaces_in_root():
+    # Arrange
+    base = (COMPASS_CSS_DIR / "_base.css").read_text()
+    # Act
+    has_root_block = ":root {" in base
+    light_bg_primary = "--bg-primary: #f5f4f2" in base  # shell light surface
+    # Assert -- :root (the light default) carries light, not dark, surfaces.
+    assert has_root_block and light_bg_primary
+
+
+def test_base_css_declares_dark_surfaces_under_data_theme_dark():
+    # Arrange
+    base = (COMPASS_CSS_DIR / "_base.css").read_text()
+    # Act
+    has_dark_block = '[data-theme="dark"] {' in base
+    dark_bg_primary = "--bg-primary: #0d0d0d" in base  # scholar's original dark
+    # Assert -- a [data-theme="dark"] override restores the approved dark
+    # surfaces, so dark mode is unchanged while light mode is fixed.
+    assert has_dark_block and dark_bg_primary
+
+
+def test_base_css_light_and_dark_surfaces_differ():
+    # Arrange
+    base = (COMPASS_CSS_DIR / "_base.css").read_text()
+    # Act
+    # Both a light and a dark value for --bg-primary must be present, and they
+    # must be different tokens (a single pinned value is the original bug).
+    has_light = "--bg-primary: #f5f4f2" in base
+    has_dark = "--bg-primary: #0d0d0d" in base
+    # Assert
+    assert has_light and has_dark
+
+
+# --- PWA: the standalone app must be installable -----------------------------
+#
+# No shared-shell change: every leaf declares its own name/icons, so Scholar's
+# own template + static carries the manifest, theme-color, and iOS icon. A
+# service worker is deliberately omitted (stateless app; offline caching is a
+# separate product decision).
+# ---------------------------------------------------------------------------
+
+COMPASS_PWA_DIR = Path(views.__file__).parent / "static" / "scholar" / "pwa"
+
+
+def test_pwa_manifest_present_and_valid():
+    # Arrange
+    manifest_path = COMPASS_PWA_DIR / "manifest.json"
+    # Act -- parse the manifest; the single assertion below checks every field
+    # Chrome's installability requires in one semantically-precise expression
+    # (STX-TQ007: one assertion per test).
+    exists = manifest_path.exists()
+    data = _json.loads(manifest_path.read_text()) if exists else {}
+    icons = data.get("icons") or []
+    has_192 = any("192" in (i.get("sizes") or "") for i in icons)
+    has_512 = any("512" in (i.get("sizes") or "") for i in icons)
+    # Assert -- present, and every installability field is correct.
+    assert (
+        exists
+        and data.get("name")
+        and data.get("short_name")
+        and data.get("start_url")
+        and data.get("scope")
+        and data.get("display") in ("standalone", "fullscreen", "minimal-ui")
+        and has_192
+        and has_512
+    )
+
+
+def test_pwa_manifest_icons_exist_on_disk():
+    # Arrange
+    manifest = _json.loads((COMPASS_PWA_DIR / "manifest.json").read_text())
+    # Act -- every icon src named in the manifest must exist on disk, plus the
+    # iOS apple-touch-icon; one combined assertion (STX-TQ007).
+    missing = [
+        i["src"] for i in manifest.get("icons", [])
+        if not (COMPASS_PWA_DIR / i["src"]).exists()
+    ]
+    apple_ok = (COMPASS_PWA_DIR / "apple-touch-icon.png").exists()
+    # Assert -- no missing manifest icons AND the apple-touch-icon is present.
+    assert not missing and apple_ok
+
+
+def test_template_declares_pwa_head_meta():
+    # Arrange
+    body = _compass_index_body()
+    # Act
+    has_manifest_link = 'rel="manifest"' in body and "scholar/pwa/manifest.json" in body
+    has_theme_color = 'name="theme-color"' in body
+    has_apple_icon = 'rel="apple-touch-icon"' in body and "apple-touch-icon.png" in body
+    # Assert
+    assert has_manifest_link and has_theme_color and has_apple_icon
+
+
+# --- i18n (operator directive 2026-09-14): EN default + full JA translation ---
+#
+# Contract: EN default, full JA, no mixed EN/JA on a page. The whole page
+# flips via LocaleMiddleware; these tests render the main page in each
+# language and assert the JA render is a genuine translation (not byte-
+# identical to EN, not an English leak) and that every msgid in the catalog
+# has a non-empty, non-source JA msgstr (no untranslated labels).
+# ---------------------------------------------------------------------------
+
+
+def _render_index_in(lang: str) -> str:
+    from django.utils import translation
+
+    translation.activate(lang)
+    body = _compass_index_body()
+    translation.activate("en")
+    return body
+
+
+def test_main_page_renders_in_english_by_default():
+    # Arrange
+    # Act
+    en = _render_index_in("en")
+    # Assert -- the EN default carries the English header and the i18n JS dict.
+    assert "Scientific Literature Management" in en and "SCHOLAR_I18N" in en
+
+
+def _i18n_script_body(page: str) -> str:
+    # A real HTML parser: the template's own HTML comment also mentions the tag.
+    from html.parser import HTMLParser
+
+    class ScriptBodyReader(HTMLParser):
+        def __init__(self):
+            super().__init__(convert_charrefs=False)
+            self.inside = False
+            self.body = None
+
+        def handle_starttag(self, tag, attrs):
+            self.inside = tag == "script" and ("id", "SCHOLAR_I18N") in attrs
+
+        def handle_endtag(self, tag):
+            self.inside = False
+
+        def handle_data(self, data):
+            if self.inside:
+                self.body = data
+
+    reader = ScriptBodyReader()
+    reader.feed(page)
+    return reader.body
+
+
+def test_i18n_script_body_is_not_html_escaped():
+    # Regression (site-audit D1): &quot; broke JSON.parse on every Search/Library render.
+    # Arrange
+    page = _render_index_in("en")
+    # Act
+    body = _i18n_script_body(page)
+    # Assert
+    assert "&quot;" not in body
+
+
+def test_i18n_script_body_parses_as_the_js_string_dict():
+    # Arrange
+    page = _render_index_in("en")
+    # Act
+    parsed = json.loads(_i18n_script_body(page))
+    # Assert
+    assert parsed == views._js_i18n_dict()
+
+
+def test_i18n_script_body_parses_in_japanese():
+    # Arrange
+    page = _render_index_in("ja")
+    # Act
+    parsed = json.loads(_i18n_script_body(page))
+    # Assert
+    assert parsed["Untitled"] != "Untitled"
+
+
+def test_main_page_ja_render_is_not_byte_identical_to_en():
+    # Arrange
+    # Act
+    en = _render_index_in("en")
+    ja = _render_index_in("ja")
+    # Assert -- the hub's measured defect was byte-identity; a real
+    # translation changes the output.
+    assert en != ja
+
+
+def test_main_page_ja_render_has_no_untranslated_labels():
+    # Arrange
+    # Act
+    ja = _render_index_in("ja")
+    # Assert -- the EN source of the page header is absent (replaced by JA) and
+    # the JA catalog produced Japanese text on the page.
+    assert "Scientific Literature Management" not in ja and "科学文献管理" in ja
+
+
+def test_ja_catalog_translates_every_msgid():
+    # Arrange
+    # The catalog lives at the APP path's locale dir (src/scitex_scholar/_django/
+    # locale/...), which is where Django discovers it for every installed app —
+    # hub AND standalone, no LOCALE_PATHS. views.__file__ is _django/views.py,
+    # so Path(...).parent is the _django app dir.
+    app_locale = Path(views.__file__).parent / "locale" / "ja" / "LC_MESSAGES"
+    po_path = app_locale / "django.po"
+    mo_path = app_locale / "django.mo"
+    # Proper nouns / format labels that stay in Latin in Japanese UI (translating
+    # them would be wrong, not a missed translation).
+    proper_nouns = {
+        "SciTeX Scholar", "DOI", "CrossRef API",
+        "BibTeX (.bib)", "RIS (.ris)", "EndNote (.enw)",
+    }
+    # Act
+    po = po_path.read_text(encoding="utf-8")
+    pairs = re.findall(r'^msgid "((?:[^"\\]|\\.)*)"\nmsgstr "((?:[^"\\]|\\.)*)"', po, re.M)
+    untranslated = [
+        (i, m) for i, m in pairs
+        if i != "" and i not in proper_nouns and (m == "" or m == i)
+    ]
+    # Assert -- at least one msgid (the header, known JA) and zero untranslated
+    # (proper nouns excluded by the explicit list above).
+    assert (
+        any("科学文献管理" in m for _, m in pairs) and not untranslated
+    )
+
+
+def test_ja_compiled_mo_exists_at_app_locale_path():
+    # Arrange
+    # The hub mounts ScholarEditorConfig (app path .../_django) and Django only
+    # discovers <app path>/locale — so the COMPILED catalog must exist there,
+    # not one level up. Without the .mo the page silently renders EN on the
+    # mount (the defect hub measured: gettext("Search databases") -> unchanged).
+    mo_path = (
+        Path(views.__file__).parent / "locale" / "ja" / "LC_MESSAGES" / "django.mo"
+    )
+    # Act
+    exists = mo_path.exists()
+    size_ok = exists and mo_path.stat().st_size > 0
+    # Assert
+    assert size_ok
 
 
 # EOF

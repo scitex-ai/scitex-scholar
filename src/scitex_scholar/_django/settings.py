@@ -90,10 +90,32 @@ INSTALLED_APPS.append("scitex_ui")
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     # Alt+I / Ctrl+I visual debugging overlay.
     "scitex_ui.middleware.ElementInspectorMiddleware",
 ]
+
+# i18n (operator directive 2026-09-14: EN default, full JA translation).
+# LocaleMiddleware is BEFORE CommonMiddleware so the language is resolved
+# per-request. Mounted in the hub: follows Django's active language
+# (django_language cookie). Standalone: falls back to the browser locale via
+# CommonMiddleware + USE_I18N (LANGUAGE_CODE is the final default).
+LANGUAGE_CODE = "en"
+LANGUAGES = [
+    ("en", "English"),
+    ("ja", "日本語"),
+]
+USE_I18N = True
+USE_L10N = True
+# No LOCALE_PATHS: the catalog lives at the app's own <app path>/locale
+# (src/scitex_scholar/_django/locale/), which Django discovers by default for
+# EVERY installed app. This is why the mounted hub (which installs
+# ScholarEditorConfig but does not know scholar's source tree) and the
+# standalone server both find it without a path override. A LOCALE_PATHS
+# pointing at src/scitex_scholar/locale/ (one level up) would only mask the
+# discovery in standalone and leave the hub untranslated — the exact defect
+# the catalog move fixes.
 
 ROOT_URLCONF = "scitex_scholar._django._standalone_urls"
 
@@ -105,6 +127,11 @@ TEMPLATES = [
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.request",
+                # Required for the {% csrf_token %} tag in scholar.html
+                # (the Library Import POST). Inert standalone (no CSRF
+                # middleware); emits the real token when the host -- the
+                # mounted hub -- enables CsrfViewMiddleware.
+                "django.template.context_processors.csrf",
             ],
         },
     },

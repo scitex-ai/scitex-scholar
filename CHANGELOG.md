@@ -7,6 +7,103 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.12.0] - 2026-09-17
+
+### Fixed
+- **The citation-graph health route no longer fails the normal initial load
+  with a same-origin 503** (P5 beta E2E blocker). Opening the app emitted
+  `503 /api/graph/health` on *every* page load: `CitationGraphManager.checkServiceHealth()`
+  ran from `DOMContentLoaded`, so an optional backend that is simply
+  unconfigured was reported as a 5xx — and a host that refuses to allowlist 5xx
+  cannot front that. The route now answers **200 in five truthful states**
+  (`unconfigured`, `configured` — present but *not* probed, `healthy`,
+  `degraded`, `unavailable`), the initial load asks for configuration only with
+  **no network call**, and the live canary probe runs via `?probe=1` when the
+  Citation Graph tab is opened, at most once per page. A configured but
+  unreachable backend still reports `unavailable` with its cause and fix: the
+  5xx is gone, not the failure. The three graph *build* routes
+  (`network`/`related`/`paper`) keep their 503 on purpose — they are
+  user-initiated actions, and a failed action is truthfully a 5xx. Measured
+  before/after: the same initial load produced 52 same-origin responses
+  including one `503`; now 52 responses, 0 5xx and 0 4xx, in both the
+  unconfigured and the configured-but-unreachable case.
+- **Scholar standalone GUI now follows the light/dark theme** (UI226). The
+  scholar-owned surface tokens (`--bg-*`, `--accent-hover`, `--edge-color`)
+  were pinned to DARK literals in `:root` with no `[data-theme="dark"]`
+  override, while the seven shadowed text/border tokens are theme-aware — so
+  in light mode the shell/sidebar/search panel stayed near-black with dark
+  text on them (dark-on-dark, low contrast) over a white shell body. The fix
+  mirrors scitex-ui `theme.css`'s own pattern: light values in `:root` (the
+  shell's own light surfaces) and the original dark literals under
+  `[data-theme="dark"]`, so dark mode is unchanged and light mode is coherent.
+
+### Added
+- **Metadata enrichment is now a contextual Library operation** (product
+  compass #106). The Library tab lists the user's local library and each paper
+  row carries an **Enrich** action, instead of enrichment being a top-level tab
+  (#105 removed it). Two new API routes back it, both thin adapters over the
+  package's own storage + enrichment layer (the same code the `library` CLI
+  drives): `GET /api/library` lists the user's MASTER metadata files directly
+  (file-scoped, so it is always the calling user's local library and never a
+  shared store), and `POST /api/library/enrich` runs
+  `ScholarPipelineMetadataSingle.enrich_paper_async` on one paper and writes the
+  enriched metadata (abstract, citations, impact factor) back to the same
+  per-user record. No account is required — standalone user scope is the local
+  `~/.scitex/scholar/library`, per the 2026-09-02 "standalone works without an
+  account; the local library is the default" constraint. The tab bar is
+  unchanged (Search databases / Library / Citation Graph).
+
+### Changed
+- **The Scholar database-search input is larger and visually primary** (product
+  compass #93). The input height is now driven by a scholar-owned
+  `--scholar-search-height` token (48px == scitex-ui's `--spacing-xxl` step,
+  larger than the 36px `--input-height` standard) declared in the app's own
+  linked CSS. This replaces the earlier `var(--input-height, 44px)`, which on
+  the standalone route silently fell back to a hardcoded 44px because the
+  standalone shell links `scitex_ui/css/shell/*.css` but not
+  `primitives/spacing.css` where `--input-height` is defined — i.e. it was
+  exactly the "hardcoded cross-app styling" #93 asked to avoid. The token keeps
+  the input larger than the standard control and the existing 44px+ touch
+  target, and stays consistent whether the app is served standalone or mounted
+  in the hub. On a 390px viewport the larger input made the input + button +
+  results row overflow (button clipped at the right edge), so below 768px the
+  search form row stacks vertically and the flex input is allowed to shrink.
+- **The standalone GUI is search-first, and backend API infrastructure is no
+  longer the default researcher view** (compass 2026-09-10, L303/L653/L316/
+  L345). The Search tab is now the default (was: Citation Graph); the paper
+  search input and the tab bar carry a 44px touch-target minimum, keyed to the
+  shared scitex-ui `--input-height` token with a `44px` fallback so the target
+  is accessible now and grows with the upstream token when it merges.
+  Advanced query syntax, the search source (mode), the "Ignore cache" control
+  (wired to the existing `/api/search?no_cache=` / `mode=` params), and the
+  CrossRef API status moved out of the always-visible sidebar into a collapsed
+  "Advanced" section in the Search tab, so a first-time user sees a keyword box
+  instead of a raw endpoint. The Library placeholder tab now shares the same
+  container as the content tabs so switching does not shift the layout, and each
+  search result with a DOI offers a quiet "Build citation graph" action that
+  prefills the Graph tab — a graph can be started from a search result rather
+  than only via the top-level tab.
+- **The Search surface now says where it searches** (compass 2026-09-10,
+  TODO 115/116). The tab and submit button read "Search databases" and the
+  description names the external databases (OpenAlex, Crossref, PubMed,
+  Semantic Scholar) and states it searches external databases, not the
+  Library — so a user is not left guessing that the (not-yet-built) Library
+  is the default target.
+- **Metadata Enrichment is no longer a top-level tab** (compass 2026-09-10,
+  TODO 105). Small operations should not be promoted to top-level navigation;
+  the Enrichment tab and its "Coming in Phase 4" placeholder are removed,
+  leaving the standalone GUI with three tabs (Search, Library, Citation
+  Graph). Enrichment actions will live inside the Library surface (TODO 106,
+  a separate build) rather than as their own tab.
+- **The standalone shell no longer reserves empty side panes** (compass
+  2026-09-10, responsive fix). `views.index` now declares the shell's
+  Console/Files/Viewer panes unused, so a standalone Scholar page renders
+  full-width instead of beside a large empty gutter (the gutter is the
+  scitex-ui workspace shell's side panes, which Scholar has no content for).
+  A `<768px` media query collapses Scholar's two-column `.app-container`
+  (sidebar + main) to a single stacked column so the page is usable at mobile
+  width rather than overflowing.
+
 ## [1.11.0] - 2026-09-07
 
 ### Added
@@ -725,3 +822,106 @@ Old and new forms route to the same handler, so behaviour is identical.
 - Hidden `metadata_engines/.combined-SemanticScholarSource/` backup directory.
 
 [1.1.0]: https://github.com/scitex-ai/scitex-scholar/compare/v1.0.1...v1.1.0
+
+### Fixed
+- **#94 — search placeholder is now example-driven.** The database-search
+  field showed the generic "Enter keywords…", which did not tell a researcher
+  whether to type a title, author, DOI, or concept. It now leads with a
+  concrete example ("e.g. graph neural networks for molecular property
+  prediction"), matching the in-repo convention the DOI field already uses
+  ("e.g. 10.1038/s41586-020-2008-3"). Guarded by
+  `test_search_placeholder_is_clear_and_example_driven`.
+
+### Fixed
+- **Mobile search form: query input and "Search databases" button now stack
+  full-width on a 390px viewport.** The input + button shared a flex *row*
+  inside `.input-wrapper`, leaving the query input ~182px wide with its
+  placeholder visibly truncated; the stacked `.form-group` also right-aligned
+  at intrinsic width (~207px) because `_forms.css`'s desktop
+  `.graph-form .form-row { align-items: flex-end }` won the cascade over
+  `_layout.css`'s mobile `.form-row { align-items: stretch }` (equal
+  specificity, `_forms.css` loads last in the `@import` chain). The fix:
+  below 768px the `.input-wrapper` stacks vertically (input full-width,
+  button full-width beneath it) and a matching-specificity `.graph-form
+  .form-row { align-items: stretch }` override in `_forms.css` makes the form
+  groups fill the card width. Desktop is unchanged (825px input, button on
+  the same row). Guards: `test_search_input_button_stack_vertically_on_mobile`
+  + `test_mobile_form_row_stretches_groups_full_width`.
+
+### Added
+- **PWA installability for the standalone Scholar app.** A Web App Manifest
+  (`scholar/pwa/manifest.json`), theme-color meta, apple-touch-icon, and
+  generated brand icons (192px, 512px, 180px) so the app is installable on
+  desktop and mobile. No service worker — the app is stateless; offline
+  caching is a separate product decision. No shared-shell change; Scholar
+  declares its own PWA head in its template.
+
+### Changed
+- **#95 — Search submit is now a visually distinct primary action.** The
+  "Search databases" button previously shared `class="btn-build"` with the
+  "Build Graph" button (and per-row actions), so the primary action had no
+  visual distinction. It now carries its own `.btn-primary` class: the
+  scitex-ui `--accent` token (theme-aware — light + dark both resolve from
+  `theme.css`), a 44px touch-target minimum, and slightly heavier weight/padding
+  than the secondary `.btn-build`. No shared-shell change; no service worker.
+  The mobile media rule (`.input-wrapper .btn-build`) now also covers
+  `.btn-primary` so the full-width stacked layout on 390px is preserved.
+  Guards: `test_search_primary_distinct_from_build_graph` (negative control —
+  fails on the pre-change template) + `test_btn_primary_uses_accent_token_and_44px_minimum`.
+
+### Fixed
+- **Citation-graph service status now explains what is limited and what to do
+  (TODO 150-152, hub live audit 2026-09-14).** The sidebar showed
+  "Service limited / Unknown" with no explanation or next step. `/api/graph/
+  health` now returns a user-facing `{status, error, detail, fix}` for every
+  limited state: the not-configured 503, the unreachable 503 (previously leaked
+  the raw exception string), and the **degraded** state (endpoint up but the
+  canary probe returned no data — previously fell through to a bare
+  "Service limited / Unknown" because the client never handled it). The label
+  names the capability ("Citation Graph: …") so the user knows what is
+  affected.
+- **The internal crossref-local endpoint URL is no longer shown to users.**
+  The Advanced panel printed the raw `{{ api_url }}` (e.g.
+  `http://127.0.0.1:8000`) and the health endpoint body carried `api_url`;
+  both are removed. The UI keeps the Configured / Not-configured state label.
+
+### Added
+- **i18n: English default + full Japanese translation (TODO 152, operator
+  directive 2026-09-14).** Django gettext for the server templates (all 50
+  user-facing strings in `scholar.html` wrapped), `LocaleMiddleware` +
+  `LANGUAGES` in settings, and a Japanese catalog
+  (`src/scitex_scholar/locale/ja/LC_MESSAGES/django.po` + compiled `.mo`, 67
+  msgids — proper nouns like DOI/CrossRef API/format names stay in Latin).
+  Mounted in the hub the page follows Django's active language
+  (`django_language` cookie); standalone follows the browser locale.
+  Client-rendered strings use a server-rendered per-language JSON dict
+  (`<script id="SCHOLAR_I18N">` + `scholarT()` in `stx-mount.js`) — an interim
+  mechanism, to be replaced by scitex-ui's shared shell-i18n primitive
+  (`scitex-ui-shell-i18n-en-ja-20260914`) when it publishes.
+  Guards: 4 tests (EN default render; JA render not byte-identical to EN; JA
+  render has no untranslated labels; catalog translates every msgid).
+  147 `_django` pass (143 + 4); audit 0 unmasked.
+
+### Fixed
+- **JA translations now load when mounted in the hub.** The catalog was at
+  `src/scitex_scholar/locale/` (one level above the app path); Django only
+  discovers `<app path>/locale`, and the hub installs `ScholarEditorConfig`
+  (app path `src/scitex_scholar/_django`) without knowing scholar's source
+  tree — so `gettext("Search databases")` stayed English on the mount while
+  standalone (which had a `LOCALE_PATHS` override) worked. The catalog is now
+  at `src/scitex_scholar/_django/locale/ja/LC_MESSAGES/` (Django's default app
+  discovery) and the `LOCALE_PATHS` override is removed, so both mounts use the
+  same mechanism. The compiled `.mo` is force-tracked at the new path.
+  Guard: `test_ja_compiled_mo_exists_at_app_locale_path`.
+
+### Fixed
+- **JA translations for the three `{% blocktrans %}` sentences** (search
+  description, query-syntax help, library description). Django's blocktrans
+  msgid is the RAW block text (newlines + indentation, tags kept); the earlier
+  catalog generator collapsed whitespace, so those msgids mismatched the
+  runtime gettext lookup and the sentences silently rendered English in JA —
+  a mixed-language page that violated the operator's no-mix contract and left
+  a stray `>Export<` (hub-measured). The generator now keys the catalog on the
+  exact raw msgids (verified by instrumenting gettext on a live render) and
+  escapes newlines correctly for `.po`. Verified: all three sentences render in
+  Japanese, no English label leaks into the JA render, JA ≠ EN.

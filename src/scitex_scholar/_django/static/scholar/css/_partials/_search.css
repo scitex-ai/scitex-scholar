@@ -33,3 +33,114 @@
   color: var(--text-secondary);
   line-height: 1.5;
 }
+
+/*
+ * L653 (compass 2026-09-10): the "Advanced" <details> block in the Search tab.
+ * Collapsed by default so the first screen shows a keyword box, not backend
+ * API infrastructure. Houses the query-syntax help, the search source (mode),
+ * the "Ignore cache" control, and the CrossRef API status.
+ */
+.search-advanced {
+  margin-top: 16px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+}
+
+.search-advanced__summary {
+  cursor: pointer;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  list-style: none;
+}
+.search-advanced__summary::before {
+  content: "\25B8 "; /* ▸ collapsed, ▾ expanded */
+  display: inline-block;
+  transition: transform 0.15s;
+}
+.search-advanced[open] .search-advanced__summary::before {
+  content: "\25BE ";
+}
+.search-advanced__summary::-webkit-details-marker {
+  display: none;
+}
+
+.search-advanced__body {
+  padding: 0 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.search-advanced__syntax {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.search-advanced__syntax code {
+  background: var(--bg-primary);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.search-advanced__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.search-advanced__row .form-select {
+  max-width: 220px;
+}
+
+.search-advanced__check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-primary);
+  cursor: pointer;
+  min-height: var(--input-height, 44px);
+}
+.search-advanced__check input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+
+.search-advanced__api {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/*
+ * L345 (compass 2026-09-10): per-result "Build citation graph" action. A
+ * quiet secondary button next to the DOI -- the demotion path that lets a
+ * graph be started FROM a search result instead of only via the top-level tab.
+ */
+.search-result__graph-btn {
+  margin-left: 12px;
+  padding: 4px 10px;
+  background: none;
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  cursor: pointer;
+  min-height: 24px;
+  transition:
+    color 0.15s,
+    border-color 0.15s,
+    background 0.15s;
+}
+.search-result__graph-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--bg-primary);
+}

@@ -4,6 +4,13 @@
  * Submits the query to /api/search and renders the results. All search
  * logic (query parsing, engine selection, ranking) belongs to the package's
  * ScholarSearchEngine behind that endpoint -- this file only renders.
+ *
+ * COMPASS 2026-09-10 (L653, L345): the Advanced block (query syntax, search
+ * source, Ignore-cache, CrossRef status) is collapsed by default. The
+ * search source and the "Ignore cache" checkbox are wired into the request
+ * here (mode + no_cache are existing /api/search params). Each result with a
+ * DOI offers "Build citation graph", which prefills the Graph tab's DOI and
+ * jumps there -- graph creation from a search result, the demotion path.
  */
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("searchForm");
@@ -11,6 +18,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const input = document.getElementById("searchInput");
   const maxResults = document.getElementById("searchMaxResults");
+  const modeSelect = document.getElementById("searchMode");
+  const noCache = document.getElementById("searchNoCache");
   const loading = document.getElementById("searchLoading");
   const errorBox = document.getElementById("searchError");
   const errorMessage = document.getElementById("searchErrorMessage");
@@ -18,8 +27,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const resultsContent = document.getElementById("searchResultsContent");
   const stats = document.getElementById("searchStats");
 
-  const show = (el) => el.classList.remove("hidden");
-  const hide = (el) => el.classList.add("hidden");
+  const show = (el) => el && el.classList.remove("hidden");
+  const hide = (el) => el && el.classList.add("hidden");
 
   function showError(message) {
     errorMessage.textContent = message;
@@ -28,13 +37,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function formatAuthors(paper) {
     const authors = paper.authors || [];
-    if (!authors.length) return "Unknown authors";
+    if (!authors.length) return scholarT("Unknown authors");
     const names = authors.map((a) =>
       typeof a === "string" ? a : a.name || "",
     );
     return names.length > 3
       ? `${names.slice(0, 3).join(", ")} et al.`
       : names.join(", ");
+  }
+
+  /**
+   * Jump to the Citation Graph tab with this paper's DOI prefilled.
+   * Does NOT auto-submit -- the user still presses "Build Graph", so the
+   * action stays explicit rather than surprising.
+   */
+  function buildGraphFromDoi(doi) {
+    const doiInput = document.getElementById("doiInput");
+    if (doiInput && doi) {
+      doiInput.value = doi;
+    }
+    const graphTab = document.querySelector('.tab-btn[data-tab="graph"]');
+    if (graphTab) graphTab.click();
+    if (doiInput) doiInput.focus();
   }
 
   function renderPaper(paper) {
@@ -44,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const title = document.createElement("div");
     title.className = "search-result__title";
     // textContent, not innerHTML: titles and abstracts are third-party data.
-    title.textContent = paper.title || "Untitled";
+    title.textContent = paper.title || scholarT("Untitled");
     item.appendChild(title);
 
     const meta = document.createElement("div");
@@ -60,15 +84,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     item.appendChild(meta);
 
+    // DOI line: the DOI link plus a "Build citation graph" action.
     if (paper.doi) {
+      const doiLine = document.createElement("div");
+      doiLine.className = "search-result__meta";
+
       const link = document.createElement("a");
       link.href = `https://doi.org/${paper.doi}`;
       link.target = "_blank";
       link.rel = "noopener noreferrer";
       link.textContent = paper.doi;
-      const doiLine = document.createElement("div");
-      doiLine.className = "search-result__meta";
       doiLine.appendChild(link);
+
+      const graphBtn = document.createElement("button");
+      graphBtn.type = "button";
+      graphBtn.className = "search-result__graph-btn";
+      graphBtn.textContent = scholarT("Build citation graph");
+      graphBtn.addEventListener("click", () => buildGraphFromDoi(paper.doi));
+      doiLine.appendChild(graphBtn);
+
       item.appendChild(doiLine);
     }
 
@@ -122,6 +156,8 @@ document.addEventListener("DOMContentLoaded", () => {
         q: query,
         max_results: maxResults.value,
       });
+      if (modeSelect) params.set("mode", modeSelect.value);
+      if (noCache && noCache.checked) params.set("no_cache", "true");
       const response = await fetch(`${STX_MOUNT}/api/search?${params}`);
       const data = await response.json();
 

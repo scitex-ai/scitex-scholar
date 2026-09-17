@@ -52,6 +52,17 @@
 
 .form-input {
   flex: 1;
+  /*
+   * #93 (compass 2026-09-11): the database-search input is the primary
+   * control, so it is sized up via the scholar-owned --scholar-search-height
+   * token (48px == scitex-ui --spacing-xxl, larger than the 36px standard).
+   * No raw px here and no fallback to an unlinked scitex-ui token: the
+   * standalone route does not load primitives/spacing.css, so
+   * var(--input-height, <px>) would be a silent hardcode. The token is
+   * declared in _base.css (always linked) and is larger than the touch
+   * minimum, so the target is accessible AND reads as the primary action.
+   */
+  min-height: var(--scholar-search-height);
 }
 
 .form-input:focus,
@@ -84,6 +95,38 @@
 .btn-build:hover {
   background: var(--accent-hover);
 }
+/*
+ * #95: the database-search submit is the app's PRIMARY action, distinct from
+ * the secondary .btn-build (Build Graph / per-row actions). It carries the
+ * scitex-ui --accent token (theme-aware: light + dark both resolve from
+ * theme.css) and a 44px touch-target minimum so it reads as primary AND stays
+ * tappable on mobile. Same background token as .btn-build so light/dark stay
+ * coherent; the distinction is semantic (the class), not a recolour.
+ */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 20px;
+  background: var(--accent);
+  border: none;
+  border-radius: 6px;
+  color: var(--text-inverse);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+.btn-primary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
 
 .graph-controls {
   display: flex;
@@ -107,4 +150,25 @@
 .btn-control:hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+
+/*
+ * Mobile search form (768px and below): the form-row groups must stretch to
+ * the full card width. The desktop rule above (`.graph-form .form-row {
+ * align-items: flex-end }`) wins the cascade over `_layout.css`'s
+ * `.form-row { align-items: stretch }` — this file loads last in
+ * scholar.css's @import chain, and both selectors have equal specificity
+ * (0,2,0) — so without this override the stacked form-groups right-align at
+ * their intrinsic width (~207px in a 324px form), and the query input
+ * inherits that 207px and its placeholder truncates. This block restores the
+ * stretch at matching specificity and source order.
+ */
+@media (max-width: 768px) {
+  .graph-form .form-row {
+    align-items: stretch;
+  }
+  .graph-form .form-row .form-group--doi,
+  .graph-form .form-row .form-group--options {
+    width: 100%;
+  }
 }

@@ -12,6 +12,9 @@ class CitationGraphManager {
     this.transform = { x: 0, y: 0, k: 1 };
     this.isDragging = false;
     this.selectedNode = null;
+    // Set once the Citation Graph tab has asked the backend (see
+    // bindLazyHealthProbe) so the live probe runs at most once per page.
+    this.probed = false;
 
     this.renderer = new GraphRenderer({
       onNodeHover: (node, el) => this.showNodeTooltip(node, el),
@@ -25,7 +28,23 @@ class CitationGraphManager {
 
   init() {
     this.bindEvents();
-    this.checkServiceHealth();
+    // CONFIGURATION ONLY on the initial-load path: no network call, so an
+    // unconfigured or unreachable optional backend cannot delay the page or
+    // emit a failing same-origin request. The live probe runs when the user
+    // actually opens the Citation Graph tab.
+    this.checkServiceHealth(false);
+    this.bindLazyHealthProbe();
+  }
+
+  /** Probe once, the first time the Citation Graph tab is opened. */
+  bindLazyHealthProbe() {
+    const graphTab = document.querySelector('.tab-btn[data-tab="graph"]');
+    if (!graphTab) return;
+    graphTab.addEventListener("click", () => {
+      if (this.probed) return;
+      this.probed = true;
+      this.checkServiceHealth(true);
+    });
   }
 
   bindEvents() {
@@ -43,26 +62,58 @@ class CitationGraphManager {
     if (fitBtn) fitBtn.addEventListener("click", () => this.fitToView());
   }
 
-  async checkServiceHealth() {
+  async checkServiceHealth(probe) {
     const el = document.getElementById("serviceStatus");
     if (!el) return;
 
+    // Render helper: a status dot + label, and (when limited) the explanation
+    // of what is limited and what the user can DO. The health endpoint returns
+    // {status, error, detail, fix}; `detail`/`fix` are the answer, `error` the
+    // one-line label (item 150-152, hub live audit 2026-09-14).
+    const set = (cls, label, detail, fix) => {
+      let html =
+        '<span class="status-indicator ' + cls + '">&#9679; ' + label + "</span>";
+      if (detail) html += '<small class="status-detail">' + detail + "</small>";
+      if (fix) html += '<small class="status-fix">' + fix + "</small>";
+      el.innerHTML = html;
+    };
+
+    // `probe` is the ONLY difference between the initial-load report and the
+    // live check: the tab probe asks the backend, the initial load asks the
+    // configuration. Same states, same UI.
+    const url = STX_MOUNT + "/api/graph/health" + (probe ? "?probe=1" : "");
+
     try {
-      const resp = await fetch(STX_MOUNT + "/api/graph/health");
+      const resp = await fetch(url);
       const data = await resp.json();
       if (data.status === "healthy") {
-        el.innerHTML =
-          '<span class="status-indicator status-healthy">&#9679; Service available</span>';
+        set("status-healthy", scholarT("Service available"));
+      } else if (data.status === "degraded") {
+        set("status-warning", data.error || scholarT("Service limited"), data.detail, data.fix);
+      } else if (data.status === "configured") {
+        // Endpoint present, not probed yet — deliberately NOT "available":
+        // claiming ready before the backend answered is the failure this
+        // endpoint exists to avoid.
+        set(
+          "status-checking",
+          data.error || scholarT("Not checked yet"),
+          data.detail,
+          data.fix,
+        );
+      } else if (data.status === "unconfigured") {
+        set(
+          "status-warning",
+          data.error || scholarT("Service limited"),
+          data.detail,
+          data.fix,
+        );
       } else {
-        el.innerHTML =
-          '<span class="status-indicator status-warning">&#9679; Service limited</span>' +
-          '<small class="status-detail">' +
-          (data.error || "Unknown") +
-          "</small>";
+        set("status-error", data.error || scholarT("Service unavailable"), data.detail, data.fix);
       }
     } catch {
-      el.innerHTML =
-        '<span class="status-indicator status-error">&#9679; Service unavailable</span>';
+      // The report itself could not be read — a genuine failure, reported as
+      // unavailable rather than as limited or ready.
+      set("status-error", scholarT("Service unavailable"));
     }
   }
 
