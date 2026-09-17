@@ -22,7 +22,7 @@ This inventory treats `scitex-scholar` as the single source of truth for Scholar
 3. Standalone uses scitex-ui `LocalProjectProvider` and a package-owned listing endpoint.
 4. A pick navigates to `?project={id}` and an explicit accessible project becomes current.
 5. Both package config surfaces pin local Crossref/OpenAlex before the online API fallback tier, and both search pipelines EXECUTE that order (local tier alone first; online only on an empty local result or a missing corpus, with the reason reported in `metadata.source_tier_reason`).
-6. Desktop and 390px contracts are executable tests, including a wrapping full-width mobile picker.
+6. Desktop and 390px contracts are executable tests, including a wrapping full-width mobile picker; the 2026-09-17 browser pass that exercised the real storage root is recorded in `docs/migration/scholar-picker-browser-evidence-20260917.md` (authorized project becomes current; `MASTER`/`downloads` do not; one mounted picker; no 1440px or 390px overflow).
 7. This slice does **not** authorize deletion of the Hub reference or claim full UI/search migration.
 8. Operator screenshot acceptance: Library empty and filtered-empty states must be distinct and name visible actions; Citation Graph must start with DOI guidance, an empty required seed, and a visibly labelled/accessible maximum-paper control at desktop and 390px.
 
@@ -32,5 +32,5 @@ This inventory treats `scitex-scholar` as the single source of truth for Scholar
 - Build and benchmark the 10k–20k results path, including cancellation, virtualization/paging, filters, sorting, source counts, and preferences.
 - Complete Library project semantics, batch enrichment progress/resume/provenance, and citation-graph parity.
 - Implement stable-ID bidirectional citation graph node/row selection, shared clear state, reorder/filter/relayout resilience, and desktop/390px interaction tests; this is an explicit parity blocker from operator screenshots.
-- Add real standalone and host-mounted browser coverage at desktop and 390px, then compare against the Hub reference.
+- Add real host-MOUNTED browser coverage at desktop and 390px, then compare against the Hub reference (standalone desktop/390px browser coverage was produced 2026-09-17 — see `docs/migration/scholar-picker-browser-evidence-20260917.md`).
 - Switch Hub to a thin mount only after these gates pass; delete neither reference nor host integration in this slice.
