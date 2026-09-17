@@ -88,6 +88,25 @@ def available_local_corpora() -> set:
     return available
 
 
+class CorpusUnavailable(RuntimeError):
+    """A configured local corpus cannot be queried in this installation."""
+
+
+def default_corpus_search(query: str, limit: int, sources: list):
+    """Query the installed local corpora through ``local_dbs.unified``.
+
+    The ``local_dbs`` PACKAGE re-exports its crossref/openalex shims, and those
+    raise ImportError when the optional corpora are absent -- translated here
+    into :class:`CorpusUnavailable` so "this deployment has no NAS corpora" is
+    a reportable state rather than an exception that kills the user's search.
+    """
+    try:
+        from scitex_scholar.local_dbs import unified
+    except ImportError as exc:
+        raise CorpusUnavailable(str(exc)) from exc
+    return unified.search(query, limit=limit, sources=sources)
+
+
 class LocalCorpusSearchEngine(BaseSearchEngine):
     """Search the NAS-local corpora through the online engines' interface.
 
@@ -95,11 +114,24 @@ class LocalCorpusSearchEngine(BaseSearchEngine):
     like any other engine: same ``search_by_keywords(query, filters,
     max_results)`` call, same standardized result dicts, same Paper conversion
     downstream. No network client is constructed here at all.
+
+    ``available`` and ``search`` are injection seams (the collaborators, as
+    parameters): production passes neither, and they exist so a test can drive
+    the corpus-absent path and inspect the work mapping without patching
+    anything.
     """
 
-    def __init__(self, engine_name: str, sources: Tuple[str, ...]):
+    def __init__(
+        self,
+        engine_name: str,
+        sources: Tuple[str, ...],
+        available=None,
+        search=None,
+    ):
         self._engine_name = engine_name
         self._sources = tuple(sources)
+        self._available = available or available_local_corpora
+        self._search = search or default_corpus_search
 
     @property
     def name(self) -> str:
@@ -117,13 +149,13 @@ class LocalCorpusSearchEngine(BaseSearchEngine):
         filters: Optional[Dict[str, Any]] = None,
         max_results: int = 100,
     ) -> List[Dict[str, Any]]:
-        """Query the local corpora; ``[]`` when neither corpus is installed.
+        """Query the local corpora; ``[]`` when this install cannot.
 
         Year/citation thresholds are NOT pushed here: the pipelines apply them
         after aggregation (``_apply_threshold_filters``), which keeps the local
         and online tiers filtered by identical rules.
         """
-        usable = available_local_corpora().intersection(self._sources)
+        usable = self._available().intersection(self._sources)
         if not usable:
             logger.warning(
                 f"{self._engine_name}: local corpus unavailable "
@@ -131,22 +163,13 @@ class LocalCorpusSearchEngine(BaseSearchEngine):
             )
             return []
 
-        # The local_dbs PACKAGE re-exports its crossref/openalex shims, and
-        # those raise ImportError when the optional corpora are absent -- so a
-        # deployment without them must be handled HERE, as "corpus unavailable",
-        # not as an exception that kills the user's search.
         try:
-            from scitex_scholar.local_dbs import unified
-        except ImportError as exc:
+            result = self._search(query, limit=max_results, sources=sorted(usable))
+        except CorpusUnavailable as exc:
             logger.warning(
                 f"{self._engine_name}: local corpus package not importable ({exc})"
             )
             return []
-
-        try:
-            result = unified.search(
-                query, limit=max_results, sources=sorted(usable)
-            )
         except Exception as exc:  # a broken corpus must not kill the search
             logger.error(f"{self._engine_name}: local corpus search failed: {exc}")
             return []
@@ -211,6 +234,7 @@ def declared_engines() -> List[str]:
 def build_tiered_engines(
     tiers: Optional[Dict[str, List[str]]] = None,
     email: Optional[str] = None,
+    available=None,
 ) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     """Resolve tier names to engine instances.
 
@@ -237,7 +261,7 @@ def build_tiered_engines(
                 f"skipped (known: {sorted(LOCAL_CORPUS_SOURCES)})"
             )
             continue
-        primary[name] = LocalCorpusSearchEngine(name, sources)
+        primary[name] = LocalCorpusSearchEngine(name, sources, available=available)
 
     ordered_fallbacks = list(tiers.get("online_fallback", []))
     ordered_fallbacks += [
@@ -265,6 +289,7 @@ def resolve_tier(
     primary_results: int,
     primary_engines: Dict[str, Any],
     min_primary_results: int = 1,
+    available=None,
 ) -> Tuple[str, str]:
     """Which tier should serve the query, and the reason, from primary results.
 
@@ -272,18 +297,22 @@ def resolve_tier(
     ``("online_fallback", <reason>)`` -- the reason distinguishes "the corpora
     answered with nothing" from "the corpora are not installed here", which
     have different fixes and must not read the same in a bug report.
+
+    ``available`` is the corpus-availability collaborator as a parameter
+    (defaults to the real probe), so a test can drive both reasons directly.
     """
     if primary_results >= min_primary_results:
         return "primary", ""
     if not primary_engines:
         return "online_fallback", "no primary (local corpus) engine configured"
+    availability = available or available_local_corpora
     missing = sorted(
         {
             source
             for engine in primary_engines.values()
             for source in getattr(engine, "sources", ())
         }
-        - available_local_corpora()
+        - availability()
     )
     if missing:
         return (

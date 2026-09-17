@@ -634,12 +634,16 @@ def _degraded_payload() -> dict:
 
 
 @require_GET
-def search(request):
+def search(request, _engine=None):
     """Search academic databases through the package's ScholarSearchEngine.
 
     Thin HTTP adapter: query parsing, engine selection and result
     aggregation all belong to the package facade, so this view only
     validates parameters, delegates, and caches.
+
+    `_engine` is a test-injection seam: the collaborator is a PARAMETER, not a
+    monkeypatch (PA-306), exactly as `library_enrich(_pipeline=)` is. Django
+    routes call it with only `request`.
     """
     query = request.GET.get("q", "").strip()
     if not query:
@@ -666,7 +670,7 @@ def search(request):
             return JsonResponse(cached)
 
     try:
-        engine = _get_search_engine()
+        engine = _engine or _get_search_engine()
         result = asyncio.run(
             engine.search(query=query, mode=mode, max_results=max_results)
         )

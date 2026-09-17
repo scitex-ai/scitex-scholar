@@ -290,28 +290,48 @@ def test_search_marks_cached_results_as_cached():
 # --- source tiers (review blocker 1): the GUI must run local corpora first ---
 
 
-def test_gui_search_engine_runs_local_corpora_as_primary(monkeypatch):
-    # Arrange -- the engine /api/search is actually served by. Bypass the
-    # process-wide cache so this test builds (and inspects) its own.
-    monkeypatch.setattr(views, "_search_engine", None)
-    # Act
+def test_gui_search_engine_has_online_engines_only_as_fallback():
+    # Arrange -- the engine /api/search is actually served by.
     engine = views._get_search_engine()
-    # Assert -- BOTH modes, because "single" is the rate-limited GUI option and
-    # its pipeline used to be online-only as well.
+    # Act
+    fallbacks = [sorted(p.fallback_engines) for p in _gui_pipelines(engine)]
+    # Assert
+    assert all("CrossRef" in names for names in fallbacks)
+
+
+def _gui_pipelines(engine):
+    """Both pipelines the GUI can select: parallel and the rate-limited single."""
+    return (engine.parallel_pipeline, engine.single_pipeline)
+
+
+def test_gui_search_engine_primary_tier_is_the_local_corpora():
+    # Arrange
+    engine = views._get_search_engine()
+    # Act
+    primaries = [sorted(p.primary_engines) for p in _gui_pipelines(engine)]
+    # Assert -- BOTH modes: "single" is the rate-limited GUI option and its
+    # pipeline used to be online-only as well.
+    assert primaries == [["CrossRefLocal", "OpenAlexLocal"]] * 2
+
+
+def test_gui_search_engine_local_tier_engines_are_corpus_adapters():
+    # Arrange
     from scitex_scholar.search_engines._source_tiers import LocalCorpusSearchEngine
 
-    for pipeline in (engine.parallel_pipeline, engine.single_pipeline):
-        assert sorted(pipeline.primary_engines) == ["CrossRefLocal", "OpenAlexLocal"]
-        assert all(
-            isinstance(engine_, LocalCorpusSearchEngine)
-            for engine_ in pipeline.primary_engines.values()
-        )
-        assert "CrossRef" in pipeline.fallback_engines
+    engine = views._get_search_engine()
+    # Act
+    adapters = [
+        isinstance(candidate, LocalCorpusSearchEngine)
+        for pipeline in _gui_pipelines(engine)
+        for candidate in pipeline.primary_engines.values()
+    ]
+    # Assert
+    assert all(adapters)
 
 
-def test_gui_search_response_carries_the_serving_tier(monkeypatch):
-    # Arrange -- a deterministic engine so the assertion is about the view's
-    # pass-through, not about a live query.
+def test_gui_search_response_carries_the_serving_tier():
+    # Arrange -- a hand-rolled engine so the assertion is about the view's
+    # pass-through, not about a live query (injected, not patched: PA-306).
     class _TieredEngine:
         async def search(self, query, mode=None, max_results=20):
             return {
@@ -319,15 +339,14 @@ def test_gui_search_response_carries_the_serving_tier(monkeypatch):
                 "metadata": {"source_tier": "primary", "source_tier_reason": ""},
             }
 
-    monkeypatch.setattr(views, "_search_engine", _TieredEngine())
     request = RequestFactory().get("/api/search?q=tier-probe&no_cache=true")
     # Act
-    body = json.loads(views.search(request).content)
+    body = json.loads(views.search(request, _engine=_TieredEngine()).content)
     # Assert -- the GUI can say which corpus answered.
     assert body["metadata"]["source_tier"] == "primary"
 
 
-def test_search_stats_surface_the_serving_tier():
+def test_search_stats_read_the_serving_tier_from_the_response():
     # Arrange -- the label the user reads, so a network fallback is visible
     # instead of looking identical to a local hit.
     script = (
@@ -337,8 +356,20 @@ def test_search_stats_surface_the_serving_tier():
     renders = "metadata.source_tier" in script
     # Assert
     assert renders
-    assert 'scholarT("Local corpus (NAS)")' in script
-    assert 'scholarT("Online fallback")' in script
+
+
+def test_search_stats_labels_both_tiers_in_the_ui():
+    # Arrange
+    script = (
+        Path(views.__file__).parent / "static" / "scholar" / "js" / "search.js"
+    ).read_text()
+    # Act
+    labels = (
+        'scholarT("Local corpus (NAS)")' in script,
+        'scholarT("Online fallback")' in script,
+    )
+    # Assert
+    assert labels == (True, True)
 
 
 # ---------------------------------------------------------------------------
@@ -2343,19 +2374,42 @@ def test_standalone_provider_hides_symlinked_entries(tmp_path):
     assert [project["id"] for project in payload["projects"]] == ["Alpha"]
 
 
-def test_default_storage_root_is_the_filtered_root(tmp_path, monkeypatch):
+@contextlib.contextmanager
+def _scitex_dir_env(root: Path):
+    """Point SCITEX_DIR at a temp root and clear the Scholar overrides.
+
+    The sanctioned env-var yield pattern (not monkeypatch): PA-306 forbids
+    patching, and this is the documented replacement for environment state.
+    """
+    keys = (
+        "SCITEX_DIR",
+        "SCITEX_SCHOLAR_PROJECTS_DIR",
+        "SCITEX_SCHOLAR_LIBRARY_ROOT",
+    )
+    previous = {key: os.environ.get(key) for key in keys}
+    os.environ["SCITEX_DIR"] = str(root)
+    for key in keys[1:]:
+        os.environ.pop(key, None)
+    try:
+        yield
+    finally:
+        for key, value in previous.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
+
+
+def test_default_storage_root_is_the_filtered_root(tmp_path):
     # Arrange -- no env overrides at all: the standalone root is the library
     # root derived from SCITEX_DIR, and the filter must apply THERE too (the
     # defect was measured on the default root, not on a test seam).
     library = tmp_path / "scholar" / "library"
     (library / "MASTER").mkdir(parents=True)
     (library / "Alpha").mkdir()
-    monkeypatch.setenv("SCITEX_DIR", str(tmp_path))
-    monkeypatch.delenv("SCITEX_SCHOLAR_PROJECTS_DIR", raising=False)
-    monkeypatch.delenv("SCITEX_SCHOLAR_LIBRARY_ROOT", raising=False)
     request = RequestFactory().get("/api/projects")
     # Act
-    with override_settings(SCITEX_PROJECT_PROVIDER=""):
+    with _scitex_dir_env(tmp_path), override_settings(SCITEX_PROJECT_PROVIDER=""):
         payload = json.loads(views.project_scope(request).content)
     # Assert
     assert [project["id"] for project in payload["projects"]] == ["Alpha"]
@@ -2567,25 +2621,38 @@ def test_library_list_filter_narrows_rows_and_says_so(tmp_path):
         )
 
 
-def test_library_list_filter_matches_author_and_doi(tmp_path):
-    # Arrange
+def test_library_list_filter_matches_authors(tmp_path):
+    # Arrange -- the placeholder the UI shows ("Title, author, or DOI") must be
+    # true for authors too, which the MASTER record stores as a list.
     with _library_env(tmp_path):
         _seed_library(tmp_path, paper_id="P1", title="A paper",
                       authors=["Jane Watanabe", "John Second"])
         _seed_library(tmp_path, paper_id="P2", doi="10.5/unique-doi",
                       title="Another paper")
-        rf = RequestFactory()
         # Act
-        by_author = _json.loads(
-            views.library_list(rf.get("/api/library", {"q": "watanabe"})).content
+        data = _json.loads(
+            views.library_list(
+                RequestFactory().get("/api/library", {"q": "watanabe"})
+            ).content
         )
-        by_doi = _json.loads(
-            views.library_list(rf.get("/api/library", {"q": "10.5/unique"})).content
+        # Assert
+        assert [p["paper_id"] for p in data["papers"]] == ["P1"]
+
+
+def test_library_list_filter_matches_dois(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="P1", title="A paper")
+        _seed_library(tmp_path, paper_id="P2", doi="10.5/unique-doi",
+                      title="Another paper")
+        # Act
+        data = _json.loads(
+            views.library_list(
+                RequestFactory().get("/api/library", {"q": "10.5/unique"})
+            ).content
         )
-        # Assert -- the placeholder the UI shows ("Title, author, or DOI") is
-        # true for all three, not just titles.
-        assert [p["paper_id"] for p in by_author["papers"]] == ["P1"]
-        assert [p["paper_id"] for p in by_doi["papers"]] == ["P2"]
+        # Assert
+        assert [p["paper_id"] for p in data["papers"]] == ["P2"]
 
 
 def test_library_filtered_empty_state_is_reachable(tmp_path):
@@ -2646,20 +2713,42 @@ def test_no_scholarT_call_interpolates_before_lookup():
     assert offenders == []
 
 
-def test_library_state_strings_are_translated_in_japanese():
+def test_library_filtered_empty_copy_is_translated_in_japanese():
+    # Arrange -- the JS dict the JA page ships (json_script escapes non-ASCII,
+    # so the body is PARSED rather than substring-matched).
+    ja_dict = json.loads(_i18n_script_body(_render_index_in("ja")))
+    # Act
+    rendered = ja_dict["No papers match the current filters."]
+    # Assert
+    assert rendered == "現在の絞り込み条件に一致する論文はありません。"
+
+
+def test_library_empty_copy_is_translated_in_japanese():
+    # Arrange
+    english = "Your library is empty. Import a BibTeX file to add papers."
+    ja_dict = json.loads(_i18n_script_body(_render_index_in("ja")))
+    # Act
+    rendered = ja_dict[english]
+    # Assert -- a JA page must not fall back to the English literal.
+    assert rendered != english
+
+
+def test_library_clear_filters_label_is_translated_in_japanese():
+    # Arrange
+    ja_dict = json.loads(_i18n_script_body(_render_index_in("ja")))
+    # Act
+    rendered = ja_dict["Clear filters"]
+    # Assert
+    assert rendered == "絞り込みを解除"
+
+
+def test_library_filter_field_label_is_translated_in_japanese():
     # Arrange
     ja_page = _render_index_in("ja")
-    # Act -- the JS dict the JA page ships (json_script escapes non-ASCII, so
-    # the body is PARSED rather than substring-matched).
-    ja_dict = json.loads(_i18n_script_body(ja_page))
-    # Assert -- both states the Library list can render are translated, and
-    # the filter controls' labels reached the page in JA.
-    assert ja_dict["No papers match the current filters."] == "現在の絞り込み条件に一致する論文はありません。"
-    assert ja_dict["Your library is empty. Import a BibTeX file to add papers."] != (
-        "Your library is empty. Import a BibTeX file to add papers."
-    )
-    assert ja_dict["Clear filters"] == "絞り込みを解除"
-    assert "ライブラリを絞り込む" in ja_page
+    # Act -- the rendered filter field, not the JS dict.
+    rendered = "ライブラリを絞り込む" in ja_page
+    # Assert
+    assert rendered
 
 
 def test_graph_initial_state_explains_seed_and_library_workflow():
