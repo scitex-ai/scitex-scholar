@@ -136,6 +136,7 @@ JA = {
     "Service available": "サービス利用可能",
     "Service limited": "サービス制限あり",
     "Service unavailable": "サービス利用不可",
+    "Not checked yet": "未確認",
     "Unknown": "不明",
     "Related papers": "関連論文",
     "Paper": "論文",

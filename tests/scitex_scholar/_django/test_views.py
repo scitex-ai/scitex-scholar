@@ -12,7 +12,9 @@ this is new coverage written directly against the ported views):
   GET /api/graph/network   -> 400 without ?doi=, 503 with no API configured
   GET /api/graph/related   -> 503 with no API configured
   GET /api/graph/paper     -> 503 with no API configured
-  GET /api/graph/health    -> 503 with no API configured
+  GET /api/graph/health    -> 200 capability report, never 5xx: unconfigured /
+                                configured (no probe) / healthy / degraded /
+                                unavailable from ?probe=1
 
 Uses Django's `RequestFactory` directly against the view functions
 (bypasses URL routing, same approach as scitex-writer's precedent at
@@ -215,14 +217,111 @@ def test_graph_paper_returns_503_with_no_api_configured():
 
 
 @override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL=None)
-def test_graph_health_returns_503_with_no_api_configured():
+def test_graph_health_reports_unconfigured_without_a_5xx():
+    """The initial-load path must never emit a same-origin 5xx (2026-09-17)."""
     # Arrange
     rf = RequestFactory()
     request = rf.get("/api/graph/health")
     # Act
     resp = views.graph_health(request)
     # Assert
-    assert resp.status_code == 503
+    assert resp.status_code == 200
+
+
+@override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL=None)
+def test_graph_health_unconfigured_body_still_carries_the_truth_and_the_fix():
+    # Arrange
+    request = RequestFactory().get("/api/graph/health")
+    # Act
+    body = json.loads(views.graph_health(request).content)
+    # Assert
+    assert (body["status"], body["probed"]) == ("unconfigured", False)
+
+
+@override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL="http://127.0.0.1:1")
+def test_graph_health_initial_load_does_not_probe_the_backend():
+    """Configured-but-unprobed is its own state, and the load path is cheap.
+
+    The endpoint points at a CLOSED PORT, so if the default path probed the
+    backend the status would be `unavailable`; `configured` proves no probe ran
+    without needing a mock or a spy.
+    """
+    # Arrange
+    request = RequestFactory().get("/api/graph/health")
+    # Act
+    body = json.loads(views.graph_health(request).content)
+    # Assert
+    assert (body["status"], body["probed"]) == ("configured", False)
+
+
+@override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL="http://127.0.0.1:1")
+def test_graph_health_probe_reports_an_unreachable_backend_as_unavailable():
+    """A genuine failure must not be masked: the probe says unavailable."""
+    # Arrange
+    request = RequestFactory().get("/api/graph/health", {"probe": "1"})
+    # Act
+    body = json.loads(views.graph_health(request).content)
+    # Assert
+    assert (body["status"], body["probed"]) == ("unavailable", True)
+
+
+@override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL="http://127.0.0.1:1")
+def test_graph_health_probe_answers_200_even_when_the_backend_fails():
+    """Not a failed request: the capability report itself always succeeds."""
+    # Arrange
+    request = RequestFactory().get("/api/graph/health", {"probe": "1"})
+    # Act
+    resp = views.graph_health(request)
+    # Assert
+    assert resp.status_code == 200
+
+
+def test_initial_load_checks_configuration_without_probing():
+    """The initial-load path asks the server for CONFIGURATION only."""
+    # Arrange
+    script = (
+        Path(views.__file__).parent / "static" / "scholar" / "js" / "graph"
+        / "citation-graph.js"
+    ).read_text()
+    # Act
+    initial = "this.checkServiceHealth(false);" in script
+    # Assert
+    assert initial
+
+
+def test_live_probe_is_bound_to_opening_the_graph_tab():
+    """The backend is asked when the feature is opened, not on every load."""
+    # Arrange
+    script = (
+        Path(views.__file__).parent / "static" / "scholar" / "js" / "graph"
+        / "citation-graph.js"
+    ).read_text()
+    # Act
+    lazy = 'bindLazyHealthProbe' in script and '?probe=1' in script
+    # Assert
+    assert lazy
+
+
+def test_client_distinguishes_configured_from_ready():
+    """`configured` must render as its own state, never as available."""
+    # Arrange
+    script = (
+        Path(views.__file__).parent / "static" / "scholar" / "js" / "graph"
+        / "citation-graph.js"
+    ).read_text()
+    # Act
+    handled = 'data.status === "configured"' in script
+    # Assert
+    assert handled
+
+
+def test_not_checked_label_is_translatable():
+    # Arrange
+    keys = views._js_i18n_dict()
+    # Act
+    present = "Not checked yet" in keys
+    # Assert
+    assert present
 
 
 def test_search_requires_q_param():
@@ -964,6 +1063,11 @@ GRAPH_ROUTES_THAT_NEED_AN_ENDPOINT = (
     ("graph_health", "/api/graph/health", {}),
 )
 
+# The three routes that BUILD a graph: user-initiated actions, whose failure is
+# truthfully a 5xx. `graph_health` is deliberately NOT in this tuple -- it is on
+# the normal initial-load path, and a capability report is not a failed request.
+GRAPH_BUILD_ROUTES_THAT_NEED_AN_ENDPOINT = GRAPH_ROUTES_THAT_NEED_AN_ENDPOINT[:3]
+
 
 def _unconfigured_response(view_name: str, path: str, params: dict):
     """Call one graph view with no endpoint configured; return its parsed body."""
@@ -997,9 +1101,13 @@ def test_unconfigured_graph_route_says_what_to_do_next(view_name, path, params):
     assert required_keys <= set(body), body
 
 
-@pytest.mark.parametrize("view_name,path,params", GRAPH_ROUTES_THAT_NEED_AN_ENDPOINT)
+@pytest.mark.parametrize("view_name,path,params", GRAPH_BUILD_ROUTES_THAT_NEED_AN_ENDPOINT)
 def test_unconfigured_graph_route_still_answers_503(view_name, path, params):
-    """The status code is the contract consumers branch on; it must not move."""
+    """A user-initiated BUILD action that cannot run is truthfully a 5xx.
+
+    Only the three build routes: the health route is on the initial-load path
+    and answers 200 with the same truth in its body.
+    """
     # Arrange
     expected = 503
     # Act
@@ -1011,7 +1119,7 @@ def test_unconfigured_graph_route_still_answers_503(view_name, path, params):
 def test_graph_health_keeps_its_status_field_alongside_the_fix():
     """graph_health's own shape survives: callers read `status`, not `error`."""
     # Arrange
-    expected = "unhealthy"
+    expected = "unconfigured"
     # Act
     _, body = _unconfigured_response("graph_health", "/api/graph/health", {})
     # Assert

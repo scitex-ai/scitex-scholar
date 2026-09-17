@@ -176,14 +176,18 @@ def _api_url() -> Optional[str]:
     return None
 
 
-# The citation-graph routes answer 503 when no crossref-local endpoint is
-# configured. That is the right STATUS; the body used to be the wrong ANSWER —
-# "CrossRef API not configured" states what broke and not what to do, which
-# leaves a first-time user stuck with no next step (measured 2026-09-02 as a
-# standalone first-run blocker). Built once and shared so the four routes
-# cannot drift into four different explanations.
+# The three citation-graph BUILD routes (network/related/paper) answer 503 when
+# no crossref-local endpoint is configured: they are user-initiated actions, and
+# a failed action is truthfully a 5xx. The HEALTH route is different and must
+# never be 5xx -- it is called on the normal initial-load path, and a capability
+# report is not a failed request (see graph_health).
+#
+# The body was the wrong ANSWER — "CrossRef API not configured" states what
+# broke and not what to do, which leaves a first-time user stuck with no next
+# step (measured 2026-09-02 as a standalone first-run blocker). Built once and
+# shared so the routes cannot drift into different explanations.
 def _not_configured_payload() -> dict:
-    """The 503 body for 'no crossref-local endpoint', with the fix in it."""
+    """The 'no crossref-local endpoint' body, with the fix in it."""
     return {
         "error": "CrossRef API not configured",
         "detail": (
@@ -378,6 +382,9 @@ def _js_i18n_dict() -> dict:
         "Service available": _i18n("Service available"),
         "Service limited": _i18n("Service limited"),
         "Service unavailable": _i18n("Service unavailable"),
+        # Citation Graph capability: endpoint configured but not yet probed --
+        # deliberately not "available", since the backend has not answered.
+        "Not checked yet": _i18n("Not checked yet"),
         "Unknown": _i18n("Unknown"),
         "Checking...": _i18n("Checking..."),
         "Related papers": _i18n("Related papers"),
@@ -567,36 +574,66 @@ def graph_paper(request):
 
 @require_GET
 def graph_health(request):
-    """Health check for citation graph service.
+    """Capability report for the citation graph. NEVER answers 5xx.
 
-    The response is the ANSWER, not the diagnosis: it says which capability
-    is affected, what is limited, and what the user can DO (item 150-152,
-    hub live audit 2026-09-14). It deliberately does NOT expose the internal
-    crossref-local endpoint URL — that is server infrastructure, not a user
-    concern (the previous body leaked `http://127.0.0.1:8000` to the UI).
+    WHY NOT 5xx (measured 2026-09-17): the initial Scholar load called this
+    route unconditionally, so an unconfigured optional backend turned every
+    page load into a same-origin 503 -- and a host that refuses to allowlist
+    5xx cannot front that. The status code was also the wrong SHAPE: this is a
+    capability REPORT, not a failed request, and the report itself always
+    succeeds; the body is where the truth belongs.
+
+    Two modes, so the expensive part happens only when the feature is opened:
+
+    * default      -> configuration only, NO network call (the initial load);
+    * ``?probe=1`` -> the live canary probe, run when the Citation Graph tab is
+      activated.
+
+    Truthful states, never masked: ``unconfigured`` (nothing to query, with the
+    fix), ``configured`` (endpoint present, not probed yet), ``healthy``,
+    ``degraded`` (reachable but the canary returned nothing) and ``unavailable``
+    (configured and the probe FAILED -- reported as unavailable, never as
+    ready).
     """
     api_url = _api_url()
     if not api_url:
         return JsonResponse(
-            {"status": "unhealthy", **_not_configured_payload()}, status=503
+            {"status": "unconfigured", "probed": False, **_not_configured_payload()}
+        )
+
+    if request.GET.get("probe") != "1":
+        return JsonResponse(
+            {
+                "status": "configured",
+                "probed": False,
+                "error": "Citation Graph: not checked",
+                "detail": (
+                    "A crossref-local endpoint is configured. The graph backend "
+                    "is probed when you open the Citation Graph tab, so a slow "
+                    "or unreachable backend cannot delay the rest of the page."
+                ),
+                "fix": "Open the Citation Graph tab to check it.",
+            }
         )
 
     try:
         builder = _get_builder()
         summary = builder.get_paper_summary("10.1038/s41586-020-2008-3")
         if summary:
-            return JsonResponse({"status": "healthy"})
+            return JsonResponse({"status": "healthy", "probed": True})
         # Configured and reachable but the canary probe returned no data — the
         # capability is limited, not broken (previously fell through to a bare
         # "Service limited / Unknown" because the client never handled it).
-        return JsonResponse(_degraded_payload(), status=200)
+        return JsonResponse({**_degraded_payload(), "probed": True})
     except Exception:
-        # Configured but unreachable/errored — limited with the cause and the
-        # fix, instead of the raw exception string (which can name internal
-        # hosts).
+        # Configured but unreachable/errored — LIMITED WITH THE CAUSE AND THE
+        # FIX, and still not a 5xx: the request succeeded, the capability did
+        # not. The raw exception string is deliberately not returned (it can
+        # name internal hosts).
         return JsonResponse(
             {
-                "status": "unhealthy",
+                "status": "unavailable",
+                "probed": True,
                 "error": "Citation Graph: unavailable",
                 "detail": (
                     "The crossref-local endpoint is configured but could not "
@@ -606,8 +643,7 @@ def graph_health(request):
                     "Verify the crossref-local service is running and that "
                     "the endpoint is reachable, then retry."
                 ),
-            },
-            status=503,
+            }
         )
 
 
