@@ -19,10 +19,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const errorEl = document.getElementById("libraryError");
   const errorMsgEl = document.getElementById("libraryErrorMessage");
   const statsEl = document.getElementById("libraryStats");
+  const filterEl = document.getElementById("libraryFilter");
+  const filterClearEl = document.getElementById("libraryFilterClear");
 
   const show = (el) => el && el.classList.remove("hidden");
   const hide = (el) => el && el.classList.add("hidden");
   let loaded = false;
+  let filterTimer = null;
 
   function formatAuthors(paper) {
     const authors = paper.authors || [];
@@ -133,12 +136,63 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  /**
+   * The two empty states, each with the actions that ACTUALLY exist.
+   *
+   * Review blocker 2: the old copy told the user to "save a paper from
+   * Search", but Search exposes no save action or endpoint -- so the state
+   * named an action the user could not take. What exists is Import (the
+   * button above, wired to /api/library/import) and, when a filter matched
+   * nothing, clearing that filter. Both actions are rendered here as real
+   * controls rather than described in prose, and the filtered variant is only
+   * reachable because the filter box now exists.
+   */
+  function emptyState(data) {
+    const empty = document.createElement("div");
+    empty.className = "empty-message";
+
+    if (data.filtered) {
+      const text = document.createElement("div");
+      text.textContent = scholarT("No papers match the current filters.");
+      empty.appendChild(text);
+      const clear = document.createElement("button");
+      clear.type = "button";
+      clear.className = "btn-control-library";
+      clear.textContent = scholarT("Clear filters");
+      clear.addEventListener("click", () => {
+        if (filterEl) filterEl.value = "";
+        loadLibrary(true);
+      });
+      empty.appendChild(clear);
+      return empty;
+    }
+
+    const text = document.createElement("div");
+    text.textContent = scholarT("Your library is empty. Import a BibTeX file to add papers.");
+    empty.appendChild(text);
+    const importBtn = document.getElementById("libraryImportBtn");
+    if (importBtn) {
+      const go = document.createElement("button");
+      go.type = "button";
+      go.className = "btn-control-library";
+      go.textContent = scholarT("Import BibTeX");
+      go.addEventListener("click", () => importBtn.click());
+      empty.appendChild(go);
+    }
+    return empty;
+  }
+
   async function loadLibrary(force = false) {
     if (loaded && !force) return;
     hide(errorEl);
     show(loadingEl);
+    const query = filterEl ? filterEl.value.trim() : "";
+    if (filterClearEl) filterClearEl.classList.toggle("hidden", !query);
     try {
-      const resp = await fetch(`${STX_MOUNT}/api/library`);
+      const url = query
+        ? `${STX_MOUNT}/api/library?q=${encodeURIComponent(query)}`
+        : `${STX_MOUNT}/api/library`;
+      const resp = await fetch(url);
       const data = await resp.json();
       if (!resp.ok) throw new Error(data.error || `Library load failed (${resp.status})`);
       hide(loadingEl);
@@ -146,15 +200,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const papers = data.papers || [];
       if (statsEl) {
         const n = papers.length;
-        statsEl.textContent = n + " " + scholarT(n === 1 ? "Paper" : "Papers");
+        statsEl.textContent = data.filtered
+          ? scholarT("%(count)s of %(total)s Papers", { count: n, total: data.total })
+          : n + " " + scholarT(n === 1 ? "Paper" : "Papers");
       }
       if (!papers.length) {
-        const empty = document.createElement("div");
-        empty.className = "empty-message";
-        empty.textContent = scholarT(
-          "Your library is empty. Save papers from Search or Import, then Enrich them here.",
-        );
-        listEl.appendChild(empty);
+        listEl.appendChild(emptyState(data));
       } else {
         papers.forEach((p) => listEl.appendChild(makeRow(p)));
       }
@@ -232,7 +283,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || `Import failed (${resp.status})`);
-        setIoStatus(scholarT(`Imported ${data.imported} paper${data.imported === 1 ? "" : "s"} from ${file.name}.`));
+        // A dict keyed call, not a template literal: scholarT looks the string
+        // up verbatim, so an interpolated literal could never match the
+        // catalog and the JA page showed English here (review blocker 2).
+        setIoStatus(
+          scholarT(
+            data.imported === 1
+              ? "Imported %(n)s paper from %(file)s"
+              : "Imported %(n)s papers from %(file)s",
+            { n: data.imported, file: file.name },
+          ),
+        );
         importFile.value = "";
         loadLibrary(true); // refresh the list to show the imported papers
       } catch (err) {
@@ -248,6 +309,21 @@ document.addEventListener("DOMContentLoaded", () => {
   if (libTabBtn) {
     libTabBtn.addEventListener("click", () => {
       if (!loaded) loadLibrary();
+    });
+  }
+  // Filter: debounced server-side query (?q=). Typing before the list has ever
+  // loaded also triggers the first load, so the filtered empty state is
+  // reachable on a fresh page.
+  if (filterEl) {
+    filterEl.addEventListener("input", () => {
+      clearTimeout(filterTimer);
+      filterTimer = setTimeout(() => loadLibrary(true), 250);
+    });
+  }
+  if (filterClearEl) {
+    filterClearEl.addEventListener("click", () => {
+      if (filterEl) filterEl.value = "";
+      loadLibrary(true);
     });
   }
   // If the page loads with Library already active (it does not by default), load now.

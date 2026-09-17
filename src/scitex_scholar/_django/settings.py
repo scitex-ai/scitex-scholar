@@ -71,6 +71,10 @@ else:
 # (`scitex-scholar gui`), so standalone is the default here.
 SCITEX_APP_MODE = os.environ.get("SCITEX_APP_MODE", "standalone")
 
+# Standalone project picker provider. Mounted hosts replace this URL and the
+# provider implementation; Scholar never imports host project/auth models.
+SCITEX_PROJECT_PROVIDER_URL = "/api/projects"
+
 INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.staticfiles",

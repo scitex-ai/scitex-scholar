@@ -21,6 +21,7 @@
   "standalone_command": "scitex-scholar gui",
   "standalone_port": 31297,
   "frontend_type": "vanilla",
+  "scope": "project",
   "embedded_package": true,
   "dependencies": {
     "python": ["scitex-scholar", "django"]

@@ -125,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!papers.length) {
       const empty = document.createElement("div");
       empty.className = "empty-message";
-      empty.textContent = "No papers matched this query.";
+      empty.textContent = scholarT("No papers matched this query.");
       resultsContent.appendChild(empty);
     } else {
       papers.forEach((paper) => resultsContent.appendChild(renderPaper(paper)));
@@ -135,6 +135,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const parts = [`${papers.length} paper${papers.length === 1 ? "" : "s"}`];
     if (metadata.cached) parts.push("cached");
     if (metadata.search_mode) parts.push(metadata.search_mode);
+    // READINESS: which corpus answered. The configured policy is local-first,
+    // and the user (and a bug report) must be able to see when the network was
+    // actually needed -- a silent fallback is indistinguishable from a local
+    // hit that happened to work.
+    if (metadata.source_tier) {
+      parts.push(
+        metadata.source_tier === "primary"
+          ? scholarT("Local corpus (NAS)")
+          : scholarT("Online fallback"),
+      );
+    }
     stats.textContent = parts.join(" · ");
     show(results);
   }

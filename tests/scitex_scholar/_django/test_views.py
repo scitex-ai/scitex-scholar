@@ -24,14 +24,17 @@ bootstrap via conftest.py (bare `django.setup()`, no pytest-django dep).
 
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 import re
 from pathlib import Path
 
 import pytest
-
+import scitex_ui
+import tomllib
 from django.test import RequestFactory, override_settings
+from scitex_ui.project_scope import LocalProjectProvider
 
 from scitex_scholar._django import views
 
@@ -381,6 +384,91 @@ def test_search_marks_cached_results_as_cached():
     resp = views.search(request)
     # Assert
     assert json.loads(resp.content)["metadata"]["cached"] is True
+
+
+# --- source tiers (review blocker 1): the GUI must run local corpora first ---
+
+
+def test_gui_search_engine_has_online_engines_only_as_fallback():
+    # Arrange -- the engine /api/search is actually served by.
+    engine = views._get_search_engine()
+    # Act
+    fallbacks = [sorted(p.fallback_engines) for p in _gui_pipelines(engine)]
+    # Assert
+    assert all("CrossRef" in names for names in fallbacks)
+
+
+def _gui_pipelines(engine):
+    """Both pipelines the GUI can select: parallel and the rate-limited single."""
+    return (engine.parallel_pipeline, engine.single_pipeline)
+
+
+def test_gui_search_engine_primary_tier_is_the_local_corpora():
+    # Arrange
+    engine = views._get_search_engine()
+    # Act
+    primaries = [sorted(p.primary_engines) for p in _gui_pipelines(engine)]
+    # Assert -- BOTH modes: "single" is the rate-limited GUI option and its
+    # pipeline used to be online-only as well.
+    assert primaries == [["CrossRefLocal", "OpenAlexLocal"]] * 2
+
+
+def test_gui_search_engine_local_tier_engines_are_corpus_adapters():
+    # Arrange
+    from scitex_scholar.search_engines._source_tiers import LocalCorpusSearchEngine
+
+    engine = views._get_search_engine()
+    # Act
+    adapters = [
+        isinstance(candidate, LocalCorpusSearchEngine)
+        for pipeline in _gui_pipelines(engine)
+        for candidate in pipeline.primary_engines.values()
+    ]
+    # Assert
+    assert all(adapters)
+
+
+def test_gui_search_response_carries_the_serving_tier():
+    # Arrange -- a hand-rolled engine so the assertion is about the view's
+    # pass-through, not about a live query (injected, not patched: PA-306).
+    class _TieredEngine:
+        async def search(self, query, mode=None, max_results=20):
+            return {
+                "results": [],
+                "metadata": {"source_tier": "primary", "source_tier_reason": ""},
+            }
+
+    request = RequestFactory().get("/api/search?q=tier-probe&no_cache=true")
+    # Act
+    body = json.loads(views.search(request, _engine=_TieredEngine()).content)
+    # Assert -- the GUI can say which corpus answered.
+    assert body["metadata"]["source_tier"] == "primary"
+
+
+def test_search_stats_read_the_serving_tier_from_the_response():
+    # Arrange -- the label the user reads, so a network fallback is visible
+    # instead of looking identical to a local hit.
+    script = (
+        Path(views.__file__).parent / "static" / "scholar" / "js" / "search.js"
+    ).read_text()
+    # Act
+    renders = "metadata.source_tier" in script
+    # Assert
+    assert renders
+
+
+def test_search_stats_labels_both_tiers_in_the_ui():
+    # Arrange
+    script = (
+        Path(views.__file__).parent / "static" / "scholar" / "js" / "search.js"
+    ).read_text()
+    # Act
+    labels = (
+        'scholarT("Local corpus (NAS)")' in script,
+        'scholarT("Online fallback")' in script,
+    )
+    # Assert
+    assert labels == (True, True)
 
 
 # ---------------------------------------------------------------------------
@@ -743,7 +831,6 @@ def test_scholar_entry_point_reaches_a_partial_only_token():
 def test_health_reports_the_package_version():
     # Arrange
     from scitex_scholar import __version__
-
     from scitex_scholar._django.views import health
 
     request = RequestFactory().get("/api/health")
@@ -1565,7 +1652,6 @@ def test_mobile_form_row_stretches_groups_full_width():
 # the monkeypatch fixture). No network, no user data.
 # ---------------------------------------------------------------------------
 
-import contextlib
 import json as _json
 
 
@@ -2309,6 +2395,495 @@ def test_ja_compiled_mo_exists_at_app_locale_path():
     size_ok = exists and mo_path.stat().st_size > 0
     # Assert
     assert size_ok
+
+
+# --- first leaf-migration slice: canonical app header + project picker -------
+
+_PROJECT_SELECTOR_CSS = (
+    Path(scitex_ui.__file__).parent
+    / "static" / "scitex_ui" / "css" / "app" / "project-selector.css"
+)
+
+
+@contextlib.contextmanager
+def _project_root_env(root: Path):
+    old = os.environ.get("SCITEX_SCHOLAR_PROJECTS_DIR")
+    os.environ["SCITEX_SCHOLAR_PROJECTS_DIR"] = str(root)
+    try:
+        yield
+    finally:
+        if old is None:
+            os.environ.pop("SCITEX_SCHOLAR_PROJECTS_DIR", None)
+        else:
+            os.environ["SCITEX_SCHOLAR_PROJECTS_DIR"] = old
+
+
+def test_standalone_uses_scitex_ui_local_project_provider(tmp_path):
+    # Arrange
+    request = RequestFactory().get("/")
+    # Act
+    with _project_root_env(tmp_path), override_settings(SCITEX_PROJECT_PROVIDER=""):
+        provider = views._project_provider(request)
+    # Assert -- still scitex-ui's provider (Scholar adds only the reserved-dir
+    # filter below); the picker's id/state contract stays scitex-ui's.
+    assert isinstance(provider, LocalProjectProvider)
+
+
+def test_standalone_project_endpoint_lists_local_projects(tmp_path):
+    # Arrange
+    (tmp_path / "Alpha").mkdir()
+    (tmp_path / "Beta").mkdir()
+    request = RequestFactory().get("/api/projects")
+    # Act
+    with _project_root_env(tmp_path), override_settings(SCITEX_PROJECT_PROVIDER=""):
+        payload = json.loads(views.project_scope(request).content)
+    # Assert
+    assert [project["id"] for project in payload["projects"]] == ["Alpha", "Beta"]
+
+
+def test_standalone_provider_hides_reserved_library_dirs_from_the_picker(tmp_path):
+    # Arrange -- the real library root: the deduplicated store and the PDF
+    # staging area live beside the projects, and neither is selectable.
+    for name in ("MASTER", "MASTER_quarantine", "downloads", "Alpha"):
+        (tmp_path / name).mkdir()
+    request = RequestFactory().get("/api/projects")
+    # Act
+    with _project_root_env(tmp_path), override_settings(SCITEX_PROJECT_PROVIDER=""):
+        payload = json.loads(views.project_scope(request).content)
+    # Assert -- MASTER exposed as a project was the review defect.
+    assert [project["id"] for project in payload["projects"]] == ["Alpha"]
+
+
+def test_standalone_provider_reserved_filter_is_case_insensitive(tmp_path):
+    # Arrange -- a case-insensitive filesystem cannot host both "MASTER" and
+    # "master"; either spelling is the same internal store.
+    (tmp_path / "master").mkdir()
+    (tmp_path / "Alpha").mkdir()
+    request = RequestFactory().get("/api/projects")
+    # Act
+    with _project_root_env(tmp_path), override_settings(SCITEX_PROJECT_PROVIDER=""):
+        payload = json.loads(views.project_scope(request).content)
+    # Assert
+    assert [project["id"] for project in payload["projects"]] == ["Alpha"]
+
+
+def test_standalone_provider_hides_symlinked_entries(tmp_path):
+    # Arrange -- a project's paper symlinks point INTO MASTER; a symlinked
+    # directory at the root is storage plumbing, not a project (the same rule
+    # storage._project_reconcile applies when it enumerates projects).
+    (tmp_path / "MASTER" / "AECB5227").mkdir(parents=True)
+    (tmp_path / "Alpha").mkdir()
+    (tmp_path / "not-a-project").symlink_to(tmp_path / "MASTER")
+    request = RequestFactory().get("/api/projects")
+    # Act
+    with _project_root_env(tmp_path), override_settings(SCITEX_PROJECT_PROVIDER=""):
+        payload = json.loads(views.project_scope(request).content)
+    # Assert
+    assert [project["id"] for project in payload["projects"]] == ["Alpha"]
+
+
+@contextlib.contextmanager
+def _scitex_dir_env(root: Path):
+    """Point SCITEX_DIR at a temp root and clear the Scholar overrides.
+
+    The sanctioned env-var yield pattern (not monkeypatch): PA-306 forbids
+    patching, and this is the documented replacement for environment state.
+    """
+    keys = (
+        "SCITEX_DIR",
+        "SCITEX_SCHOLAR_PROJECTS_DIR",
+        "SCITEX_SCHOLAR_LIBRARY_ROOT",
+    )
+    previous = {key: os.environ.get(key) for key in keys}
+    os.environ["SCITEX_DIR"] = str(root)
+    for key in keys[1:]:
+        os.environ.pop(key, None)
+    try:
+        yield
+    finally:
+        for key, value in previous.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
+
+
+def test_default_storage_root_is_the_filtered_root(tmp_path):
+    # Arrange -- no env overrides at all: the standalone root is the library
+    # root derived from SCITEX_DIR, and the filter must apply THERE too (the
+    # defect was measured on the default root, not on a test seam).
+    library = tmp_path / "scholar" / "library"
+    (library / "MASTER").mkdir(parents=True)
+    (library / "Alpha").mkdir()
+    request = RequestFactory().get("/api/projects")
+    # Act
+    with _scitex_dir_env(tmp_path), override_settings(SCITEX_PROJECT_PROVIDER=""):
+        payload = json.loads(views.project_scope(request).content)
+    # Assert
+    assert [project["id"] for project in payload["projects"]] == ["Alpha"]
+
+
+def test_reserved_picker_filter_uses_the_storage_contract_set():
+    # Arrange -- one reserved-name list, not two: the picker filter and the
+    # library reconciler must not be able to disagree.
+    from scitex_scholar.storage._project_reconcile import RESERVED_LIBRARY_DIRS
+
+    source = (Path(views.__file__)).read_text()
+    # Act
+    used = "RESERVED_LIBRARY_DIRS" in source
+    # Assert
+    assert used and {"MASTER", "MASTER_quarantine", "downloads"} <= set(
+        RESERVED_LIBRARY_DIRS
+    )
+
+
+def test_index_renders_one_picker_in_canonical_scholar_header(tmp_path):
+    # Arrange
+    (tmp_path / "Alpha").mkdir()
+    settings_override = override_settings(
+        SCITEX_PROJECT_PROVIDER="", SCITEX_PROJECT_PROVIDER_URL="/api/projects"
+    )
+    # Act
+    with _project_root_env(tmp_path), settings_override:
+        html = views.index(RequestFactory().get("/?project=Alpha")).content.decode()
+    # Assert
+    assert html.count("data-stx-project-picker") == 1
+
+
+def test_index_picker_navigates_with_project_query(tmp_path):
+    # Arrange
+    (tmp_path / "Alpha").mkdir()
+    settings_override = override_settings(
+        SCITEX_PROJECT_PROVIDER="", SCITEX_PROJECT_PROVIDER_URL="/api/projects"
+    )
+    # Act
+    with _project_root_env(tmp_path), settings_override:
+        html = views.index(RequestFactory().get("/?project=Alpha")).content.decode()
+    # Assert
+    assert 'data-current="Alpha" data-navigate="?project={id}"' in html
+
+
+def test_host_mount_supplies_picker_provider_url(tmp_path):
+    # Arrange
+    settings_override = override_settings(
+        SCITEX_PROJECT_PROVIDER="",
+        SCITEX_PROJECT_PROVIDER_URL="/host/api/project-scope/",
+    )
+    # Act
+    with _project_root_env(tmp_path), settings_override:
+        html = views.index(RequestFactory().get("/")).content.decode()
+    # Assert
+    assert 'data-provider-url="/host/api/project-scope/"' in html
+
+
+def test_header_source_places_picker_after_identity_before_content():
+    # Arrange
+    source = TEMPLATE.read_text()
+    # Act
+    positions = [
+        source.index('class="stx-app-header__identity"'),
+        source.index('class="stx-app-header__slot--project-selector"'),
+        source.index('class="app-container"'),
+    ]
+    # Assert
+    assert positions == sorted(positions)
+
+
+def test_manifest_declares_project_scope():
+    # Arrange
+    manifest_path = Path(views.__file__).parent / "manifest.json"
+    # Act
+    manifest = json.loads(manifest_path.read_text())
+    # Assert
+    assert manifest["scope"] == "project"
+
+
+def test_server_extra_requires_header_slot_capable_scitex_ui():
+    # Arrange
+    repo_root = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").is_file())
+    # Act
+    requirements = tomllib.loads((repo_root / "pyproject.toml").read_text())["project"]["optional-dependencies"]["server"]
+    # Assert
+    assert "scitex-ui>=0.22.0" in requirements
+
+
+def test_390px_header_wraps_picker_without_horizontal_overflow():
+    # Arrange
+    css = (CSS_DIR / "_partials" / "_layout.css").read_text()
+    # Act
+    mobile = css.split("@media (max-width: 600px)", 1)[1]
+    wraps = re.search(r"\.stx-app-header\s*\{[^}]*flex-wrap:\s*wrap", mobile)
+    full_width = re.search(r"\.stx-app-header__slot--project-selector\s*\{[^}]*width:\s*100%", mobile)
+    # Assert
+    assert wraps is not None and full_width is not None
+
+
+def test_shared_desktop_slot_pins_picker_left_before_actions():
+    # Arrange
+    css = _PROJECT_SELECTOR_CSS.read_text()
+    # Act
+    slot = re.search(r"\.stx-app-header__slot--project-selector\s*\{[^}]*order:\s*1[^}]*margin-left:\s*0[^}]*margin-right:\s*auto", css)
+    # Assert
+    assert slot is not None
+
+
+def test_shared_picker_has_44px_390px_touch_target():
+    # Arrange
+    css = _PROJECT_SELECTOR_CSS.read_text()
+    # Act
+    mobile = css.split("@media (max-width: 600px), (pointer: coarse)", 1)[1]
+    target = re.search(r"\.stx-app-project-selector__trigger[^}]*height:\s*44px", mobile)
+    # Assert
+    assert target is not None
+
+
+# --- Library empty / filtered states (review blocker 2) ----------------------
+#
+# The previous coverage asserted the strings existed in library.js -- which
+# says nothing about whether the ACTIONS they name exist, whether the filtered
+# state is reachable, or whether the strings are translatable. These tests
+# assert the rendered contract instead.
+
+_JS_DIR = Path(views.__file__).parent / "static" / "scholar" / "js"
+
+
+def _library_js() -> str:
+    return (_JS_DIR / "library.js").read_text()
+
+
+def _library_panel_html() -> str:
+    """The Library tab's rendered markup (the filter box must be IN the panel)."""
+    page = views.index(RequestFactory().get("/")).content.decode()
+    return page.split('id="tab-library"', 1)[1].split('id="tab-graph"', 1)[0]
+
+
+def test_library_empty_state_names_no_action_that_does_not_exist():
+    # Arrange -- "save a paper from Search" was the review's example: Search
+    # has no save action and /api/search has no save endpoint, so the copy
+    # promised something the user could not do.
+    script = _library_js()
+    # Act
+    claims_removed = "save a paper from Search" not in script
+    promises_import = "Import a BibTeX file" in script
+    # Assert
+    assert claims_removed and promises_import
+
+
+def test_library_empty_state_actions_are_real_controls():
+    # Arrange -- each action the empty state renders must hit a control or
+    # endpoint that exists: Import -> the Library's own import button (POST
+    # /api/library/import), Clear -> the filter input beside the list.
+    script = _library_js()
+    panel = _library_panel_html()
+    # Act
+    imports_existing_button = (
+        'document.getElementById("libraryImportBtn")' in script
+        and 'id="libraryImportBtn"' in panel
+    )
+    clears_existing_filter = (
+        'document.getElementById("libraryFilter")' in script
+        and 'id="libraryFilter"' in panel
+    )
+    # Assert
+    assert imports_existing_button and clears_existing_filter
+
+
+def test_library_filter_control_is_rendered_in_the_library_panel():
+    # Arrange -- without a filter control the filtered-empty branch is dead
+    # code no user can reach, which is what the review measured.
+    panel = _library_panel_html()
+    # Act
+    has_input = 'id="libraryFilter"' in panel
+    has_clear = 'id="libraryFilterClear"' in panel
+    # Assert
+    assert has_input and has_clear and "Clear filters" in panel
+
+
+def test_library_list_reports_unfiltered_state(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="P1", title="First Paper")
+        _seed_library(tmp_path, paper_id="P2", doi="10.1/other", title="Second Paper")
+        # Act
+        data = _json.loads(views.library_list(RequestFactory().get("/api/library")).content)
+        # Assert -- an unfiltered list is the whole library.
+        assert data["count"] == 2 and data["total"] == 2 and data["filtered"] is False
+
+
+def test_library_list_filter_narrows_rows_and_says_so(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="P1", title="Hippocampal Ripples")
+        _seed_library(tmp_path, paper_id="P2", doi="10.1/other", title="Unrelated Topic")
+        # Act -- what the filter box sends.
+        data = _json.loads(
+            views.library_list(RequestFactory().get("/api/library", {"q": "hippocampal"})).content
+        )
+        # Assert -- narrowed rows, and the client is TOLD it is a filtered view.
+        assert (
+            [p["title"] for p in data["papers"]] == ["Hippocampal Ripples"]
+            and data["count"] == 1
+            and data["total"] == 2
+            and data["filtered"] is True
+            and data["query"] == "hippocampal"
+        )
+
+
+def test_library_list_filter_matches_authors(tmp_path):
+    # Arrange -- the placeholder the UI shows ("Title, author, or DOI") must be
+    # true for authors too, which the MASTER record stores as a list.
+    with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="P1", title="A paper",
+                      authors=["Jane Watanabe", "John Second"])
+        _seed_library(tmp_path, paper_id="P2", doi="10.5/unique-doi",
+                      title="Another paper")
+        # Act
+        data = _json.loads(
+            views.library_list(
+                RequestFactory().get("/api/library", {"q": "watanabe"})
+            ).content
+        )
+        # Assert
+        assert [p["paper_id"] for p in data["papers"]] == ["P1"]
+
+
+def test_library_list_filter_matches_dois(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="P1", title="A paper")
+        _seed_library(tmp_path, paper_id="P2", doi="10.5/unique-doi",
+                      title="Another paper")
+        # Act
+        data = _json.loads(
+            views.library_list(
+                RequestFactory().get("/api/library", {"q": "10.5/unique"})
+            ).content
+        )
+        # Assert
+        assert [p["paper_id"] for p in data["papers"]] == ["P2"]
+
+
+def test_library_filtered_empty_state_is_reachable(tmp_path):
+    # Arrange -- a non-empty library plus a filter that matches nothing: the
+    # state the old copy described but nothing could produce.
+    with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="P1", title="A paper")
+        # Act
+        data = _json.loads(
+            views.library_list(RequestFactory().get("/api/library", {"q": "zzz-nothing"})).content
+        )
+        # Assert
+        assert (
+            data["papers"] == []
+            and data["count"] == 0
+            and data["total"] == 1
+            and data["filtered"] is True
+        )
+
+
+def test_library_js_sends_the_filter_and_branches_on_the_flag():
+    # Arrange -- the two halves of the contract: the client asks for ?q= and
+    # distinguishes "empty library" from "filter matched none" via the flag.
+    script = _library_js()
+    # Act
+    sends_query = "/api/library?q=" in script
+    branches_on_flag = "data.filtered" in script
+    # Assert
+    assert sends_query and branches_on_flag
+
+
+def test_every_scholarT_key_is_translatable():
+    # Arrange -- review blocker 2: new strings were missing from
+    # _js_i18n_dict, so a JA page fell back to the English literal. Every
+    # scholarT("...") literal in the shipped JS must be a dict key.
+    keys = set(views._js_i18n_dict())
+    # Act
+    literals = set()
+    for path in sorted(_JS_DIR.rglob("*.js")):
+        for match in re.finditer(r'scholarT\(\s*"((?:[^"\\]|\\.)*)"', path.read_text()):
+            literals.add(match.group(1))
+    missing = sorted(literals - keys)
+    # Assert
+    assert literals and not missing
+
+
+def test_no_scholarT_call_interpolates_before_lookup():
+    # Arrange -- scholarT looks the string up VERBATIM, so a template literal
+    # with ${} can never match a catalog entry (the Library import status did
+    # exactly this and stayed English on a JA page).
+    # Act
+    offenders = [
+        str(path)
+        for path in sorted(_JS_DIR.rglob("*.js"))
+        if re.search(r"scholarT\(\s*`", path.read_text())
+    ]
+    # Assert
+    assert offenders == []
+
+
+def test_library_filtered_empty_copy_is_translated_in_japanese():
+    # Arrange -- the JS dict the JA page ships (json_script escapes non-ASCII,
+    # so the body is PARSED rather than substring-matched).
+    ja_dict = json.loads(_i18n_script_body(_render_index_in("ja")))
+    # Act
+    rendered = ja_dict["No papers match the current filters."]
+    # Assert
+    assert rendered == "現在の絞り込み条件に一致する論文はありません。"
+
+
+def test_library_empty_copy_is_translated_in_japanese():
+    # Arrange
+    english = "Your library is empty. Import a BibTeX file to add papers."
+    ja_dict = json.loads(_i18n_script_body(_render_index_in("ja")))
+    # Act
+    rendered = ja_dict[english]
+    # Assert -- a JA page must not fall back to the English literal.
+    assert rendered != english
+
+
+def test_library_clear_filters_label_is_translated_in_japanese():
+    # Arrange
+    ja_dict = json.loads(_i18n_script_body(_render_index_in("ja")))
+    # Act
+    rendered = ja_dict["Clear filters"]
+    # Assert
+    assert rendered == "絞り込みを解除"
+
+
+def test_library_filter_field_label_is_translated_in_japanese():
+    # Arrange
+    ja_page = _render_index_in("ja")
+    # Act -- the rendered filter field, not the JS dict.
+    rendered = "ライブラリを絞り込む" in ja_page
+    # Assert
+    assert rendered
+
+
+def test_graph_initial_state_explains_seed_and_library_workflow():
+    # Arrange
+    html = views.index(RequestFactory().get("/")).content.decode()
+    # Act
+    expected = ["Start with a DOI", "Search or your Library", "Max papers in graph"]
+    # Assert
+    assert all(text in html for text in expected)
+
+
+def test_graph_seed_is_required_and_not_prefilled():
+    # Arrange
+    html = views.index(RequestFactory().get("/")).content.decode()
+    # Act
+    input_tag = re.search(r'<input[^>]+id="doiInput"[^>]*>', html).group(0)
+    # Assert
+    assert "required" in input_tag and "value=" not in input_tag
+
+
+def test_graph_limit_has_visible_and_accessible_meaning():
+    # Arrange
+    html = views.index(RequestFactory().get("/")).content.decode()
+    # Act
+    select_tag = re.search(r'<select[^>]+id="topN"[^>]*>', html).group(0)
+    # Assert
+    assert 'aria-label="Maximum papers in citation graph"' in select_tag
 
 
 # EOF
