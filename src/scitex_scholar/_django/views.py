@@ -267,9 +267,43 @@ def _standalone_projects_root() -> Path:
     return scitex_root / "scholar" / "library"
 
 
+class ScholarLocalProjectProvider(LocalProjectProvider):
+    """scitex-ui's standalone provider, minus the library's reserved dirs.
+
+    scitex-ui's ::class:`LocalProjectProvider` treats EVERY non-hidden folder
+    under its root as a selectable project. Scholar's standalone root IS the
+    library root, whose direct children also include ``MASTER/`` (the
+    deduplicated paper store) and ``downloads/`` (the PDF staging area), so the
+    stock provider offered the internal store as if it were a user project.
+
+    Subclassing (rather than reimplementing) keeps scitex-ui authoritative for
+    the picker's id/name/detail shape and for the stored last-visited file,
+    while the LISTING follows Scholar's own storage contract. The reserved
+    names come from ``storage._project_reconcile`` -- the same set the library
+    reconciler and audit use -- so the picker and the storage layer cannot
+    disagree about what a project is.
+    """
+
+    def list_projects(self, request=None):
+        """Projects the picker may offer: real project dirs only."""
+        from scitex_scholar.storage._project_reconcile import RESERVED_LIBRARY_DIRS
+
+        reserved = {name.upper() for name in RESERVED_LIBRARY_DIRS}
+        return [
+            entry
+            for entry in super().list_projects(request)
+            # Case-insensitive: a "master" folder is the same internal store on
+            # a case-insensitive filesystem, and MUST NOT slip through here.
+            if entry.name.upper() not in reserved
+            and not (self.root / entry.name).is_symlink()
+        ]
+
+
 def _project_provider(request):
     """Use the mounted host provider, or scitex-ui's local provider standalone."""
-    return host_project_provider() or LocalProjectProvider(_standalone_projects_root())
+    return host_project_provider() or ScholarLocalProjectProvider(
+        _standalone_projects_root()
+    )
 
 
 # Shared scitex-ui GET-list / POST-remember endpoint. The provider factory is
@@ -355,9 +389,23 @@ def _js_i18n_dict() -> dict:
         "Enriching…": _i18n("Enriching…"),
         "Enrichment failed": _i18n("Enrichment failed"),
         "Enrichment failed (HTTP %(status)s)": _i18n("Enrichment failed (HTTP %(status)s)"),
-        "Your library is empty. Save papers from Search or Import, then Enrich them here.": _i18n(
-            "Your library is empty. Save papers from Search or Import, then Enrich them here."
+        # Library states (review blocker 2): every message below is rendered by
+        # library.js, so it MUST be a key here -- an English literal in the JS
+        # is invisible to the catalog and shows EN on a JA page.
+        "Your library is empty. Import a BibTeX file to add papers.": _i18n(
+            "Your library is empty. Import a BibTeX file to add papers."
         ),
+        "No papers match the current filters.": _i18n(
+            "No papers match the current filters."
+        ),
+        "Clear filters": _i18n("Clear filters"),
+        "Import BibTeX": _i18n("Import BibTeX"),
+        "%(count)s of %(total)s Papers": _i18n("%(count)s of %(total)s Papers"),
+        # Search tab: the empty result state was an English literal in search.js.
+        "No papers matched this query.": _i18n("No papers matched this query."),
+        # Search tab: which tier answered (local NAS corpora vs online fallback).
+        "Local corpus (NAS)": _i18n("Local corpus (NAS)"),
+        "Online fallback": _i18n("Online fallback"),
         "Imported %(n)s paper from %(file)s": _i18n("Imported %(n)s paper from %(file)s"),
         "Imported %(n)s papers from %(file)s": _i18n("Imported %(n)s papers from %(file)s"),
     }
@@ -765,21 +813,39 @@ def _save_library_paper(paper, root: Path) -> Path:
 
 @require_GET
 def library_list(request):
-    """List the user's local library papers.
+    """List the user's local library papers, optionally filtered by ``?q=``.
 
-    Returns {papers: [...], count, library_root}. Reads the user's MASTER
-    metadata files directly (``collect_rows`` -- "no store involved"), scoped
-    to the request's user (see ``_library_root_for``), so a mounted hub never
-    exposes one shared service-account library to every user. An empty or
-    missing library is an empty list, not an error.
+    Returns {papers: [...], count, total, filtered, query, library_root}.
+    Reads the user's MASTER metadata files directly (``collect_rows`` -- "no
+    store involved"), scoped to the request's user (see ``_library_root_for``),
+    so a mounted hub never exposes one shared service-account library to every
+    user. An empty or missing library is an empty list, not an error.
+
+    ``filtered`` says whether a filter was APPLIED, and ``total`` how many
+    papers the library holds before it. The client needs both to tell "you have
+    no papers" from "your filter matched none" -- the two states carry
+    different copy and different actions, and without the flag the filtered
+    empty state is dead code no user can ever reach.
     """
     root = _library_root_for(request)
     from scitex_scholar.storage import _library_index as idx
 
+    query = (request.GET.get("q") or "").strip()
+
+    def _payload(papers: list, total: int) -> dict:
+        return {
+            "papers": papers,
+            "count": len(papers),
+            "total": total,
+            "filtered": bool(query),
+            "query": query,
+            "library_root": str(root),
+        }
+
     try:
         rows = idx.collect_rows(root)
     except FileNotFoundError:
-        return JsonResponse({"papers": [], "count": 0, "library_root": str(root)})
+        return JsonResponse(_payload([], 0))
     except ValueError as e:
         # Duplicate DOIs across MASTER entries == library corruption; surface it
         # rather than silently listing an inconsistent view.
@@ -799,7 +865,34 @@ def library_list(request):
         }
         for r in rows
     ]
-    return JsonResponse({"papers": papers, "count": len(papers), "library_root": str(root)})
+    if query:
+        papers = [p for p in papers if _paper_matches(p, query)]
+    return JsonResponse(_payload(papers, len(rows)))
+
+
+def _paper_matches(paper: dict, query: str) -> bool:
+    """Case-insensitive substring match over the fields the UI shows.
+
+    Authors arrive as names or objects depending on the MASTER record, so both
+    shapes are flattened here rather than guessed at in the client.
+    """
+    authors = [
+        a if isinstance(a, str) else (a or {}).get("name", "")
+        for a in (paper.get("authors") or [])
+    ]
+    haystack = " ".join(
+        str(part)
+        for part in (
+            paper.get("title"),
+            paper.get("doi"),
+            paper.get("venue"),
+            paper.get("year"),
+            paper.get("paper_id"),
+            *authors,
+        )
+        if part is not None
+    )
+    return query.casefold() in haystack.casefold()
 
 
 @require_POST

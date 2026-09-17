@@ -284,6 +284,23 @@ API infrastructure.
                                     <button type="button" id="libraryImportBtn" class="btn-control-library">{% trans "Import BibTeX" %}</button>
                                 </div>
                                 <div id="libraryIoStatus" class="library-io__status"></div>
+                                <!-- Filter: the Library list's empty state has a
+                                     FILTERED variant ("no papers match"), which
+                                     is unreachable without a real filter control
+                                     (review blocker 2). Filtering happens in
+                                     /api/library?q= (server-side, over the same
+                                     MASTER metadata the list shows). -->
+                                <div class="library-filter">
+                                    <label class="form-label" for="libraryFilter">{% trans "Filter your library" %}</label>
+                                    <input type="search"
+                                           id="libraryFilter"
+                                           class="form-input library-filter__input"
+                                           placeholder="{% trans "Title, author, or DOI" %}"
+                                           autocomplete="off">
+                                    <button type="button"
+                                            id="libraryFilterClear"
+                                            class="btn-control-library hidden">{% trans "Clear filters" %}</button>
+                                </div>
                                 <!-- CSRF: emitted by the standard {% csrf_token %}
                                      tag. Inert standalone (no CsrfViewMiddleware,
                                      value empty); when the mounted hub enables

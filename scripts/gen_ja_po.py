@@ -104,9 +104,19 @@ JA = {
     "RIS (.ris)": "RIS (.ris)",
     "EndNote (.enw)": "EndNote (.enw)",
     "Import BibTeX": "BibTeX をインポート",
+    "Filter your library": "ライブラリを絞り込む",
+    "Title, author, or DOI": "タイトル、著者、DOI",
+    "Clear filters": "絞り込みを解除",
     "Loading your library...": "ライブラリを読み込み中…",
     # --- Graph tab ---
     "Build Citation Network": "引用ネットワークを構築",
+    # Graph seed/limit copy added with the graph demotion; these were missing
+    # from the catalog, so the JA page rendered them in English.
+    "Start with a DOI. Find one by title, topic, or keywords in Search or your Library, then build an interactive citation graph of related papers.":
+        "DOI から始めます。タイトル・トピック・キーワードで検索タブまたはライブラリから DOI を探し、関連論文の対話的な引用グラフを構築してください。",
+    "Paste the DOI for one seed paper; titles and keywords belong in Search.":
+        "起点となる論文の DOI を貼り付けてください。タイトルやキーワードでの検索は検索タブで行います。",
+    "Max papers in graph": "グラフ内の最大論文数",
     "Enter a DOI to build an interactive citation network. The graph shows related papers based on bibliographic coupling, co-citation, and direct citations.":
         "DOI を入力すると対話的な引用ネットワークを構築します。グラフは書誌的結合、共被引用、直接引用に基づいた関連論文を表示します。",
     "DOI": "DOI",
@@ -135,8 +145,13 @@ JA = {
     "Enriching…": "補完中…",
     "Enrichment failed": "補完に失敗",
     "Enrichment failed (HTTP %(status)s)": "補完に失敗（HTTP %(status)s）",
-    "Your library is empty. Save papers from Search or Import, then Enrich them here.":
-        "ライブラリは空です。検索から論文を保存するかインポートし、ここで補完してください。",
+    "Your library is empty. Import a BibTeX file to add papers.":
+        "ライブラリは空です。BibTeX ファイルをインポートして論文を追加してください。",
+    "No papers match the current filters.": "現在の絞り込み条件に一致する論文はありません。",
+    "%(count)s of %(total)s Papers": "%(total)s 件中 %(count)s 件の論文",
+    "No papers matched this query.": "このクエリに一致する論文はありませんでした。",
+    "Local corpus (NAS)": "ローカルコーパス（NAS）",
+    "Online fallback": "オンラインへのフォールバック",
     "Imported %(n)s paper from %(file)s": "%(file)s から %(n)s 件の論文をインポートしました",
     "Imported %(n)s papers from %(file)s": "%(file)s から %(n)s 件の論文をインポートしました",
 }
