@@ -4,10 +4,17 @@
 
 Delegates to `scitex_app.embed.run_standalone`, which pre-wires
 scitex-ui static assets + the workspace shell so the same local server
-looks like scitex.ai/apps/scholar. scitex-app is a HARD dependency of the
-server extra: there is no bare-Django fallback any more (retired 2026-09-03,
-see the Removed entry in CHANGELOG), because a fallback that silently drops
-the shell AND the ALLOWED_HOSTS derivation is a second, quieter way to break.
+looks like scitex.ai/apps/scholar. There is no bare-Django fallback
+(retired 2026-09-03, see the Removed entry in CHANGELOG), because a
+fallback that silently drops the shell AND the ALLOWED_HOSTS derivation
+is a second, quieter way to break.
+
+scitex-app is an OPTIONAL dependency of the DISTRIBUTION (`[server]`), not
+of this MODULE. `_cli/gui.py` imports `DEFAULT_PORT` from here at module
+top, so this file sits on the console-script launch path and must import
+with or without the GUI stack installed. The capability is still not
+optional at RUN time: `run()` refuses with the extra's name rather than
+falling back to a half-wired server (see the guards below).
 
 Cloud deployments do NOT use this -- they mount `scitex_scholar._django.urls`
 into their own Django project.
@@ -31,14 +38,29 @@ console = slogging.getConsole(__name__)
 # on 31297", which is a coincidence maintained by hand, not a constant).
 DEFAULT_PORT = 31297
 
+# The ONE install line every [server]-capability refusal names, so the CLI
+# notice and the in-module refusals cannot drift apart.
+SERVER_EXTRA_HINT = "pip install 'scitex-scholar[server]'"
+
 # `hosts_to_allow` lived here first (#137) and was copied verbatim into
 # scitex-app, which made it the fleet's single implementation and gave it a
 # PUBLIC name in 0.11.0. The copy is gone; the import is the whole point.
-# Hard import on purpose: the server extra requires scitex-app, and settings.py
-# already hard-imports scitex_ui by the same reasoning -- fail where the cause
-# is legible, not three layers later as a 400 nobody can explain.
-from scitex_app import hosts_to_allow
-from scitex_app.embed import run_standalone
+#
+# GUARDED (2026-09-20). It used to be a hard import, on the reasoning that
+# the server extra requires scitex-app so a missing one is a broken install
+# -- true of `gui serve`, false of THIS MODULE, which the console script
+# imports at launch (`_cli/gui.py` -> `DEFAULT_PORT`). An unguarded import
+# here made `scitex-scholar --version` fail on a bare install.
+#
+# The guard is LOUD, not a fallback: the sentinels stay None and every RUN
+# path that needs them refuses by name. Nothing is silently substituted --
+# which is the failure mode the retired try/except base-class swap had.
+try:
+    from scitex_app import hosts_to_allow
+    from scitex_app.embed import run_standalone
+except ImportError:  # scitex-app absent -- the [server] capability only
+    hosts_to_allow = None  # type: ignore[assignment]
+    run_standalone = None  # type: ignore[assignment]
 
 
 def run(
@@ -57,6 +79,16 @@ def run(
     The requested port is bound as given: when it is already in use the
     server fails instead of drifting to the next free port.
     """
+    # Refuse BEFORE touching the environment or printing a URL. The CLI
+    # (`_cli/gui.py::_embed`) normally gates this first; this is the second
+    # gate, so an in-process `_server.run(...)` caller gets the same
+    # actionable sentence instead of an AttributeError on a None sentinel.
+    if run_standalone is None or hosts_to_allow is None:
+        raise ImportError(
+            "The Scholar GUI server needs scitex-app, which is not installed. "
+            f"Install the server extra: {SERVER_EXTRA_HINT}"
+        )
+
     if api_url:
         # Write the canonical name; resolve_env reads this one first.
         os.environ["SCITEX_SCHOLAR_CROSSREF_API_URL"] = api_url
@@ -83,11 +115,16 @@ def run(
     console.info(f"SciTeX Scholar GUI: http://{host}:{port}")
     console.info("Press Ctrl+C to stop")
 
-    import django
+    try:
+        import django
+        from django.core.management import call_command
+    except ImportError as exc:  # the [server] stack, second member
+        raise ImportError(
+            "The Scholar GUI server needs Django, which is not installed. "
+            f"Install the server extra: {SERVER_EXTRA_HINT}"
+        ) from exc
 
     django.setup()
-
-    from django.core.management import call_command
 
     call_command("migrate", "--run-syncdb", verbosity=0)
 

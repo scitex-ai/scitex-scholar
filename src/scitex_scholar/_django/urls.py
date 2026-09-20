@@ -1,8 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""URL patterns for the scitex-scholar Django app."""
+"""URL patterns for the scitex-scholar Django app.
 
-from django.urls import path
+Django is a `[server]`-extra member, so it is not optional AT RUN TIME --
+this module IS a urlconf and has no meaning without the framework. It IS
+optional for the DISTRIBUTION, so the import is GUARDED and the guard
+FAILS LOUDLY rather than substituting anything (see apps.py for why a
+silent guard is unacceptable here).
+"""
+
+try:
+    from django.urls import path
+except ImportError as exc:  # django absent -- the [server] capability only
+    raise ImportError(
+        "scitex_scholar._django.urls needs Django, which is not installed. "
+        "Install the server extra: pip install 'scitex-scholar[server]'"
+    ) from exc
 
 from . import views
 

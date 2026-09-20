@@ -256,7 +256,19 @@ def collect_recent_screenshots(
         List of screenshot paths (most recent first)
     """
     if screenshot_dir is None:
-        from scitex_config import get_paths
+        # GUARDED, not declared (PS-233). scitex-config is present
+        # transitively in every real install (scitex-dev requires it), but it
+        # is not a core dependency of THIS distribution, so the import is
+        # wrapped. The guard is LOUD: a caller who somehow lacks it gets the
+        # package name to install plus the one-call way to avoid it.
+        try:
+            from scitex_config import get_paths
+        except ImportError as exc:
+            raise ImportError(
+                "collect_recent_screenshots needs scitex-config to resolve the "
+                "default browser-screenshot directory. Install it with: "
+                "pip install scitex-config (or pass screenshot_dir=…)."
+            ) from exc
 
         screenshot_dir = get_paths().resolve("browser_screenshots")
 

@@ -26,20 +26,47 @@ from pathlib import Path
 from typing import Dict, Optional
 
 import scitex_logging as slogging
-from django.apps import apps as _django_apps
-from django.conf import settings as django_settings
-from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpResponse, JsonResponse
-from django.template.loader import render_to_string
-from django.utils.translation import gettext as _i18n  # noqa: N816  (JS string dict)
-from django.views.decorators.http import require_GET, require_POST
-from scitex_app.embed import mount_prefix
-from scitex_ui.project_scope import (
-    LocalProjectProvider,
-    host_project_provider,
-    project_listing_view,
-    resolve_project,
-)
+
+# The whole `[server]` stack is OPTIONAL for the DISTRIBUTION (a bare
+# `pip install scitex-scholar` must not pull Django) and REQUIRED for THIS
+# module -- a Django view set has no meaning without the framework. Each
+# import is therefore GUARDED (2026-09-20) and each guard FAILS LOUDLY with
+# the extra to install; none of them silently degrades to a missing name.
+# See apps.py for why a silent guard is unacceptable on this surface.
+try:
+    from django.apps import apps as _django_apps
+    from django.conf import settings as django_settings
+    from django.core.exceptions import ImproperlyConfigured
+    from django.http import HttpResponse, JsonResponse
+    from django.template.loader import render_to_string
+    from django.utils.translation import gettext as _i18n  # noqa: N816  (JS string dict)
+    from django.views.decorators.http import require_GET, require_POST
+except ImportError as exc:  # django absent -- the [server] capability only
+    raise ImportError(
+        "scitex_scholar._django.views needs Django, which is not installed. "
+        "Install the server extra: pip install 'scitex-scholar[server]'"
+    ) from exc
+
+try:
+    from scitex_app.embed import mount_prefix
+except ImportError as exc:  # scitex-app absent -- the [server] capability only
+    raise ImportError(
+        "scitex_scholar._django.views needs scitex-app, which is not "
+        "installed. Install the server extra: pip install 'scitex-scholar[server]'"
+    ) from exc
+
+try:
+    from scitex_ui.project_scope import (
+        LocalProjectProvider,
+        host_project_provider,
+        project_listing_view,
+        resolve_project,
+    )
+except ImportError as exc:  # scitex-ui absent -- the [server] capability only
+    raise ImportError(
+        "scitex_scholar._django.views needs scitex-ui, which is not "
+        "installed. Install the server extra: pip install 'scitex-scholar[server]'"
+    ) from exc
 
 # The dotted INSTALLED_APPS entry a host must carry for these views to
 # work. Kept as ONE string so the refusal below and the docs name the
@@ -253,7 +280,14 @@ def _app_label(base: str) -> str:
     ``<title>`` was dropped in favour of the shell, and what
     ``test_index_body_contains_title`` caught.
     """
-    from django.conf import settings
+    try:
+        from django.conf import settings
+    except ImportError as exc:  # django absent -- the [server] capability only
+        raise ImportError(
+            "scitex_scholar._django.views needs Django, which is not "
+            "installed. Install the server extra: "
+            "pip install 'scitex-scholar[server]'"
+        ) from exc
 
     mode = getattr(settings, "SCITEX_APP_MODE", "standalone")
     return f"{base} (hub)" if mode == "hub" else base

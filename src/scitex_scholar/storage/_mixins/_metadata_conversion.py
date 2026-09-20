@@ -20,7 +20,14 @@ class MetadataConversionMixin:
 
     def _dotdict_to_dict(self, obj):
         """Recursively convert DotDict to plain dict for JSON serialization."""
-        from scitex_dict import DotDict
+        # GUARDED, not declared (PS-233): see storage/ScholarLibrary.py.
+        try:
+            from scitex_dict import DotDict
+        except ImportError as exc:
+            raise ImportError(
+                "MetadataConversionMixin needs scitex-dict (DotDict), which is "
+                "not installed. Install it with: pip install scitex-dict"
+            ) from exc
 
         if isinstance(obj, DotDict):
             return {k: self._dotdict_to_dict(v) for k, v in obj._data.items()}

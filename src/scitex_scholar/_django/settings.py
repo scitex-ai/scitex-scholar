@@ -83,12 +83,22 @@ INSTALLED_APPS = [
 
 # scitex-ui supplies the shared SciTeX branding partial that
 # `scholar.html` includes in its <head>. It is a REQUIRED member of the
-# `server` extra (alongside django itself), so this import is hard on
-# purpose: a `try/except ImportError` here would swallow a broken install
-# and resurface it later as a TemplateDoesNotExist pointing at scitex-ui's
-# template -- sending the reader to the wrong package. Fail at import time,
-# where the cause is legible.
-import scitex_ui  # noqa: F401
+# `server` extra (alongside django itself), so it is not optional AT RUN
+# TIME -- but it IS optional for the DISTRIBUTION, so the import is GUARDED
+# (2026-09-20) and the guard FAILS LOUDLY.
+#
+# A silent guard would be the worst option here: it would swallow a broken
+# install and resurface it later as a TemplateDoesNotExist pointing at
+# scitex-ui's template -- sending the reader to the wrong package. The
+# `except` below re-raises with the extra's name, so the failure stays at
+# import time, where the cause is legible.
+try:
+    import scitex_ui  # noqa: F401
+except ImportError as exc:  # scitex-ui absent -- the [server] capability only
+    raise ImportError(
+        "scitex_scholar._django.settings needs scitex-ui, which is not "
+        "installed. Install the server extra: pip install 'scitex-scholar[server]'"
+    ) from exc
 
 INSTALLED_APPS.append("scitex_ui")
 
