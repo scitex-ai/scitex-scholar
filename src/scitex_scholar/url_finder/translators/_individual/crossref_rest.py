@@ -22,6 +22,10 @@ import re
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 from urllib.parse import quote
 
+import scitex_logging as slogging
+
+logger = slogging.getLogger(__name__)
+
 if TYPE_CHECKING:
     from playwright.async_api import Page
 
@@ -576,44 +580,44 @@ if __name__ == "__main__":
 
     async def main():
         """Demonstration of CrossrefRESTTranslator usage."""
-        print("=" * 70)
-        print("Testing CrossrefRESTTranslator")
-        print("=" * 70)
+        logger.info("=" * 70)
+        logger.info("Testing CrossrefRESTTranslator")
+        logger.info("=" * 70)
 
         # Test DOI search
         test_doi = "10.1038/s41467-020-15908-3"
-        print(f"\nSearching by DOI: {test_doi}")
+        logger.info(f"\nSearching by DOI: {test_doi}")
 
         items = await CrossrefRESTTranslator.search_by_doi(test_doi)
 
         if items:
             item = items[0]
-            print("\nResults:")
-            print(f"  Type: {item.get('itemType')}")
-            print(f"  Title: {item.get('title')}")
-            print(f"  DOI: {item.get('DOI')}")
-            print(f"  Journal: {item.get('publicationTitle')}")
-            print(f"  Date: {item.get('date')}")
-            print(f"  Authors: {len(item.get('creators', []))}")
+            logger.info("\nResults:")
+            logger.info(f"  Type: {item.get('itemType')}")
+            logger.info(f"  Title: {item.get('title')}")
+            logger.info(f"  DOI: {item.get('DOI')}")
+            logger.info(f"  Journal: {item.get('publicationTitle')}")
+            logger.info(f"  Date: {item.get('date')}")
+            logger.info(f"  Authors: {len(item.get('creators', []))}")
             if item.get("creators"):
-                print(f"    First: {item['creators'][0]}")
+                logger.info(f"    First: {item['creators'][0]}")
         else:
-            print("No results found")
+            logger.info("No results found")
 
         # Test query search
-        print(f"\n{'=' * 70}")
+        logger.info(f"\n{'=' * 70}")
         test_query = "machine learning neural networks"
-        print(f"Searching by query: {test_query}")
+        logger.info(f"Searching by query: {test_query}")
 
         items = await CrossrefRESTTranslator.search_by_query(test_query)
-        print(f"\nFound {len(items)} results")
+        logger.info(f"\nFound {len(items)} results")
 
         if items:
-            print("\nFirst result:")
+            logger.info("\nFirst result:")
             item = items[0]
-            print(f"  Type: {item.get('itemType')}")
-            print(f"  Title: {item.get('title')}")
-            print(f"  DOI: {item.get('DOI')}")
+            logger.info(f"  Type: {item.get('itemType')}")
+            logger.info(f"  Title: {item.get('title')}")
+            logger.info(f"  DOI: {item.get('DOI')}")
 
     asyncio.run(main())
 

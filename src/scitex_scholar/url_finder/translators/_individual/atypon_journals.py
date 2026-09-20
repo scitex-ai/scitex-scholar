@@ -50,9 +50,12 @@ Atypon is a major publishing platform serving 100+ publishers including:
 import re
 from typing import List, Optional
 
+import scitex_logging as slogging
 from playwright.async_api import Page
 
 from .._core.base import BaseTranslator
+
+logger = slogging.getLogger(__name__)
 
 
 class AtyponJournalsTranslator(BaseTranslator):
@@ -217,13 +220,13 @@ if __name__ == "__main__":
         ]
 
         for test_url in test_urls:
-            print(f"\nTesting AtyponJournalsTranslator with URL: {test_url}")
-            print(
+            logger.info(f"\nTesting AtyponJournalsTranslator with URL: {test_url}")
+            logger.info(
                 f"URL matches pattern: {AtyponJournalsTranslator.matches_url(test_url)}"
             )
 
             if not AtyponJournalsTranslator.matches_url(test_url):
-                print("  URL doesn't match Atypon pattern, skipping...")
+                logger.info("  URL doesn't match Atypon pattern, skipping...")
                 continue
 
             async with async_playwright() as p:
@@ -232,24 +235,24 @@ if __name__ == "__main__":
                 page = await context.new_page()
 
                 try:
-                    print("  Navigating to Atypon page...")
+                    logger.info("  Navigating to Atypon page...")
                     await page.goto(test_url, timeout=30000)
                     await page.wait_for_load_state("domcontentloaded")
 
-                    print("  Extracting PDF URLs...")
+                    logger.info("  Extracting PDF URLs...")
                     pdf_urls = await AtyponJournalsTranslator.extract_pdf_urls_async(
                         page
                     )
 
-                    print(f"  Found {len(pdf_urls)} PDF URL(s)")
+                    logger.info(f"  Found {len(pdf_urls)} PDF URL(s)")
                     for url in pdf_urls:
-                        print(f"    - {url}")
+                        logger.info(f"    - {url}")
 
                 except Exception as e:
                     from scitex_browser.debugging import capture_debug_artifacts_async
 
                     await capture_debug_artifacts_async(page, label="demo_atypon_error")
-                    print(f"  Error: {e}")
+                    logger.info(f"  Error: {e}")
                 finally:
                     await browser.close()
 

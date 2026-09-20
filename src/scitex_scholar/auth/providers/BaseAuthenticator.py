@@ -147,28 +147,28 @@ if __name__ == "__main__":
         try:
             # Check if already authenticate_async
             is_auth = await auth.is_authenticate_async()
-            print(f"Initially authenticate_async: {is_auth}")
+            logger.info(f"Initially authenticate_async: {is_auth}")
 
             if not is_auth:
                 # Perform authentication
-                print("Authenticating...")
+                logger.info("Authenticating...")
                 success = await auth.authenticate_async()
-                print(f"Authentication successful: {success}")
+                logger.info(f"Authentication successful: {success}")
 
             # Get authentication headers/cookies for requests
             headers = await auth.get_auth_headers_async()
             cookies = await auth.get_auth_cookies_async()
-            print(f"Auth headers: {list(headers.keys())}")
-            print(f"Auth cookies: {list(cookies.keys())}")
+            logger.info(f"Auth headers: {list(headers.keys())}")
+            logger.info(f"Auth cookies: {list(cookies.keys())}")
 
             # Get session info
             session_info = await auth.get_session_info_async()
-            print(f"Session info: {session_info}")
+            logger.info(f"Session info: {session_info}")
 
         finally:
             # Always cleanup
             await auth.logout_async()
-            print("Logged out successfully")
+            logger.info("Logged out successfully")
 
     # Run the example
     asyncio.run(main())

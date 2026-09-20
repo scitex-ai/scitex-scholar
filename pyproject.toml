@@ -79,6 +79,36 @@ dependencies = [
     "scitex-dev>=0.30.0",
     "tenacity>=8.0.0",
     "tqdm>=4.64.0",
+    # ------------------------------------------------------------------
+    # PS-233 (runtime-import-dependency-undeclared) — these are imported
+    # UNGUARDED by shipped source, so a minimal install must resolve them.
+    #
+    # numpy: the shipped demo scripts under src/scitex_scholar/examples/
+    # import it at module top; pandas already forces numpy at runtime, so
+    # this only makes the implicit explicit.
+    "numpy>=1.21.0",
+    # The GUI/server stack. `_cli/gui.py` (the CLI entry that owns the
+    # `gui` group) imports `_django._server` at module top, and
+    # `_django/apps.py` + `_django/settings.py` document why their
+    # django/scitex_ui imports are hard ON PURPOSE: a guard there would
+    # substitute a different AppConfig base class or swallow a broken
+    # install and resurface it as a template error pointing at the wrong
+    # package. Unguarded import + core surface ⇒ hard dependency
+    # (same shape as scitex-cards / scitex-writer).
+    "django>=4.2",
+    "scitex-app>=0.11.0",
+    "scitex-ui>=0.22.0",
+    # fastmcp: `_mcp_server.py` is the MCP-server entry point (scitex-dev
+    # audit-mcp-tools discovers `scitex_scholar._mcp_server.mcp`); an MCP
+    # server that cannot import fastmcp is broken (PS-149 _NEVER_FLAG).
+    "fastmcp>=2.0.0",
+    # scitex-config: `jobs/_errors.py` resolves the browser-screenshot
+    # directory through it. Base peer package — core in scitex-dev,
+    # scitex-app, scitex-stats and figrecipe.
+    "scitex-config>=0.3.0",
+    # scitex-dict: `DotDict` is the storage layer's metadata carrier
+    # (storage/_mixins/*, storage/_bibtex/*, storage/ScholarLibrary.py).
+    "scitex-dict>=0.1.8",
 ]
 
 [project.optional-dependencies]

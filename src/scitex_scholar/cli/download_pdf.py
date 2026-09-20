@@ -25,6 +25,8 @@ import sys
 
 import scitex_logging as logging
 
+console = logging.getConsole(__name__)
+
 from scitex_scholar.core import Paper
 from scitex_scholar.pdf_download.ScholarPDFDownloader import ScholarPDFDownloader
 
@@ -106,13 +108,13 @@ def main():
 
         bibtex_path = Path(args.file)
         if not bibtex_path.exists():
-            print(f"Error: BibTeX file not found: {bibtex_path}")
+            console.error(f"Error: BibTeX file not found: {bibtex_path}")
             return 1
 
-        print("\n🎯 SciTeX Scholar - PDF Downloader")
-        print(f"📄 Processing: {bibtex_path}")
-        print(f"🏢 Project: {args.project}")
-        print("🔐 Using institutional authentication")
+        console.info("\n🎯 SciTeX Scholar - PDF Downloader")
+        console.info(f"📄 Processing: {bibtex_path}")
+        console.info(f"🏢 Project: {args.project}")
+        console.info("🔐 Using institutional authentication")
 
         try:
             # Use Scholar interface
@@ -122,21 +124,21 @@ def main():
             output_dir = Path(f"/tmp/scholar_downloads/{args.project}/")
             output_dir.mkdir(parents=True, exist_ok=True)
 
-            print("\n⬇️  Starting downloads...")
-            print(f"📁 Output directory: {output_dir}")
+            console.info("\n⬇️  Starting downloads...")
+            console.info(f"📁 Output directory: {output_dir}")
 
             # Download PDFs using Scholar interface - it handles loading and DOI extraction
             results = scholar.download_pdfs_from_bibtex(bibtex_path, output_dir)
 
-            print(f"\n✅ Downloaded: {results['downloaded']} PDFs")
-            print(f"❌ Failed: {results['failed']}")
+            console.success(f"\n✅ Downloaded: {results['downloaded']} PDFs")
+            console.error(f"❌ Failed: {results['failed']}")
             if results.get("errors"):
-                print(f"⚠️  Errors: {results['errors']}")
+                console.warning(f"⚠️  Errors: {results['errors']}")
 
             return 0
 
         except Exception as e:
-            print(f"❌ Error: {e}")
+            console.error(f"❌ Error: {e}")
             import traceback
 
             traceback.print_exc()
@@ -160,11 +162,11 @@ def main():
             if args.url:
                 paper.metadata.url.publisher = args.url
 
-            print("\n🎯 SciTeX Scholar - Paywalled PDF Downloader")
-            print(f"📄 Paper: {paper.metadata.basic.title}")
-            print(f"🔗 {'DOI' if args.doi else 'URL'}: {args.doi or args.url}")
-            print(f"🏢 Project: {args.project}")
-            print("🔐 Using institutional authentication")
+            console.info("\n🎯 SciTeX Scholar - Paywalled PDF Downloader")
+            console.info(f"📄 Paper: {paper.metadata.basic.title}")
+            console.info(f"🔗 {'DOI' if args.doi else 'URL'}: {args.doi or args.url}")
+            console.info(f"🏢 Project: {args.project}")
+            console.info("🔐 Using institutional authentication")
 
             try:
                 # Set up browser with authentication
@@ -197,15 +199,15 @@ def main():
                     success = bool(pdf_path)
 
                 if success and pdf_path:
-                    print(f"\n✅ Downloaded successfully: {pdf_path}")
+                    console.success(f"\n✅ Downloaded successfully: {pdf_path}")
                 else:
-                    print("\n❌ Download failed")
+                    console.error("\n❌ Download failed")
 
                 await browser.close()
                 return 0 if success else 1
 
             except Exception as e:
-                print(f"❌ Error: {e}")
+                console.error(f"❌ Error: {e}")
                 import traceback
 
                 traceback.print_exc()
@@ -214,17 +216,17 @@ def main():
         return asyncio.run(download_paper_async(args))
 
     elif args.command == "info":
-        print("\n🎯 SciTeX Scholar - Paywalled PDF Downloader")
-        print("=" * 50)
-        print("Strategy: Institutional Authentication + Stealth Browser")
-        print("Focus: Paywalled academic content")
-        print("Authentication: OpenAthens/University credentials")
-        print("Extensions: Accept Cookies, Zotero Connector")
-        print("Zotero Translators: Enabled")
-        print("=" * 50)
-        print("\n💡 This tool specializes in accessing paywalled academic content")
-        print("   that requires institutional authentication.")
-        print("\n🏆 Competitive Advantage: Access content others can't reach!")
+        console.info("\n🎯 SciTeX Scholar - Paywalled PDF Downloader")
+        console.info("=" * 50)
+        console.info("Strategy: Institutional Authentication + Stealth Browser")
+        console.info("Focus: Paywalled academic content")
+        console.info("Authentication: OpenAthens/University credentials")
+        console.info("Extensions: Accept Cookies, Zotero Connector")
+        console.info("Zotero Translators: Enabled")
+        console.info("=" * 50)
+        console.info("\n💡 This tool specializes in accessing paywalled academic content")
+        console.info("   that requires institutional authentication.")
+        console.info("\n🏆 Competitive Advantage: Access content others can't reach!")
     else:
         parser.print_help()
         return 1

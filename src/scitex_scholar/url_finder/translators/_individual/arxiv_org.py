@@ -18,6 +18,10 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING, List
 
+import scitex_logging as slogging
+
+logger = slogging.getLogger(__name__)
+
 if TYPE_CHECKING:
     from playwright.async_api import Page
 
@@ -81,7 +85,7 @@ class ArXivOrgTranslator(BaseTranslator):
                 return pdf_urls
             else:
                 # Fallback: if regex fails, log error
-                print(f"arXiv translator: Could not extract arXiv ID from URL: {url}")
+                logger.warning(f"arXiv translator: Could not extract arXiv ID from URL: {url}")
                 return []
 
         # Handle search, find, list, and catchup pages - multiple items
@@ -119,7 +123,7 @@ class ArXivOrgTranslator(BaseTranslator):
 
         except Exception as e:
             # Log error but don't fail completely
-            print(f"Error extracting PDF URLs from arXiv: {e}")
+            logger.error(f"Error extracting PDF URLs from arXiv: {e}")
 
         return pdf_urls
 

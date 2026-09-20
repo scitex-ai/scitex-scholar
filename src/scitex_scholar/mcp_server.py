@@ -27,6 +27,10 @@ from __future__ import annotations
 
 import warnings
 
+import scitex_logging as slogging
+
+logger = slogging.getLogger(__name__)
+
 warnings.warn(
     "scitex_scholar.mcp_server is deprecated. Use 'scitex serve' or "
     "'from scitex.mcp_server import run_server' for the unified MCP server.",
@@ -399,15 +403,15 @@ def main():
     if not MCP_AVAILABLE:
         import sys
 
-        print("=" * 60)
-        print("MCP Server 'scitex-scholar' requires the 'mcp' package.")
-        print()
-        print("Install with:")
-        print("  pip install mcp")
-        print()
-        print("Or install scitex with MCP support:")
-        print("  pip install scitex[mcp]")
-        print("=" * 60)
+        logger.error("=" * 60)
+        logger.error("MCP Server 'scitex-scholar' requires the 'mcp' package.")
+        logger.error("")
+        logger.error("Install with:")
+        logger.error("  pip install mcp")
+        logger.error("")
+        logger.error("Or install scitex with MCP support:")
+        logger.error("  pip install scitex[mcp]")
+        logger.error("=" * 60)
         sys.exit(1)
 
     asyncio.run(_run_server())

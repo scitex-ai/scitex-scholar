@@ -12,10 +12,10 @@ Key features:
 - Test cases show "Full Text PDF" attachments
 """
 
-import logging
 import re
 from typing import List
 
+import scitex_logging as slogging
 from playwright.async_api import Error as PlaywrightError
 from playwright.async_api import Page
 
@@ -23,7 +23,7 @@ from playwright.async_api import Page
 __all__ = ["OpenEditionJournalsTranslator"]
 
 # Private module-level logger - not exported
-_logger = logging.getLogger(__name__)
+_logger = slogging.getLogger(__name__)
 
 
 class OpenEditionJournalsTranslator:
@@ -134,8 +134,8 @@ if __name__ == "__main__":
         ]
 
         for test_url in test_urls:
-            print(f"\nTesting OpenEditionJournalsTranslator with URL: {test_url}")
-            print(
+            _logger.info(f"\nTesting OpenEditionJournalsTranslator with URL: {test_url}")
+            _logger.info(
                 f"URL matches pattern: {OpenEditionJournalsTranslator.matches_url(test_url)}"
             )
 
@@ -144,19 +144,19 @@ if __name__ == "__main__":
                 context = await browser.new_context()
                 page = await context.new_page()
                 try:
-                    print("Navigating to OpenEdition Journals page...")
+                    _logger.info("Navigating to OpenEdition Journals page...")
                     await page.goto(test_url, timeout=60000)
                     await page.wait_for_load_state("domcontentloaded")
 
-                    print("Extracting PDF URLs...")
+                    _logger.info("Extracting PDF URLs...")
                     pdf_urls = await OpenEditionJournalsTranslator.extract_pdf_urls_async(
                         page
                     )
 
-                    print("\nResults:")
-                    print(f"  Found {len(pdf_urls)} PDF URL(s)")
+                    _logger.info("\nResults:")
+                    _logger.info(f"  Found {len(pdf_urls)} PDF URL(s)")
                     for url in pdf_urls:
-                        print(f"  - {url}")
+                        _logger.info(f"  - {url}")
                 except Exception:
                     from scitex_browser.debugging import capture_debug_artifacts_async
 

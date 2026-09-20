@@ -23,11 +23,12 @@ breaks with no warning ever having been issued.
 
 from __future__ import annotations
 
-import logging
 import os
 from typing import Sequence
 
-logger = logging.getLogger(__name__)
+import scitex_logging as slogging
+
+logger = slogging.getLogger(__name__)
 
 __all__ = ["resolve_env"]
 

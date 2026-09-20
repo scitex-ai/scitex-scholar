@@ -332,7 +332,7 @@ if __name__ == "__main__":
         url_finder = ScholarURLFinder(context)
         pdfs = await url_finder.find_pdf_urls(args.url)
 
-        print(f"\nFound {len(pdfs)} PDF URLs:")
+        logger.info(f"\nFound {len(pdfs)} PDF URLs:")
         pprint(pdfs)
 
         await browser_manager.close()

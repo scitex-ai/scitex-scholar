@@ -20,12 +20,12 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
-import logging
 import os
 import time
 from pathlib import Path
 from typing import Dict, Optional
 
+import scitex_logging as slogging
 from django.apps import apps as _django_apps
 from django.conf import settings as django_settings
 from django.core.exceptions import ImproperlyConfigured
@@ -99,7 +99,7 @@ _refuse_unless_app_installed()
 # THAT EMITS THE MARKER, pass that view's route here; the function
 # raises MountPrefixMismatch rather than guessing.
 
-logger = logging.getLogger(__name__)
+logger = slogging.getLogger(__name__)
 
 # Simple in-memory cache (framework-agnostic, ported verbatim)
 _cache: Dict[str, dict] = {}

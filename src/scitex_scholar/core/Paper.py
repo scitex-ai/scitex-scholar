@@ -6,6 +6,10 @@ from __future__ import annotations
 
 import os
 
+import scitex_logging as slogging
+
+logger = slogging.getLogger(__name__)
+
 __FILE__ = "./src/scitex/scholar/core/Paper.py"
 __DIR__ = os.path.dirname(__FILE__)
 # ----------------------------------------
@@ -588,17 +592,17 @@ class Paper(BaseModel):
 if __name__ == "__main__":
     import json
 
-    print("=" * 80)
-    print("Paper Class - Pydantic Type-Safe Metadata with Runtime Validation")
-    print("=" * 80)
+    logger.info("=" * 80)
+    logger.info("Paper Class - Pydantic Type-Safe Metadata with Runtime Validation")
+    logger.info("=" * 80)
 
     # 1. Create empty paper
-    print("\n1. Create empty Paper:")
+    logger.info("\n1. Create empty Paper:")
     paper = Paper()
-    print(f"   Empty paper created: {type(paper).__name__}")
+    logger.info(f"   Empty paper created: {type(paper).__name__}")
 
     # 2. Set basic metadata
-    print("\n2. Set basic metadata:")
+    logger.info("\n2. Set basic metadata:")
     paper.metadata.basic.title = "Attention Is All You Need"
     paper.metadata.basic.authors = [
         "Vaswani, Ashish",
@@ -612,78 +616,78 @@ if __name__ == "__main__":
         "attention",
         "neural networks",
     ]
-    print(f"   Title: {paper.metadata.basic.title}")
-    print(f"   Authors: {paper.metadata.basic.authors[:2]}...")
-    print(f"   Year: {paper.metadata.basic.year}")
+    logger.info(f"   Title: {paper.metadata.basic.title}")
+    logger.info(f"   Authors: {paper.metadata.basic.authors[:2]}...")
+    logger.info(f"   Year: {paper.metadata.basic.year}")
 
     # 3. Set DOI (auto-syncs URL)
-    print("\n3. Set DOI (auto-syncs DOI URL):")
+    logger.info("\n3. Set DOI (auto-syncs DOI URL):")
     paper.metadata.set_doi("10.48550/arXiv.1706.03762")
-    print(f"   DOI: {paper.metadata.id.doi}")
-    print(f"   DOI URL (auto-synced): {paper.metadata.url.doi}")
+    logger.info(f"   DOI: {paper.metadata.id.doi}")
+    logger.info(f"   DOI URL (auto-synced): {paper.metadata.url.doi}")
 
     # 4. Set publication details
-    print("\n4. Set publication details:")
+    logger.info("\n4. Set publication details:")
     paper.metadata.publication.journal = "NeurIPS"
     paper.metadata.publication.volume = "30"
     paper.metadata.publication.impact_factor = 12.345
-    print(f"   Journal: {paper.metadata.publication.journal}")
-    print(f"   Volume: {paper.metadata.publication.volume}")
-    print(f"   Impact Factor: {paper.metadata.publication.impact_factor}")
+    logger.info(f"   Journal: {paper.metadata.publication.journal}")
+    logger.info(f"   Volume: {paper.metadata.publication.volume}")
+    logger.info(f"   Impact Factor: {paper.metadata.publication.impact_factor}")
 
     # 5. Set citation counts with year breakdown
-    print("\n5. Set citation counts:")
+    logger.info("\n5. Set citation counts:")
     paper.metadata.citation_count.total = 85432
     paper.metadata.citation_count.y2024 = 15234
     paper.metadata.citation_count.y2023 = 18765
-    print(f"   Total citations: {paper.metadata.citation_count.total}")
-    print(f"   2024 citations: {paper.metadata.citation_count.y2024}")
-    print(f"   2023 citations: {paper.metadata.citation_count.y2023}")
+    logger.info(f"   Total citations: {paper.metadata.citation_count.total}")
+    logger.info(f"   2024 citations: {paper.metadata.citation_count.y2024}")
+    logger.info(f"   2023 citations: {paper.metadata.citation_count.y2023}")
 
     # 6. Set container metadata
-    print("\n6. Set container metadata:")
+    logger.info("\n6. Set container metadata:")
     paper.container.projects = ["transformers_research", "nlp_2024"]
     paper.container.library_id = "ABC12345"
     paper.container.readable_name = "Vaswani-2017-NeurIPS"
-    print(f"   Projects: {paper.container.projects}")
-    print(f"   Library ID: {paper.container.library_id}")
-    print(f"   Readable name: {paper.container.readable_name}")
+    logger.info(f"   Projects: {paper.container.projects}")
+    logger.info(f"   Library ID: {paper.container.library_id}")
+    logger.info(f"   Readable name: {paper.container.readable_name}")
 
     # 7. Demonstrate type validation
-    print("\n7. Type validation (validate_assignment=True):")
-    print("   ✓ Automatic type coercion: year='2017' -> 2017 (int)")
+    logger.info("\n7. Type validation (validate_assignment=True):")
+    logger.info("   ✓ Automatic type coercion: year='2017' -> 2017 (int)")
     paper.metadata.basic.year = "2017"  # String coerced to int
-    print(
+    logger.info(
         f"     Result: {paper.metadata.basic.year} (type: {type(paper.metadata.basic.year).__name__})"
     )
 
-    print("   ✓ Range validation: year must be 1900-2100")
+    logger.info("   ✓ Range validation: year must be 1900-2100")
     try:
         paper.metadata.basic.year = 1800  # Too old
-        print("     ERROR: Should have raised ValidationError")
+        logger.info("     ERROR: Should have raised ValidationError")
     except Exception as e:
-        print(f"     Correctly rejected: {type(e).__name__}")
+        logger.info(f"     Correctly rejected: {type(e).__name__}")
 
-    print("   ✓ Non-negative validation: citations cannot be negative")
+    logger.error("   ✓ Non-negative validation: citations cannot be negative")
     try:
         paper.metadata.citation_count.total = -100
-        print("     ERROR: Should have raised ValidationError")
+        logger.info("     ERROR: Should have raised ValidationError")
     except Exception as e:
-        print(f"     Correctly rejected: {type(e).__name__}")
+        logger.info(f"     Correctly rejected: {type(e).__name__}")
 
     # Reset to valid value
     paper.metadata.basic.year = 2017
     paper.metadata.citation_count.total = 85432
 
     # 8. Serialize to JSON (with aliases)
-    print("\n8. Serialize to JSON with field aliases:")
+    logger.info("\n8. Serialize to JSON with field aliases:")
     paper_dict = paper.to_dict()
-    print("   Year fields use numeric keys in JSON:")
-    print(f"     '2024': {paper_dict['metadata']['citation_count'].get('2024')}")
-    print(f"     '2023': {paper_dict['metadata']['citation_count'].get('2023')}")
+    logger.info("   Year fields use numeric keys in JSON:")
+    logger.info(f"     '2024': {paper_dict['metadata']['citation_count'].get('2024')}")
+    logger.info(f"     '2023': {paper_dict['metadata']['citation_count'].get('2023')}")
 
     # 9. Create from dictionary
-    print("\n9. Load from dictionary (from_dict):")
+    logger.info("\n9. Load from dictionary (from_dict):")
     sample_data = {
         "metadata": {
             "basic": {
@@ -699,19 +703,19 @@ if __name__ == "__main__":
     }
 
     paper2 = Paper.from_dict(sample_data)
-    print(f"   Title: {paper2.metadata.basic.title}")
-    print(f"   Year: {paper2.metadata.basic.year}")
-    print(f"   DOI: {paper2.metadata.id.doi}")
-    print(f"   DOI URL (auto-synced): {paper2.metadata.url.doi}")
-    print(f"   2024 citations: {paper2.metadata.citation_count.y2024}")
+    logger.info(f"   Title: {paper2.metadata.basic.title}")
+    logger.info(f"   Year: {paper2.metadata.basic.year}")
+    logger.info(f"   DOI: {paper2.metadata.id.doi}")
+    logger.info(f"   DOI URL (auto-synced): {paper2.metadata.url.doi}")
+    logger.info(f"   2024 citations: {paper2.metadata.citation_count.y2024}")
 
     # 10. Show JSON structure
-    print("\n10. Full JSON structure (first 500 chars):")
+    logger.info("\n10. Full JSON structure (first 500 chars):")
     json_str = json.dumps(paper.to_dict(), indent=2)
-    print(f"   {json_str[:500]}...")
+    logger.info(f"   {json_str[:500]}...")
 
-    print("\n" + "=" * 80)
-    print("✅ Paper class demonstration complete!")
-    print("=" * 80)
+    logger.info("\n" + "=" * 80)
+    logger.success("✅ Paper class demonstration complete!")
+    logger.info("=" * 80)
 
 # EOF

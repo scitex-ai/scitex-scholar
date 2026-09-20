@@ -22,6 +22,10 @@ from __future__ import annotations
 import os
 from typing import Optional
 
+import scitex_logging as slogging
+
+console = slogging.getConsole(__name__)
+
 # The single source of truth for scholar's GUI port; `_cli/gui.py` imports
 # it from here rather than restating the literal (they used to "just agree
 # on 31297", which is a coincidence maintained by hand, not a constant).
@@ -35,6 +39,7 @@ DEFAULT_PORT = 31297
 # is legible, not three layers later as a 400 nobody can explain.
 from scitex_app import hosts_to_allow
 from scitex_app.embed import run_standalone
+
 
 def run(
     port: int = DEFAULT_PORT,
@@ -75,8 +80,8 @@ def run(
 
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "scitex_scholar._django.settings")
 
-    print(f"SciTeX Scholar GUI: http://{host}:{port}")
-    print("Press Ctrl+C to stop")
+    console.info(f"SciTeX Scholar GUI: http://{host}:{port}")
+    console.info("Press Ctrl+C to stop")
 
     import django
 

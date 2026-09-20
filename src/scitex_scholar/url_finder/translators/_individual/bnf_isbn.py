@@ -19,6 +19,10 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING, List, Optional
 
+import scitex_logging as slogging
+
+logger = slogging.getLogger(__name__)
+
 if TYPE_CHECKING:
     from playwright.async_api import Page
 
@@ -107,16 +111,16 @@ if __name__ == "__main__":
     # Example ISBN
     test_isbn = "9781841692203"
 
-    print(f"Testing BnFISBNTranslator with ISBN: {test_isbn}")
-    print(f"Can search: {BnFISBNTranslator.detect_search(test_isbn)}\n")
+    logger.info(f"Testing BnFISBNTranslator with ISBN: {test_isbn}")
+    logger.info(f"Can search: {BnFISBNTranslator.detect_search(test_isbn)}\n")
 
     # Generate search URL
     search_url = BnFISBNTranslator.search_by_isbn(test_isbn)
-    print("BnF SRU API URL:")
-    print(f"  {search_url}\n")
+    logger.info("BnF SRU API URL:")
+    logger.info(f"  {search_url}\n")
 
-    print("Note: This is a search translator.")
-    print("To retrieve actual metadata, query the API URL and parse MARCXML response.")
+    logger.info("Note: This is a search translator.")
+    logger.info("To retrieve actual metadata, query the API URL and parse MARCXML response.")
 
 
 # EOF

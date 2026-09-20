@@ -702,17 +702,17 @@ if __name__ == "__main__":
     # Example usage
     from pathlib import Path
 
-    print("LibraryCacheManager Test:")
+    logger.info("LibraryCacheManager Test:")
 
     # This would require a real config in practice
     # manager = LibraryCacheManager(config, "test_project")
 
-    print("Note: Full testing requires ScholarConfig instance")
-    print("Core functionality:")
-    print("- is_doi_stored(): Search for existing DOIs")
-    print("- save_to_scholar_library(): Cache resolved DOIs")
-    print("- save_unresolved_entry(): Track failed resolutions")
-    print("- get_unresolved_entries(): List papers needing resolution")
-    print("- get_cache_statistics(): Get cache metrics")
+    logger.info("Note: Full testing requires ScholarConfig instance")
+    logger.info("Core functionality:")
+    logger.info("- is_doi_stored(): Search for existing DOIs")
+    logger.info("- save_to_scholar_library(): Cache resolved DOIs")
+    logger.error("- save_unresolved_entry(): Track failed resolutions")
+    logger.info("- get_unresolved_entries(): List papers needing resolution")
+    logger.info("- get_cache_statistics(): Get cache metrics")
 
 # EOF
