@@ -15,7 +15,10 @@ Key features:
 import re
 from typing import List
 
+import scitex_logging as slogging
 from playwright.async_api import Page
+
+logger = slogging.getLogger(__name__)
 
 
 class ScinapseTranslator:
@@ -86,25 +89,25 @@ if __name__ == "__main__":
         """Demonstration of ScinapseTranslator usage."""
         test_url = "https://www.scinapse.io/papers/2981511200"
 
-        print(f"Testing ScinapseTranslator with URL: {test_url}")
-        print(f"URL matches pattern: {ScinapseTranslator.matches_url(test_url)}\n")
+        logger.info(f"Testing ScinapseTranslator with URL: {test_url}")
+        logger.info(f"URL matches pattern: {ScinapseTranslator.matches_url(test_url)}\n")
 
         async with async_playwright() as p:
             browser = await p.chromium.launch(headless=True)
             context = await browser.new_context()
             page = await context.new_page()
             try:
-                print("Navigating to Scinapse page...")
+                logger.info("Navigating to Scinapse page...")
                 await page.goto(test_url, timeout=60000)
                 await page.wait_for_load_state("domcontentloaded")
 
-                print("Extracting PDF URLs...")
+                logger.info("Extracting PDF URLs...")
                 pdf_urls = await ScinapseTranslator.extract_pdf_urls_async(page)
 
-                print("\nResults:")
-                print(f"  Found {len(pdf_urls)} PDF URL(s)")
+                logger.info("\nResults:")
+                logger.info(f"  Found {len(pdf_urls)} PDF URL(s)")
                 for url in pdf_urls:
-                    print(f"  - {url}")
+                    logger.info(f"  - {url}")
             except Exception:
                 from scitex_browser.debugging import capture_debug_artifacts_async
 

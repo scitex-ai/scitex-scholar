@@ -20,8 +20,14 @@ production, which is exactly right: this urlconf is the LOCAL-DEV launcher and
 nothing else routes through it. Hub mounts `urls.py`, not this file.
 """
 
-from django.contrib.staticfiles.views import serve as _serve_static
-from django.urls import include, path, re_path
+try:
+    from django.contrib.staticfiles.views import serve as _serve_static
+    from django.urls import include, path, re_path
+except ImportError as exc:  # django absent -- the [server] capability only
+    raise ImportError(
+        "scitex_scholar._django._standalone_urls needs Django, which is not "
+        "installed. Install the server extra: pip install 'scitex-scholar[server]'"
+    ) from exc
 
 urlpatterns = [
     re_path(r"^static/(?P<path>.*)$", _serve_static, {"insecure": True}),

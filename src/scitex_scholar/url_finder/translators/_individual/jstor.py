@@ -19,6 +19,10 @@ import re
 import urllib.parse
 from typing import TYPE_CHECKING, List, Optional
 
+import scitex_logging as slogging
+
+logger = slogging.getLogger(__name__)
+
 if TYPE_CHECKING:
     from playwright.async_api import Page
 
@@ -208,7 +212,7 @@ class JSTORTranslator(BaseTranslator):
 
         except Exception as e:
             # Log error but don't fail completely
-            print(f"Error extracting JSTOR PDF URLs: {e}")
+            logger.error(f"Error extracting JSTOR PDF URLs: {e}")
 
         return pdf_urls
 

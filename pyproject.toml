@@ -79,6 +79,30 @@ dependencies = [
     "scitex-dev>=0.30.0",
     "tenacity>=8.0.0",
     "tqdm>=4.64.0",
+    # ------------------------------------------------------------------
+    # PS-233 (runtime-import-dependency-undeclared) — POLICY: a GUARDED
+    # import must NOT be declared here.
+    #
+    # The first PS-233 remedy for this package declared every unguarded
+    # import hard (django / scitex-app / scitex-ui / fastmcp / scitex-config
+    # / scitex-dict / numpy), which made a bare `pip install scitex-scholar`
+    # pull the whole Django GUI stack. That is wrong for THIS package: the
+    # GUI/server stack and the MCP server are OPTIONAL capabilities, not
+    # requirements of the search/enrich/download library. The remedy is a
+    # guard at each import site, so those distributions are no longer
+    # declared here — declaring a distribution used only under a guard is
+    # itself a PS-233 error.
+    #
+    # Where each guarded capability's install hint points:
+    #   django / scitex-app / scitex-ui  ->  [server]  (the `gui` surface)
+    #   fastmcp                          ->  [mcp]     (the MCP server)
+    #   numpy / scitex-config / scitex-dict -> named directly in the hint;
+    #     they ship transitively anyway (pandas pulls numpy, scitex-dev
+    #     pulls scitex-config, scitex-session pulls scitex-dict), so
+    #     dropping the explicit pin costs a bare install nothing.
+    # The guards are LOUD: each one raises/prints an actionable,
+    # extra-naming message (or sets a sentinel the caller can test) —
+    # never a silent `pass`.
 ]
 
 [project.optional-dependencies]
@@ -155,10 +179,12 @@ dev = [
     "aiohttp>=3.8.0",
     "django>=4.2",
     "scitex-app>=0.11.0",  # hosts_to_allow public name (fleet single implementation)
-    # `_django/settings.py` imports scitex_ui unguarded (it is a hard
-    # member of `[server]`), so the Django tests cannot even import
-    # without it. NOT guarded with importorskip on purpose: a skip would
-    # hide a genuinely broken GUI install behind a green run.
+    # The rest of the `[server]` stack. Its imports in src/ are GUARDED now
+    # (PS-233, 2026-09-20), so a `-e .[dev]` install missing these imports
+    # fine and then fails every Django test on the guard's message. They stay
+    # in `[dev]` so the GUI suite RUNS rather than degrading -- and the guards
+    # are deliberately NOT importorskip'd: a skip would hide a genuinely
+    # broken GUI install behind a green run.
     "scitex-ui>=0.22.0",
     "watchdog>=3.0.0",
     # tests/integration/test_clew_integration.py — used (with importorskip)

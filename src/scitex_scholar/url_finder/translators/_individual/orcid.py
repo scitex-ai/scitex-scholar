@@ -20,7 +20,10 @@ from typing import Dict, List, Optional
 from xml.etree import ElementTree as ET
 
 import httpx
+import scitex_logging as slogging
 from playwright.async_api import Page
+
+logger = slogging.getLogger(__name__)
 
 
 class ORCIDTranslator:
@@ -234,50 +237,50 @@ if __name__ == "__main__":
         # Example ORCID profile URL
         test_url = "https://orcid.org/0000-0003-0902-4386"
 
-        print(f"Testing ORCIDTranslator with URL: {test_url}")
-        print(f"URL matches pattern: {ORCIDTranslator.matches_url(test_url)}\n")
+        logger.info(f"Testing ORCIDTranslator with URL: {test_url}")
+        logger.info(f"URL matches pattern: {ORCIDTranslator.matches_url(test_url)}\n")
 
         async with async_playwright() as p:
             browser = await p.chromium.launch(headless=False)
             context = await browser.new_context()
             page = await context.new_page()
             try:
-                print("Navigating to ORCID profile...")
+                logger.info("Navigating to ORCID profile...")
                 await page.goto(test_url, timeout=60000)
                 await page.wait_for_load_state("domcontentloaded")
 
                 # Detect if page has works
                 result = await ORCIDTranslator.detect_web(page)
-                print(f"Detection result: {result}")
+                logger.info(f"Detection result: {result}")
 
                 # Extract ORCID
                 orcid = await ORCIDTranslator.extract_orcid_from_page(page)
-                print(f"ORCID: {orcid}\n")
+                logger.info(f"ORCID: {orcid}\n")
 
                 if orcid:
                     # Fetch works list
-                    print("Fetching works list...")
+                    logger.info("Fetching works list...")
                     works = await ORCIDTranslator.fetch_works_list(orcid)
-                    print(f"Found {len(works)} works:")
+                    logger.info(f"Found {len(works)} works:")
                     for put_code, title in list(works.items())[:5]:
-                        print(f"  [{put_code}] {title}")
+                        logger.info(f"  [{put_code}] {title}")
 
                     if works:
                         # Fetch metadata for first work
                         first_code = list(works.keys())[0]
-                        print(f"\nFetching metadata for work {first_code}...")
+                        logger.info(f"\nFetching metadata for work {first_code}...")
                         metadata = await ORCIDTranslator.fetch_work_metadata(
                             orcid, first_code
                         )
 
                         if metadata:
-                            print(f"Metadata keys: {list(metadata.keys())}")
+                            logger.info(f"Metadata keys: {list(metadata.keys())}")
                             if "title" in metadata:
-                                print(f"Title: {metadata['title']}")
+                                logger.info(f"Title: {metadata['title']}")
                             if "author" in metadata:
                                 authors = metadata["author"]
                                 if isinstance(authors, list) and authors:
-                                    print(f"First author: {authors[0]}")
+                                    logger.info(f"First author: {authors[0]}")
             except Exception:
                 from scitex_browser.debugging import capture_debug_artifacts_async
 

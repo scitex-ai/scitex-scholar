@@ -30,7 +30,16 @@ class SymlinkHandlersMixin:
         journal: Optional[str] = None,
     ) -> str:
         """Generate readable symlink name from metadata."""
-        from scitex_dict import DotDict
+        # GUARDED, not declared (PS-233): scitex-dict is not a core dependency
+        # of this distribution, so the import is wrapped and fails loudly with
+        # the distribution to install rather than a bare ModuleNotFoundError.
+        try:
+            from scitex_dict import DotDict
+        except ImportError as exc:
+            raise ImportError(
+                "SymlinkHandlersMixin needs scitex-dict (DotDict), which is not "
+                "installed. Install it with: pip install scitex-dict"
+            ) from exc
 
         from scitex_scholar.config.core._path_helpers import sanitize_filename
 

@@ -300,39 +300,39 @@ if __name__ == "__main__":
     DOI = "10.1038/nature12373"
 
     # Example 1: Internal API (Docker network or localhost)
-    print("\n" + "=" * 60)
-    print("INTERNAL API EXAMPLE")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("INTERNAL API EXAMPLE")
+    logger.info("=" * 60)
     engine_internal = OpenAlexLocalEngine(
         "test@example.com", api_url="http://openalex:31292"
     )
-    print(f"API URL: {engine_internal.api_url}")
-    print(f"Is External: {engine_internal._is_external_api}")
-    print(f"Works endpoint: {engine_internal._build_endpoint_url('works')}")
+    logger.info(f"API URL: {engine_internal.api_url}")
+    logger.info(f"Is External: {engine_internal._is_external_api}")
+    logger.info(f"Works endpoint: {engine_internal._build_endpoint_url('works')}")
 
     # Example 2: External API (public internet)
-    print("\n" + "=" * 60)
-    print("EXTERNAL API EXAMPLE")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("EXTERNAL API EXAMPLE")
+    logger.info("=" * 60)
     engine_external = OpenAlexLocalEngine(
         "test@example.com", api_url="https://scitex.ai/scholar/api/openalex"
     )
-    print(f"API URL: {engine_external.api_url}")
-    print(f"Is External: {engine_external._is_external_api}")
-    print(f"Works endpoint: {engine_external._build_endpoint_url('works')}")
+    logger.info(f"API URL: {engine_external.api_url}")
+    logger.info(f"Is External: {engine_external._is_external_api}")
+    logger.info(f"Works endpoint: {engine_external._build_endpoint_url('works')}")
 
     # Test search (use internal for demo)
-    print("\n" + "=" * 60)
-    print("SEARCH TEST")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("SEARCH TEST")
+    logger.info("=" * 60)
     engine = OpenAlexLocalEngine("test@example.com")
     result = engine.search(doi=DOI)
     if result:
-        print(f"Title: {result.get('basic', {}).get('title')}")
-        print(f"DOI: {result.get('id', {}).get('doi')}")
-        print(f"Year: {result.get('basic', {}).get('year')}")
+        logger.info(f"Title: {result.get('basic', {}).get('title')}")
+        logger.info(f"DOI: {result.get('id', {}).get('doi')}")
+        logger.info(f"Year: {result.get('basic', {}).get('year')}")
     else:
-        print("No results found")
+        logger.info("No results found")
 
 
 # Usage examples:

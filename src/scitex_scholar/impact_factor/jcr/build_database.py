@@ -33,7 +33,18 @@ import re
 from pathlib import Path
 from typing import Dict, Iterator, Optional
 
-import openpyxl
+# openpyxl gates the optional maintenance path: this script rebuilds the JCR
+# table from an .xlsx export and is run by hand, never from the library's
+# runtime (nothing under src/scitex_scholar/impact_factor/ imports it at
+# request time). Guarded, with the install line, rather than declared hard
+# — a spreadsheet reader is not a runtime requirement of the package.
+try:
+    import openpyxl
+except ImportError as exc:  # optional dependency
+    raise ImportError(
+        "Rebuilding the JCR database from an .xlsx export needs openpyxl: "
+        "pip install openpyxl"
+    ) from exc
 import scitex_logging as logging
 
 logger = logging.getLogger(__name__)

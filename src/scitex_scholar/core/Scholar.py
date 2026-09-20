@@ -147,57 +147,57 @@ if __name__ == "__main__":
 
     def main():
         """Demonstrate Scholar class usage - Clean API Demo."""
-        print("\n" + "=" * 60)
-        print("Scholar Module Demo - Clean API")
-        print("=" * 60 + "\n")
+        logger.info("\n" + "=" * 60)
+        logger.info("Scholar Module Demo - Clean API")
+        logger.info("=" * 60 + "\n")
 
         # 1. Initialize Scholar
-        print("1. Initialize Scholar")
-        print("-" * 60)
+        logger.info("1. Initialize Scholar")
+        logger.info("-" * 60)
         scholar = Scholar(
             project="demo_project",
             project_description="Demo project for testing Scholar API",
         )
-        print("Scholar initialized")
-        print(f"  Project: {scholar.project}")
-        print()
+        logger.info("Scholar initialized")
+        logger.info(f"  Project: {scholar.project}")
+        logger.info("")
 
         # 2. Project Management
-        print("2. Project Management:")
+        logger.info("2. Project Management:")
         try:
             project_dir = scholar._create_project_metadata(
                 "neural_networks_2024",
                 description="Collection of neural network papers from 2024",
             )
-            print("   Created project: neural_networks_2024")
-            print(f"   Project directory: {project_dir}")
+            logger.info("   Created project: neural_networks_2024")
+            logger.info(f"   Project directory: {project_dir}")
 
             projects = scholar.list_projects()
-            print(f"   Total projects in library: {len(projects)}")
+            logger.info(f"   Total projects in library: {len(projects)}")
             for proj in projects[:3]:
-                print(f"      - {proj['name']}: {proj.get('description', 'No desc')}")
+                logger.info(f"      - {proj['name']}: {proj.get('description', 'No desc')}")
             if len(projects) > 3:
-                print(f"      ... and {len(projects) - 3} more")
+                logger.info(f"      ... and {len(projects) - 3} more")
 
         except Exception as e:
-            print(f"   Project management demo skipped: {e}")
-        print()
+            logger.info(f"   Project management demo skipped: {e}")
+        logger.info("")
 
         # 3. Library Statistics
-        print("3. Library Statistics:")
+        logger.info("3. Library Statistics:")
         try:
             stats = scholar.get_library_statistics()
-            print(f"   Total projects: {stats['total_projects']}")
-            print(f"   Total papers: {stats['total_papers']}")
-            print(f"   Storage usage: {stats['storage_mb']:.2f} MB")
-            print(f"   Library path: {stats['library_path']}")
+            logger.info(f"   Total projects: {stats['total_projects']}")
+            logger.info(f"   Total papers: {stats['total_papers']}")
+            logger.info(f"   Storage usage: {stats['storage_mb']:.2f} MB")
+            logger.info(f"   Library path: {stats['library_path']}")
 
         except Exception as e:
-            print(f"   Library statistics demo skipped: {e}")
-        print()
+            logger.info(f"   Library statistics demo skipped: {e}")
+        logger.info("")
 
         # 4. Working with Papers
-        print("4. Working with Papers:")
+        logger.info("4. Working with Papers:")
         p1 = Paper()
         p1.metadata.basic.title = "Vision Transformer: An Image Is Worth 16x16 Words"
         p1.metadata.basic.authors = ["Dosovitskiy, Alexey", "Beyer, Lucas"]
@@ -211,24 +211,24 @@ if __name__ == "__main__":
             project="neural_networks_2024",
             config=scholar.config,
         )
-        print(f"   Created collection with {len(papers)} papers")
-        print()
+        logger.info(f"   Created collection with {len(papers)} papers")
+        logger.info("")
 
         # 5. Configuration
-        print("5. Configuration Management:")
-        print(f"   Scholar directory: {scholar.config.paths.scholar_dir}")
-        print(f"   Library directory: {scholar.config.get_library_project_dir()}")
-        print()
+        logger.info("5. Configuration Management:")
+        logger.info(f"   Scholar directory: {scholar.config.paths.scholar_dir}")
+        logger.info(f"   Library directory: {scholar.config.get_library_project_dir()}")
+        logger.info("")
 
         # 6. Service Components
-        print("6. Service Components (Internal):")
-        print(f"   Scholar Engine: {type(scholar._scholar_engine).__name__}")
-        print(f"   Auth Manager: {type(scholar._auth_manager).__name__}")
-        print(f"   Browser Manager: {type(scholar._browser_manager).__name__}")
-        print(f"   Library Manager: {type(scholar._library_manager).__name__}")
-        print()
+        logger.info("6. Service Components (Internal):")
+        logger.info(f"   Scholar Engine: {type(scholar._scholar_engine).__name__}")
+        logger.info(f"   Auth Manager: {type(scholar._auth_manager).__name__}")
+        logger.info(f"   Browser Manager: {type(scholar._browser_manager).__name__}")
+        logger.info(f"   Library Manager: {type(scholar._library_manager).__name__}")
+        logger.info("")
 
-        print("Scholar demo completed!")
+        logger.info("Scholar demo completed!")
 
     main()
 

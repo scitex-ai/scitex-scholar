@@ -108,11 +108,11 @@ class CascadeConfig:
     def print(self):
         """Print how each config was resolved"""
         if not self.resolution_log:
-            print("No configurations resolved yet")
+            logger.info("No configurations resolved yet")
             return
 
-        print("Configuration Resolution Log:")
-        print("-" * 50)
+        logger.info("Configuration Resolution Log:")
+        logger.info("-" * 50)
         for entry in self.resolution_log:
             if isinstance(entry["key"], str):
                 _key = entry["key"][:20]
@@ -122,7 +122,7 @@ class CascadeConfig:
                 _value = entry["value"][:20]
             else:
                 _value = entry["value"]
-            print(f"{_key} = {_value} ({entry['source']})")
+            logger.info(f"{_key} = {_value} ({entry['source']})")
 
     def clear_log(self):
         """Clear resolution log"""

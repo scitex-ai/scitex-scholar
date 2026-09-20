@@ -7,6 +7,8 @@ from __future__ import annotations
 
 import os
 
+import scitex_logging as slogging
+
 __FILE__ = "./src/zotero_translators_python/core/registry.py"
 __DIR__ = os.path.dirname(__FILE__)
 # ----------------------------------------
@@ -25,7 +27,6 @@ Usage:
     pdf_urls = await TranslatorRegistry.extract_pdf_urls_async(url, page)
 """
 
-import logging
 from typing import TYPE_CHECKING, List, Optional, Type
 
 if TYPE_CHECKING:
@@ -33,7 +34,7 @@ if TYPE_CHECKING:
 
 from .base import BaseTranslator
 
-logger = logging.getLogger(__name__)
+logger = slogging.getLogger(__name__)
 
 from .._individual.abc_news_australia import ABCNewsAustraliaTranslator
 from .._individual.access_engineering import AccessEngineeringTranslator

@@ -155,7 +155,7 @@ if __name__ == "__main__":
                 try:
                     await page.goto("https://sso.unimelb.edu.au/")
                     success = await automator.perform_login_async(page)
-                    print(f"Login success: {success}")
+                    logger.info(f"Login success: {success}")
 
                     await page.wait_for_timeout(5000)
                 except Exception as e:
@@ -164,7 +164,7 @@ if __name__ == "__main__":
                     )
 
                     await capture_debug_artifacts_async(page, label="demo_sso_error")
-                    print(f"Error: {e}")
+                    logger.info(f"Error: {e}")
                 finally:
                     await browser.close()
 

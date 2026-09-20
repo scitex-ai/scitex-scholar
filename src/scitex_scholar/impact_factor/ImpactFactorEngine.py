@@ -157,25 +157,25 @@ if __name__ == "__main__":
         metrics_instance = ImpactFactorEngine()
 
         # Show where the rows come from
-        print("Impact-factor table")
-        print("=" * 50)
+        logger.info("Impact-factor table")
+        logger.info("=" * 50)
         db_info = metrics_instance.get_database_info()
         for key, value in db_info.items():
-            print(f"{key}: {value}")
+            logger.info(f"{key}: {value}")
 
-        print("\nJournal Metrics Lookup Demo")
-        print("=" * 50)
+        logger.info("\nJournal Metrics Lookup Demo")
+        logger.info("=" * 50)
 
         test_journals = ["Nature", "Science", "Cell"]
 
         for journal in test_journals:
-            print(f"\nJournal: {journal}")
+            logger.info(f"\nJournal: {journal}")
             metrics = get_journal_metrics(journal)
             if metrics:
                 for key, value in metrics.items():
-                    print(f"  {key}: {value}")
+                    logger.info(f"  {key}: {value}")
             else:
-                print("  No metrics found")
+                logger.info("  No metrics found")
 
     main()
 # python -m scitex_scholar.extra.JournalMetrics

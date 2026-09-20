@@ -92,7 +92,17 @@ class CitationGraph:
             Directed graph with node attributes: title, short_title,
             year, citations, similarity, journal.
         """
-        import networkx as nx
+        # networkx is an optional graph backend, not a runtime requirement:
+        # this conversion (and the matplotlib rendering that consumes it) is
+        # the only thing that needs it. Guarded so a fresh install carries no
+        # graph library it never asked for; the use site still fails with the
+        # install line rather than a bare ModuleNotFoundError.
+        try:
+            import networkx as nx
+        except ImportError as exc:  # optional dependency
+            raise ImportError(
+                "CitationGraph.to_networkx() needs networkx: pip install networkx"
+            ) from exc
 
         G = nx.DiGraph()
         for node in self.nodes:

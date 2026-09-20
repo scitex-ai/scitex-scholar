@@ -272,19 +272,19 @@ if __name__ == "__main__":
 
         # Test known institution
         strategy = resolver.resolve_strategy(openathens_email="test@unimelb.edu.au")
-        print(
+        logger.info(
             f"UniMelb Strategy: {strategy.method.value}, URL: {strategy.primary_url}, Confidence: {strategy.confidence}"
         )
 
         # Test unknown institution
         strategy = resolver.resolve_strategy(openathens_email="test@unknown.edu")
-        print(
+        logger.info(
             f"Unknown Strategy: {strategy.method.value}, URL: {strategy.primary_url}, Confidence: {strategy.confidence}"
         )
 
         # Test manual fallback
         strategy = resolver.resolve_strategy()
-        print(
+        logger.info(
             f"No Email Strategy: {strategy.method.value}, URL: {strategy.primary_url}, Confidence: {strategy.confidence}"
         )
 
