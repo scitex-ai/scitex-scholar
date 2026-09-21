@@ -45,7 +45,7 @@ Where:
 | Option | Short | Description | Example |
 |--------|-------|-------------|---------|
 | `--enrich` | `-e` | Enrich with metadata (DOIs, abstracts, citations) | `--enrich` |
-| `--download` | `-d` | Download PDFs to MASTER library | `--download` |
+| `--download` | `-d` | Download PDFs to the primary library | `--download` |
 | `--list` | `-l` | List papers in project | `--list` |
 | `--search QUERY` | `-s` | Search papers in library | `--search "EEG"` |
 | `--stats` | | Show library statistics | `--stats` |
@@ -97,7 +97,7 @@ python -m scitex.scholar \
 ### 2. PDF Downloads
 
 ```bash
-# Download from enriched BibTeX (MASTER storage with project symlinks)
+# Download from enriched BibTeX (primary storage with project symlinks)
 python -m scitex.scholar \
     --bibtex data/neurovista_enriched.bib \
     --project neurovista \

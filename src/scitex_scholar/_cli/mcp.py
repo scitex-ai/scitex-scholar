@@ -20,19 +20,31 @@ from typing import Any
 
 import click
 
-from ._scaffolding import CONTEXT_SETTINGS
+from ._scaffolding import CONTEXT_SETTINGS, spec_command_kwargs, spec_group_kwargs
 
 # ---------------------------------------------------------------------------
 # Group: mcp
 # ---------------------------------------------------------------------------
 
 
-@click.group(context_settings=CONTEXT_SETTINGS)
+@click.group(
+    **spec_group_kwargs("MCP (Model Context Protocol) server commands."),
+    context_settings=CONTEXT_SETTINGS,
+)
 def mcp() -> None:
     """MCP (Model Context Protocol) server commands."""
 
 
-@mcp.command("start")
+@mcp.command(
+    "start",
+    **spec_command_kwargs(
+        "Start the scitex-scholar MCP server.",
+        examples=(
+            ("{prog} mcp start", "Serve over stdio."),
+            ("{prog} mcp start --dry-run", "Print the launch plan only."),
+        ),
+    ),
+)
 @click.option("--dry-run", is_flag=True, help="Print launch plan without starting.")
 @click.option("--yes", "-y", is_flag=True, help="Assume yes; non-interactive.")
 def mcp_start(dry_run, yes):
@@ -60,7 +72,16 @@ async def _run_mcp_server_async() -> int:
     return 0
 
 
-@mcp.command("list-tools")
+@mcp.command(
+    "list-tools",
+    **spec_command_kwargs(
+        "List available MCP tools.",
+        examples=(
+            ("{prog} mcp list-tools", "List tool names."),
+            ("{prog} mcp list-tools --json", "Machine-readable output."),
+        ),
+    ),
+)
 @click.option("--json", "as_json", is_flag=True, help="JSON output.")
 def mcp_list_tools(as_json):
     """List available MCP tools.
@@ -82,7 +103,19 @@ def mcp_list_tools(as_json):
         click.echo(t)
 
 
-@mcp.command("doctor")
+@mcp.command(
+    "doctor",
+    **spec_command_kwargs(
+        "Check MCP server dependencies.",
+        examples=(
+            ("{prog} mcp doctor", "Exit non-zero when fastmcp is missing."),
+        ),
+        exit_codes=(
+            (0, "MCP server ready."),
+            (1, "fastmcp not installed, or a handler import failed."),
+        ),
+    ),
+)
 def mcp_doctor():
     """Check MCP server dependencies.
 
@@ -97,7 +130,7 @@ def mcp_doctor():
         click.secho(f"  OK  fastmcp {fastmcp.__version__}", fg="green")
     except ImportError:
         click.secho("  NG  fastmcp not installed", fg="red")
-        click.echo("      Install: pip install scitex-scholar[mcp]")
+        click.echo("      Install: pip install scitex-scholar[all]")
         sys.exit(1)
     try:
         from .._mcp import all_handlers as _h
@@ -112,7 +145,16 @@ def mcp_doctor():
     click.echo("Run: scitex-scholar mcp start")
 
 
-@mcp.command("install")
+@mcp.command(
+    "install",
+    **spec_command_kwargs(
+        "Show MCP installation instructions.",
+        examples=(
+            ("{prog} mcp install", "Print the setup steps."),
+            ("{prog} mcp install --claude-code", "Claude Code config snippet."),
+        ),
+    ),
+)
 @click.option("--claude-code", is_flag=True, help="Show Claude Code config snippet.")
 @click.option("--dry-run", is_flag=True, help="Print plan without executing.")
 @click.option("--yes", "-y", is_flag=True)
@@ -140,7 +182,7 @@ def mcp_install(claude_code, dry_run, yes):
     click.echo("scitex-scholar MCP Server Installation")
     click.echo("=" * 40)
     click.echo()
-    click.echo("1. Install: pip install scitex-scholar[mcp]")
+    click.echo("1. Install: pip install scitex-scholar[all]")
     click.echo("2. Config:  scitex-scholar mcp install --claude-code")
     click.echo("3. Test:    scitex-scholar mcp doctor")
 

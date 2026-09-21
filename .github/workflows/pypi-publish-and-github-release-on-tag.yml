@@ -8,9 +8,10 @@ name: release
 #
 # Everything else fires automatically:
 #
-#   1. test          — matrix pytest INSIDE the SIF. Must pass or the pipeline
+#   1. verify        — matrix pytest INSIDE the SIF. Must pass or the pipeline
 #                      halts; nothing is published until tests are green on the
-#                      tagged commit.
+#                      tagged commit. (Job ID is `verify`, not `test`: PS-164
+#                      (c') admits only its pipeline-step vocabulary here.)
 #   2. build         — wheel + sdist built INSIDE the SIF, uploaded as artifact.
 #   3. publish       — PyPI via MANUAL OIDC trusted publishing INSIDE the SIF.
 #   4. release       — GitHub Release with CHANGELOG notes + artifacts.
@@ -55,7 +56,7 @@ env:
   SCITEX_CI_SIF: ${{ vars.SCITEX_CI_SIF }}
 
 jobs:
-  test:
+  verify:
     runs-on: ${{ fromJSON(vars.CI_RUNS_ON || '["self-hosted","Linux","X64","scitex-ci"]') }}
     strategy:
       fail-fast: false
@@ -85,7 +86,7 @@ jobs:
         run: bash .github/ci/exec-in-sif.sh run-in-sif.sh ${{ matrix.python-version }}
 
   build:
-    needs: test
+    needs: verify
     runs-on: ${{ fromJSON(vars.CI_RUNS_ON || '["self-hosted","Linux","X64","scitex-ci"]') }}
     outputs:
       version: ${{ steps.ver.outputs.version }}

@@ -33,7 +33,7 @@ Fields (additive-only; adding one is a schema edit, never a data migration):
     citation_count INTEGER
     updated_at     REAL     metadata.json mtime at index time
 
-Rows for papers that disappear from MASTER are HIDDEN, never deleted: the
+Rows for papers that disappear from the primary store are HIDDEN, never deleted: the
 store has no delete verb, and a hidden row still carries the history that a
 later ``build()`` can un-hide.
 """
@@ -200,9 +200,9 @@ def _row_from_metadata(
 
 
 def collect_rows(library_root: Path | str, verbose: bool = False) -> list[dict]:
-    """Derive every index row from MASTER metadata. No store involved.
+    """Derive every index row from primary metadata. No store involved.
 
-    Raises ``FileNotFoundError`` when MASTER is missing and ``ValueError``
+    Raises ``FileNotFoundError`` when the primary store is missing and ``ValueError``
     when two paper folders claim the same DOI — that is library corruption,
     not a benign duplicate, and it is detected BEFORE anything is written so
     a corrupt library cannot damage the rows already indexed.
@@ -261,7 +261,7 @@ def _rows_for(store, root_key: str) -> Iterator[dict]:
 
 
 def build(library_root: Path | str, verbose: bool = False) -> int:
-    """(Re)build the index from MASTER metadata. Returns row count."""
+    """(Re)build the index from primary metadata. Returns row count."""
     from scitex_dev.store import ANY_REVISION
 
     root_key = _root_key(library_root)

@@ -82,13 +82,16 @@ jobs:
       upload_artifact: true
       artifact_name: sphinx-html
 
-  vendor-and-commit:
+  sphinx-vendor-and-commit:
+    # PS-164: shares the `sphinx-` stem with the build job above so the
+    # two-job build→vendor pipeline reads as one check, not two concerns.
     # develop pushes only. `main` is PR-only: its bundle arrives through the
     # develop -> main PR, so direct bot-pushes to main stay inhibited and that
     # branch's history remains linear-via-PR.
     needs: sphinx-via-org-reusable
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
-    runs-on: ubuntu-latest
+    # PS-169: self-hosted like the rest of CI, not GitHub-hosted.
+    runs-on: ${{ fromJSON(vars.CI_RUNS_ON || '["self-hosted","Linux","X64","scitex-ci"]') }}
     permissions:
       contents: write
     steps:

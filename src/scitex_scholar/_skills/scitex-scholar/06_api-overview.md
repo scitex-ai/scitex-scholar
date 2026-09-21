@@ -47,7 +47,7 @@ Core subpackages:
 * `pdf_download/` — `ScholarPDFDownloader` with multiple strategies
 * `pipelines/` — `ScholarPipelineSingle`, `ScholarPipelineParallel`, `ScholarPipelineBibTeX`, metadata/search variants
 * `browser/`, `auth/` — Playwright-based browser automation with OpenAthens / institutional SSO
-* `storage/`, `local_dbs/` — MASTER-hash storage with project symlinks, local DB indexes
+* `storage/`, `local_dbs/` — primary-hash storage with project symlinks, local DB indexes
 * `filters.py`, `formatting.py` — filtering and BibTeX/RIS/EndNote export
 * `citation_graph/`, `migration/`, `zotero/`, `integration/` — optional adapters
 
@@ -114,14 +114,10 @@ Cache / state lives under `~/.scitex/scholar/cache/` (URL resolver, Chrome profi
 ## Installation
 
 ```bash
-pip install scitex-scholar               # core
-pip install "scitex-scholar[pdf]"        # pdfplumber for PDF text extraction
-pip install "scitex-scholar[mcp]"        # fastmcp MCP server deps
-pip install "scitex-scholar[browser]"    # Playwright browser automation
-pip install "scitex-scholar[export]"     # openpyxl (.xlsx export)
-pip install "scitex-scholar[server]"     # aiohttp/django (HTTP adapters + gui)
-pip install "scitex-scholar[watch]"      # watchdog (library watcher)
-pip install "scitex-scholar[all]"        # everything above + dev tooling
+pip install scitex-scholar               # core (Playwright included)
+pip install "scitex-scholar[all]"        # + gui (django/scitex-app/scitex-ui), mcp (fastmcp),
+                                         #   pdf (pdfplumber), export (openpyxl),
+                                         #   watch (watchdog), clew (scitex-clew)
 ```
 
 ## Status / caveats

@@ -33,7 +33,7 @@ def _doctor() -> int:
         console.info(f"  OK  fastmcp {fastmcp.__version__}")
     except ImportError:
         console.info("  NG  fastmcp not installed")
-        console.info("      Install: pip install scitex-scholar[mcp]")
+        console.info("      Install: pip install scitex-scholar[all]")
         return 1
 
     try:
@@ -64,7 +64,7 @@ def _install(claude_code: bool) -> int:
     console.info("scitex-scholar MCP Server Installation")
     console.info("=" * 40)
     console.info("")
-    console.info("1. Install: pip install scitex-scholar[mcp]")
+    console.info("1. Install: pip install scitex-scholar[all]")
     console.info("2. Config:  scitex-scholar mcp install --claude-code")
     console.info("3. Test:    scitex-scholar mcp doctor")
     return 0

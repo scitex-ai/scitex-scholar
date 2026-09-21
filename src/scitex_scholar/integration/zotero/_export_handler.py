@@ -126,7 +126,7 @@ class ZoteroExportHandler:
 
     @staticmethod
     def _copy_pdfs(entry_dir: Path, paper: Paper, pdf_dir: Path) -> int:
-        """Copy PDFs from a MASTER entry to the export pdf_dir. Returns count."""
+        """Copy PDFs from a primary entry to the export pdf_dir. Returns count."""
         copied = 0
         for pdf_file in entry_dir.glob("*.pdf"):
             dest_name = _scholar_pdf_name(paper, pdf_file.name)

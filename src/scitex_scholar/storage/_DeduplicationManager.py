@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 class DeduplicationManager:
-    """Manages deduplication of papers in the MASTER library."""
+    """Manages deduplication of papers in the primary library."""
 
     def __init__(self, config: ScholarConfig = None):
         self.name = self.__class__.__name__
@@ -25,7 +25,7 @@ class DeduplicationManager:
         self.master_dir = self.config.path_manager.get_library_master_dir()
 
     def find_duplicate_papers(self) -> Dict[str, List[Path]]:
-        """Find all duplicate papers in MASTER library.
+        """Find all duplicate papers in the primary library.
 
         Returns:
             Dictionary mapping paper fingerprint to list of duplicate paths
@@ -404,7 +404,7 @@ class DeduplicationManager:
                         shutil.copy2(log, target)
 
     def deduplicate_library(self, dry_run: bool = True) -> Dict[str, int]:
-        """Deduplicate entire MASTER library.
+        """Deduplicate the entire primary library.
 
         Args:
             dry_run: If True, only report what would be done
@@ -534,7 +534,7 @@ class DeduplicationManager:
                         symlink.symlink_to(Path("..") / "MASTER" / keep_dir.name)
 
     def check_for_existing_paper(self, metadata: Dict) -> Optional[Path]:
-        """Check if a paper already exists in MASTER library.
+        """Check if a paper already exists in the primary library.
 
         Args:
             metadata: Paper metadata to check
@@ -550,7 +550,7 @@ class DeduplicationManager:
         if not fingerprint:
             return None
 
-        # Check all papers in MASTER
+        # Check all papers in the primary store
         for paper_dir in self.master_dir.iterdir():
             if not paper_dir.is_dir():
                 continue

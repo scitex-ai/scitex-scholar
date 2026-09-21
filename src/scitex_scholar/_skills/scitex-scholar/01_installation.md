@@ -15,19 +15,15 @@ pip install scitex-scholar
 
 ## Optional extras
 
-| Extra      | Adds                                            |
-|------------|-------------------------------------------------|
-| `browser`  | playwright (OpenAthens / publisher PDF download) |
-| `pdf`      | pdfplumber (PDF text + figure extraction)        |
-| `mcp`      | fastmcp (expose tools to AI agents)              |
-| `server`   | aiohttp + django (HTTP server mode / `gui` command) |
-| `export`   | openpyxl (XLSX export)                           |
-| `watch`    | watchdog (library watch mode)                    |
-| `clew`     | scitex-clew (provenance hashing)                 |
-| `all`      | every extra above                                |
+Two installs exist — core, and everything:
+
+| Install | Contents |
+|---|---|
+| `pip install scitex-scholar` | core (Playwright browser automation included) |
+| `pip install 'scitex-scholar[all]'` | + GUI server (django / scitex-app / scitex-ui), MCP server (fastmcp), PDF text extraction (pdfplumber), XLSX export (openpyxl), library watcher (watchdog), provenance hashing (scitex-clew) |
 
 ```bash
-pip install 'scitex-scholar[browser,pdf,mcp]'
+pip install scitex-scholar
 pip install 'scitex-scholar[all]'
 ```
 

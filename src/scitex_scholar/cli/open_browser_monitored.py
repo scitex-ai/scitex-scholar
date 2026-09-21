@@ -33,10 +33,10 @@ import scitex_logging as slogging
 try:
     from watchdog.events import FileSystemEventHandler
     from watchdog.observers import Observer
-except ImportError as exc:  # optional dependency: `scitex-scholar[watch]`
+except ImportError as exc:  # optional dependency: `scitex-scholar[all]`
     raise ImportError(
         "The monitored-browser watcher needs watchdog: "
-        "pip install 'scitex-scholar[watch]'"
+        "pip install 'scitex-scholar[all]'"
     ) from exc
 
 console = slogging.getConsole(__name__)
@@ -472,7 +472,7 @@ class DownloadMonitor(FileSystemEventHandler):
 
             # Update project symlinks: SymlinkHandlersMixin.update_symlink
             # regenerates the `PDF-NN_CC-..._IF-..._YYYY_Author_Journal`
-            # readable name from the current MASTER state (counts PDFs in
+            # readable name from the current primary state (counts PDFs in
             # paper_dir) and replaces stale links. Run once per project
             # that contains this paper.
             try:

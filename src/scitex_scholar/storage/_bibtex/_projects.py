@@ -161,7 +161,7 @@ class BibTeXProjectsMixin:
             if not item.is_symlink():
                 continue
 
-            # Resolve symlink to master directory
+            # Resolve symlink to the primary directory
             try:
                 master_path = item.resolve()
                 if not master_path.exists():

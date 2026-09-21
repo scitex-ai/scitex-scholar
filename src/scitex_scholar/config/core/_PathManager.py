@@ -345,7 +345,7 @@ class PathManager:
             authors: List of authors
             year: Publication year
             journal: Journal name
-            project: Project name (default: "MASTER")
+            project: Project name (default: the primary store)
 
         Returns:
             Tuple of (storage_path, readable_name, paper_id)
@@ -355,7 +355,7 @@ class PathManager:
             doi=doi, title=title, authors=authors, year=year
         )
 
-        # Get storage path (always in MASTER directory)
+        # Get storage path (always in the primary-store directory)
         storage_path = self.get_library_master_paper_dir(paper_id)
 
         # Generate readable name

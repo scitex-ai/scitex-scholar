@@ -34,11 +34,11 @@ import scitex_logging as slogging
 logger = slogging.getLogger(__name__)
 
 # The ONE install line this module's refusals name.
-MCP_EXTRA_HINT = "pip install 'scitex-scholar[mcp]'"
+ALL_EXTRA_HINT = "pip install 'scitex-scholar[all]'"
 
 try:
     from fastmcp import FastMCP
-except ImportError:  # fastmcp absent -- the [mcp] capability only
+except ImportError:  # fastmcp absent -- the [all]-gated MCP capability only
     FastMCP = None  # type: ignore[assignment]
 
 MCP_AVAILABLE = FastMCP is not None
@@ -61,7 +61,7 @@ else:
     logger.error(
         "fastmcp is not installed, so the scitex-scholar MCP server is "
         "unavailable. Install it with: %s",
-        MCP_EXTRA_HINT,
+        ALL_EXTRA_HINT,
     )
 
 
@@ -148,6 +148,6 @@ if __name__ == "__main__":
     if mcp is None:
         raise SystemExit(
             "fastmcp is not installed, so the scitex-scholar MCP server "
-            f"cannot start. Install it with: {MCP_EXTRA_HINT}"
+            f"cannot start. Install it with: {ALL_EXTRA_HINT}"
         )
     mcp.run()

@@ -27,10 +27,10 @@ still cannot be mistaken for a working install.
 
 try:
     from scitex_app._django import ScitexAppConfig
-except ImportError as exc:  # scitex-app absent -- the [server] capability only
+except ImportError as exc:  # scitex-app absent -- the [all]-gated GUI capability only
     raise ImportError(
         "scitex_scholar._django needs scitex-app, which is not installed. "
-        "Install the server extra: pip install 'scitex-scholar[server]'"
+        "Install the optional stack: pip install 'scitex-scholar[all]'"
     ) from exc
 
 

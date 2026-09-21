@@ -41,18 +41,18 @@ try:
     from django.template.loader import render_to_string
     from django.utils.translation import gettext as _i18n  # noqa: N816  (JS string dict)
     from django.views.decorators.http import require_GET, require_POST
-except ImportError as exc:  # django absent -- the [server] capability only
+except ImportError as exc:  # django absent -- the [all]-gated GUI capability only
     raise ImportError(
         "scitex_scholar._django.views needs Django, which is not installed. "
-        "Install the server extra: pip install 'scitex-scholar[server]'"
+        "Install the optional stack: pip install 'scitex-scholar[all]'"
     ) from exc
 
 try:
     from scitex_app.embed import mount_prefix
-except ImportError as exc:  # scitex-app absent -- the [server] capability only
+except ImportError as exc:  # scitex-app absent -- the [all]-gated GUI capability only
     raise ImportError(
         "scitex_scholar._django.views needs scitex-app, which is not "
-        "installed. Install the server extra: pip install 'scitex-scholar[server]'"
+        "installed. Install the optional stack: pip install 'scitex-scholar[all]'"
     ) from exc
 
 try:
@@ -62,10 +62,10 @@ try:
         project_listing_view,
         resolve_project,
     )
-except ImportError as exc:  # scitex-ui absent -- the [server] capability only
+except ImportError as exc:  # scitex-ui absent -- the [all]-gated GUI capability only
     raise ImportError(
         "scitex_scholar._django.views needs scitex-ui, which is not "
-        "installed. Install the server extra: pip install 'scitex-scholar[server]'"
+        "installed. Install the optional stack: pip install 'scitex-scholar[all]'"
     ) from exc
 
 # The dotted INSTALLED_APPS entry a host must carry for these views to
@@ -282,11 +282,11 @@ def _app_label(base: str) -> str:
     """
     try:
         from django.conf import settings
-    except ImportError as exc:  # django absent -- the [server] capability only
+    except ImportError as exc:  # django absent -- the [all]-gated GUI capability only
         raise ImportError(
             "scitex_scholar._django.views needs Django, which is not "
-            "installed. Install the server extra: "
-            "pip install 'scitex-scholar[server]'"
+            "installed. Install the optional stack: "
+            "pip install 'scitex-scholar[all]'"
         ) from exc
 
     mode = getattr(settings, "SCITEX_APP_MODE", "standalone")
@@ -330,7 +330,7 @@ class ScholarLocalProjectProvider(LocalProjectProvider):
         return [
             entry
             for entry in super().list_projects(request)
-            # Case-insensitive: a "master" folder is the same internal store on
+            # Case-insensitive: the primary-store folder is the same internal store on
             # a case-insensitive filesystem, and MUST NOT slip through here.
             if entry.name.upper() not in reserved
             and not (self.root / entry.name).is_symlink()
@@ -760,7 +760,7 @@ def search(request, _engine=None):
 # the same code the `scitex-scholar library` CLI drives. No library or
 # enrichment logic lives in these views:
 #   list  -> storage._library_index (user's local library index)
-#   enrich-> storage.PaperIO (master metadata.json) +
+#   enrich-> storage.PaperIO (primary metadata.json) +
 #            pipelines.ScholarPipelineMetadataSingle (the enrichment engine)
 #
 # USER SCOPE: standalone scholar has no account system; the user's library is
@@ -851,7 +851,7 @@ def _assert_safe_library_id(library_id: str) -> str:
 
 
 def _load_library_paper(root: Path, paper_id: str):
-    """Load one master metadata.json as a Paper, keyed by paper_id.
+    """Load one primary metadata.json as a Paper, keyed by paper_id.
 
     Real library files store {"metadata": {...}} with no "container", so the
     paper_id is set explicitly -- that is what PaperIO needs to write back to
@@ -867,13 +867,13 @@ def _load_library_paper(root: Path, paper_id: str):
 
 
 def _save_library_paper(paper, root: Path) -> Path:
-    """Persist an enriched Paper to its master dir.
+    """Persist an enriched Paper to its primary dir.
 
-    The library is the user's local MASTER files; the view writes them directly
+    The library is the user's local primary files; the view writes them directly
     (PaperIO) and does NOT touch the shared relational library index -- that
     store is keyed by the running user, and rebuilding it here would couple the
     GUI to a store the app may not own. Reading back is done straight from the
-    master files (see library_list), which is the same user-scope guarantee.
+    primary files (see library_list), which is the same user-scope guarantee.
 
     The library_id is validated to be a single safe path component BEFORE any
     write, so MASTER/<library_id> can never escape the library root.
@@ -890,7 +890,7 @@ def library_list(request):
     """List the user's local library papers, optionally filtered by ``?q=``.
 
     Returns {papers: [...], count, total, filtered, query, library_root}.
-    Reads the user's MASTER metadata files directly (``collect_rows`` -- "no
+    Reads the user's primary metadata files directly (``collect_rows`` -- "no
     store involved"), scoped to the request's user (see ``_library_root_for``),
     so a mounted hub never exposes one shared service-account library to every
     user. An empty or missing library is an empty list, not an error.
@@ -921,7 +921,7 @@ def library_list(request):
     except FileNotFoundError:
         return JsonResponse(_payload([], 0))
     except ValueError as e:
-        # Duplicate DOIs across MASTER entries == library corruption; surface it
+        # Duplicate DOIs across primary entries == library corruption; surface it
         # rather than silently listing an inconsistent view.
         logger.error(f"library list: {e}")
         return JsonResponse({"error": f"Library index inconsistent: {e}"}, status=500)
@@ -947,7 +947,7 @@ def library_list(request):
 def _paper_matches(paper: dict, query: str) -> bool:
     """Case-insensitive substring match over the fields the UI shows.
 
-    Authors arrive as names or objects depending on the MASTER record, so both
+    Authors arrive as names or objects depending on the primary record, so both
     shapes are flattened here rather than guessed at in the client.
     """
     authors = [
@@ -973,7 +973,7 @@ def _paper_matches(paper: dict, query: str) -> bool:
 def library_enrich(request, _pipeline=None):
     """Enrich ONE library paper's metadata from the databases (#106).
 
-    Body: {"paper_id": str, "force": bool}. Loads the master record, runs the
+    Body: {"paper_id": str, "force": bool}. Loads the primary record, runs the
     package's enrichment engine, and writes the enriched metadata back to the
     same user-scoped library (no account required).
 

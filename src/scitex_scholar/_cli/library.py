@@ -31,6 +31,13 @@ from ._library_db import (
 )
 from ._library_shared import default_library_root as _default_library_root
 from ._scaffolding import CONTEXT_SETTINGS, _CategorizedGroup
+from ._scaffolding import spec_command_kwargs, spec_group_kwargs
+
+try:  # SpecGroup is the spec-built base (audit §4b); before it existed,
+    # the sectioned plain-click base below was the fallback.
+    from scitex_dev.ecosystem import SpecGroup as _SpecGroupBase
+except ImportError:  # pragma: no cover — old scitex-dev without help_spec
+    _SpecGroupBase = _CategorizedGroup  # type: ignore[assignment]
 
 __all__ = [
     "library",
@@ -46,7 +53,18 @@ __all__ = [
 # ---------------------------------------------------------------------------
 
 
-class _LibraryGroup(_CategorizedGroup):
+class _LibraryGroup(_SpecGroupBase):  # type: ignore[valid-type, misc]
+    # Spec-built help (audit §4b) rides on the SpecGroup base; the sections
+    # below feed it as COMMAND_CATEGORIES (SECTIONS is the same content in
+    # the legacy shape, kept so the pre-SpecGroup fallback still sections).
+    # The get_command() shorthand override is untouched — project-name
+    # dispatch is runtime behavior, not help text.
+    COMMAND_CATEGORIES = (
+        ("Daily", ("list", "open-urls", "refresh")),
+        ("Layout", ("bind", "link-project-tree", "materialize", "dematerialize")),
+        ("Share", ("sync", "export", "zotero")),
+        ("Database", ("db", "audit-files", "dedupe")),
+    )
     SECTIONS = [
         ("Daily", ["list", "open-urls", "refresh"]),
         ("Layout", ["bind", "link-project-tree", "materialize", "dematerialize"]),
@@ -107,7 +125,18 @@ def _make_shorthand_bind(project_name: str):
     return _shorthand
 
 
-@click.group(cls=_LibraryGroup, context_settings=CONTEXT_SETTINGS)
+@click.group(
+    **spec_group_kwargs(
+        "Library-tree management.",
+        description=(
+            "Common workflow: `list` shows what's in the library, "
+            "`open-urls` opens paper URLs in a browser, `refresh` "
+            "reconciles and regenerates symlinks.",
+        ),
+        cls=_LibraryGroup,
+    ),
+    context_settings=CONTEXT_SETTINGS,
+)
 def library() -> None:
     """Library-tree management.
 
@@ -131,7 +160,18 @@ def _library_link_options(f):
     return f
 
 
-@library.command("link-project-tree")
+@library.command(
+    "link-project-tree",
+    **spec_command_kwargs(
+        "Symlink a project's .scitex/scholar/library to the home library.",
+        examples=(
+            (
+                "{prog} library link-project-tree .",
+                "Link the current project.",
+            ),
+        ),
+    ),
+)
 @_library_link_options
 def library_link_project_tree(project_dir, force, dry_run, yes):
     """Symlink a project's .scitex/scholar/library to the home library.
@@ -172,7 +212,19 @@ def _library_materialize_options(f):
     return f
 
 
-@library.command("materialize")
+@library.command(
+    "materialize",
+    **spec_command_kwargs(
+        "Replace a library-symlink with a bib-filtered real directory.",
+        examples=(
+            (
+                "{prog} library materialize .scitex/scholar/library "
+                "--bib refs.bib",
+                "Materialize, keeping only refs.bib DOIs.",
+            ),
+        ),
+    ),
+)
 @_library_materialize_options
 def library_materialize(link_path, bib, dry_run, yes):
     """Replace a library-symlink with a bib-filtered real directory.
@@ -210,7 +262,18 @@ def _library_dematerialize_options(f):
     return f
 
 
-@library.command("dematerialize")
+@library.command(
+    "dematerialize",
+    **spec_command_kwargs(
+        "Replace a materialized library directory with a symlink.",
+        examples=(
+            (
+                "{prog} library dematerialize .scitex/scholar/library",
+                "Restore the symlink.",
+            ),
+        ),
+    ),
+)
 @_library_dematerialize_options
 def library_dematerialize(path, target, dry_run, yes):
     """Replace a materialized library directory with a symlink.
@@ -280,7 +343,18 @@ def _save_project_metadata(library_root: Path, project: str, data: dict) -> None
 # ----- library zotero (bidirectional migration) -------------------------
 
 
-@library.group("zotero", context_settings=CONTEXT_SETTINGS)
+@library.group(
+    "zotero",
+    **spec_group_kwargs(
+        "Bidirectional Zotero migration (local library, no API key).",
+        description=(
+            "Import: Zotero -> Scholar (papers + collections + tags + PDFs). "
+            "Export: Scholar -> Zotero (BibTeX + PDFs, ready for "
+            "File > Import). Diff: show what's in one but not the other.",
+        ),
+    ),
+    context_settings=CONTEXT_SETTINGS,
+)
 def library_zotero():
     """Bidirectional Zotero migration (reads the local Zotero library, no API key).
 
@@ -291,7 +365,22 @@ def library_zotero():
     """
 
 
-@library_zotero.command("import")
+@library_zotero.command(
+    "import",
+    **spec_command_kwargs(
+        "Import from local Zotero database into the Scholar library.",
+        examples=(
+            (
+                "{prog} library zotero import --project neurovista --dry-run",
+                "Preview only.",
+            ),
+            (
+                "{prog} library zotero import --project neurovista --yes",
+                "Real run.",
+            ),
+        ),
+    ),
+)
 @click.option("--project", default=None, help="Scholar project to import into.")
 @click.option("--collection", default=None, help="Limit to one Zotero collection.")
 @click.option("--tag", "tags", multiple=True, help="Filter by Zotero tag (repeatable).")
@@ -363,7 +452,23 @@ def library_zotero_import(
     click.secho(f"{verb} {n} item(s) into project '{project}'.", fg="green")
 
 
-@library_zotero.command("export")
+@library_zotero.command(
+    "export",
+    **spec_command_kwargs(
+        "Export Scholar papers as a Zotero-importable package.",
+        description=("BibTeX + PDFs, ready for Zotero's File > Import.",),
+        examples=(
+            (
+                "{prog} library zotero export --project neurovista --dry-run",
+                "Preview only.",
+            ),
+            (
+                "{prog} library zotero export --project neurovista --yes",
+                "Real run.",
+            ),
+        ),
+    ),
+)
 @click.option("--project", default=None, help="Scholar project to export.")
 @click.option(
     "--output",
@@ -437,7 +542,22 @@ def library_zotero_export(project, output_dir, include_pdfs, dry_run, yes):
     )
 
 
-@library_zotero.command("diff")
+@library_zotero.command(
+    "diff",
+    **spec_command_kwargs(
+        "Compare Zotero vs Scholar — items in one but not the other.",
+        examples=(
+            (
+                "{prog} library zotero diff --project neurovista",
+                "Human-readable diff.",
+            ),
+            (
+                "{prog} library zotero diff --project neurovista --json",
+                "Machine-readable output.",
+            ),
+        ),
+    ),
+)
 @click.option("--project", default=None, help="Scholar project to compare.")
 @click.option(
     "--db", default=None, help="Path to the Zotero database file (auto-detect)."
@@ -473,7 +593,26 @@ def library_zotero_diff(project, db, as_json):
     )
 
 
-@library.command("audit-files")
+@library.command(
+    "audit-files",
+    **spec_command_kwargs(
+        "Verify recorded files vs disk state for every paper.",
+        description=(
+            "For each primary entry, cross-references `metadata.path.files` "
+            "(role + sha256 + name) against what's actually in the "
+            "directory. Reports missing (recorded file not on disk), "
+            "orphan (file on disk with no record), and hash_mismatch "
+            "(name matches but content differs).",
+        ),
+        examples=(
+            ("{prog} library audit-files", "Audit the whole library."),
+            (
+                "{prog} library audit-files --project neurovista --json",
+                "One project, machine-readable.",
+            ),
+        ),
+    ),
+)
 @click.option(
     "--library-root",
     default=None,
@@ -493,7 +632,7 @@ def library_audit_files(library_root, project, rehash, as_json):
     """Verify recorded files vs disk state for every paper.
 
     \b
-    For each MASTER entry, cross-references ``metadata.path.files``
+    For each primary entry, cross-references ``metadata.path.files``
     (role + sha256 + name) against what's actually in the directory.
 
     \b
@@ -625,7 +764,25 @@ def library_audit_files(library_root, project, rehash, as_json):
         click.echo(f"  ... and {len(report['papers']) - 30} more")
 
 
-@library.command("refresh")
+@library.command(
+    "refresh",
+    **spec_command_kwargs(
+        "One-button maintenance: reconcile + refresh symlinks + sync.",
+        description=(
+            "Runs in order: reconcile-projects (sync `container.projects` "
+            "with filesystem symlinks), refresh-symlinks (regenerate "
+            "readable names), then an optional rsync push (or --pull) per "
+            "--sync HOST.",
+        ),
+        examples=(
+            ("{prog} library refresh", "Maintain the home library."),
+            (
+                "{prog} library refresh neurovista --sync spartan",
+                "Plus an rsync push.",
+            ),
+        ),
+    ),
+)
 @click.argument("project", required=False)
 @click.option(
     "--library-root",
@@ -682,7 +839,7 @@ def library_refresh(project, library_root, sync_hosts, pull, delete, dry_run, as
 
     rec = reconcile_projects(root, dry_run=dry_run)
 
-    # 2) Refresh symlinks: walk MASTER, call canonical update_symlink per
+    # 2) Refresh symlinks: walk the primary store, call canonical update_symlink per
     #    (paper, project) pair. Limit to PROJECT if given.
     from ..config import ScholarConfig
     from ..storage._LibraryManager import LibraryManager
@@ -986,7 +1143,21 @@ def _export_flat_pdfs(library_root: Path, project: str, out: Path) -> int:
     return n
 
 
-@library.command("export")
+@library.command(
+    "export",
+    **spec_command_kwargs(
+        "Export PROJECT in a portable format.",
+        description=(
+            "Default location: `<project-dir>/.scitex/scholar/exports/"
+            "<project>-<ts>.<ext>` when bound, "
+            "`~/.scitex/scholar/exports/<project>-<ts>.<ext>` otherwise.",
+        ),
+        examples=(
+            ("{prog} library export neurovista --dry-run", "Preview only."),
+            ("{prog} library export neurovista --yes", "Real run."),
+        ),
+    ),
+)
 @click.argument("project")
 @click.option(
     "--format",
@@ -1077,7 +1248,27 @@ def library_export(project, fmt, output, library_root, dry_run, yes):
 # ----- library bind ------------------------------------------------------
 
 
-@library.command("bind")
+@library.command(
+    "bind",
+    **spec_command_kwargs(
+        "Add a project-local view of the home library via one symlink.",
+        description=(
+            "Effect: `<project-dir>/.scitex/scholar/library/<project>` links "
+            "to `~/.scitex/scholar/library/<project>`. No data is moved. "
+            "With --unbind: just remove the symlink (target untouched).",
+        ),
+        examples=(
+            (
+                "{prog} library bind neurovista ~/proj/neurovista",
+                "Bind the project.",
+            ),
+            (
+                "{prog} library bind neurovista ~/proj/neurovista --unbind",
+                "Remove the symlink.",
+            ),
+        ),
+    ),
+)
 @click.argument("project")
 @click.argument("project_dir", type=click.Path(file_okay=False, path_type=Path))
 @click.option(
@@ -1096,7 +1287,7 @@ def library_bind(project, project_dir, unbind, dry_run, yes):
         ─→  ~/.scitex/scholar/library/<project>
 
     \b
-    No data is moved; no MASTER passthrough is needed (relative
+    No data is moved; no primary-store passthrough is needed (relative
     ``../MASTER/<id>`` symlinks inside the home dir resolve correctly
     because Linux follows the symlink to its real target before resolving
     relative paths).
@@ -1153,7 +1344,27 @@ def library_bind(project, project_dir, unbind, dry_run, yes):
 # ----- library sync ------------------------------------------------------
 
 
-@library.command("sync")
+@library.command(
+    "sync",
+    **spec_command_kwargs(
+        "rsync the library to/from a remote HOST.",
+        description=(
+            "If the project is bound (`library bind`), the synced tree is "
+            "the project repo's `.scitex/scholar/library/` on each side; "
+            "otherwise `~/.scitex/scholar/library/[<project>/]` is mirrored.",
+        ),
+        examples=(
+            (
+                "{prog} library sync spartan --project neurovista --dry-run",
+                "Preview the push.",
+            ),
+            (
+                "{prog} library sync spartan --pull --project neurovista",
+                "Pull instead.",
+            ),
+        ),
+    ),
+)
 @click.argument("host")
 @click.option("--project", default=None, help="Limit to a single project.")
 @click.option(
@@ -1262,7 +1473,24 @@ def library_sync(host, project, pull, delete, dry_run, copy_links, remote_path, 
 # ----- library open-urls --------------------------------------------------
 
 
-@library.command("open-urls")
+@library.command(
+    "open-urls",
+    **spec_command_kwargs(
+        "Open per-paper URLs in a browser for PROJECT.",
+        description=(
+            "Smart URL pick (OpenURL → publisher → DOI). With `--watch`, "
+            "downloaded PDFs are matched and moved into the primary store; "
+            "unmatched PDFs go to `library/downloads/unmatched/<project>/`.",
+        ),
+        examples=(
+            ("{prog} library open-urls neurovista", "Open the URLs."),
+            (
+                "{prog} library open-urls neurovista --watch",
+                "Auto-import downloaded PDFs.",
+            ),
+        ),
+    ),
+)
 @click.argument("project")
 @click.option(
     "--all",
@@ -1315,7 +1543,7 @@ def library_open_urls(
 
     \b
     With ``--watch``, downloaded PDFs are matched (filename → PDF /Title →
-    DOI on page 1) and moved into MASTER. Unmatched PDFs go to
+    DOI on page 1) and moved into the primary store. Unmatched PDFs go to
     ``library/downloads/unmatched/<project>/``.
 
     \b
@@ -1408,7 +1636,23 @@ def library_open_urls(
 # ----- library list -------------------------------------------------------
 
 
-@library.command("list")
+@library.command(
+    "list",
+    **spec_command_kwargs(
+        "List projects and their paper counts.",
+        description=(
+            "Without PROJECT: every project's totals. With PROJECT: only "
+            "that project. Verbosity: (none) project/total/downloaded, "
+            "-v adds paper_id and title, -vv adds URL and PDF flag, -vvv "
+            "adds DOI and full container.projects.",
+        ),
+        examples=(
+            ("{prog} library list", "Every project's totals."),
+            ("{prog} library list neurovista", "One project."),
+            ("{prog} library list --json", "Machine-readable output."),
+        ),
+    ),
+)
 @click.option(
     "--library-root",
     default=None,
@@ -1483,11 +1727,11 @@ def library_list(library_root, verbose, as_json, project):
 def _gather_project_papers(
     library_root: Path, project: str, *, open_all: bool
 ) -> list[dict]:
-    """Collect papers in ``project`` from MASTER metadata.
+    """Collect papers in ``project`` from primary metadata.
 
     Filtering:
       * project membership: ``container.projects`` contains ``project``
-      * default: only entries with **no** ``*.pdf`` in the MASTER entry dir
+      * default: only entries with **no** ``*.pdf`` in the primary entry dir
       * with ``open_all=True``: every project member
     """
     master = Path(library_root) / "MASTER"
@@ -1557,7 +1801,7 @@ def _gather_project_papers(
 
 
 def _summarize_projects(library_root: Path, *, verbose: int = 0) -> dict:
-    """Build a per-project summary by reading every MASTER metadata.json.
+    """Build a per-project summary by reading every primary metadata.json.
 
     Returns ``{"projects": [{name, total, downloaded, missing, papers: [...]}]}``.
     The ``papers`` list is populated only when ``verbose >= 1``.
@@ -1625,7 +1869,25 @@ def _summarize_projects(library_root: Path, *, verbose: int = 0) -> dict:
 # ----- library dedupe -----------------------------------------------------
 
 
-@library.command("dedupe")
+@library.command(
+    "dedupe",
+    **spec_command_kwargs(
+        "Resolve duplicate-DOI entries in the primary store (fail-loud).",
+        description=(
+            "Wraps the public `storage._library_dedupe` planner so a "
+            "production library-sync cron can gate on the exit code "
+            "without importing a private module.",
+        ),
+        examples=(
+            ("{prog} library dedupe --dry-run", "Plan only."),
+            ("{prog} library dedupe --apply", "Quarantine duplicates."),
+        ),
+        exit_codes=(
+            (0, "clean state (or empty plan on --dry-run)."),
+            (1, "duplicates need resolving, or conflicts remain."),
+        ),
+    ),
+)
 @click.option(
     "--library-root",
     default=None,
@@ -1651,7 +1913,7 @@ def _summarize_projects(library_root: Path, *, verbose: int = 0) -> dict:
     help="With --apply, delete losers instead of quarantining (irreversible).",
 )
 def library_dedupe(library_root, mode, hard_delete):
-    """Resolve duplicate-DOI entries in MASTER (fail-loud).
+    """Resolve duplicate-DOI entries in the primary store (fail-loud).
 
     Wraps the public ``storage._library_dedupe`` planner so a production
     library-sync cron can gate on it without importing a private module.

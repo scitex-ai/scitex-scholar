@@ -1,0 +1,40 @@
+name: Sync main to release tag on push
+
+# When a v* tag is pushed (created on develop at release time),
+# fast-forward main to that tag so `main` always = "the latest released
+# commit". Branch-protection-friendly release shim: tags (not direct
+# pushes) move main, and the pypi-publish pipeline runs off the same tag.
+# PS-165 required baseline; filename per PS-164 naming grammar.
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  sync:
+    name: Sync main to release tag
+    # PS-169: self-hosted like the rest of CI, not GitHub-hosted.
+    runs-on: ${{ fromJSON(vars.CI_RUNS_ON || '["self-hosted","Linux","X64","scitex-ci"]') }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sync main to tag ${{ github.ref_name }}
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          TAG="${{ github.ref_name }}"
+          git fetch origin --tags
+          if git merge --ff-only "$TAG"; then
+            echo "Fast-forwarded main to $TAG."
+          else
+            git merge --no-ff "$TAG" -m "merge: sync main with $TAG"
+            echo "Created merge commit for $TAG."
+          fi
+          git push origin main

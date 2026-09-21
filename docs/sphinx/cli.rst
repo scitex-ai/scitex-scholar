@@ -207,19 +207,21 @@ Database / integrity
    scitex-scholar library audit-files --project neurovista --json
    scitex-scholar library audit-files --no-rehash    # presence only (fast)
 
-skills
-~~~~~~
+dev skills
+~~~~~~~~~~
 
 Bundled SciTeX-Scholar skill leaves (under
-``src/scitex_scholar/_skills/scitex-scholar/``).
+``src/scitex_scholar/_skills/scitex-scholar/``), nested under ``dev`` per
+doctrine §13 (the old top-level ``skills`` spelling still works as a
+hidden alias).
 
 .. code-block:: bash
 
-   scitex-scholar skills list
-   scitex-scholar skills list --json
-   scitex-scholar skills get 04_cli-reference
-   scitex-scholar skills install            # symlink into ~/.claude/skills/
-   scitex-scholar skills install --copy --force --dry-run
+   scitex-scholar dev skills list
+   scitex-scholar dev skills list --json
+   scitex-scholar dev skills get 04_cli-reference
+   scitex-scholar dev skills install            # symlink into ~/.claude/skills/
+   scitex-scholar dev skills install --copy --force --dry-run
 
 Python API introspection
 ~~~~~~~~~~~~~~~~~~~~~~~~
