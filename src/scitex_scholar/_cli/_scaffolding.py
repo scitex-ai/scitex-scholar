@@ -28,6 +28,8 @@ __all__ = [
     "_INT_OR_HELP",
     "_IntOrHelp",
     "_warn_deprecated",
+    "spec_command_kwargs",
+    "spec_group_kwargs",
 ]
 
 
@@ -102,6 +104,74 @@ def _warn_deprecated(old_form: str, new_form: str) -> None:
         fg="yellow",
         err=True,
     )
+
+
+# ---------------------------------------------------------------------------
+# Spec-built help (audit §4b)
+# ---------------------------------------------------------------------------
+#
+# Every CLI command/group builds its ``--help`` from a
+# ``scitex_dev.ecosystem.CliHelp`` spec via ``SpecCommand`` / ``SpecGroup``
+# instead of free-form text (doctrine §4: fixed-order epilog — Examples /
+# Exit codes / Config resolution / See also — so help cannot drift). These
+# two factories are the only construction site: each command passes its
+# one-line summary plus genuine ``{prog}`` examples.
+#
+# ImportError fallback: scitex-dev is a hard dependency, but the floor in
+# ``pyproject.toml`` predates the ``help_spec`` API, so an older scitex-dev
+# degrades to plain ``help=`` text instead of breaking the CLI import.
+
+
+def spec_command_kwargs(
+    summary: str,
+    description: tuple[str, ...] = (),
+    examples: tuple[tuple[str, str], ...] = (),
+    exit_codes: tuple[tuple[int, str], ...] = (),
+) -> dict:
+    """Decorator kwargs making a leaf a spec-built ``SpecCommand``."""
+    try:
+        from scitex_dev.ecosystem import CliHelp, Example, SpecCommand
+    except ImportError:  # pragma: no cover — old scitex-dev without help_spec
+        return {"help": "\n\n".join((summary, *description))}
+    return {
+        "cls": SpecCommand,
+        "help_spec": CliHelp(
+            summary=summary,
+            description=description,
+            examples=tuple(Example(cmd, note) for cmd, note in examples),
+            exit_codes=exit_codes,
+        ),
+    }
+
+
+def spec_group_kwargs(
+    summary: str,
+    description: tuple[str, ...] = (),
+    command_categories: list[tuple[str, list[str]]] | None = None,
+    cls=None,
+    version_of: str | None = None,
+) -> dict:
+    """Decorator kwargs making a group a spec-built ``SpecGroup``.
+
+    ``cls`` overrides the group class (e.g. a ``SpecGroup`` subclass with
+    extra runtime behavior); ``command_categories`` is ignored then, since
+    the subclass carries its own ``COMMAND_CATEGORIES``. ``version_of``
+    names the distribution whose version renders in the summary line
+    (root command only — doctrine §4).
+    """
+    try:
+        from scitex_dev.ecosystem import CliHelp, SpecGroup
+    except ImportError:  # pragma: no cover — old scitex-dev without help_spec
+        return {"help": "\n\n".join((summary, *description))}
+    kwargs: dict = {
+        "cls": cls or SpecGroup,
+        "help_spec": CliHelp(
+            summary=summary, description=description, version_of=version_of
+        ),
+    }
+    if command_categories is not None:
+        kwargs["command_categories"] = command_categories
+    return kwargs
 
 
 # EOF

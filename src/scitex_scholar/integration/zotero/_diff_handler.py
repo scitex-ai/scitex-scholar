@@ -112,7 +112,7 @@ class ZoteroDiffHandler:
         return {"by_doi": by_doi, "by_title": by_title}
 
     def _load_scholar_entries(self):
-        """Load all Scholar MASTER entries as flat dicts."""
+        """Load all Scholar primary entries as flat dicts."""
         master_dir = self._library_manager.config.path_manager.library_dir / "MASTER"
         entries = {}
         if not master_dir.exists():

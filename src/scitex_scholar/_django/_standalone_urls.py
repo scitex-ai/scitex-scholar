@@ -23,10 +23,10 @@ nothing else routes through it. Hub mounts `urls.py`, not this file.
 try:
     from django.contrib.staticfiles.views import serve as _serve_static
     from django.urls import include, path, re_path
-except ImportError as exc:  # django absent -- the [server] capability only
+except ImportError as exc:  # django absent -- the [all]-gated GUI capability only
     raise ImportError(
         "scitex_scholar._django._standalone_urls needs Django, which is not "
-        "installed. Install the server extra: pip install 'scitex-scholar[server]'"
+        "installed. Install the optional stack: pip install 'scitex-scholar[all]'"
     ) from exc
 
 urlpatterns = [

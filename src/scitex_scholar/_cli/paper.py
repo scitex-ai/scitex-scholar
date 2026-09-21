@@ -21,14 +21,17 @@ from pathlib import Path
 
 import click
 
-from ._scaffolding import CONTEXT_SETTINGS
+from ._scaffolding import CONTEXT_SETTINGS, spec_command_kwargs, spec_group_kwargs
 
 # ---------------------------------------------------------------------------
 # Group: paper
 # ---------------------------------------------------------------------------
 
 
-@click.group(context_settings=CONTEXT_SETTINGS)
+@click.group(
+    **spec_group_kwargs("Operate on a paper / batch of papers."),
+    context_settings=CONTEXT_SETTINGS,
+)
 def paper() -> None:
     """Operate on a paper / batch of papers."""
 
@@ -94,7 +97,23 @@ def _paper_fetch_options(f):
     return f
 
 
-@paper.command("fetch")
+@paper.command(
+    "fetch",
+    **spec_command_kwargs(
+        "Fetch a single paper into the library.",
+        examples=(
+            (
+                "{prog} paper fetch --doi 10.1038/nature12373 --project demo",
+                "Fetch one paper by DOI.",
+            ),
+            (
+                "{prog} paper fetch --doi 10.1002/epi.70076 "
+                "--pdf-main ~/Downloads/Liu_2026.pdf --project neurovista",
+                "Import a local PDF; metadata enrichment still runs.",
+            ),
+        ),
+    ),
+)
 @_paper_fetch_options
 def paper_fetch(
     doi,
@@ -249,7 +268,19 @@ def _paper_fetch_batch_options(f):
     return f
 
 
-@paper.command("fetch-batch")
+@paper.command(
+    "fetch-batch",
+    **spec_command_kwargs(
+        "Fetch multiple papers in parallel.",
+        examples=(
+            (
+                "{prog} paper fetch-batch --dois 10.1/x --dois 10.2/y "
+                "--project demo",
+                "Fetch two papers with the default worker count.",
+            ),
+        ),
+    ),
+)
 @_paper_fetch_batch_options
 def paper_fetch_batch(
     dois,

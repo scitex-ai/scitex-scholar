@@ -10,7 +10,7 @@ Installation
 
 .. code-block:: bash
 
-   pip install scitex-scholar[mcp]
+   pip install scitex-scholar[all]
 
 Starting the Server
 -------------------

@@ -38,9 +38,9 @@ console = slogging.getConsole(__name__)
 # on 31297", which is a coincidence maintained by hand, not a constant).
 DEFAULT_PORT = 31297
 
-# The ONE install line every [server]-capability refusal names, so the CLI
-# notice and the in-module refusals cannot drift apart.
-SERVER_EXTRA_HINT = "pip install 'scitex-scholar[server]'"
+# The ONE install line every [all]-gated GUI-capability refusal names, so the
+# CLI notice and the in-module refusals cannot drift apart.
+ALL_EXTRA_HINT = "pip install 'scitex-scholar[all]'"
 
 # `hosts_to_allow` lived here first (#137) and was copied verbatim into
 # scitex-app, which made it the fleet's single implementation and gave it a
@@ -86,7 +86,7 @@ def run(
     if run_standalone is None or hosts_to_allow is None:
         raise ImportError(
             "The Scholar GUI server needs scitex-app, which is not installed. "
-            f"Install the server extra: {SERVER_EXTRA_HINT}"
+            f"Install the optional stack: {ALL_EXTRA_HINT}"
         )
 
     if api_url:
@@ -118,10 +118,10 @@ def run(
     try:
         import django
         from django.core.management import call_command
-    except ImportError as exc:  # the [server] stack, second member
+    except ImportError as exc:  # the [all] GUI stack, second member
         raise ImportError(
             "The Scholar GUI server needs Django, which is not installed. "
-            f"Install the server extra: {SERVER_EXTRA_HINT}"
+            f"Install the optional stack: {ALL_EXTRA_HINT}"
         ) from exc
 
     django.setup()

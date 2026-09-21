@@ -36,8 +36,8 @@ def validate_library_dois(
     """Validate all DOIs in the scholar library.
 
     Args:
-        library_path: Path to MASTER directory (default: from ScholarConfig)
-        project: Specific project to validate (default: validate all in MASTER)
+        library_path: Path to the primary-store directory (default: from ScholarConfig)
+        project: Specific project to validate (default: validate everything in the primary store)
         delay_between_requests: Delay in seconds between DOI checks (be polite)
         fix_invalid: If True, remove invalid DOIs from metadata.json files
         output_file: Optional path to save validation report as JSON

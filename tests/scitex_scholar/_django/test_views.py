@@ -2598,11 +2598,12 @@ def test_manifest_declares_project_scope():
     assert manifest["scope"] == "project"
 
 
-def test_server_extra_requires_header_slot_capable_scitex_ui():
-    # Arrange
+def test_all_extra_requires_header_slot_capable_scitex_ui():
+    # Arrange — per-feature extras are retired (PS-225): the GUI/server
+    # stack (incl. scitex-ui) ships flat in `[all]`.
     repo_root = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").is_file())
     # Act
-    requirements = tomllib.loads((repo_root / "pyproject.toml").read_text())["project"]["optional-dependencies"]["server"]
+    requirements = tomllib.loads((repo_root / "pyproject.toml").read_text())["project"]["optional-dependencies"]["all"]
     # Assert
     assert "scitex-ui>=0.22.0" in requirements
 

@@ -5,12 +5,12 @@
 
 Extracted verbatim from ``_cli_main.py`` (which had grown past the repo's
 512-line limit) so the module stays under that gate. See
-``GITIGNORED/REFACTORING.md``. Kept together because both live under the
-"Skills" entry of ``COMMAND_CATEGORIES`` in ``_cli_main.py``.
+``GITIGNORED/REFACTORING.md``.
 
-Registered by ``_cli_main`` via ``from ._cli.skills import skills,
-list_python_apis`` + ``cli.add_command(skills)`` /
-``cli.add_command(list_python_apis)``.
+Registered by ``_cli_main`` under the ``dev`` group
+(``dev.add_command(skills)``) per doctrine §13; the old top-level
+``skills`` spelling stays as a hidden warn-phase alias. ``list-python-apis``
+stays top-level (it is a domain verb, not self-maintenance plumbing).
 
 Note: ``_skills_dir()`` resolves relative to *this* file's location, one
 directory deeper than the original ``_cli_main.py`` — hence the extra
@@ -24,7 +24,7 @@ from pathlib import Path
 
 import click
 
-from ._scaffolding import CONTEXT_SETTINGS
+from ._scaffolding import CONTEXT_SETTINGS, spec_command_kwargs, spec_group_kwargs
 
 # ---------------------------------------------------------------------------
 # Group: skills
@@ -35,19 +35,31 @@ def _skills_dir() -> Path:
     return Path(__file__).parent.parent / "_skills" / "scitex-scholar"
 
 
-@click.group(context_settings=CONTEXT_SETTINGS)
+@click.group(
+    **spec_group_kwargs("Bundled skill leaves."),
+    context_settings=CONTEXT_SETTINGS,
+)
 def skills() -> None:
     """Bundled skill leaves."""
 
 
-@skills.command("list")
+@skills.command(
+    "list",
+    **spec_command_kwargs(
+        "List bundled skill leaf names.",
+        examples=(
+            ("{prog} dev skills list", "List leaf names."),
+            ("{prog} dev skills list --json", "Machine-readable output."),
+        ),
+    ),
+)
 @click.option("--json", "as_json", is_flag=True, help="JSON output.")
 def skills_list(as_json):
     """List bundled skill leaf names.
 
     \b
     Example:
-      $ scitex-scholar skills list
+      $ scitex-scholar dev skills list
     """
     d = _skills_dir()
     if not d.is_dir():
@@ -62,7 +74,19 @@ def skills_list(as_json):
         click.echo(n)
 
 
-@skills.command("get")
+@skills.command(
+    "get",
+    **spec_command_kwargs(
+        "Print the contents of a skill leaf.",
+        examples=(
+            ("{prog} dev skills get 04_cli-reference", "Print one leaf."),
+            (
+                "{prog} dev skills get 04_cli-reference --json",
+                "Machine-readable output.",
+            ),
+        ),
+    ),
+)
 @click.argument("name")
 @click.option("--json", "as_json", is_flag=True, help="JSON output.")
 def skills_get(name, as_json):
@@ -70,8 +94,8 @@ def skills_get(name, as_json):
 
     \b
     Example:
-      $ scitex-scholar skills get 04_cli-reference
-      $ scitex-scholar skills get 04_cli-reference --json
+      $ scitex-scholar dev skills get 04_cli-reference
+      $ scitex-scholar dev skills get 04_cli-reference --json
     """
     d = _skills_dir()
     p = d / f"{name}.md"
@@ -84,7 +108,19 @@ def skills_get(name, as_json):
         click.echo(body)
 
 
-@skills.command("install")
+@skills.command(
+    "install",
+    **spec_command_kwargs(
+        "Install bundled skills to ~/.claude/skills/scitex-scholar/.",
+        examples=(
+            ("{prog} dev skills install", "Symlink install."),
+            (
+                "{prog} dev skills install --copy --force",
+                "Copy over an existing target.",
+            ),
+        ),
+    ),
+)
 @click.option(
     "--target",
     default=None,
@@ -104,8 +140,8 @@ def skills_install(target, symlink, force, dry_run, yes):
 
     \b
     Example:
-      $ scitex-scholar skills install
-      $ scitex-scholar skills install --copy --force
+      $ scitex-scholar dev skills install
+      $ scitex-scholar dev skills install --copy --force
     """
     src = _skills_dir()
     dst = (
@@ -140,7 +176,17 @@ def skills_install(target, symlink, force, dry_run, yes):
 # ---------------------------------------------------------------------------
 
 
-@click.command("list-python-apis", context_settings=CONTEXT_SETTINGS)
+@click.command(
+    "list-python-apis",
+    **spec_command_kwargs(
+        "List public callables in scitex_scholar.__all__.",
+        examples=(
+            ("{prog} list-python-apis", "List names."),
+            ("{prog} list-python-apis -v", "With signatures."),
+        ),
+    ),
+    context_settings=CONTEXT_SETTINGS,
+)
 @click.option("-v", "--verbose", count=True, help="-v: signatures.")
 @click.option("--json", "as_json", is_flag=True)
 def list_python_apis(verbose, as_json):

@@ -14,3 +14,7 @@ nouns:
 transitive_verbs:
   - lookup
   - dedupe
+
+# Verb-synonym exemptions (§1f): each entry needs an inline `# why` comment.
+verb_exceptions:
+  - refresh  # why: established Scholar verb (`library refresh`, `auth refresh` re-read remote/library state onto existing records); renaming to sync-* would break the documented CLI surface for no operator gain.

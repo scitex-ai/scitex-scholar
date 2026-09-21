@@ -11,10 +11,10 @@ silent guard is unacceptable here).
 
 try:
     from django.urls import path
-except ImportError as exc:  # django absent -- the [server] capability only
+except ImportError as exc:  # django absent -- the [all]-gated GUI capability only
     raise ImportError(
         "scitex_scholar._django.urls needs Django, which is not installed. "
-        "Install the server extra: pip install 'scitex-scholar[server]'"
+        "Install the optional stack: pip install 'scitex-scholar[all]'"
     ) from exc
 
 from . import views

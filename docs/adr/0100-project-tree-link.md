@@ -1,8 +1,11 @@
 # ADR-100: Project-tree link and library materialization
 
-- **Status:** Accepted
 - **Date:** 2026-04-20
 - **Context:** scitex-scholar + downstream consumers (one-way)
+
+## Status
+
+Accepted.
 
 ## Context
 

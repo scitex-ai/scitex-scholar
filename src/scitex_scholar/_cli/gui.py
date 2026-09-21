@@ -38,6 +38,7 @@ from typing import Optional
 import click
 
 from ._scaffolding import CONTEXT_SETTINGS
+from ._scaffolding import spec_command_kwargs, spec_group_kwargs
 from .._django._server import DEFAULT_PORT
 
 DEFAULT_HOST = "127.0.0.1"
@@ -70,7 +71,7 @@ def _embed():
         click.secho(
             "scitex-app is not installed -- the GUI lifecycle (serve/status/"
             "stop) is delegated to it. Install it with: "
-            "pip install 'scitex-scholar[server]' (needs scitex-app >= 0.5.0).",
+            "pip install 'scitex-scholar[all]' (needs scitex-app >= 0.11.0).",
             fg="red",
             err=True,
         )
@@ -79,12 +80,33 @@ def _embed():
     return embed
 
 
-@click.group(context_settings=CONTEXT_SETTINGS)
+@click.group(
+    **spec_group_kwargs(
+        "Scholar's browser-based GUI (paper library / citation graph).",
+        description=(
+            "Every browser-based surface mounts here with four verbs: "
+            "`open` (browser-launching), `serve` (foreground headless "
+            "server), `status`, and `stop`.",
+        ),
+    ),
+    context_settings=CONTEXT_SETTINGS,
+)
 def gui() -> None:
     """Scholar's browser-based GUI (paper library / citation graph)."""
 
 
-@gui.command("open")
+@gui.command(
+    "open",
+    **spec_command_kwargs(
+        "Open the Scholar GUI in a browser, auto-serving when not running.",
+        examples=(
+            (
+                "{prog} gui open",
+                "Serve detached if needed, then open the browser.",
+            ),
+        ),
+    ),
+)
 @click.option("--port", default=DEFAULT_PORT, show_default=True, type=int)
 @click.option("--host", default=DEFAULT_HOST, show_default=True)
 @click.option(
@@ -182,7 +204,16 @@ def gui_open(port: int, host: str, api_url: Optional[str]) -> None:
     sys.exit(1)
 
 
-@gui.command("serve")
+@gui.command(
+    "serve",
+    **spec_command_kwargs(
+        "Run the Scholar GUI server in the foreground (Ctrl-C to stop).",
+        examples=(
+            ("{prog} gui serve --port 31297", "Serve on the default port."),
+            ("{prog} gui serve --force", "Reclaim an orphaned server first."),
+        ),
+    ),
+)
 @click.option("--port", default=DEFAULT_PORT, show_default=True, type=int)
 @click.option("--host", default=DEFAULT_HOST, show_default=True)
 @click.option(
@@ -231,7 +262,16 @@ def gui_serve(port: int, host: str, api_url: Optional[str], force: bool) -> None
     sys.exit(exit_code)
 
 
-@gui.command("status")
+@gui.command(
+    "status",
+    **spec_command_kwargs(
+        "Report whether the Scholar GUI server is running.",
+        examples=(
+            ("{prog} gui status", "Human-readable state."),
+            ("{prog} gui status --json", "Machine-readable output."),
+        ),
+    ),
+)
 @click.option("--json", "as_json", is_flag=True)
 def gui_status(as_json: bool) -> None:
     """Report whether the Scholar GUI server is running.
@@ -252,7 +292,20 @@ def gui_status(as_json: bool) -> None:
         click.echo("not running")
 
 
-@gui.command("stop")
+@gui.command(
+    "stop",
+    **spec_command_kwargs(
+        "Stop the running Scholar GUI server.",
+        examples=(
+            ("{prog} gui stop -y", "Stop without prompting."),
+            ("{prog} gui stop --dry-run", "Preview only."),
+        ),
+        exit_codes=(
+            (0, "stopped (or nothing running)."),
+            (1, "refused without --yes, or the stop failed."),
+        ),
+    ),
+)
 @click.option("--dry-run", is_flag=True, help="Print what would happen without stopping.")
 @click.option("--yes", "-y", is_flag=True, help="Confirm stopping the server.")
 def gui_stop(dry_run: bool, yes: bool) -> None:

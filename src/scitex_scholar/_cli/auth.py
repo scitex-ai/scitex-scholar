@@ -19,14 +19,26 @@ from typing import Any
 
 import click
 
-from ._scaffolding import CONTEXT_SETTINGS
+from ._scaffolding import CONTEXT_SETTINGS, spec_command_kwargs, spec_group_kwargs
 
 # ---------------------------------------------------------------------------
 # Group: auth — institutional SSO session management
 # ---------------------------------------------------------------------------
 
 
-@click.group(context_settings=CONTEXT_SETTINGS)
+@click.group(
+    **spec_group_kwargs(
+        "Institutional SSO authentication (OpenAthens / EZProxy / Shibboleth).",
+        description=(
+            "The cached session lives at "
+            "`~/.scitex/scholar/cache/auth/<provider>.json`. It is refreshed "
+            "lazily by `paper fetch`, but these commands let you inspect or "
+            "drive the lifecycle directly — useful for debugging the SSO "
+            "automator and pre-warming sessions for batch jobs.",
+        ),
+    ),
+    context_settings=CONTEXT_SETTINGS,
+)
 def auth() -> None:
     """Institutional SSO authentication (OpenAthens / EZProxy / Shibboleth).
 
@@ -48,7 +60,21 @@ def _auth_cache_paths() -> list[Path]:
     return sorted(p for p in auth_dir.glob("*.json") if p.is_file())
 
 
-@auth.command("status", context_settings=CONTEXT_SETTINGS)
+@auth.command(
+    "status",
+    **spec_command_kwargs(
+        "Show cached SSO session state.",
+        examples=(
+            ("{prog} auth status", "Human-readable session table."),
+            ("{prog} auth status --json", "Machine-readable output."),
+        ),
+        exit_codes=(
+            (0, "at least one session is valid."),
+            (1, "no session, or all expired."),
+        ),
+    ),
+    context_settings=CONTEXT_SETTINGS,
+)
 @click.option("--json", "as_json", is_flag=True)
 def auth_status(as_json: bool) -> int:
     """Show cached SSO session state.
@@ -123,7 +149,22 @@ def auth_status(as_json: bool) -> int:
     return 0 if any_valid else 1
 
 
-@auth.command("logout", context_settings=CONTEXT_SETTINGS)
+@auth.command(
+    "logout",
+    **spec_command_kwargs(
+        "Clear cached SSO session(s) — forces next call to re-authenticate.",
+        examples=(
+            ("{prog} auth logout", "Clear every cached session."),
+            ("{prog} auth logout --provider openathens", "Clear one provider."),
+            ("{prog} auth logout --dry-run", "Preview only."),
+        ),
+        exit_codes=(
+            (0, "sessions cleared (or nothing to clear)."),
+            (2, "refused: mutating run without --yes/-y."),
+        ),
+    ),
+    context_settings=CONTEXT_SETTINGS,
+)
 @click.option("--provider", default=None, help="Specific provider (default: all).")
 @click.option("--yes", "-y", is_flag=True, help="Assume yes; non-interactive.")
 @click.option("--dry-run", is_flag=True, help="Show what would be deleted.")
@@ -176,7 +217,24 @@ def auth_logout(provider: str | None, yes: bool, dry_run: bool) -> int:
     return 0
 
 
-@auth.command("login", context_settings=CONTEXT_SETTINGS)
+@auth.command(
+    "login",
+    **spec_command_kwargs(
+        "Trigger SSO login flow now — pre-warm the cached session.",
+        examples=(
+            ("{prog} auth login", "Log in with the default provider."),
+            (
+                "{prog} auth login --browser-mode interactive",
+                "Drive the login visibly.",
+            ),
+        ),
+        exit_codes=(
+            (0, "authenticated."),
+            (1, "authentication failed."),
+        ),
+    ),
+    context_settings=CONTEXT_SETTINGS,
+)
 @click.option("--provider", default="openathens", help="Provider to authenticate.")
 @click.option(
     "--browser-mode",
@@ -201,7 +259,17 @@ def auth_login(provider: str, browser_mode: str) -> int:
     return asyncio.run(_go())
 
 
-@auth.command("refresh", context_settings=CONTEXT_SETTINGS)
+@auth.command(
+    "refresh",
+    **spec_command_kwargs(
+        "Force re-login: equivalent to `auth logout --yes` then `auth login`.",
+        examples=(
+            ("{prog} auth refresh", "Re-login every provider."),
+            ("{prog} auth refresh --provider openathens", "Re-login one."),
+        ),
+    ),
+    context_settings=CONTEXT_SETTINGS,
+)
 @click.option("--provider", default=None, help="Specific provider (default: all).")
 @click.pass_context
 def auth_refresh(ctx: click.Context, provider: str | None) -> int:

@@ -117,6 +117,11 @@ scitex-scholar also reads a broad set of ecosystem vars (`SCITEX_CLOUD_*`,
 `SCITEX_WRITER_*`, `SCITEX_DEV_*`, `SCITEX_TUNNEL_*`, `SCITEX_UI_*`). These
 are documented by their owning packages — set them there, not here.
 
+Exception with a scholar-owned canonical name: `SCITEX_SCHOLAR_APP_MODE`
+(`hub` | `standalone`, default `standalone`) selects the GUI mode. The
+pre-convention `SCITEX_APP_MODE` still works as a legacy fallback behind a
+loud deprecation warning (see `src/scitex_scholar/_utils/_env.py`).
+
 ## Audit
 
 ```bash
