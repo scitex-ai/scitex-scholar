@@ -22,8 +22,24 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 
-from watchdog.events import FileSystemEventHandler
-from watchdog.observers import Observer
+import scitex_logging as slogging
+
+# `watchdog` gates the optional `watch` capability (the `[watch]` extra):
+# this module is only imported on demand (`_cli/library.py` pulls it inside
+# `open_browser_with_monitoring`, and it also runs as `python -m`), so the
+# guard is real optionality rather than a swallowed failure — when the
+# watcher IS asked for and watchdog is absent, the caller gets the install
+# line instead of a bare ModuleNotFoundError.
+try:
+    from watchdog.events import FileSystemEventHandler
+    from watchdog.observers import Observer
+except ImportError as exc:  # optional dependency: `scitex-scholar[all]`
+    raise ImportError(
+        "The monitored-browser watcher needs watchdog: "
+        "pip install 'scitex-scholar[all]'"
+    ) from exc
+
+console = slogging.getConsole(__name__)
 
 # Add parent to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -212,7 +228,7 @@ class DownloadMonitor(FileSystemEventHandler):
         if self.ui is not None:
             self.ui.event(msg, level=level)
         else:
-            print(msg, flush=True)
+            console.info(msg)
 
     def on_created(self, event):
         if event.is_directory:
@@ -456,7 +472,7 @@ class DownloadMonitor(FileSystemEventHandler):
 
             # Update project symlinks: SymlinkHandlersMixin.update_symlink
             # regenerates the `PDF-NN_CC-..._IF-..._YYYY_Author_Journal`
-            # readable name from the current MASTER state (counts PDFs in
+            # readable name from the current primary state (counts PDFs in
             # paper_dir) and replaces stale links. Run once per project
             # that contains this paper.
             try:

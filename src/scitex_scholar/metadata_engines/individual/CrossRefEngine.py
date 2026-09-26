@@ -252,9 +252,9 @@ if __name__ == "__main__":
         outputs["empty_json"] = engine._create_minimal_metadata(return_as="json")
 
         for k, v in outputs.items():
-            print("----------------------------------------")
-            print(k)
-            print("----------------------------------------")
+            logger.info("----------------------------------------")
+            logger.info(k)
+            logger.info("----------------------------------------")
             pprint(v)
             time.sleep(1)
 

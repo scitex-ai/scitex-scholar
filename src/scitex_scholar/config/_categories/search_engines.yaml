@@ -8,11 +8,22 @@
 engines:
   - URL
   - CrossRefLocal
+  - OpenAlexLocal
   - Semantic_Scholar
   - CrossRef
   - OpenAlex
   - PubMed
   - arXiv
+
+# Local package adapters are primary; public APIs are the last fallback for
+# those same corpora. Hosts provide deployment/context only, never this policy.
+source_tiers:
+  primary:
+    - CrossRefLocal
+    - OpenAlexLocal
+  online_fallback:
+    - CrossRef
+    - OpenAlex
 
 # ----------------------------------------
 # Search Settings

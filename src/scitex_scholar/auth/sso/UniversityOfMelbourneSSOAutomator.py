@@ -6,6 +6,10 @@ from __future__ import annotations
 
 import os
 
+import scitex_logging as slogging
+
+logger = slogging.getLogger(__name__)
+
 __FILE__ = __file__
 __DIR__ = os.path.dirname(__FILE__)
 # ----------------------------------------
@@ -472,6 +476,7 @@ class UniversityOfMelbourneSSOAutomator(BaseSSOAutomator):
         """Take debug screenshot."""
         try:
             import time
+
             from scitex_scholar.config import ScholarConfig
 
             screenshot_path = (
@@ -502,11 +507,11 @@ if __name__ == "__main__":
                 try:
                     await page.goto("https://sso.unimelb.edu.au/")
                     success = await automator.perform_login_async(page)
-                    print(f"Login success: {success}")
+                    logger.info(f"Login success: {success}")
 
                     await page.wait_for_timeout(5000)
                 except Exception as e:
-                    print(f"Error: {e}")
+                    logger.info(f"Error: {e}")
                 finally:
                     await browser.close()
 

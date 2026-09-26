@@ -41,7 +41,7 @@ class PDFDownloadMixin:
 
         Args:
             dois: List of DOI strings
-            output_dir: Output directory (not used - downloads to library MASTER)
+            output_dir: Output directory (not used - downloads to the library primary store)
             max_concurrent: Maximum concurrent downloads (default: 1 for sequential)
 
         Returns

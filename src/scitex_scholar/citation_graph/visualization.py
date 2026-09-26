@@ -104,7 +104,16 @@ def _plot_figrecipe(G, output=None, **kwargs):
 
 def _plot_scitex_plt(G, output=None, **kwargs):
     """Render with scitex.plt (AxisWrapper + CSV auto-export)."""
-    import scitex_plt as stx_plt
+    # Optional backend. scitex-plt is not a runtime requirement of the
+    # package: it is one of four renderers, selected explicitly or by the
+    # availability order above. Guarded so the import names the install line
+    # instead of raising a bare ModuleNotFoundError from a plot call.
+    try:
+        import scitex_plt as stx_plt
+    except ImportError as exc:  # optional dependency
+        raise ImportError(
+            "The 'scitex.plt' backend needs scitex-plt: pip install scitex-plt"
+        ) from exc
 
     preset = _fr_get_preset("citation") if _FIGRECIPE_AVAILABLE else {}
     merged = {**preset, **kwargs}
@@ -128,7 +137,16 @@ def _plot_scitex_plt(G, output=None, **kwargs):
 def _plot_matplotlib(G, output=None, **kwargs):  # noqa: C901
     """Render with raw matplotlib + networkx (no external deps)."""
     import matplotlib.pyplot as plt
-    import networkx as nx
+
+    # networkx is the optional layout engine of this backend (the other
+    # backends draw through figrecipe / pyvis). Optional dependency: guarded
+    # so the failure names the install line.
+    try:
+        import networkx as nx
+    except ImportError as exc:  # optional dependency
+        raise ImportError(
+            "The 'matplotlib' backend needs networkx: pip install networkx"
+        ) from exc
 
     fig, ax = plt.subplots(1, 1, figsize=kwargs.pop("figsize", (8, 6)))
 

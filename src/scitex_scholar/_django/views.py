@@ -20,19 +20,53 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
-import logging
 import os
 import time
 from pathlib import Path
 from typing import Dict, Optional
 
-from django.conf import settings as django_settings
-from django.http import HttpResponse, JsonResponse
-from django.template.loader import render_to_string
+import scitex_logging as slogging
 
-from django.apps import apps as _django_apps
-from django.core.exceptions import ImproperlyConfigured
-from django.utils.translation import gettext as _i18n  # noqa: N816  (JS string dict)
+# The whole `[server]` stack is OPTIONAL for the DISTRIBUTION (a bare
+# `pip install scitex-scholar` must not pull Django) and REQUIRED for THIS
+# module -- a Django view set has no meaning without the framework. Each
+# import is therefore GUARDED (2026-09-20) and each guard FAILS LOUDLY with
+# the extra to install; none of them silently degrades to a missing name.
+# See apps.py for why a silent guard is unacceptable on this surface.
+try:
+    from django.apps import apps as _django_apps
+    from django.conf import settings as django_settings
+    from django.core.exceptions import ImproperlyConfigured
+    from django.http import HttpResponse, JsonResponse
+    from django.template.loader import render_to_string
+    from django.utils.translation import gettext as _i18n  # noqa: N816  (JS string dict)
+    from django.views.decorators.http import require_GET, require_POST
+except ImportError as exc:  # django absent -- the [all]-gated GUI capability only
+    raise ImportError(
+        "scitex_scholar._django.views needs Django, which is not installed. "
+        "Install the optional stack: pip install 'scitex-scholar[all]'"
+    ) from exc
+
+try:
+    from scitex_app.embed import mount_prefix
+except ImportError as exc:  # scitex-app absent -- the [all]-gated GUI capability only
+    raise ImportError(
+        "scitex_scholar._django.views needs scitex-app, which is not "
+        "installed. Install the optional stack: pip install 'scitex-scholar[all]'"
+    ) from exc
+
+try:
+    from scitex_ui.project_scope import (
+        LocalProjectProvider,
+        host_project_provider,
+        project_listing_view,
+        resolve_project,
+    )
+except ImportError as exc:  # scitex-ui absent -- the [all]-gated GUI capability only
+    raise ImportError(
+        "scitex_scholar._django.views needs scitex-ui, which is not "
+        "installed. Install the optional stack: pip install 'scitex-scholar[all]'"
+    ) from exc
 
 # The dotted INSTALLED_APPS entry a host must carry for these views to
 # work. Kept as ONE string so the refusal below and the docs name the
@@ -91,10 +125,8 @@ _refuse_unless_app_installed()
 # registered at path("", ...). IF SCHOLAR EVER ADDS A NON-ROOT VIEW
 # THAT EMITS THE MARKER, pass that view's route here; the function
 # raises MountPrefixMismatch rather than guessing.
-from scitex_app.embed import mount_prefix
-from django.views.decorators.http import require_GET, require_POST
 
-logger = logging.getLogger(__name__)
+logger = slogging.getLogger(__name__)
 
 # Simple in-memory cache (framework-agnostic, ported verbatim)
 _cache: Dict[str, dict] = {}
@@ -248,10 +280,74 @@ def _app_label(base: str) -> str:
     ``<title>`` was dropped in favour of the shell, and what
     ``test_index_body_contains_title`` caught.
     """
-    from django.conf import settings
+    try:
+        from django.conf import settings
+    except ImportError as exc:  # django absent -- the [all]-gated GUI capability only
+        raise ImportError(
+            "scitex_scholar._django.views needs Django, which is not "
+            "installed. Install the optional stack: "
+            "pip install 'scitex-scholar[all]'"
+        ) from exc
 
     mode = getattr(settings, "SCITEX_APP_MODE", "standalone")
     return f"{base} (hub)" if mode == "hub" else base
+
+
+def _standalone_projects_root() -> Path:
+    """Return the folder the standalone scitex-ui provider lists."""
+    explicit = os.environ.get("SCITEX_SCHOLAR_PROJECTS_DIR")
+    if explicit:
+        return Path(explicit).expanduser()
+    library_root = os.environ.get("SCITEX_SCHOLAR_LIBRARY_ROOT")
+    if library_root:
+        return Path(library_root).expanduser()
+    scitex_root = Path(os.environ.get("SCITEX_DIR", "~/.scitex")).expanduser()
+    return scitex_root / "scholar" / "library"
+
+
+class ScholarLocalProjectProvider(LocalProjectProvider):
+    """scitex-ui's standalone provider, minus the library's reserved dirs.
+
+    scitex-ui's ::class:`LocalProjectProvider` treats EVERY non-hidden folder
+    under its root as a selectable project. Scholar's standalone root IS the
+    library root, whose direct children also include ``MASTER/`` (the
+    deduplicated paper store) and ``downloads/`` (the PDF staging area), so the
+    stock provider offered the internal store as if it were a user project.
+
+    Subclassing (rather than reimplementing) keeps scitex-ui authoritative for
+    the picker's id/name/detail shape and for the stored last-visited file,
+    while the LISTING follows Scholar's own storage contract. The reserved
+    names come from ``storage._project_reconcile`` -- the same set the library
+    reconciler and audit use -- so the picker and the storage layer cannot
+    disagree about what a project is.
+    """
+
+    def list_projects(self, request=None):
+        """Projects the picker may offer: real project dirs only."""
+        from scitex_scholar.storage._project_reconcile import RESERVED_LIBRARY_DIRS
+
+        reserved = {name.upper() for name in RESERVED_LIBRARY_DIRS}
+        return [
+            entry
+            for entry in super().list_projects(request)
+            # Case-insensitive: the primary-store folder is the same internal store on
+            # a case-insensitive filesystem, and MUST NOT slip through here.
+            if entry.name.upper() not in reserved
+            and not (self.root / entry.name).is_symlink()
+        ]
+
+
+def _project_provider(request):
+    """Use the mounted host provider, or scitex-ui's local provider standalone."""
+    return host_project_provider() or ScholarLocalProjectProvider(
+        _standalone_projects_root()
+    )
+
+
+# Shared scitex-ui GET-list / POST-remember endpoint. The provider factory is
+# request-time so mounted hosts remain authoritative for permissions and
+# project identity; Scholar contains no Hub model or authorization logic.
+project_scope = project_listing_view(_project_provider)
 
 
 def index(request):
@@ -264,6 +360,12 @@ def index(request):
     which is what the removed `_favicon_href()` did.
     """
     resolved_api = _api_url()
+    provider = _project_provider(request)
+    current_project = resolve_project(
+        request,
+        provider,
+        explicit=request.GET.get("project"),
+    )
     html = render_to_string(
         "scholar/scholar.html",
         {
@@ -271,6 +373,8 @@ def index(request):
             "api_url": resolved_api or "Not configured",
             "stx_mount": mount_prefix(request),
             "app_label": _app_label("SciTeX Scholar"),
+            "app_scope": "project",
+            "current_project": current_project,
             # i18n (operator directive 2026-09-14): the whole page flips via
             # LocaleMiddleware; this carries the strings that live ONLY in
             # JS, translated server-side for the current request language so
@@ -326,9 +430,23 @@ def _js_i18n_dict() -> dict:
         "Enriching…": _i18n("Enriching…"),
         "Enrichment failed": _i18n("Enrichment failed"),
         "Enrichment failed (HTTP %(status)s)": _i18n("Enrichment failed (HTTP %(status)s)"),
-        "Your library is empty. Save papers from Search or Import, then Enrich them here.": _i18n(
-            "Your library is empty. Save papers from Search or Import, then Enrich them here."
+        # Library states (review blocker 2): every message below is rendered by
+        # library.js, so it MUST be a key here -- an English literal in the JS
+        # is invisible to the catalog and shows EN on a JA page.
+        "Your library is empty. Import a BibTeX file to add papers.": _i18n(
+            "Your library is empty. Import a BibTeX file to add papers."
         ),
+        "No papers match the current filters.": _i18n(
+            "No papers match the current filters."
+        ),
+        "Clear filters": _i18n("Clear filters"),
+        "Import BibTeX": _i18n("Import BibTeX"),
+        "%(count)s of %(total)s Papers": _i18n("%(count)s of %(total)s Papers"),
+        # Search tab: the empty result state was an English literal in search.js.
+        "No papers matched this query.": _i18n("No papers matched this query."),
+        # Search tab: which tier answered (local NAS corpora vs online fallback).
+        "Local corpus (NAS)": _i18n("Local corpus (NAS)"),
+        "Online fallback": _i18n("Online fallback"),
         "Imported %(n)s paper from %(file)s": _i18n("Imported %(n)s paper from %(file)s"),
         "Imported %(n)s papers from %(file)s": _i18n("Imported %(n)s papers from %(file)s"),
     }
@@ -586,12 +704,16 @@ def _degraded_payload() -> dict:
 
 
 @require_GET
-def search(request):
+def search(request, _engine=None):
     """Search academic databases through the package's ScholarSearchEngine.
 
     Thin HTTP adapter: query parsing, engine selection and result
     aggregation all belong to the package facade, so this view only
     validates parameters, delegates, and caches.
+
+    `_engine` is a test-injection seam: the collaborator is a PARAMETER, not a
+    monkeypatch (PA-306), exactly as `library_enrich(_pipeline=)` is. Django
+    routes call it with only `request`.
     """
     query = request.GET.get("q", "").strip()
     if not query:
@@ -618,7 +740,7 @@ def search(request):
             return JsonResponse(cached)
 
     try:
-        engine = _get_search_engine()
+        engine = _engine or _get_search_engine()
         result = asyncio.run(
             engine.search(query=query, mode=mode, max_results=max_results)
         )
@@ -638,7 +760,7 @@ def search(request):
 # the same code the `scitex-scholar library` CLI drives. No library or
 # enrichment logic lives in these views:
 #   list  -> storage._library_index (user's local library index)
-#   enrich-> storage.PaperIO (master metadata.json) +
+#   enrich-> storage.PaperIO (primary metadata.json) +
 #            pipelines.ScholarPipelineMetadataSingle (the enrichment engine)
 #
 # USER SCOPE: standalone scholar has no account system; the user's library is
@@ -729,7 +851,7 @@ def _assert_safe_library_id(library_id: str) -> str:
 
 
 def _load_library_paper(root: Path, paper_id: str):
-    """Load one master metadata.json as a Paper, keyed by paper_id.
+    """Load one primary metadata.json as a Paper, keyed by paper_id.
 
     Real library files store {"metadata": {...}} with no "container", so the
     paper_id is set explicitly -- that is what PaperIO needs to write back to
@@ -745,13 +867,13 @@ def _load_library_paper(root: Path, paper_id: str):
 
 
 def _save_library_paper(paper, root: Path) -> Path:
-    """Persist an enriched Paper to its master dir.
+    """Persist an enriched Paper to its primary dir.
 
-    The library is the user's local MASTER files; the view writes them directly
+    The library is the user's local primary files; the view writes them directly
     (PaperIO) and does NOT touch the shared relational library index -- that
     store is keyed by the running user, and rebuilding it here would couple the
     GUI to a store the app may not own. Reading back is done straight from the
-    master files (see library_list), which is the same user-scope guarantee.
+    primary files (see library_list), which is the same user-scope guarantee.
 
     The library_id is validated to be a single safe path component BEFORE any
     write, so MASTER/<library_id> can never escape the library root.
@@ -765,23 +887,41 @@ def _save_library_paper(paper, root: Path) -> Path:
 
 @require_GET
 def library_list(request):
-    """List the user's local library papers.
+    """List the user's local library papers, optionally filtered by ``?q=``.
 
-    Returns {papers: [...], count, library_root}. Reads the user's MASTER
-    metadata files directly (``collect_rows`` -- "no store involved"), scoped
-    to the request's user (see ``_library_root_for``), so a mounted hub never
-    exposes one shared service-account library to every user. An empty or
-    missing library is an empty list, not an error.
+    Returns {papers: [...], count, total, filtered, query, library_root}.
+    Reads the user's primary metadata files directly (``collect_rows`` -- "no
+    store involved"), scoped to the request's user (see ``_library_root_for``),
+    so a mounted hub never exposes one shared service-account library to every
+    user. An empty or missing library is an empty list, not an error.
+
+    ``filtered`` says whether a filter was APPLIED, and ``total`` how many
+    papers the library holds before it. The client needs both to tell "you have
+    no papers" from "your filter matched none" -- the two states carry
+    different copy and different actions, and without the flag the filtered
+    empty state is dead code no user can ever reach.
     """
     root = _library_root_for(request)
     from scitex_scholar.storage import _library_index as idx
 
+    query = (request.GET.get("q") or "").strip()
+
+    def _payload(papers: list, total: int) -> dict:
+        return {
+            "papers": papers,
+            "count": len(papers),
+            "total": total,
+            "filtered": bool(query),
+            "query": query,
+            "library_root": str(root),
+        }
+
     try:
         rows = idx.collect_rows(root)
     except FileNotFoundError:
-        return JsonResponse({"papers": [], "count": 0, "library_root": str(root)})
+        return JsonResponse(_payload([], 0))
     except ValueError as e:
-        # Duplicate DOIs across MASTER entries == library corruption; surface it
+        # Duplicate DOIs across primary entries == library corruption; surface it
         # rather than silently listing an inconsistent view.
         logger.error(f"library list: {e}")
         return JsonResponse({"error": f"Library index inconsistent: {e}"}, status=500)
@@ -799,14 +939,41 @@ def library_list(request):
         }
         for r in rows
     ]
-    return JsonResponse({"papers": papers, "count": len(papers), "library_root": str(root)})
+    if query:
+        papers = [p for p in papers if _paper_matches(p, query)]
+    return JsonResponse(_payload(papers, len(rows)))
+
+
+def _paper_matches(paper: dict, query: str) -> bool:
+    """Case-insensitive substring match over the fields the UI shows.
+
+    Authors arrive as names or objects depending on the primary record, so both
+    shapes are flattened here rather than guessed at in the client.
+    """
+    authors = [
+        a if isinstance(a, str) else (a or {}).get("name", "")
+        for a in (paper.get("authors") or [])
+    ]
+    haystack = " ".join(
+        str(part)
+        for part in (
+            paper.get("title"),
+            paper.get("doi"),
+            paper.get("venue"),
+            paper.get("year"),
+            paper.get("paper_id"),
+            *authors,
+        )
+        if part is not None
+    )
+    return query.casefold() in haystack.casefold()
 
 
 @require_POST
 def library_enrich(request, _pipeline=None):
     """Enrich ONE library paper's metadata from the databases (#106).
 
-    Body: {"paper_id": str, "force": bool}. Loads the master record, runs the
+    Body: {"paper_id": str, "force": bool}. Loads the primary record, runs the
     package's enrichment engine, and writes the enriched metadata back to the
     same user-scoped library (no account required).
 

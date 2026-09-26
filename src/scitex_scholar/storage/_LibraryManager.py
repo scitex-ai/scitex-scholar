@@ -6,7 +6,7 @@
 Unified manager for Scholar library structure and paper storage.
 
 This module provides a comprehensive library manager that:
-- Manages paper storage in the master library
+- Manages paper storage in the primary library
 - Handles metadata conversion and standardization
 - Creates project symlinks for organization
 - Generates BibTeX entries and structures
@@ -83,7 +83,7 @@ class LibraryManager(
     project : str
         Current project name
     library_master_dir : Path
-        Path to the master library directory
+        Path to the primary library directory
     single_doi_resolver : object
         DOI resolver instance
     dedup_manager : DeduplicationManager

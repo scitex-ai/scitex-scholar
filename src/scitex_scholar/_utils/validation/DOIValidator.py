@@ -272,22 +272,22 @@ if __name__ == "__main__":
         "invalid-doi",  # Invalid format
     ]
 
-    print("=" * 80)
-    print("DOI Validator Demo")
-    print("=" * 80)
+    logger.info("=" * 80)
+    logger.info("DOI Validator Demo")
+    logger.info("=" * 80)
 
     for doi in test_dois:
-        print(f"\nTesting: {doi or '(empty)'}")
+        logger.info(f"\nTesting: {doi or '(empty)'}")
         is_valid, message, status_code, resolved_url = validator.validate_doi(doi)
 
-        print(f"  Valid: {is_valid}")
-        print(f"  Message: {message}")
-        print(f"  Status Code: {status_code}")
+        logger.info(f"  Valid: {is_valid}")
+        logger.info(f"  Message: {message}")
+        logger.info(f"  Status Code: {status_code}")
         if resolved_url:
-            print(f"  Resolved URL: {resolved_url[:80]}...")
+            logger.info(f"  Resolved URL: {resolved_url[:80]}...")
 
-    print("\n" + "=" * 80)
-    print("Demo complete")
-    print("=" * 80)
+    logger.info("\n" + "=" * 80)
+    logger.info("Demo complete")
+    logger.info("=" * 80)
 
 # EOF

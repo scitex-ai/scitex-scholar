@@ -30,7 +30,16 @@ class SymlinkHandlersMixin:
         journal: Optional[str] = None,
     ) -> str:
         """Generate readable symlink name from metadata."""
-        from scitex_dict import DotDict
+        # GUARDED, not declared (PS-233): scitex-dict is not a core dependency
+        # of this distribution, so the import is wrapped and fails loudly with
+        # the distribution to install rather than a bare ModuleNotFoundError.
+        try:
+            from scitex_dict import DotDict
+        except ImportError as exc:
+            raise ImportError(
+                "SymlinkHandlersMixin needs scitex-dict (DotDict), which is not "
+                "installed. Install it with: pip install scitex-dict"
+            ) from exc
 
         from scitex_scholar.config.core._path_helpers import sanitize_filename
 
@@ -158,13 +167,13 @@ class SymlinkHandlersMixin:
     def _create_project_symlink(
         self, master_storage_path: Path, project: str, readable_name: str
     ) -> Optional[Path]:
-        """Create symlink in project directory pointing to master storage."""
+        """Create symlink in project directory pointing to primary storage."""
         try:
             project_dir = self.config.path_manager.get_library_project_dir(project)
             symlink_path = project_dir / readable_name
             master_id = master_storage_path.name
 
-            # Remove old symlinks pointing to the same master entry
+            # Remove old symlinks pointing to the same primary entry
             for existing_link in project_dir.iterdir():
                 if not existing_link.is_symlink():
                     continue
@@ -202,13 +211,13 @@ class SymlinkHandlersMixin:
         """Create symlink inside the project's own directory tree.
 
         Target location: ``{project_dir}/.scitex/scholar/library/{project}/{readable_name}``
-        Target of symlink: absolute path to master storage entry.
+        Target of symlink: absolute path to the primary storage entry.
 
         This mirrors the ``~/.scitex/scholar/library/{project}/`` view directly
         inside the user's code project so papers are visible alongside source code.
 
         Args:
-            master_storage_path: Absolute path to the MASTER entry directory.
+            master_storage_path: Absolute path to the primary entry directory.
             readable_name: Human-readable symlink name (PDF-xx_CC-... format).
 
         Returns
@@ -232,7 +241,7 @@ class SymlinkHandlersMixin:
 
             symlink_path = local_lib / readable_name
 
-            # Remove stale symlinks pointing to the same master entry
+            # Remove stale symlinks pointing to the same primary entry
             master_id = master_storage_path.name
             for existing in local_lib.iterdir():
                 if not existing.is_symlink():
@@ -272,7 +281,7 @@ class SymlinkHandlersMixin:
         paper_id: str = None,
         master_storage_path: Path = None,
     ) -> None:
-        """Ensure project symlink exists for paper in master library."""
+        """Ensure project symlink exists for paper in the primary library."""
         try:
             if not paper_id or not master_storage_path:
                 return

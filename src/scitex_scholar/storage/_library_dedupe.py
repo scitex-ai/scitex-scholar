@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Resolve duplicate-DOI entries in MASTER.
+"""Resolve duplicate-DOI entries in the primary store.
 
 Strategy:
 1. Detect all duplicate DOIs (case-insensitive).

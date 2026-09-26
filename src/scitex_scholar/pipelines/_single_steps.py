@@ -233,7 +233,7 @@ class PipelineStepsMixin:
     def _step_07_import_files(
         self, paper, io, *, pdf_main, pdf_supples, attachments, force
     ):
-        """Place user-provided files into MASTER and record them.
+        """Place user-provided files into the primary store and record them.
 
         Roles and on-disk naming (flat layout, prefix-encoded):
           * ``pdf_main``    → ``MASTER/<id>/<First>-<Year>-<Journal>.pdf``

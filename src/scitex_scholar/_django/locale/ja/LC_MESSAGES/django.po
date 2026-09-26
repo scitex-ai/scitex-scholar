@@ -110,14 +110,23 @@ msgstr "EndNote (.enw)"
 msgid "Import BibTeX"
 msgstr "BibTeX をインポート"
 
+msgid "Filter your library"
+msgstr "ライブラリを絞り込む"
+
+msgid "Title, author, or DOI"
+msgstr "タイトル、著者、DOI"
+
+msgid "Clear filters"
+msgstr "絞り込みを解除"
+
 msgid "Loading your library..."
 msgstr "ライブラリを読み込み中…"
 
 msgid "Build Citation Network"
 msgstr "引用ネットワークを構築"
 
-msgid "Enter a DOI to build an interactive citation network. The graph shows related papers based on bibliographic coupling, co-citation, and direct citations."
-msgstr "DOI を入力すると対話的な引用ネットワークを構築します。グラフは書誌的結合、共被引用、直接引用に基づいた関連論文を表示します。"
+msgid "Start with a DOI. Find one by title, topic, or keywords in Search or your Library, then build an interactive citation graph of related papers."
+msgstr "DOI から始めます。タイトル・トピック・キーワードで検索タブまたはライブラリから DOI を探し、関連論文の対話的な引用グラフを構築してください。"
 
 msgid "DOI"
 msgstr "DOI"
@@ -125,8 +134,11 @@ msgstr "DOI"
 msgid "Build Graph"
 msgstr "グラフを構築"
 
-msgid "Papers"
-msgstr "論文"
+msgid "Paste the DOI for one seed paper; titles and keywords belong in Search."
+msgstr "起点となる論文の DOI を貼り付けてください。タイトルやキーワードでの検索は検索タブで行います。"
+
+msgid "Max papers in graph"
+msgstr "グラフ内の最大論文数"
 
 msgid "Building citation network... This may take a moment."
 msgstr "引用ネットワークを構築中。少し時間がかかる場合があります。"
@@ -185,6 +197,9 @@ msgstr "不明"
 msgid "Related papers"
 msgstr "関連論文"
 
+msgid "Papers"
+msgstr "論文"
+
 msgid "Paper"
 msgstr "論文"
 
@@ -206,8 +221,23 @@ msgstr "補完に失敗"
 msgid "Enrichment failed (HTTP %(status)s)"
 msgstr "補完に失敗（HTTP %(status)s）"
 
-msgid "Your library is empty. Save papers from Search or Import, then Enrich them here."
-msgstr "ライブラリは空です。検索から論文を保存するかインポートし、ここで補完してください。"
+msgid "Your library is empty. Import a BibTeX file to add papers."
+msgstr "ライブラリは空です。BibTeX ファイルをインポートして論文を追加してください。"
+
+msgid "No papers match the current filters."
+msgstr "現在の絞り込み条件に一致する論文はありません。"
+
+msgid "%(count)s of %(total)s Papers"
+msgstr "%(total)s 件中 %(count)s 件の論文"
+
+msgid "No papers matched this query."
+msgstr "このクエリに一致する論文はありませんでした。"
+
+msgid "Local corpus (NAS)"
+msgstr "ローカルコーパス（NAS）"
+
+msgid "Online fallback"
+msgstr "オンラインへのフォールバック"
 
 msgid "Imported %(n)s paper from %(file)s"
 msgstr "%(file)s から %(n)s 件の論文をインポートしました"

@@ -1291,7 +1291,7 @@ async def add_papers_to_project_handler(
                 papers = scholar.load_bibtex(bibtex_path)
                 for paper in papers:
                     try:
-                        # Save to library (this creates symlinks from project to MASTER)
+                        # Save to library (this creates symlinks from project to the primary store)
                         scholar.save_papers_to_library([paper])
                         added.append(
                             {

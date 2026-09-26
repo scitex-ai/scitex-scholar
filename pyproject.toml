@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "scitex-scholar"
-version = "1.12.0"
+version = "1.12.1"
 description = "Scientific paper search, enrichment, download, and management for the SciTeX ecosystem"
 readme = "README.md"
 license = "AGPL-3.0-only"
@@ -79,65 +79,43 @@ dependencies = [
     "scitex-dev>=0.30.0",
     "tenacity>=8.0.0",
     "tqdm>=4.64.0",
+    # ------------------------------------------------------------------
+    # PS-233 (runtime-import-dependency-undeclared) — POLICY: a GUARDED
+    # import must NOT be declared here.
+    #
+    # The first PS-233 remedy for this package declared every unguarded
+    # import hard (django / scitex-app / scitex-ui / fastmcp / scitex-config
+    # / scitex-dict / numpy), which made a bare `pip install scitex-scholar`
+    # pull the whole Django GUI stack. That is wrong for THIS package: the
+    # GUI/server stack and the MCP server are OPTIONAL capabilities, not
+    # requirements of the search/enrich/download library. The remedy is a
+    # guard at each import site, so those distributions are no longer
+    # declared here — declaring a distribution used only under a guard is
+    # itself a PS-233 error.
+    #
+    # Where each guarded capability's install hint points: `[all]`. There
+    # are no per-feature extras (PS-225) -- the GUI/server stack, the MCP
+    # server, the PDF/export/clew/watch backends are ALL optional
+    # capabilities gated on `pip install scitex-scholar[all]`, so every
+    # guard names that switch directly:
+    #   django / scitex-app / scitex-ui / fastmcp / watchdog / openpyxl /
+    #   pdfplumber / scitex-clew  ->  [all]
+    #   numpy / scitex-config / scitex-dict -> named directly in the hint;
+    #     they ship transitively anyway (pandas pulls numpy, scitex-dev
+    #     pulls scitex-config, scitex-session pulls scitex-dict), so
+    #     dropping the explicit pin costs a bare install nothing.
+    # The guards are LOUD: each one raises/prints an actionable,
+    # extra-naming message (or sets a sentinel the caller can test) —
+    # never a silent `pass`.
 ]
 
 [project.optional-dependencies]
-browser = [
-    "playwright>=1.40.0",
-]
-clew = [
-    "scitex-clew>=0.1.0",
-]
-export = [
-    "openpyxl>=3.1.0",
-]
-mcp = [
-    "fastmcp>=2.0.0",
-]
-pdf = [
-    "pdfplumber>=0.9.0",
-]
-server = [
-    "aiohttp>=3.8.0",
-    "django>=4.2",
-    # scitex-app supplies the standalone Django launcher (run_standalone),
-    # the ScitexAppConfig base class the `gui` server builds on, and the
-    # guarded GUI lifecycle (`embed.serve_gui` / `gui_status` / `gui_stop`
-    # / `gui_port_holder`) that `_cli/gui.py` delegates to.
-    # 0.5.0 is the floor, not a preference: `serve_gui` gained orphan
-    # reclaim under --force, and `gui_port_holder` gained the frozen
-    # three-valued `PortHolder` whose `ours is None` the `gui open` code
-    # branches on. Against 0.4.x those branches read a different shape.
-    "scitex-app>=0.11.0",  # hosts_to_allow public name (fleet single implementation)
-    # gui_runtime (pid/port/host lifecycle bookkeeping for `scholar gui`)
-    # shipped in scitex-dev 0.30.0 (2026-07-12).
-    "scitex-dev>=0.30.0",
-    # scholar.html EXTENDS `scitex_ui/standalone_shell.html` (since 1.9.0), so
-    # the shell supplies our whole <html> document, not just a branding partial.
-    #
-    # >=0.19.0 because BELOW it that shell hardcodes `<html lang="en">` while the
-    # theme attribute beside it is already `{{ }}`-driven. That matters more than
-    # a wrong metadata field: `lang` is where a screen reader takes its
-    # PRONUNCIATION rules, so a non-English page served as lang="en" is read with
-    # English phonetics.
-    #
-    # Scholar does NOT call `shell_context()` -- views.py builds its own context
-    # and calls render_to_string directly -- so we depend specifically on the
-    # TEMPLATE-level `{{ shell_lang|default:'en' }}`, not on the function's
-    # default. Verified on a real HTTP response from the PUBLISHED wheels
-    # (scitex-scholar 1.9.0 + scitex-ui 0.19.0, isolated venv):
-    #     <html lang="en" data-theme-default="dark">
-    # i.e. present and correct rather than the empty lang a function-only default
-    # would have produced here.
-    #
-    # THE PREVIOUS COMMENT HERE WAS FALSE and worth naming: it said scholar
-    # "owns its own layout and deliberately does not extend that shell". True
-    # before 1.9.0, wrong after, and nothing failed when it went stale.
-    "scitex-ui>=0.19.0",
-]
-watch = [
-    "watchdog>=3.0.0",
-]
+# PS-225: per-feature extras are retired — exactly two installs exist,
+# `pip install <pkg>` (core) and `pip install <pkg>[all]` (everything).
+# The former browser/clew/export/mcp/pdf/server/watch groups were
+# collapsed here (audit-green, 2026-09-22). `[browser]` was a pure no-op
+# (playwright is a core dep); `[server]`'s aiohttp/scitex-dev lines were
+# core-redundant. Surviving feature pins live FLAT in `[all]` below.
 dev = [
     "scitex-dev>=0.30.0",
     "pytest>=7.0.0",
@@ -151,16 +129,18 @@ dev = [
     "aiohttp>=3.8.0",
     "django>=4.2",
     "scitex-app>=0.11.0",  # hosts_to_allow public name (fleet single implementation)
-    # `_django/settings.py` imports scitex_ui unguarded (it is a hard
-    # member of `[server]`), so the Django tests cannot even import
-    # without it. NOT guarded with importorskip on purpose: a skip would
-    # hide a genuinely broken GUI install behind a green run.
-    "scitex-ui>=0.19.0",
+    # The rest of the `[all]` feature stack. Its imports in src/ are GUARDED now
+    # (PS-233, 2026-09-20), so a `-e .[dev]` install missing these imports
+    # fine and then fails every Django test on the guard's message. They stay
+    # in `[dev]` so the GUI suite RUNS rather than degrading -- and the guards
+    # are deliberately NOT importorskip'd: a skip would hide a genuinely
+    # broken GUI install behind a green run.
+    "scitex-ui>=0.22.0",
     "watchdog>=3.0.0",
     # tests/integration/test_clew_integration.py — used (with importorskip)
     # to exercise the optional scitex-clew provenance path in storage/PaperIO.
     "scitex-clew>=0.1.0",
-    # `[pdf]` extra completeness; pdfplumber is the bundled PDF text-layer
+    # `[pdf]`-era completeness; pdfplumber is the bundled PDF text-layer
     # backend exercised by pdf_highlight/* code paths.
     "pdfplumber>=0.9.0",
 ]
@@ -174,23 +154,37 @@ docs = [
 # PS-221 §3: every PUBLIC extra (non-underscore, not `all`) must be a
 # SUBSET of `all`, so `pip install scitex-scholar[all]` is the single
 # "give me everything public" switch and can never silently
-# under-install. Keep this list closed over EVERY public extra above --
-# adding a new public extra without adding it here is the violation.
-# `[dev]` and `[docs]` are public here -- CI installs `.[all,dev]`
-# (.github/ci/run-in-sif.sh) and RTD installs `.[docs]`
-# (.github/workflows/rtd-sphinx-build-caller.yml) by those
-# exact names -- so they are listed too, matching how scitex-dev,
-# scitex-logging, and scitex-session close their own `all`.
+# under-install. Only `dev` and `docs` remain beside `all` (PS-225) --
+# CI installs `.[all,dev]` (.github/ci/run-in-sif.sh) and RTD installs
+# `.[docs]` (.github/workflows/rtd-sphinx-build-caller.yml) by those
+# exact names, so they are listed too, matching how scitex-dev,
+# scitex-logging, and scitex-session close their own `all`. Feature pins
+# (GUI, MCP, PDF, export, clew, watch) are FLAT below, not extras.
 all = [
-    "scitex-scholar[browser]",
-    "scitex-scholar[clew]",
     "scitex-scholar[dev]",
     "scitex-scholar[docs]",
-    "scitex-scholar[export]",
-    "scitex-scholar[mcp]",
-    "scitex-scholar[pdf]",
-    "scitex-scholar[server]",
-    "scitex-scholar[watch]",
+    "scitex-clew>=0.1.0",
+    "openpyxl>=3.1.0",
+    "fastmcp>=2.0.0",
+    "pdfplumber>=0.9.0",
+    "django>=4.2",
+    # scitex-app supplies the standalone Django launcher (run_standalone)
+    # and the guarded GUI lifecycle (`embed.serve_gui` / `gui_status` /
+    # `gui_stop` / `gui_port_holder`) that `_cli/gui.py` delegates to.
+    # 0.5.0 is the floor, not a preference: `serve_gui` gained orphan
+    # reclaim under --force, and `gui_port_holder` gained the frozen
+    # three-valued `PortHolder` whose `ours is None` the `gui open` code
+    # branches on. Against 0.4.x those branches read a different shape.
+    "scitex-app>=0.11.0",  # hosts_to_allow public name (fleet single implementation)
+    # scholar.html EXTENDS `scitex_ui/standalone_shell.html` (since 1.9.0).
+    # >=0.22.0 for the `.stx-app-header__slot--project-selector` guard plus
+    # the earlier >=0.19.0 `<html lang>` accessibility floor (screen-reader
+    # pronunciation follows `lang`, so a wrong value is read with English
+    # phonetics). Scholar builds its own context and calls render_to_string
+    # directly, so it depends on the TEMPLATE-level
+    # `{{ shell_lang|default:'en' }}`, not on `shell_context()`'s default.
+    "scitex-ui>=0.22.0",
+    "watchdog>=3.0.0",
 ]
 
 [project.scripts]
@@ -214,6 +208,10 @@ packages = ["src/scitex_scholar"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
+markers = [
+    "smoke: fast CLI happy-path tests (<60s, runs on every PR)",
+    "e2e: end-to-end workflows (slow, gated by RUN_E2E=1)",
+]
 # THE PACKAGE UNDER TEST IS THIS CHECKOUT, NOT WHATEVER IS INSTALLED.
 #
 # `scitex_scholar` lives under src/, and pytest prepends only the ROOTDIR --

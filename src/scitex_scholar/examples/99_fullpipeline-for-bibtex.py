@@ -40,7 +40,13 @@ import asyncio
 from pathlib import Path
 from pprint import pprint
 
-import numpy as _np
+try:
+    import numpy as _np
+except ImportError as exc:  # numpy absent -- example scripts are not library surface
+    raise ImportError(
+        "This example needs numpy, which is not installed. "
+        "Install it with: pip install numpy"
+    ) from exc
 
 try:
     import scitex as stx

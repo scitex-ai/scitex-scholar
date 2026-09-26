@@ -20,9 +20,9 @@ from typing import Dict, List, Optional, Union
 import requests
 import scitex_logging as logging
 
+from ..._utils._env import resolve_env
 from ..utils import standardize_metadata
 from ._BaseDOIEngine import BaseDOIEngine
-from ..._utils._env import resolve_env
 
 logger = logging.getLogger(__name__)
 
@@ -128,7 +128,7 @@ class URLDOIEngine(BaseDOIEngine):
         if not url:
             return self._create_minimal_metadata(return_as=return_as)
 
-        print("bbb")
+        logger.info("bbb")
         try:
             assert return_as in [
                 "dict",
@@ -392,9 +392,9 @@ if __name__ == "__main__":
     outputs["empty_json"] = engine._create_minimal_metadata(return_as="json")
 
     for k, v in outputs.items():
-        print("----------------------------------------")
-        print(k)
-        print("----------------------------------------")
+        logger.info("----------------------------------------")
+        logger.info(k)
+        logger.info("----------------------------------------")
         pprint(v)
         time.sleep(1)
 

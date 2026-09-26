@@ -231,7 +231,7 @@ class ZoteroImportHandler:
             logger.error(f"Failed to import {title[:60]}: {e}")
 
     def _copy_pdfs(self, pdfs: List[ResolvedAttachment], scholar_id: str) -> bool:
-        """Copy PDFs from Zotero storage to Scholar MASTER."""
+        """Copy PDFs from Zotero storage to the Scholar primary store."""
         master_dir = (
             self._library_manager.config.path_manager.library_dir
             / "MASTER"

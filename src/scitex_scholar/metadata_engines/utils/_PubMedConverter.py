@@ -393,9 +393,9 @@ def pmid2doi(pmid: Union[str, int], pubmed_email=None, api_key=None, config=None
 
 def main():
     """Test and demonstrate PubMedConverter functionality."""
-    print("=" * 60)
-    print("PubMedConverter Test Suite")
-    print("=" * 60)
+    logger.info("=" * 60)
+    logger.info("PubMedConverter Test Suite")
+    logger.info("=" * 60)
 
     converter = PubMedConverter(email="test@example.com")
 
@@ -409,14 +409,14 @@ def main():
         "",  # Empty
     ]
 
-    print("\n1. Testing individual PMID to DOI conversion:")
+    logger.info("\n1. Testing individual PMID to DOI conversion:")
     for pmid in test_pmids:
         result = converter.pmid2doi(pmid)
         status = "✅" if result else "❌"
-        print(f"   {status} {pmid} → {result}")
+        logger.info(f"   {status} {pmid} → {result}")
 
     # Test BibTeX entry conversion
-    print("\n2. Testing BibTeX entry conversion:")
+    logger.info("\n2. Testing BibTeX entry conversion:")
     test_entries = [
         {"title": "Paper with PMID", "pmid": "25821343", "year": "2015"},
         {
@@ -435,25 +435,25 @@ def main():
     for i, entry in enumerate(test_entries):
         result = converter.bibtex_entry2doi(entry)
         status = "✅" if result else "❌"
-        print(f"   {status} Entry {i}: '{entry['title']}' → {result}")
+        logger.info(f"   {status} Entry {i}: '{entry['title']}' → {result}")
 
     # Test batch conversion
-    print("\n3. Testing batch conversion:")
+    logger.info("\n3. Testing batch conversion:")
     batch_results = converter.bibtex_entries2dois(test_entries)
-    print(
+    logger.info(
         f"   📊 Converted PMIDs to DOIs for {len(batch_results)} out of {len(test_entries)} entries"
     )
     for entry_idx, doi in batch_results.items():
-        print(f"     Entry {entry_idx}: {doi}")
+        logger.info(f"     Entry {entry_idx}: {doi}")
 
-    print("\n" + "=" * 60)
-    print("✅ PubMedConverter test completed!")
-    print("=" * 60)
-    print("\nUsage patterns:")
-    print("1. Single PMID: converter.pmid2doi(pmid)")
-    print("2. BibTeX entry: converter.bibtex_entry2doi(entry)")
-    print("3. Batch entries: converter.bibtex_entries2dois(entries)")
-    print("4. Async batch: converter.bibtex_entries2dois_async(entries)")
+    logger.info("\n" + "=" * 60)
+    logger.success("✅ PubMedConverter test completed!")
+    logger.info("=" * 60)
+    logger.info("\nUsage patterns:")
+    logger.info("1. Single PMID: converter.pmid2doi(pmid)")
+    logger.info("2. BibTeX entry: converter.bibtex_entry2doi(entry)")
+    logger.info("3. Batch entries: converter.bibtex_entries2dois(entries)")
+    logger.info("4. Async batch: converter.bibtex_entries2dois_async(entries)")
 
 
 if __name__ == "__main__":

@@ -17,6 +17,10 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING, List
 
+import scitex_logging as slogging
+
+logger = slogging.getLogger(__name__)
+
 if TYPE_CHECKING:
     from playwright.async_api import Page
 
@@ -146,6 +150,6 @@ class BioRxivTranslator(BaseTranslator):
 
             except Exception as e:
                 # Log error but don't fail completely
-                print(f"Error extracting PDF URLs from bioRxiv search: {e}")
+                logger.error(f"Error extracting PDF URLs from bioRxiv search: {e}")
 
         return pdf_urls

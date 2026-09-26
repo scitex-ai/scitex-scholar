@@ -1,5 +1,5 @@
 {% extends "scitex_ui/standalone_shell.html" %}
-{% load static i18n %}
+{% load static i18n scitex_project_picker %}
 {% comment %}
 Extends scitex-ui's shared workspace shell, so scholar renders inside the same
 frame as every other leaf (scitex-storage, scitex-writer, figrecipe) instead of
@@ -71,10 +71,15 @@ API infrastructure.
 {% endblock %}
 
 {% block app_content %}
-        <!-- Header -->
-        <header class="app-header">
-            <h1>{% trans "SciTeX Scholar" %}</h1>
-            <span class="subtitle">{% trans "Scientific Literature Management" %}</span>
+        <!-- Scholar owns its app header; scitex-ui owns the picker primitive. -->
+        <header class="stx-app-header">
+            <div class="stx-app-header__identity">
+                <h1 class="stx-app-header__title">{% trans "SciTeX Scholar" %}</h1>
+                <span class="stx-app-header__subtitle">{% trans "Scientific Literature Management" %}</span>
+            </div>
+            <div class="stx-app-header__slot--project-selector">
+                {% scitex_project_picker scope="project" current=current_project %}
+            </div>
         </header>
         <div class="app-container">
             <!-- Sidebar -->
@@ -279,6 +284,23 @@ API infrastructure.
                                     <button type="button" id="libraryImportBtn" class="btn-control-library">{% trans "Import BibTeX" %}</button>
                                 </div>
                                 <div id="libraryIoStatus" class="library-io__status"></div>
+                                <!-- Filter: the Library list's empty state has a
+                                     FILTERED variant ("no papers match"), which
+                                     is unreachable without a real filter control
+                                     (review blocker 2). Filtering happens in
+                                     /api/library?q= (server-side, over the same
+                                     MASTER metadata the list shows). -->
+                                <div class="library-filter">
+                                    <label class="form-label" for="libraryFilter">{% trans "Filter your library" %}</label>
+                                    <input type="search"
+                                           id="libraryFilter"
+                                           class="form-input library-filter__input"
+                                           placeholder="{% trans "Title, author, or DOI" %}"
+                                           autocomplete="off">
+                                    <button type="button"
+                                            id="libraryFilterClear"
+                                            class="btn-control-library hidden">{% trans "Clear filters" %}</button>
+                                </div>
                                 <!-- CSRF: emitted by the standard {% csrf_token %}
                                      tag. Inert standalone (no CsrfViewMiddleware,
                                      value empty); when the mounted hub enables
@@ -316,7 +338,7 @@ API infrastructure.
                             </div>
                             <div class="graph-card__body">
                                 <p class="graph-description">
-                                    {% trans "Enter a DOI to build an interactive citation network. The graph shows related papers based on bibliographic coupling, co-citation, and direct citations." %}
+                                    {% trans "Start with a DOI. Find one by title, topic, or keywords in Search or your Library, then build an interactive citation graph of related papers." %}
                                 </p>
                                 <form id="graphForm" class="graph-form">
                                     <div class="form-row">
@@ -326,14 +348,16 @@ API infrastructure.
                                                 <input type="text"
                                                        id="doiInput"
                                                        class="form-input"
-                                                       placeholder="e.g. 10.1038/s41586-020-2008-3"
-                                                       value="10.1038/s41586-020-2008-3">
+                                                       required
+                                                       aria-describedby="graphSeedHelp"
+                                                       placeholder="e.g. 10.1038/s41586-020-2008-3">
                                                 <button type="submit" class="btn-build">{% trans "Build Graph" %}</button>
                                             </div>
+                                            <small id="graphSeedHelp">{% trans "Paste the DOI for one seed paper; titles and keywords belong in Search." %}</small>
                                         </div>
                                         <div class="form-group--options">
-                                            <label class="form-label" for="topN">{% trans "Papers" %}</label>
-                                            <select id="topN" class="form-select">
+                                            <label class="form-label" for="topN">{% trans "Max papers in graph" %}</label>
+                                            <select id="topN" class="form-select" aria-label="Maximum papers in citation graph">
                                                 <option value="10">10</option>
                                                 <option value="20" selected>20</option>
                                                 <option value="30">30</option>

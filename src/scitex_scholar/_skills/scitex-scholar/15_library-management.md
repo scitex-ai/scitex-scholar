@@ -46,13 +46,13 @@ record-of-paper file stays read-only; annotated copies live next to it
 under their own `notes-…pdf` / `supple-…pdf`). `library audit-files`
 verifies presence + SHA-256 across all roles.
 
-The 8-digit ID is a deterministic hash of `(normalized_title, first_author, year)`, so the *same paper* added to multiple projects always resolves to the same MASTER entry — no duplication, no wasted disk.
+The 8-digit ID is a deterministic hash of `(normalized_title, first_author, year)`, so the *same paper* added to multiple projects always resolves to the same primary entry — no duplication, no wasted disk.
 
-## Why MASTER + symlinks
+## Why primary store + symlinks
 
 - A paper cited in three projects costs disk only once
 - Re-enrichment in any project is visible everywhere
-- `rm -rf ~/.scitex/scholar/library/{project}` is a safe project deletion (MASTER untouched)
+- `rm -rf ~/.scitex/scholar/library/{project}` is a safe project deletion (primary store untouched)
 
 ## Projects
 
@@ -65,7 +65,7 @@ scholar_get_library_status()
 
 ## metadata.json
 
-Each MASTER entry stores:
+Each primary entry stores:
 - DOI, title, authors, year, journal
 - Source-tagged enrichment (`<field>_source`)
 - All URLs traversed (publisher, OpenURL, PDF)
@@ -122,5 +122,5 @@ scitex-scholar paper fetch --doi 10.1002/epi.70076 \
 
 The pipeline skips the browser/download stack, runs metadata
 enrichment from the DOI, copies each file under its role-prefixed name
-into MASTER, and (for `--pdf-main`) checks the PDF's page-1 DOI
+into the primary store, and (for `--pdf-main`) checks the PDF's page-1 DOI
 against the metadata to catch silent swaps.

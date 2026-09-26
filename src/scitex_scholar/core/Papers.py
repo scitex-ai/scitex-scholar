@@ -654,9 +654,9 @@ if __name__ == "__main__":
 
     def main():
         """Demonstrate simplified Papers class."""
-        print("=" * 60)
-        print("Papers Class - Simplified Collection")
-        print("=" * 60)
+        logger.info("=" * 60)
+        logger.info("Papers Class - Simplified Collection")
+        logger.info("=" * 60)
 
         # Create test papers
         # Create sample papers with Pydantic structure
@@ -677,26 +677,26 @@ if __name__ == "__main__":
 
         papers = Papers([p1, p2, p3])
 
-        print(f"\n1. Collection: {papers}")
-        print(f"   Count: {len(papers)}")
-        print(f"   First: {papers[0].metadata.basic.title}")
+        logger.info(f"\n1. Collection: {papers}")
+        logger.info(f"   Count: {len(papers)}")
+        logger.info(f"   First: {papers[0].metadata.basic.title}")
 
         # Test filtering
         recent = papers.filter(
             lambda p: p.metadata.basic.year and p.metadata.basic.year >= 2023
         )
-        print(f"\n2. Filtered (year >= 2023): {len(recent)} papers")
+        logger.info(f"\n2. Filtered (year >= 2023): {len(recent)} papers")
 
         # Test sorting
         sorted_papers = papers.sort_by(lambda p: p.metadata.basic.year or 0)
-        print("\n3. Sorted by year:")
+        logger.info("\n3. Sorted by year:")
         for p in sorted_papers:
-            print(f"   {p.metadata.basic.year}: {p.metadata.basic.title}")
+            logger.info(f"   {p.metadata.basic.year}: {p.metadata.basic.title}")
 
-        print("\n✅ Papers class simplified!")
-        print("   - Reduced from 39 to ~15 methods")
-        print("   - Business logic moved to Scholar")
-        print("   - Clean collection interface")
+        logger.success("\n✅ Papers class simplified!")
+        logger.info("   - Reduced from 39 to ~15 methods")
+        logger.info("   - Business logic moved to Scholar")
+        logger.info("   - Clean collection interface")
 
     main()
 

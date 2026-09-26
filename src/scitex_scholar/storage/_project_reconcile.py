@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Reconcile `container.projects` in MASTER metadata against filesystem symlinks.
+"""Reconcile `container.projects` in primary metadata against filesystem symlinks.
 
 The library uses two parallel sources of truth for project membership:
 
@@ -42,12 +42,20 @@ class ReconcileReport:
         }
 
 
+# Direct children of the library root that are NOT projects: the primary
+# store is the deduplicated paper store the projects link into,
+# MASTER_quarantine holds rejected entries, downloads is the PDF staging
+# area. One name, one place --
+# the picker filter in _django.views reads this set too, so a new reserved
+# directory cannot be honoured by one surface and offered by another.
+RESERVED_LIBRARY_DIRS = frozenset({"MASTER", "MASTER_quarantine", "downloads"})
+
+
 def _project_dirs(library_root: Path) -> List[Path]:
-    skip = {"MASTER", "MASTER_quarantine", "downloads"}
     return [
         p
         for p in sorted(library_root.iterdir())
-        if p.is_dir() and not p.is_symlink() and p.name not in skip
+        if p.is_dir() and not p.is_symlink() and p.name not in RESERVED_LIBRARY_DIRS
     ]
 
 
@@ -85,7 +93,7 @@ def build_project_membership(
 
 
 def reconcile_projects(library_root: Path, *, dry_run: bool = False) -> ReconcileReport:
-    """Sync MASTER ``container.projects`` to match filesystem symlinks.
+    """Sync primary-store ``container.projects`` to match filesystem symlinks.
 
     Args:
         library_root: ``~/.scitex/scholar/library``

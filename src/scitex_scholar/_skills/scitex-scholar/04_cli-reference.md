@@ -1,7 +1,7 @@
 ---
 description: |
   [TOPIC] scitex-scholar CLI Reference
-  [DETAILS] Top-level Click-based noun-verb subcommand groups of the `scitex-scholar` CLI — paper, bibtex, pdf, library, mcp, skills, list-python-apis.
+  [DETAILS] Top-level Click-based noun-verb subcommand groups of the `scitex-scholar` CLI — paper, bibtex, pdf, library, mcp, dev (with `skills`), list-python-apis.
 tags: [scitex-scholar-cli-reference]
 ---
 
@@ -21,7 +21,7 @@ scitex-scholar --json …               # machine-readable output (where support
 
 Mutating verbs accept `--dry-run` and `-y/--yes`. Read verbs (e.g. `mcp
 list-tools`, `library db list`, `library db lookup`, `library db audit`,
-`skills list`, `list-python-apis`) accept `--json`.
+`dev skills list`, `list-python-apis`) accept `--json`.
 
 ## Top-level groups (categorized in `--help`)
 
@@ -34,9 +34,9 @@ list-tools`, `library db list`, `library db lookup`, `library db audit`,
   auth        Institutional SSO authentication
 
 [Dev]
+  dev                       Package self-maintenance commands (doctrine §13)
   list-python-apis          Public callables in scitex_scholar.__all__
   mcp                       MCP (Model Context Protocol) server commands
-  skills                    Bundled skill leaves
   install-shell-completion  Wire <TAB> completion into ~/.{bash,zsh}rc
   print-shell-completion    Print the completion script to stdout
 ```
@@ -60,7 +60,7 @@ list-tools`, `library db list`, `library db lookup`, `library db audit`,
 | `library`                   | `db {build,lookup,list,audit}`                  | Manage the library index                               |
 | `auth`                      | `status`, `login`, `logout`, `refresh`          | Institutional SSO session lifecycle                    |
 | `mcp`                       | `start`, `list-tools`, `doctor`, `install`      | MCP server commands                                    |
-| `skills`                    | `list`, `get`, `install`                        | Bundled skill leaves                                   |
+| `dev skills`                | `list`, `get`, `install`                        | Bundled skill leaves (`skills` still works as a hidden alias) |
 | `list-python-apis`          | —                                               | Print public callables in `scitex_scholar.__all__`     |
 | `install-shell-completion`  | —                                               | Wire up `<TAB>` completion                             |
 | `print-shell-completion`    | —                                               | Print completion script to stdout                      |
@@ -150,8 +150,8 @@ scitex-scholar bibtex import --bibtex refs.bib --project demo
 scitex-scholar mcp start
 scitex-scholar mcp list-tools --json
 scitex-scholar pdf highlight paper.pdf --stub
-scitex-scholar skills list
-scitex-scholar skills install
+scitex-scholar dev skills list
+scitex-scholar dev skills install
 scitex-scholar list-python-apis -v
 ```
 

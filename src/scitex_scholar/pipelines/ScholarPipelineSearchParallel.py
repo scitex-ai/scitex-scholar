@@ -32,18 +32,10 @@ from typing import Any, Callable, Dict, List, Optional
 import scitex_logging as logging
 
 from scitex_scholar.core import Paper, normalize_journal_name
-from scitex_scholar.search_engines.individual.ArXivSearchEngine import ArXivSearchEngine
-from scitex_scholar.search_engines.individual.CrossRefSearchEngine import (
-    CrossRefSearchEngine,
-)
-from scitex_scholar.search_engines.individual.OpenAlexSearchEngine import (
-    OpenAlexSearchEngine,
-)
-from scitex_scholar.search_engines.individual.PubMedSearchEngine import (
-    PubMedSearchEngine,
-)
-from scitex_scholar.search_engines.individual.SemanticScholarSearchEngine import (
-    SemanticScholarSearchEngine,
+from scitex_scholar.search_engines._source_tiers import (
+    build_tiered_engines,
+    declared_source_tiers,
+    resolve_tier,
 )
 
 logger = logging.getLogger(__name__)
@@ -58,6 +50,9 @@ class ScholarPipelineSearchParallel:
         timeout_per_engine: float = 30.0,
         use_cache: bool = True,
         email: str = None,
+        engines: Optional[Dict[str, Any]] = None,
+        source_tiers: Optional[Dict[str, List[str]]] = None,
+        min_primary_results: int = 1,
     ):
         """Initialize parallel search pipeline.
 
@@ -66,21 +61,35 @@ class ScholarPipelineSearchParallel:
             timeout_per_engine: Timeout for each engine in seconds
             use_cache: Whether to use caching for API results
             email: User email for API rate limit benefits (PubMed, CrossRef, OpenAlex)
+            engines: Explicit engine mapping (tests / embedders). When given,
+                tier membership is still decided by ``source_tiers``.
+            source_tiers: Tier policy; defaults to the configured
+                ``source_tiers`` (local corpora primary, online fallback).
+            min_primary_results: Results the PRIMARY tier must return before the
+                online fallback is considered. Default 1: the local corpora
+                answer whenever they can, and the network is the last resort.
         """
         self.name = self.__class__.__name__
         self.max_workers = max_workers
         self.timeout_per_engine = timeout_per_engine
         self.use_cache = use_cache
         self.email = email or "research@scitex.io"
+        self.min_primary_results = min_primary_results
 
-        # Initialize search engines with email for rate limit benefits
-        self.engines = {
-            "PubMed": PubMedSearchEngine(email=self.email),
-            "CrossRef": CrossRefSearchEngine(email=self.email),
-            "arXiv": ArXivSearchEngine(email=self.email),
-            "Semantic_Scholar": SemanticScholarSearchEngine(email=self.email),
-            "OpenAlex": OpenAlexSearchEngine(email=self.email),
-        }
+        # Initialize search engines with email for rate limit benefits.
+        # Tiers come from config (source_tiers), so the policy that used to be
+        # declarative-only now decides what actually runs.
+        self.source_tiers = source_tiers or declared_source_tiers()
+        primary, fallback = build_tiered_engines(self.source_tiers, email=self.email)
+        if engines is not None:
+            declared_primary = list(self.source_tiers.get("primary", []))
+            primary = {n: e for n, e in engines.items() if n in declared_primary}
+            fallback = {n: e for n, e in engines.items() if n not in primary}
+        self.primary_engines = primary
+        self.fallback_engines = fallback
+        # Combined view (primary first): statistics and capability lookups are
+        # keyed by it, and every engine the pipeline may call appears here.
+        self.engines = {**primary, **fallback}
 
         # Statistics
         self.stats = {
@@ -152,57 +161,50 @@ class ScholarPipelineSearchParallel:
         # Prepare search parameters
         filters = filters or {}
         search_fields = search_fields or ["title", "abstract"]
-        per_engine_limit = max(10, max_results // len(self.engines))
 
-        # Initialize engine counts dictionary
+        # --- Tier 1: the NAS-local corpora (primary) --------------------------
+        # The configured policy names CrossRefLocal/OpenAlexLocal primary, so
+        # they run FIRST and alone. The online engines below are reached only
+        # when this tier cannot answer (see resolve_tier for the reason).
         engine_counts = {}
+        all_papers, engines_used = await self._search_tier(
+            engines=self.primary_engines,
+            query=search_query,
+            search_fields=search_fields,
+            filters=filters,
+            max_results=max_results,
+            on_progress=on_progress,
+            engine_counts=engine_counts,
+        )
 
-        # Create search tasks for each engine
-        tasks = []
-        engine_names = []
+        source_tier, fallback_reason = resolve_tier(
+            len(all_papers), self.primary_engines, self.min_primary_results
+        )
 
-        for engine_name, engine in self.engines.items():
-            task = self._search_engine(
-                engine_name=engine_name,
-                engine=engine,
+        if source_tier == "online_fallback":
+            logger.warning(
+                f"{self.name}: online fallback ({fallback_reason}); "
+                f"querying {len(self.fallback_engines)} public API engines"
+            )
+            all_papers, engines_used = await self._search_tier(
+                engines=self.fallback_engines,
                 query=search_query,
                 search_fields=search_fields,
                 filters=filters,
-                max_results=per_engine_limit,
+                max_results=max_results,
                 on_progress=on_progress,
                 engine_counts=engine_counts,
             )
-            tasks.append(task)
-            engine_names.append(engine_name)
-
-        # Execute all searches in parallel
-        results = await asyncio.gather(*tasks, return_exceptions=True)
-
-        # Aggregate results
-        all_papers = []
-        engines_used = []
-
-        for engine_name, result in zip(engine_names, results):
-            if isinstance(result, Exception):
-                logger.error(f"{self.name}: {engine_name} search failed: {result}")
-                self.stats["engine_stats"][engine_name]["failures"] += 1
-                continue
-
-            logger.info(
-                f"{self.name}: {engine_name} returned {len(result) if result else 0} results (type: {type(result).__name__})"
-            )
-
-            if result:
-                all_papers.extend(result)
-                engines_used.append(engine_name)
-                self.stats["engine_stats"][engine_name]["successes"] += 1
-                self.stats["engine_stats"][engine_name]["total_results"] += len(result)
 
         # Deduplicate by DOI and title
         unique_papers = self._deduplicate_papers(all_papers)
 
-        # Enrich papers with missing citation counts (e.g., from PubMed)
-        unique_papers = await self._enrich_citations(unique_papers)
+        # Enrich papers with missing citation counts (e.g., from PubMed). This
+        # is a NETWORK call through OpenAlex, so it is part of the fallback, not
+        # of a local-corpus answer -- running it after a primary hit would put
+        # the network back on the local path.
+        if source_tier == "online_fallback":
+            unique_papers = await self._enrich_citations(unique_papers)
 
         # Enrich papers with impact factors
         unique_papers = self._enrich_impact_factors(unique_papers)
@@ -229,9 +231,16 @@ class ScholarPipelineSearchParallel:
         self.stats["total_time"] += search_time
         self.stats["successful_searches"] += 1
 
+        tier_size = (
+            len(self.primary_engines)
+            if source_tier == "primary"
+            else len(self.fallback_engines)
+        )
+
         logger.success(
             f"{self.name}: Parallel search completed in {search_time:.2f}s, "
-            f"{len(engines_used)}/{len(self.engines)} engines returned results, "
+            f"tier={source_tier}, "
+            f"{len(engines_used)}/{tier_size} engines returned results, "
             f"found {len(response_papers)} unique papers"
         )
 
@@ -242,14 +251,79 @@ class ScholarPipelineSearchParallel:
                 "search_fields": search_fields,
                 "filters": filters,
                 "engines_used": engines_used,
-                "total_engines": len(self.engines),
+                "total_engines": tier_size,
                 "successful_engines": len(engines_used),
                 "total_results": len(response_papers),
                 "search_time": search_time,
                 "timestamp": datetime.now().isoformat(),
                 "engine_counts": engine_counts,  # Per-engine result counts
+                # Which tier answered, and why it was that one.
+                "source_tier": source_tier,
+                "source_tier_reason": fallback_reason,
+                "primary_engines": sorted(self.primary_engines),
+                "fallback_engines": sorted(self.fallback_engines),
             },
         }
+
+    async def _search_tier(
+        self,
+        engines: Dict[str, Any],
+        query: str,
+        search_fields: List[str],
+        filters: Dict,
+        max_results: int,
+        on_progress: Optional[Callable[[str, str, int], None]] = None,
+        engine_counts: Dict[str, int] = None,
+    ) -> tuple:
+        """Run ONE tier's engines in parallel; return (papers, engines_used).
+
+        The per-engine limit is derived from THIS tier's size, so a two-engine
+        primary tier is not starved by the five-engine fallback's arithmetic.
+        """
+        engine_counts = {} if engine_counts is None else engine_counts
+        if not engines:
+            return [], []
+
+        per_engine_limit = max(10, max_results // len(engines))
+
+        tasks = []
+        engine_names = []
+        for engine_name, engine in engines.items():
+            tasks.append(
+                self._search_engine(
+                    engine_name=engine_name,
+                    engine=engine,
+                    query=query,
+                    search_fields=search_fields,
+                    filters=filters,
+                    max_results=per_engine_limit,
+                    on_progress=on_progress,
+                    engine_counts=engine_counts,
+                )
+            )
+            engine_names.append(engine_name)
+
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+
+        papers = []
+        engines_used = []
+        for engine_name, result in zip(engine_names, results):
+            if isinstance(result, Exception):
+                logger.error(f"{self.name}: {engine_name} search failed: {result}")
+                self.stats["engine_stats"][engine_name]["failures"] += 1
+                continue
+
+            logger.info(
+                f"{self.name}: {engine_name} returned {len(result) if result else 0} results (type: {type(result).__name__})"
+            )
+
+            if result:
+                papers.extend(result)
+                engines_used.append(engine_name)
+                self.stats["engine_stats"][engine_name]["successes"] += 1
+                self.stats["engine_stats"][engine_name]["total_results"] += len(result)
+
+        return papers, engines_used
 
     async def _search_engine(
         self,

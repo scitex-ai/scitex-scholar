@@ -67,8 +67,10 @@ def test_help_lists_top_level_commands_all_cmd_in_out_for_cmd_in_paper_bibtex_pd
     # Act
     out = result.output
     # Act
-    # Assert
-    assert all(cmd in out for cmd in ['paper', 'bibtex', 'pdf', 'library', 'mcp', 'skills', 'list-python-apis']), f'missing {cmd!r} in --help'
+    # Assert — `dev` (hosting `skills` per doctrine §13) is listed; the
+    # old top-level `skills` spelling is a hidden alias, so it must not be.
+    want = ['paper', 'bibtex', 'pdf', 'library', 'mcp', 'dev', 'list-python-apis']
+    assert all(cmd in out for cmd in want), f'missing {[c for c in want if c not in out]!r} in --help'
 
 
 def test_help_lists_top_level_commands_suppress_not_in_out():
@@ -139,6 +141,9 @@ LEAVES = [
     ["skills", "list", "--help"],
     ["skills", "get", "--help"],
     ["skills", "install", "--help"],
+    ["dev", "skills", "list", "--help"],
+    ["dev", "skills", "get", "--help"],
+    ["dev", "skills", "install", "--help"],
     ["list-python-apis", "--help"],
 ]
 
@@ -172,6 +177,9 @@ MUTATING = [
     ["library", "db", "build"],
     ["mcp", "start"],
     ["mcp", "install"],
+    ["dev", "skills", "install"],
+    # The old top-level `skills` spelling is a hidden warn-phase alias that
+    # forwards to `dev skills` — it keeps working, including `--help`.
     ["skills", "install"],
 ]
 
@@ -220,6 +228,8 @@ READS = [
     ["library", "db", "list"],
     ["library", "db", "lookup"],
     ["library", "db", "audit"],
+    ["dev", "skills", "list"],
+    # Old top-level spelling (hidden alias) keeps working too.
     ["skills", "list"],
     ["list-python-apis"],
 ]
@@ -374,7 +384,7 @@ def test_list_python_apis_json_scholar_paper_papers_issubset_names():
 
 
 # ---------------------------------------------------------------------------
-# skills list
+# skills list (canonical: `dev skills`; old top-level spelling is an alias)
 # ---------------------------------------------------------------------------
 
 
@@ -386,6 +396,58 @@ def test_skills_list_prints_leaf_names_result_exit_code_equals_n_0():
     # Act
     # Assert
     assert result.exit_code == 0
+
+
+def test_dev_skills_list_prints_leaf_names_result_exit_code_equals_n_0():
+    # Arrange — canonical §13 path.
+    runner = CliRunner()
+    # Act
+    result = runner.invoke(cli, ["dev", "skills", "list"])
+    # Act
+    # Assert
+    assert result.exit_code == 0
+
+
+def test_dev_skills_list_prints_leaf_names_n_04_cli_reference_in_result_output():
+    # Arrange — canonical §13 path.
+    runner = CliRunner()
+    # Act
+    result = runner.invoke(cli, ["dev", "skills", "list"])
+    # Act
+    # Assert
+    assert "04_cli-reference" in result.output
+
+
+def test_top_level_skills_alias_forwards_result_exit_code_equals_n_0():
+    # Arrange — Phase W alias forwards to `dev skills`.
+    runner = CliRunner()
+    # Act
+    result = runner.invoke(cli, ["skills", "list"])
+    # Act
+    # Assert
+    assert result.exit_code == 0
+
+
+def test_top_level_skills_alias_warns_on_stderr_result_deprecated_in_stderr(tmp_path):
+    # Arrange — Phase W alias: warns once per shell on stderr.
+    # Point XDG_RUNTIME_DIR at a fresh dir so the warn-once latch is
+    # unset no matter which alias tests ran before (explicit
+    # save/restore; PA-306 forbids monkeypatch).
+    import os
+
+    previous = os.environ.get("XDG_RUNTIME_DIR")
+    os.environ["XDG_RUNTIME_DIR"] = str(tmp_path)
+    try:
+        runner = CliRunner()
+        # Act
+        result = runner.invoke(cli, ["skills", "list"])
+    finally:
+        if previous is None:
+            os.environ.pop("XDG_RUNTIME_DIR", None)
+        else:
+            os.environ["XDG_RUNTIME_DIR"] = previous
+    # Assert
+    assert "deprecated" in result.stderr
 
 
 def test_skills_list_prints_leaf_names_n_04_cli_reference_in_result_output():

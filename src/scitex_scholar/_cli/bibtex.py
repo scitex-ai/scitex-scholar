@@ -22,14 +22,17 @@ from pathlib import Path
 
 import click
 
-from ._scaffolding import CONTEXT_SETTINGS
+from ._scaffolding import CONTEXT_SETTINGS, spec_command_kwargs, spec_group_kwargs
 
 # ---------------------------------------------------------------------------
 # Group: bibtex
 # ---------------------------------------------------------------------------
 
 
-@click.group(context_settings=CONTEXT_SETTINGS)
+@click.group(
+    **spec_group_kwargs("Operate on a BibTeX file."),
+    context_settings=CONTEXT_SETTINGS,
+)
 def bibtex() -> None:
     """Operate on a BibTeX file."""
 
@@ -59,7 +62,18 @@ def _bibtex_import_options(f):
     return f
 
 
-@bibtex.command("import")
+@bibtex.command(
+    "import",
+    **spec_command_kwargs(
+        "Import & enrich every entry from a BibTeX file.",
+        examples=(
+            (
+                "{prog} bibtex import --bibtex refs.bib --project demo",
+                "Import and enrich every entry.",
+            ),
+        ),
+    ),
+)
 @_bibtex_import_options
 def bibtex_import(
     bibtex_path,

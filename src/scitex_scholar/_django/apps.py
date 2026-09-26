@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 """Django AppConfig for the scitex-scholar editor app.
 
-The import below is HARD on purpose, matching `settings.py`'s hard import
-of `scitex_ui` and for the same reason -- both are REQUIRED members of the
-`server` extra (`scitex-app>=0.5.0`, `scitex-ui>=0.7.1`), so a missing one
-is a broken install, not a supported configuration.
+`scitex_scholar._django.apps` only exists inside the `server` extra's world:
+the module IS the AppConfig a running Django project loads. scitex-app is
+therefore not optional AT RUN TIME -- but it IS optional for the
+distribution (a bare `pip install scitex-scholar` must not pull Django), so
+the import is GUARDED and the guard FAILS LOUDLY.
 
 It previously read:
 
@@ -17,11 +18,20 @@ the failure -- it SUBSTITUTES A DIFFERENT BASE CLASS, so scholar keeps
 running and quietly stops being a scitex-app app: every contract the SDK
 provides silently stops applying while everything downstream still believes
 it is in force. A declaration that cannot be honoured must FAIL, not
-evaporate. Ruled by scitex-hub 2026-08-18; scitex-app confirmed it assumes
-a hard dependency from scholar's side.
+evaporate. Ruled by scitex-hub 2026-08-18.
+
+The guard below honours that ruling: the `except` re-raises with the extra
+to install, so the failure is as legible as the hard import was and it
+still cannot be mistaken for a working install.
 """
 
-from scitex_app._django import ScitexAppConfig
+try:
+    from scitex_app._django import ScitexAppConfig
+except ImportError as exc:  # scitex-app absent -- the [all]-gated GUI capability only
+    raise ImportError(
+        "scitex_scholar._django needs scitex-app, which is not installed. "
+        "Install the optional stack: pip install 'scitex-scholar[all]'"
+    ) from exc
 
 
 class ScholarEditorConfig(ScitexAppConfig):

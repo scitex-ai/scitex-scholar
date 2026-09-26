@@ -57,7 +57,7 @@ class LibraryCacheManager:
         title: str,
         year: Optional[int] = None,
     ) -> Optional[str]:
-        """Check if DOI already exists in master Scholar library before making API requests.
+        """Check if DOI already exists in the primary Scholar library before making API requests.
 
         Args:
             title: Paper title to search for
@@ -182,11 +182,11 @@ class LibraryCacheManager:
     #                 authors=authors,
     #                 journal=journal,
     #                 year=year,
-    #                 project="MASTER",
+    #                 project="primary",
     #             )
     #         )
 
-    #         # Ensure MASTER directory exists BEFORE writing metadata
+    #         # Ensure the primary-store directory exists BEFORE writing metadata
     #         master_storage_path.mkdir(parents=True, exist_ok=True)
 
     #         master_metadata_file = master_storage_path / "metadata.json"
@@ -273,7 +273,7 @@ class LibraryCacheManager:
                 )
             )
 
-            # Ensure MASTER directory exists BEFORE writing metadata
+            # Ensure the primary-store directory exists BEFORE writing metadata
             master_storage_path.mkdir(parents=True, exist_ok=True)
             master_metadata_file = master_storage_path / "metadata.json"
 
@@ -361,7 +361,7 @@ class LibraryCacheManager:
                 )
             )
 
-            # Ensure MASTER directory exists BEFORE writing metadata
+            # Ensure the primary-store directory exists BEFORE writing metadata
             storage_path.mkdir(parents=True, exist_ok=True)
 
             metadata_file = storage_path / "metadata.json"
@@ -424,7 +424,7 @@ class LibraryCacheManager:
     #                     title=title,
     #                     year=year,
     #                     authors=authors,
-    #                     project="MASTER",
+    #                     project="primary",
     #                 )
     #             )
 
@@ -485,7 +485,7 @@ class LibraryCacheManager:
             symlink_path.symlink_to(relative_path)
             logger.success(f"Created symlink:\n{symlink_path} -> {relative_path}")
 
-            # Sync container.projects in MASTER metadata so the field stays
+            # Sync container.projects in primary metadata so the field stays
             # consistent with the filesystem symlink.
             try:
                 from scitex_scholar.storage._project_reconcile import (
@@ -702,17 +702,17 @@ if __name__ == "__main__":
     # Example usage
     from pathlib import Path
 
-    print("LibraryCacheManager Test:")
+    logger.info("LibraryCacheManager Test:")
 
     # This would require a real config in practice
     # manager = LibraryCacheManager(config, "test_project")
 
-    print("Note: Full testing requires ScholarConfig instance")
-    print("Core functionality:")
-    print("- is_doi_stored(): Search for existing DOIs")
-    print("- save_to_scholar_library(): Cache resolved DOIs")
-    print("- save_unresolved_entry(): Track failed resolutions")
-    print("- get_unresolved_entries(): List papers needing resolution")
-    print("- get_cache_statistics(): Get cache metrics")
+    logger.info("Note: Full testing requires ScholarConfig instance")
+    logger.info("Core functionality:")
+    logger.info("- is_doi_stored(): Search for existing DOIs")
+    logger.info("- save_to_scholar_library(): Cache resolved DOIs")
+    logger.error("- save_unresolved_entry(): Track failed resolutions")
+    logger.info("- get_unresolved_entries(): List papers needing resolution")
+    logger.info("- get_cache_statistics(): Get cache metrics")
 
 # EOF

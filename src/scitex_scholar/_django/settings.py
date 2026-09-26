@@ -21,6 +21,7 @@ import secrets
 from pathlib import Path
 
 from ._db import find_crossref_api_url
+from .._utils._env import resolve_env
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -69,7 +70,19 @@ else:
 # (fleet convention; scitex-hub reads the same setting and defaults to
 # "hub"). These settings only boot the STANDALONE server
 # (`scitex-scholar gui`), so standalone is the default here.
-SCITEX_APP_MODE = os.environ.get("SCITEX_APP_MODE", "standalone")
+#
+# PS-145: scholar must not read another package's env var directly. The
+# canonical name is scholar-owned (`SCITEX_SCHOLAR_APP_MODE`); the
+# pre-convention `SCITEX_APP_MODE` survives as a LOUD legacy fallback via
+# `resolve_env`, and the Django setting name is unchanged so mounted hosts
+# (scitex-hub) keep working.
+SCITEX_APP_MODE = resolve_env(
+    "SCITEX_SCHOLAR_APP_MODE", legacy="SCITEX_APP_MODE", default="standalone"
+)
+
+# Standalone project picker provider. Mounted hosts replace this URL and the
+# provider implementation; Scholar never imports host project/auth models.
+SCITEX_PROJECT_PROVIDER_URL = "/api/projects"
 
 INSTALLED_APPS = [
     "django.contrib.contenttypes",
@@ -79,12 +92,22 @@ INSTALLED_APPS = [
 
 # scitex-ui supplies the shared SciTeX branding partial that
 # `scholar.html` includes in its <head>. It is a REQUIRED member of the
-# `server` extra (alongside django itself), so this import is hard on
-# purpose: a `try/except ImportError` here would swallow a broken install
-# and resurface it later as a TemplateDoesNotExist pointing at scitex-ui's
-# template -- sending the reader to the wrong package. Fail at import time,
-# where the cause is legible.
-import scitex_ui  # noqa: F401
+# `server` extra (alongside django itself), so it is not optional AT RUN
+# TIME -- but it IS optional for the DISTRIBUTION, so the import is GUARDED
+# (2026-09-20) and the guard FAILS LOUDLY.
+#
+# A silent guard would be the worst option here: it would swallow a broken
+# install and resurface it later as a TemplateDoesNotExist pointing at
+# scitex-ui's template -- sending the reader to the wrong package. The
+# `except` below re-raises with the extra's name, so the failure stays at
+# import time, where the cause is legible.
+try:
+    import scitex_ui  # noqa: F401
+except ImportError as exc:  # scitex-ui absent -- the [all]-gated GUI capability only
+    raise ImportError(
+        "scitex_scholar._django.settings needs scitex-ui, which is not "
+        "installed. Install the optional stack: pip install 'scitex-scholar[all]'"
+    ) from exc
 
 INSTALLED_APPS.append("scitex_ui")
 

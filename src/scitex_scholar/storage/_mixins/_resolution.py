@@ -26,7 +26,7 @@ class ResolutionMixin:
     def check_library_for_doi(
         self, title: str, year: Optional[int] = None
     ) -> Optional[str]:
-        """Check if DOI already exists in master Scholar library."""
+        """Check if DOI already exists in the primary Scholar library."""
         try:
             for paper_dir in self.library_master_dir.iterdir():
                 if not paper_dir.is_dir():

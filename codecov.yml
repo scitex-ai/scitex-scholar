@@ -10,15 +10,13 @@ coverage:
   status:
     project:
       default:
-        # `auto` while the package is still ramping toward 90% — see
-        # general/05_development_08_coverage-push-playbook.md. Switch
-        # to `target: 90%` once the per-loader / per-translator test
-        # gap is closed.
-        target: auto
+        # 90% bar is visible (PS-161); the climb is tracked via
+        # general/05_development_08_coverage-push-playbook.md.
+        target: 90%
         threshold: 1%
     patch:
       default:
-        target: 80%
+        target: 90%
 
 ignore:
   - "src/scitex_scholar/_sphinx_html/**"

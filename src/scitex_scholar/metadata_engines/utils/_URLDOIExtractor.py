@@ -205,9 +205,9 @@ class URLDOIExtractor:
 
 def main():
     """Test and demonstrate URLDOIExtractor functionality."""
-    print("=" * 60)
-    print("URLDOIExtractor Test Suite")
-    print("=" * 60)
+    logger.info("=" * 60)
+    logger.info("URLDOIExtractor Test Suite")
+    logger.info("=" * 60)
 
     extractor = URLDOIExtractor()
 
@@ -222,14 +222,14 @@ def main():
         "",  # Empty input
     ]
 
-    print("\n1. Testing individual URL extraction:")
+    logger.info("\n1. Testing individual URL extraction:")
     for url in test_urls:
         result = extractor.extract_doi_from_url(url)
         status = "✅" if result else "❌"
-        print(f"   {status} {url} → {result}")
+        logger.info(f"   {status} {url} → {result}")
 
     # Test BibTeX entry extraction
-    print("\n2. Testing BibTeX entry extraction:")
+    logger.info("\n2. Testing BibTeX entry extraction:")
     test_entries = [
         {
             "title": "Paper with DOI URL",
@@ -252,19 +252,19 @@ def main():
     for i, entry in enumerate(test_entries):
         result = extractor.bibtex_entry2doi(entry)
         status = "✅" if result else "❌"
-        print(f"   {status} Entry {i}: '{entry['title']}' → {result}")
+        logger.info(f"   {status} Entry {i}: '{entry['title']}' → {result}")
 
     # Test batch extraction
-    print("\n3. Testing batch extraction:")
+    logger.info("\n3. Testing batch extraction:")
     batch_results = extractor.bibtex_entries2dois(test_entries)
-    print(
+    logger.info(
         f"   📊 Extracted DOIs from {len(batch_results)} out of {len(test_entries)} entries"
     )
     for entry_idx, doi in batch_results.items():
-        print(f"     Entry {entry_idx}: {doi}")
+        logger.info(f"     Entry {entry_idx}: {doi}")
 
     # Test text extraction
-    print("\n4. Testing text extraction:")
+    logger.info("\n4. Testing text extraction:")
     sample_text = """
     This paper references several works:
     https://doi.org/10.1126/science.aao0702 and
@@ -273,18 +273,18 @@ def main():
     """
 
     text_dois = extractor.extract_from_text(sample_text)
-    print(f"   📄 Found {len(text_dois)} DOIs in text:")
+    logger.info(f"   📄 Found {len(text_dois)} DOIs in text:")
     for doi in text_dois:
-        print(f"     - {doi}")
+        logger.info(f"     - {doi}")
 
-    print("\n" + "=" * 60)
-    print("✅ URLDOIExtractor test completed!")
-    print("=" * 60)
-    print("\nUsage patterns:")
-    print("1. Single URL: extractor.extract_doi_from_url(url)")
-    print("2. BibTeX entry: extractor.bibtex_entry2doi(entry)")
-    print("3. Batch entries: extractor.bibtex_entries2dois(entries)")
-    print("4. Text search: extractor.extract_from_text(text)")
+    logger.info("\n" + "=" * 60)
+    logger.success("✅ URLDOIExtractor test completed!")
+    logger.info("=" * 60)
+    logger.info("\nUsage patterns:")
+    logger.info("1. Single URL: extractor.extract_doi_from_url(url)")
+    logger.info("2. BibTeX entry: extractor.bibtex_entry2doi(entry)")
+    logger.info("3. Batch entries: extractor.bibtex_entries2dois(entries)")
+    logger.info("4. Text search: extractor.extract_from_text(text)")
 
 
 if __name__ == "__main__":

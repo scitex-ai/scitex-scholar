@@ -16,7 +16,10 @@ Key features:
 import re
 from typing import List
 
+import scitex_logging as slogging
 from playwright.async_api import Page
+
+logger = slogging.getLogger(__name__)
 
 
 class GMSGermanMedicalScienceTranslator:
@@ -83,8 +86,8 @@ if __name__ == "__main__":
         """Demonstration of GMSGermanMedicalScienceTranslator usage."""
         test_url = "https://www.egms.de/static/de/journals/gms/2017-15/000242.shtml"
 
-        print(f"Testing GMSGermanMedicalScienceTranslator with URL: {test_url}")
-        print(
+        logger.info(f"Testing GMSGermanMedicalScienceTranslator with URL: {test_url}")
+        logger.info(
             f"URL matches pattern: {GMSGermanMedicalScienceTranslator.matches_url(test_url)}\n"
         )
 
@@ -93,19 +96,19 @@ if __name__ == "__main__":
             context = await browser.new_context()
             page = await context.new_page()
             try:
-                print("Navigating to GMS German Medical Science page...")
+                logger.info("Navigating to GMS German Medical Science page...")
                 await page.goto(test_url, timeout=60000)
                 await page.wait_for_load_state("domcontentloaded")
 
-                print("Extracting PDF URLs...")
+                logger.info("Extracting PDF URLs...")
                 pdf_urls = await GMSGermanMedicalScienceTranslator.extract_pdf_urls_async(
                     page
                 )
 
-                print("\nResults:")
-                print(f"  Found {len(pdf_urls)} PDF URL(s)")
+                logger.info("\nResults:")
+                logger.info(f"  Found {len(pdf_urls)} PDF URL(s)")
                 for url in pdf_urls:
-                    print(f"  - {url}")
+                    logger.info(f"  - {url}")
             except Exception:
                 from scitex_browser.debugging import capture_debug_artifacts_async
 

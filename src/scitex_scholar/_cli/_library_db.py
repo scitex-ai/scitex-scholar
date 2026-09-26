@@ -21,7 +21,7 @@ from pathlib import Path
 import click
 
 from ._library_shared import default_library_root
-from ._scaffolding import CONTEXT_SETTINGS
+from ._scaffolding import CONTEXT_SETTINGS, spec_command_kwargs, spec_group_kwargs
 
 __all__ = [
     "library_db",
@@ -32,19 +32,32 @@ __all__ = [
 ]
 
 
-@click.group("db", context_settings=CONTEXT_SETTINGS)
+@click.group(
+    "db",
+    **spec_group_kwargs("Manage the library index."),
+    context_settings=CONTEXT_SETTINGS,
+)
 def library_db() -> None:
     """Manage the library index."""
 
 
-@library_db.command("build")
+@library_db.command(
+    "build",
+    **spec_command_kwargs(
+        "(Re)build the index from primary metadata.",
+        examples=(
+            ("{prog} library db build --verbose", "Rebuild with progress."),
+            ("{prog} library db build --dry-run", "Preview only."),
+        ),
+    ),
+)
 @click.option("--library-root", default=None, type=click.Path(path_type=Path))
 @click.option("--verbose", is_flag=True)
 @click.option("--dry-run", is_flag=True, help="Print plan without rebuilding.")
 @click.option("--yes", "-y", is_flag=True)
 @click.option("--json", "as_json", is_flag=True)
 def library_db_build(library_root, verbose, dry_run, yes, as_json):
-    """(Re)build the index from MASTER metadata.
+    """(Re)build the index from primary metadata.
 
     \b
     Example:
@@ -64,7 +77,23 @@ def library_db_build(library_root, verbose, dry_run, yes, as_json):
         click.echo(f"{n} papers indexed for {root} in {store}")
 
 
-@library_db.command("lookup")
+@library_db.command(
+    "lookup",
+    **spec_command_kwargs(
+        "Fetch a paper by DOI or paper_id.",
+        examples=(
+            (
+                "{prog} library db lookup --doi 10.1038/nature12373",
+                "Look up one paper.",
+            ),
+        ),
+        exit_codes=(
+            (0, "paper printed."),
+            (1, "not found."),
+            (2, "neither --doi nor --paper-id given (or both)."),
+        ),
+    ),
+)
 @click.option("--library-root", default=None, type=click.Path(path_type=Path))
 @click.option("--doi", default=None)
 @click.option("--paper-id", default=None)
@@ -92,7 +121,15 @@ def library_db_lookup(library_root, doi, paper_id, as_json):
     click.echo(_json.dumps(row, indent=2, default=str))
 
 
-@library_db.command("list")
+@library_db.command(
+    "list",
+    **spec_command_kwargs(
+        "List indexed papers.",
+        examples=(
+            ("{prog} library db list --limit 5", "First five entries."),
+        ),
+    ),
+)
 @click.option("--library-root", default=None, type=click.Path(path_type=Path))
 @click.option("--limit", type=int, default=20, show_default=True)
 @click.option("--offset", type=int, default=0, show_default=True)
@@ -117,7 +154,20 @@ def library_db_list(library_root, limit, offset, as_json):
         )
 
 
-@library_db.command("audit")
+@library_db.command(
+    "audit",
+    **spec_command_kwargs(
+        "Report library anomalies (read-only).",
+        examples=(
+            ("{prog} library db audit --json", "Machine-readable report."),
+            ("{prog} library db audit --strict", "Exit 1 when issues found."),
+        ),
+        exit_codes=(
+            (0, "report printed."),
+            (1, "--strict passed and issues were found."),
+        ),
+    ),
+)
 @click.option("--library-root", default=None, type=click.Path(path_type=Path))
 @click.option("--json", "as_json", is_flag=True)
 @click.option("--strict", is_flag=True, help="Exit 1 when issues found.")

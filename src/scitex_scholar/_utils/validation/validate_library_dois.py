@@ -36,8 +36,8 @@ def validate_library_dois(
     """Validate all DOIs in the scholar library.
 
     Args:
-        library_path: Path to MASTER directory (default: from ScholarConfig)
-        project: Specific project to validate (default: validate all in MASTER)
+        library_path: Path to the primary-store directory (default: from ScholarConfig)
+        project: Specific project to validate (default: validate everything in the primary store)
         delay_between_requests: Delay in seconds between DOI checks (be polite)
         fix_invalid: If True, remove invalid DOIs from metadata.json files
         output_file: Optional path to save validation report as JSON
@@ -73,12 +73,12 @@ def validate_library_dois(
 
     logger.info(f"Found {len(metadata_files)} papers to validate")
 
-    print("\n" + "=" * 80)
-    print("DOI VALIDATION REPORT")
-    print("=" * 80)
-    print(f"Library: {library_path}")
-    print(f"Papers: {len(metadata_files)}")
-    print("=" * 80)
+    logger.info("\n" + "=" * 80)
+    logger.info("DOI VALIDATION REPORT")
+    logger.info("=" * 80)
+    logger.info(f"Library: {library_path}")
+    logger.info(f"Papers: {len(metadata_files)}")
+    logger.info("=" * 80)
 
     for i, metadata_file in enumerate(metadata_files, 1):
         paper_id = metadata_file.parent.name
@@ -98,9 +98,9 @@ def validate_library_dois(
 
         results["papers_with_doi"] += 1
 
-        print(f"\n[{i}/{len(metadata_files)}] {title}...")
-        print(f"  Paper ID: {paper_id}")
-        print(f"  DOI: {doi}")
+        logger.info(f"\n[{i}/{len(metadata_files)}] {title}...")
+        logger.info(f"  Paper ID: {paper_id}")
+        logger.info(f"  DOI: {doi}")
 
         # Check DOI accessibility
         is_valid, message, status_code, resolved_url = validator.validate_doi(doi)
@@ -109,7 +109,7 @@ def validate_library_dois(
             results["valid_dois"] += 1
             logger.success(f"  ✓ {message}")
             if resolved_url:
-                print(f"  Resolved to: {resolved_url[:70]}...")
+                logger.info(f"  Resolved to: {resolved_url[:70]}...")
         else:
             results["invalid_dois"] += 1
             logger.error(f"  ✗ {message}")
@@ -143,31 +143,31 @@ def validate_library_dois(
             time.sleep(delay_between_requests)
 
     # Summary
-    print("\n" + "=" * 80)
-    print("VALIDATION SUMMARY")
-    print("=" * 80)
-    print(f"Total papers: {results['total_papers']}")
-    print(f"Papers with DOI: {results['papers_with_doi']}")
+    logger.info("\n" + "=" * 80)
+    logger.info("VALIDATION SUMMARY")
+    logger.info("=" * 80)
+    logger.info(f"Total papers: {results['total_papers']}")
+    logger.info(f"Papers with DOI: {results['papers_with_doi']}")
     if results["papers_with_doi"] > 0:
-        print(
+        logger.info(
             f"  ✓ Valid DOIs: {results['valid_dois']} ({results['valid_dois'] * 100 / results['papers_with_doi']:.1f}%)"
         )
-        print(
+        logger.error(
             f"  ✗ Invalid DOIs: {results['invalid_dois']} ({results['invalid_dois'] * 100 / results['papers_with_doi']:.1f}%)"
         )
-    print(f"Papers without DOI: {results['empty_dois']}")
+    logger.info(f"Papers without DOI: {results['empty_dois']}")
 
     # Invalid DOI details
     if results["invalid_details"]:
-        print("\n" + "=" * 80)
-        print(f"INVALID DOI DETAILS ({len(results['invalid_details'])} papers)")
-        print("=" * 80)
+        logger.info("\n" + "=" * 80)
+        logger.info(f"INVALID DOI DETAILS ({len(results['invalid_details'])} papers)")
+        logger.info("=" * 80)
         for item in results["invalid_details"]:
-            print(f"\nTitle: {item['title']}")
-            print(f"  Paper ID: {item['paper_id']}")
-            print(f"  DOI: {item['doi']}")
-            print(f"  Reason: {item['reason']}")
-            print(f"  File: {item['metadata_file']}")
+            logger.info(f"\nTitle: {item['title']}")
+            logger.info(f"  Paper ID: {item['paper_id']}")
+            logger.info(f"  DOI: {item['doi']}")
+            logger.info(f"  Reason: {item['reason']}")
+            logger.info(f"  File: {item['metadata_file']}")
 
     # Save results to file if requested
     if output_file:

@@ -11,7 +11,7 @@ Top-level groups:
 - ``library`` {link-project-tree, materialize, dematerialize, db}
 - ``gui``     {open, serve, status, stop}                — browser-based paper library GUI
 - ``mcp``     {start, list-tools, doctor, install}       — MCP server commands
-- ``skills``  {list, get, install}                       — bundled skill leaves
+- ``dev``     {skills {list, get, install}}              — self-maintenance (doctrine §13)
 - ``list-python-apis``                                   — print public API names
 
 Pre-1.3.0 top-level forms (``single``, ``parallel``, ``bibtex --bibtex …``,
@@ -42,41 +42,27 @@ from ._cli._scaffolding import (  # noqa: F401
     _INT_OR_HELP,
     _IntOrHelp,
     _warn_deprecated,
+    spec_group_kwargs,
 )
 
 
-# Top-level cli: same renderer with workflow/dev split. Replaces the
-# unused scitex-dev `CategorizedGroup` import that fell back to plain
-# click.Group when scitex-dev didn't actually export it.
-class _RootGroup(_CategorizedGroup):
-    SECTIONS = [
-        ("Workflow", ["paper", "bibtex", "pdf", "library", "auth"]),
-        ("Service", ["gui"]),
-        (
-            "Dev",
-            [
-                "list-python-apis",
-                "mcp",
-                "skills",
-                "install-shell-completion",
-                "print-shell-completion",
-            ],
-        ),
-    ]
-
-
-CategorizedGroup = _RootGroup  # used by @click.group(cls=...)
-
-
-COMMAND_CATEGORIES = [
-    ("Paper", ["paper"]),
-    ("Bibtex", ["bibtex"]),
-    ("PDF", ["pdf"]),
-    ("Library", ["library"]),
-    ("Auth", ["auth"]),
+# Top-level cli: SpecGroup (audit §4b) with the old Workflow / Service / Dev
+# split as command_categories. Replaces the bespoke `_RootGroup` subclass —
+# doctrine-standard section rendering now covers it.
+_ROOT_CATEGORIES = [
+    ("Workflow", ["paper", "bibtex", "pdf", "library", "auth"]),
     ("Service", ["gui"]),
-    ("MCP", ["mcp"]),
-    ("Skills", ["skills", "list-python-apis"]),
+    (
+        "Dev",
+        [
+            "dev",
+            "list-python-apis",
+            "mcp",
+            "skills",
+            "install-shell-completion",
+            "print-shell-completion",
+        ],
+    ),
 ]
 
 
@@ -107,14 +93,17 @@ def _print_command_help(
 
 
 @click.group(
-    cls=CategorizedGroup,
+    **spec_group_kwargs(
+        "Scientific literature management.",
+        description=(
+            "Storage layout: ~/.scitex/scholar/library/MASTER/{8DIGITID}/ "
+            "(canonical), {project}/ (symlinks).",
+        ),
+        command_categories=_ROOT_CATEGORIES,
+        version_of="scitex-scholar",
+    ),
     context_settings=CONTEXT_SETTINGS,
     invoke_without_command=True,
-    help=(
-        "SciTeX Scholar — scientific literature management.\n\n"
-        "Storage layout: ~/.scitex/scholar/library/MASTER/{8DIGITID}/ "
-        "(canonical), {project}/ (symlinks)."
-    ),
 )
 @click.version_option(None, "-V", "--version", package_name="scitex-scholar")
 @click.option(
@@ -208,7 +197,29 @@ cli.add_command(mcp)
 
 from ._cli.skills import list_python_apis, skills  # noqa: E402
 
-cli.add_command(skills)
+# Doctrine §13: self-maintenance commands nest under ONE `dev` group, so
+# `dev skills` is canonical. The old top-level `skills` spelling stays as
+# a hidden warn-phase alias that forwards argv to the target (group
+# targets re-parse argv, so every `skills <verb> [opts]` keeps working,
+# including `--help`).
+try:
+    from scitex_dev.ecosystem import CliHelp as _CliHelp
+    from scitex_dev.ecosystem import SpecGroup as _SpecGroup
+    from scitex_dev.ecosystem import deprecated_alias as _deprecated_alias
+
+    dev = _SpecGroup(
+        "dev",
+        help_spec=_CliHelp(
+            summary="Package self-maintenance commands (doctrine §13)."
+        ),
+    )
+    dev.add_command(skills)
+    cli.add_command(dev)
+    _deprecated_alias(
+        cli, "skills", target=skills, target_name="dev skills", remove_in="2.0"
+    )
+except ImportError:  # pragma: no cover — old scitex-dev without help_spec
+    cli.add_command(skills)
 cli.add_command(list_python_apis)
 
 
@@ -315,14 +326,3 @@ if __name__ == "__main__":
 
 
 # EOF
-
-
-# audit §4 — inject version into root --help
-try:
-    from importlib.metadata import version as _v
-
-    cli.help = (
-        f"scitex-scholar (v{_v('scitex-scholar')}) — " + (cli.help or "").lstrip()
-    )
-except Exception:
-    pass

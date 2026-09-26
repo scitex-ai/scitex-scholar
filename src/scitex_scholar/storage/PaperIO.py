@@ -13,7 +13,7 @@ __DIR__ = os.path.dirname(__FILE__)
 """
 Functionalities:
   - Provides simple IO interface for Paper objects
-  - Handles save/load/check operations for Paper data in MASTER directory
+  - Handles save/load/check operations for Paper data in the primary-store directory
   - Each Paper gets structured directory: MASTER/{8-digit-ID}/
   - Supports incremental data addition (check → process → save pattern)
   - All operations work with Paper object fields
@@ -107,7 +107,7 @@ def _atomic_write_json(
 class PaperIO:
     """Simple IO interface for Paper objects.
 
-    Handles all file operations for a Paper in its MASTER directory.
+    Handles all file operations for a Paper in its primary directory.
     """
 
     def __init__(self, paper: Paper, base_dir: Optional[Path] = None):

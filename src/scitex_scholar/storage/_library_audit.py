@@ -3,7 +3,7 @@
 
 Addresses https://github.com/scitex-ai/scitex-scholar/issues/12:
 `db build` raises on duplicate DOIs (correctly), but leaves the user
-with no visibility into *all* the problems. `audit()` walks MASTER and
+with no visibility into *all* the problems. `audit()` walks the primary store and
 returns a structured report so the user can see everything to fix
 before re-running `build`.
 

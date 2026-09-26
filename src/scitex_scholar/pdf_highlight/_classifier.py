@@ -200,7 +200,18 @@ def classify_llm(
     import threading
     from concurrent.futures import ThreadPoolExecutor, as_completed
 
-    import anthropic
+    # `anthropic` is optional: the LLM path is one of two classifiers (the
+    # offline `--stub` pass is the other) and it additionally needs
+    # SCITEX_SCHOLAR_ANTHROPIC_API_KEY. Guarded so a fresh install that
+    # never opts into the LLM path does not need the SDK, while anyone who
+    # does gets the install line instead of a bare ModuleNotFoundError.
+    try:
+        import anthropic
+    except ImportError as exc:  # optional dependency
+        raise RuntimeError(
+            "The Anthropic-backed classifier needs the `anthropic` SDK: "
+            "pip install anthropic"
+        ) from exc
 
     info = on_info or (lambda _msg: None)
     warn = on_warning or (lambda _msg: None)

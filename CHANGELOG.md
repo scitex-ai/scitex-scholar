@@ -54,6 +54,28 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   unchanged (Search databases / Library / Citation Graph).
 
 ### Changed
+- **The GUI/server stack and the MCP server are OPTIONAL again — guarded
+  imports, not hard dependencies.** The previous packaging pass resolved the
+  PS-233 (runtime-import-dependency-undeclared) findings by DECLARING every
+  unguarded import in `[project.dependencies]`, which made a bare
+  `pip install scitex-scholar` pull `django` + `scitex-app` + `scitex-ui`
+  (and `fastmcp`, `scitex-config`, `scitex-dict`, `numpy`). Those capabilities
+  are optional for this package, so the remedy is now a guard at each of the
+  31 import sites: `django` / `scitex-app` / `scitex-ui` name
+  `pip install 'scitex-scholar[server]'`, `fastmcp` names
+  `pip install 'scitex-scholar[mcp]'`, and the rest name their own
+  distribution. The declarations were removed from `[project.dependencies]` —
+  a guarded import must not be declared.
+  The seam matters: `_cli/gui.py` imports `_django/_server.py` at module top
+  (for `DEFAULT_PORT`), so `_django/_server.py` now imports WITH OR WITHOUT
+  scitex-app and `run()` refuses by name, while the Django-only modules
+  (`apps.py`, `settings.py`, `urls.py`, `views.py`, `_standalone_urls.py`)
+  fail loudly at import with the extra to install. `scitex_scholar._mcp_server`
+  stays importable without fastmcp with `mcp = None` + `MCP_AVAILABLE = False`
+  and an ERROR log naming `[mcp]`. Verified: `import scitex_scholar`,
+  `--version`, `--help`, every non-GUI subcommand and `mcp doctor` all work
+  with the four distributions uninstalled, and the `gui` subcommands exit 1
+  with the actionable sentence instead of a traceback.
 - **The Scholar database-search input is larger and visually primary** (product
   compass #93). The input height is now driven by a scholar-owned
   `--scholar-search-height` token (48px == scitex-ui's `--spacing-xxl` step,

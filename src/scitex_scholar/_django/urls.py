@@ -1,8 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""URL patterns for the scitex-scholar Django app."""
+"""URL patterns for the scitex-scholar Django app.
 
-from django.urls import path
+Django is a `[server]`-extra member, so it is not optional AT RUN TIME --
+this module IS a urlconf and has no meaning without the framework. It IS
+optional for the DISTRIBUTION, so the import is GUARDED and the guard
+FAILS LOUDLY rather than substituting anything (see apps.py for why a
+silent guard is unacceptable here).
+"""
+
+try:
+    from django.urls import path
+except ImportError as exc:  # django absent -- the [all]-gated GUI capability only
+    raise ImportError(
+        "scitex_scholar._django.urls needs Django, which is not installed. "
+        "Install the optional stack: pip install 'scitex-scholar[all]'"
+    ) from exc
 
 from . import views
 
@@ -10,6 +23,7 @@ app_name = "scholar"
 
 urlpatterns = [
     path("", views.index, name="index"),
+    path("api/projects", views.project_scope, name="project_scope"),
     path("api/health", views.health, name="health"),
     path("api/search", views.search, name="search"),
     path("api/graph/network", views.graph_network, name="graph_network"),

@@ -7,6 +7,10 @@ from __future__ import annotations
 
 import os
 
+import scitex_logging as slogging
+
+logger = slogging.getLogger(__name__)
+
 __FILE__ = "./src/scitex/scholar/auth/library/_OpenAthensSSOAutomator.py"
 __DIR__ = os.path.dirname(__FILE__)
 # ----------------------------------------
@@ -357,11 +361,11 @@ if __name__ == "__main__":
                 try:
                     await page.goto("https://my.openathens.net/?passiveLogin=false")
                     success = await automator.perform_login_async(page)
-                    print(f"OpenAthens automation success: {success}")
+                    logger.info(f"OpenAthens automation success: {success}")
 
                     await page.wait_for_timeout(10000)
                 except Exception as e:
-                    print(f"Error: {e}")
+                    logger.info(f"Error: {e}")
                 finally:
                     await browser.close()
 

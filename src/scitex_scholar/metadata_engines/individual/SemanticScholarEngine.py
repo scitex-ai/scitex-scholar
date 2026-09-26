@@ -23,10 +23,10 @@ from tenacity import (
     wait_exponential,
 )
 
+from ..._utils._env import resolve_env
 from ..utils import standardize_metadata
 from ._BaseDOIEngine import BaseDOIEngine
 from ._s2_batch import S2BatchMixin
-from ..._utils._env import resolve_env
 
 logger = logging.getLogger(__name__)
 
@@ -424,9 +424,9 @@ if __name__ == "__main__":
     outputs["empty_json"] = engine._create_minimal_metadata(return_as="json")
 
     for k, v in outputs.items():
-        print("----------------------------------------")
-        print(k)
-        print("----------------------------------------")
+        logger.info("----------------------------------------")
+        logger.info(k)
+        logger.info("----------------------------------------")
         pprint(v)
         time.sleep(1)
 

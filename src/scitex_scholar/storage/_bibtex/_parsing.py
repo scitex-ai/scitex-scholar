@@ -24,7 +24,16 @@ class BibTeXParsingMixin:
 
     def _extract_primitive(self, value):
         """Extract primitive value from DotDict or nested structure."""
-        from scitex_dict import DotDict
+        # GUARDED, not declared (PS-233): scitex-dict is not a core dependency
+        # of this distribution, so the import is wrapped and fails loudly with
+        # the distribution to install rather than a bare ModuleNotFoundError.
+        try:
+            from scitex_dict import DotDict
+        except ImportError as exc:
+            raise ImportError(
+                "BibTeXParsingMixin needs scitex-dict (DotDict), which is not "
+                "installed. Install it with: pip install scitex-dict"
+            ) from exc
 
         if value is None:
             return None

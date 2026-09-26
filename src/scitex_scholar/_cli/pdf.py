@@ -21,13 +21,17 @@ from pathlib import Path
 import click
 
 from ._scaffolding import CONTEXT_SETTINGS, _INT_OR_HELP
+from ._scaffolding import spec_command_kwargs, spec_group_kwargs
 
 # ---------------------------------------------------------------------------
 # Group: pdf
 # ---------------------------------------------------------------------------
 
 
-@click.group(context_settings=CONTEXT_SETTINGS)
+@click.group(
+    **spec_group_kwargs("PDF post-processing."),
+    context_settings=CONTEXT_SETTINGS,
+)
 def pdf() -> None:
     """PDF post-processing."""
 
@@ -116,7 +120,25 @@ def _pdf_highlight_options(f):
     return f
 
 
-@pdf.command("highlight")
+@pdf.command(
+    "highlight",
+    **spec_command_kwargs(
+        "Overlay semantic highlights on one or more PDFs.",
+        description=(
+            "Accepts multiple paths (e.g. a shell glob), so `*.pdf` "
+            "highlights a whole directory in one invocation. "
+            "Already-highlighted outputs (`*.highlighted.pdf`) are skipped "
+            "automatically.",
+        ),
+        examples=(
+            (
+                "{prog} pdf highlight paper.pdf --stub",
+                "Offline keyword heuristic; no API calls.",
+            ),
+            ("{prog} pdf highlight refs/*.pdf", "Highlight a whole directory."),
+        ),
+    ),
+)
 @_pdf_highlight_options
 def pdf_highlight(
     pdf_paths,

@@ -16,6 +16,7 @@
 <p align="center">
   <a href="https://pypi.org/project/scitex-scholar/"><img src="https://img.shields.io/pypi/v/scitex-scholar?label=pypi" alt="pypi"></a>
   <a href="https://pypi.org/project/scitex-scholar/"><img src="https://img.shields.io/pypi/pyversions/scitex-scholar?label=python" alt="python"></a>
+  <a href="https://scitex-scholar.readthedocs.io/en/latest/"><img src="https://img.shields.io/readthedocs/scitex-scholar?label=docs" alt="Read the Docs"></a>
   <a href="https://github.com/scitex-ai/scitex-scholar/actions/workflows/rtd-sphinx-build-caller.yml"><img src="https://img.shields.io/github/actions/workflow/status/scitex-ai/scitex-scholar/rtd-sphinx-build-caller.yml?branch=develop&label=docs" alt="docs"></a>
 </p>
 <p align="center">
@@ -33,8 +34,8 @@
 | # | Problem | Solution |
 |---|---------|----------|
 | 1 | **Literature search is balkanized** -- CrossRef / OpenAlex / Semantic Scholar / arXiv / PubMed each have different APIs, rate limits, auth | **Unified search** -- `scitex scholar search "topic"` federates across all, deduplicates by DOI, returns ranked results |
-| 2 | **BibTeX from the wild is missing abstracts / DOIs / impact factors** -- manuscript prep wastes hours | **`scitex scholar bibtex` enrichment** -- one call resolves DOIs, fetches abstracts, adds impact factors, normalizes formatting |
-| 3 | **Paywalled PDFs require institutional login per journal** -- manual login-download-rename is the bottleneck | **Browser-automation + OAuth** -- persistent Chrome profile with stealth; `scitex scholar fetch 10.1038/...` grabs the PDF end-to-end |
+| 2 | **BibTeX gaps** -- wild BibTeX misses abstracts / DOIs / impact factors; manuscript prep wastes hours | **`scitex scholar bibtex` enrichment** -- one call resolves DOIs, fetches abstracts, adds impact factors, normalizes formatting |
+| 3 | **Paywalled PDFs** -- each journal needs institutional login; manual login-download-rename is the bottleneck | **Browser-automation + OAuth** -- persistent Chrome profile with stealth; `scitex scholar fetch 10.1038/...` grabs the PDF end-to-end |
 
 ## Problem
 
@@ -47,19 +48,65 @@ Literature management spans many tools and APIs: searching databases, resolving 
 - **Search** across CrossRef, Semantic Scholar, PubMed, arXiv, and OpenAlex
 - **Resolve** DOIs from titles; enrich BibTeX with abstracts, citation counts, impact factors (JCR 2024), PMIDs, and arXiv IDs
 - **Download** PDFs through institutional access (OpenAthens / SSO) with Playwright browser automation
-- **Organize** papers in a MASTER-hash library with per-project symlinks at `~/.scitex/scholar/library/`. One-button maintenance via `library refresh` (reconcile → regenerate readable names → optional rsync to remote hosts)
+- **Organize** papers in a primary-hash library with per-project symlinks at `~/.scitex/scholar/library/`. One-button maintenance via `library refresh` (reconcile → regenerate readable names → optional rsync to remote hosts)
 - **Highlight** each sentence of a PDF by rhetorical role — claim, method, limitation, supportive citation, contradicting citation — via Claude
 - **Automate** the same operations from the CLI, a Python API, or the SciTeX MCP server
+
+## Demo
+
+```mermaid
+flowchart LR
+    Q["search query<br/>or .bib / DOI"] --> S["Scholar.search() /<br/>bibtex import"]
+    S --> E["metadata_engines<br/>(CrossRef · OpenAlex · arXiv ·<br/>PubMed · Semantic Scholar)"]
+    E --> P["Papers<br/>(deduped, enriched)"]
+    P --> U["url_finder<br/>(translators + heuristics)"]
+    U --> A["auth<br/>(OpenAthens / EZProxy /<br/>Shibboleth)"]
+    A --> D["pdf_download<br/>(Playwright strategies)"]
+    D --> L["~/.scitex/scholar/library/<br/>MASTER/&lt;HASH&gt;/"]
+    P -.-> H["pdf_highlight<br/>(claim / method / limitation)"]
+    L -.-> M["MCP: scholar_* tools<br/>(scitex serve)"]
+```
+
+<sub><b>Figure 1.</b> End-to-end demo flow: one <code>paper fetch</code> call runs enrich, URL resolution, authentication, download, and storage into the primary-store library.</sub>
+
+`scitex-scholar paper fetch --doi 10.1038/...` exercises the full chain in one call: enrich → resolve URL → authenticate → download → store under `MASTER/<HASH>/` with metadata + PDF + per-project symlinks.
 
 ## Installation
 
 ```bash
-pip install scitex-scholar                 # core
-pip install "scitex-scholar[pdf]"          # PDF text extraction
-pip install "scitex-scholar[mcp]"          # MCP server deps (fastmcp)
-pip install "scitex-scholar[browser]"      # Playwright automation
-pip install "scitex-scholar[all]"          # everything
+uv pip install "scitex-scholar[all]"
 ```
+
+<details>
+<summary>Core vs full install (what <code>[all]</code> adds)</summary>
+
+| Install | Contents |
+|---|---|
+| `pip install scitex-scholar` | core: search, enrich, library (Playwright browser automation included) |
+| `pip install "scitex-scholar[all]"` | everything: GUI server (django / scitex-app / scitex-ui), MCP server (fastmcp), PDF text extraction (pdfplumber), XLSX export (openpyxl), library watcher (watchdog), provenance hashing (scitex-clew) |
+
+</details>
+
+## Architecture
+
+```mermaid
+flowchart TB
+    CLI["scitex-scholar CLI<br/>(noun-verb groups)"] --> CORE["core/<br/>Scholar · Paper · Papers"]
+    MCP["MCP tools<br/>scholar_* via scitex serve"] --> CORE
+    GUI["Django GUI<br/>_django/"] --> CORE
+    CORE --> SEARCH["search_engines<br/>CrossRef · OpenAlex · arXiv ·<br/>PubMed · Semantic Scholar"]
+    CORE --> META["metadata_engines<br/>DOI · abstracts · citations · IF"]
+    SEARCH --> META
+    META --> URL["url_finder + auth<br/>translators · OpenAthens / SSO"]
+    URL --> PDF["pdf_download<br/>Playwright strategies"]
+    PDF --> STORE["storage/<br/>primary store + project symlinks"]
+    STORE --> HL["pdf_highlight<br/>claim / method / limitation"]
+    STORE --> INT["integration/<br/>Zotero · Mendeley"]
+```
+
+<sub><b>Figure 2.</b> Module architecture: the CLI, MCP, and GUI surfaces drive <code>core/</code>; federated search and enrichment feed URL discovery and authenticated download into the primary-store library.</sub>
+
+The CLI is a thin layer over the Python API: every `scitex-scholar <noun> <verb>` command dispatches into one of `core/`, `pipelines/`, `storage/`, or `auth/`. The MCP server (`_mcp/`) exposes the same handlers as `scholar_*` tools consumed by the unified `scitex serve` server.
 
 ## 4 Interfaces
 
@@ -141,7 +188,7 @@ scitex-scholar install-shell-completion --shell bash
 scitex-scholar print-shell-completion --shell bash
 
 # Skills + Python API introspection
-scitex-scholar skills list
+scitex-scholar dev skills list
 scitex-scholar list-python-apis -v
 ```
 
@@ -203,6 +250,8 @@ The `semantic-highlight` skill documents the PDF-highlighting workflow.
 | `CitationGraphBuilder`, `plot_citation_graph` | Optional citation graph |
 | `pdf_highlight.highlight_pdf` | Overlay semantic highlights on a PDF |
 
+<sub><b>Table 1.</b> Public Python API symbols and their purposes.</sub>
+
 Sources: `core/`, `search_engines/`, `metadata_engines/`, `pdf_download/`, `pipelines/`, `browser/`, `auth/`, `storage/`, `pdf_highlight/`, `_mcp/`.
 
 ## Semantic PDF Highlighting
@@ -219,6 +268,8 @@ and any viewer can show or strip them.
 | red | `focal_limitation` | self-admitted caveat or threat to validity |
 | blue | `related_supportive` | prior work whose finding supports the paper |
 | orange | `related_contradictive` | prior work whose finding contradicts the paper |
+
+<sub><b>Table 2.</b> Highlight colours and their rhetorical categories.</sub>
 
 A compact colour legend + signature (model name, timestamp) is stamped in the lower-right corner
 of the last page. See [docs](https://scitex-scholar.readthedocs.io/en/latest/semantic_highlight.html)
@@ -249,47 +300,6 @@ Also exposed as the `scholar_highlight_pdf` MCP tool (unified `scitex serve` ser
 ```
 
 Cache and auth state live under `~/.scitex/scholar/cache/` (URL resolver, Chrome profiles, OpenAthens cookies). Override with `SCITEX_DIR`.
-
-## Architecture
-
-```
-scitex_scholar/
-├── __init__.py            ← public API (Scholar, Paper, Papers, apply_filters, to_bibtex)
-├── _cli_main.py           ← `scitex-scholar` Click entry point (noun-verb groups)
-├── core/                  ← Scholar / Paper / Papers / ScholarConfig
-├── search_engines/        ← CrossRef, OpenAlex, Semantic Scholar, arXiv, PubMed federation
-├── metadata_engines/      ← DOI resolution, abstract / IF / citation enrichment
-├── auth/                  ← OpenAthens / EZProxy / Shibboleth / SSO automators
-├── browser/               ← persistent-profile Playwright manager (stealth + interactive)
-├── url_finder/            ← PDF URL discovery (translators + heuristic strategies)
-├── pdf_download/          ← `paper fetch` strategies (chrome viewer, direct, fallback)
-├── pdf_highlight/         ← claim/method/limitation overlay via Claude
-├── pipelines/             ← end-to-end @session-decorated workflows
-├── storage/               ← MASTER-hash library + per-project symlinks
-├── citation_graph/        ← optional citation network builder + plot
-├── integration/           ← Zotero / Mendeley / RefWorks / EndNote / Paperpile importers
-├── _mcp/                  ← MCP tool handlers (`scholar_*` tools for `scitex serve`)
-└── _skills/               ← agent-facing skill files (semantic-highlight, etc.)
-```
-
-The CLI is a thin layer over the Python API: every `scitex-scholar <noun> <verb>` command dispatches into one of `core/`, `pipelines/`, `storage/`, or `auth/`. The MCP server (`_mcp/`) exposes the same handlers as `scholar_*` tools consumed by the unified `scitex serve` server.
-
-## Demo
-
-```mermaid
-flowchart LR
-    Q["search query<br/>or .bib / DOI"] --> S["Scholar.search() /<br/>bibtex import"]
-    S --> E["metadata_engines<br/>(CrossRef · OpenAlex · arXiv ·<br/>PubMed · Semantic Scholar)"]
-    E --> P["Papers<br/>(deduped, enriched)"]
-    P --> U["url_finder<br/>(translators + heuristics)"]
-    U --> A["auth<br/>(OpenAthens / EZProxy /<br/>Shibboleth)"]
-    A --> D["pdf_download<br/>(Playwright strategies)"]
-    D --> L["~/.scitex/scholar/library/<br/>MASTER/&lt;HASH&gt;/"]
-    P -.-> H["pdf_highlight<br/>(claim / method / limitation)"]
-    L -.-> M["MCP: scholar_* tools<br/>(scitex serve)"]
-```
-
-`scitex-scholar paper fetch --doi 10.1038/...` exercises the full chain in one call: enrich → resolve URL → authenticate → download → store under `MASTER/<HASH>/` with metadata + PDF + per-project symlinks.
 
 ## License
 

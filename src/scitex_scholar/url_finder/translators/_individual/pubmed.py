@@ -12,17 +12,17 @@ Strategy:
 4. Extract PDF URLs from publisher links when available
 """
 
-import logging
 import re
 from typing import Any, Dict, List, Optional
 
 import httpx
+import scitex_logging as slogging
 from bs4 import BeautifulSoup
 from playwright.async_api import Page
 
 from .._core.base import BaseTranslator
 
-logger = logging.getLogger(__name__)
+logger = slogging.getLogger(__name__)
 
 
 class PubMedTranslator(BaseTranslator):
@@ -289,10 +289,10 @@ async def main():
     # Example PubMed URL
     test_url = "https://pubmed.ncbi.nlm.nih.gov/20729678/"
 
-    print(f"Testing PubMed translator with: {test_url}")
+    logger.info(f"Testing PubMed translator with: {test_url}")
 
     if PubMedTranslator.matches_url(test_url):
-        print("✓ URL matches PubMed pattern")
+        logger.info("✓ URL matches PubMed pattern")
 
         async with async_playwright() as p:
             browser = await p.chromium.launch(headless=True)
@@ -304,21 +304,21 @@ async def main():
                 # Extract PMID
                 pmid = await PubMedTranslator.extract_pmid_from_page(page)
                 if pmid:
-                    print(f"✓ Extracted PMID: {pmid}")
+                    logger.info(f"✓ Extracted PMID: {pmid}")
 
                     # Fetch metadata
                     metadata = await PubMedTranslator.fetch_pubmed_metadata(pmid)
                     if metadata:
-                        print(f"✓ Title: {metadata.get('title', 'N/A')}")
-                        print(f"✓ Authors: {', '.join(metadata.get('authors', []))}")
-                        print(f"✓ DOI: {metadata.get('doi', 'N/A')}")
-                        print(f"✓ Journal: {metadata.get('journal', 'N/A')}")
+                        logger.info(f"✓ Title: {metadata.get('title', 'N/A')}")
+                        logger.info(f"✓ Authors: {', '.join(metadata.get('authors', []))}")
+                        logger.info(f"✓ DOI: {metadata.get('doi', 'N/A')}")
+                        logger.info(f"✓ Journal: {metadata.get('journal', 'N/A')}")
 
                 # Extract PDF URLs
                 pdf_urls = await PubMedTranslator.extract_pdf_urls_async(page)
-                print(f"✓ Found {len(pdf_urls)} PDF links")
+                logger.info(f"✓ Found {len(pdf_urls)} PDF links")
                 for url in pdf_urls[:3]:
-                    print(f"  - {url}")
+                    logger.info(f"  - {url}")
 
             except Exception:
                 from scitex_browser.debugging import capture_debug_artifacts_async
@@ -328,7 +328,7 @@ async def main():
             finally:
                 await browser.close()
     else:
-        print("✗ URL does not match PubMed pattern")
+        logger.error("✗ URL does not match PubMed pattern")
 
 
 if __name__ == "__main__":

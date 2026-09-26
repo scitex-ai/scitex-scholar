@@ -8,6 +8,8 @@ from pathlib import Path
 
 import scitex_logging as logging
 
+console = logging.getConsole(__name__)
+
 logger = logging.getLogger(__name__)
 
 
@@ -199,12 +201,12 @@ async def handle_project_operations(args, scholar):
 
             info.append(pdf_status)
 
-            print(f"{i:3d}. {title}")
+            console.info(f"{i:3d}. {title}")
             if info:
-                print(f"     {' | '.join(info)}")
+                console.info(f"     {' | '.join(info)}")
 
         if len(papers) > 20:
-            print(f"\n... and {len(papers) - 20} more papers")
+            console.info(f"\n... and {len(papers) - 20} more papers")
 
     # Search in project/library
     if args.search:
@@ -221,7 +223,7 @@ async def handle_project_operations(args, scholar):
             if len(title) > 60:
                 title = title[:60] + "..."
             year = paper.metadata.basic.year or "n/a"
-            print(f"{i:3d}. {title} ({year})")
+            console.info(f"{i:3d}. {title} ({year})")
 
     # Export project
     if args.export:
