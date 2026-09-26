@@ -7,7 +7,26 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.12.0] - 2026-09-17
+
 ### Fixed
+- **The citation-graph health route no longer fails the normal initial load
+  with a same-origin 503** (P5 beta E2E blocker). Opening the app emitted
+  `503 /api/graph/health` on *every* page load: `CitationGraphManager.checkServiceHealth()`
+  ran from `DOMContentLoaded`, so an optional backend that is simply
+  unconfigured was reported as a 5xx — and a host that refuses to allowlist 5xx
+  cannot front that. The route now answers **200 in five truthful states**
+  (`unconfigured`, `configured` — present but *not* probed, `healthy`,
+  `degraded`, `unavailable`), the initial load asks for configuration only with
+  **no network call**, and the live canary probe runs via `?probe=1` when the
+  Citation Graph tab is opened, at most once per page. A configured but
+  unreachable backend still reports `unavailable` with its cause and fix: the
+  5xx is gone, not the failure. The three graph *build* routes
+  (`network`/`related`/`paper`) keep their 503 on purpose — they are
+  user-initiated actions, and a failed action is truthfully a 5xx. Measured
+  before/after: the same initial load produced 52 same-origin responses
+  including one `503`; now 52 responses, 0 5xx and 0 4xx, in both the
+  unconfigured and the configured-but-unreachable case.
 - **Scholar standalone GUI now follows the light/dark theme** (UI226). The
   scholar-owned surface tokens (`--bg-*`, `--accent-hover`, `--edge-color`)
   were pinned to DARK literals in `:root` with no `[data-theme="dark"]`
