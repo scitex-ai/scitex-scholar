@@ -7,6 +7,18 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- **`storage.master_*` primary file-store verbs for thin web layers**
+  (`paper_id_for`, `add_paper`, `get_paper_path`, `list_papers`):
+  the `MASTER/<paper_id>/` write path (PDF/BibTeX/package-schema
+  `metadata.json`, flat-key fold, legacy `papers/` read fallback) now lives
+  in the leaf instead of being reimplemented by hosts. `add_paper` puts the
+  single derived index row on the shared store best-effort — a store outage
+  warns and never fails the save.
+- **`cli._project_tree.link_project_tree` targets any unix user's library**
+  via `library_root=` or `SCITEX_DIR`, so mounted web deployments can link
+  `<project>/.scitex/scholar/library` without knowing leaf internals.
+
 ## [1.12.0] - 2026-09-17
 
 ### Fixed
