@@ -7,6 +7,7 @@ See docs/adr/0100-project-tree-link.md.
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import scitex_logging as logging
@@ -14,12 +15,29 @@ import scitex_logging as logging
 logger = logging.getLogger(__name__)
 
 
-def _home_library() -> Path:
+def _home_library(library_root: Path | None = None) -> Path:
+    """Home ``scholar/library`` dir.
+
+    Explicit ``library_root`` wins (lets multi-user hosts such as
+    SciTeX Hub address a unix user's library without switching UID).
+    Otherwise ``$SCITEX_DIR/scholar/library`` when ``SCITEX_DIR`` is set,
+    else the classic ``~/.scitex/scholar/library``.
+    """
+    if library_root is not None:
+        return Path(library_root).expanduser().resolve()
+    scitex_dir = os.getenv("SCITEX_DIR")
+    if scitex_dir:
+        return (Path(scitex_dir).expanduser() / "scholar" / "library").resolve()
     return Path("~/.scitex/scholar/library").expanduser().resolve()
 
 
-def link_project_tree(project_dir: Path, force: bool = False) -> Path:
-    """Create `<project_dir>/.scitex/scholar/library → ~/.scitex/scholar/library/`.
+def link_project_tree(
+    project_dir: Path, force: bool = False, library_root: Path | None = None
+) -> Path:
+    """Create `<project_dir>/.scitex/scholar/library → <library>/`.
+
+    ``library`` defaults to the home library (``$SCITEX_DIR``-aware).
+    Pass ``library_root`` to target another unix user's library.
 
     Idempotent. If a different symlink or a real directory already
     occupies the path, pass ``force=True`` to replace it.
@@ -30,7 +48,7 @@ def link_project_tree(project_dir: Path, force: bool = False) -> Path:
     if not project_dir.exists():
         raise FileNotFoundError(project_dir)
 
-    target = _home_library()
+    target = _home_library(library_root)
     link_parent = project_dir / ".scitex" / "scholar"
     link_parent.mkdir(parents=True, exist_ok=True)
     link = link_parent / "library"
