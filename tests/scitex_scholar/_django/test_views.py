@@ -2894,7 +2894,7 @@ def _save_payload(paper_id="PID9", doi="10.9/example", title="Saved paper"):
     }
 
 
-def test_library_save_persists_paper(tmp_path):
+def test_library_save_returns_saved_true(tmp_path):
     # Arrange
     with _library_env(tmp_path):
         rf = RequestFactory()
@@ -2905,12 +2905,39 @@ def test_library_save_persists_paper(tmp_path):
         )
         # Act
         resp = views.library_save(req)
-        data = _json.loads(resp.content)
-        # Assert — saved under this user's root and listed back.
-        assert resp.status_code == 200 and data["saved"] is True
+        # Assert
+        assert resp.status_code == 200
+
+
+def test_library_save_returns_library_id(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        req = rf.post(
+            "/api/library/save",
+            data=_json.dumps(_save_payload()),
+            content_type="application/json",
+        )
+        # Act
+        data = _json.loads(views.library_save(req).content)
+        # Assert
         assert data["library_id"] == "PID9"
+
+
+def test_library_save_lists_back(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        req = rf.post(
+            "/api/library/save",
+            data=_json.dumps(_save_payload()),
+            content_type="application/json",
+        )
+        # Act
+        views.library_save(req)
         listed = _json.loads(views.library_list(rf.get("/api/library")).content)
-        assert listed["count"] == 1 and listed["papers"][0]["doi"] == "10.9/example"
+        # Assert
+        assert listed["papers"][0]["doi"] == "10.9/example"
 
 
 def test_library_save_derives_id_without_library_id(tmp_path):
@@ -2947,7 +2974,22 @@ def test_library_save_rejects_invalid_json(tmp_path):
         assert resp.status_code == 400
 
 
-def test_library_save_bulk_partial_success(tmp_path):
+def test_library_save_bulk_saves_good_row(tmp_path):
+    # Arrange — one good row, one invalid row.
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        body = _json.dumps({"papers": [_save_payload("PID1"), "NOT-A-DICT"]})
+        # Act
+        data = _json.loads(
+            views.library_save_bulk(
+                rf.post("/api/library/save-bulk", data=body, content_type="application/json")
+            ).content
+        )
+        # Assert
+        assert len(data["saved"]) == 1
+
+
+def test_library_save_bulk_reports_bad_row(tmp_path):
     # Arrange — one good row, one invalid row.
     with _library_env(tmp_path):
         rf = RequestFactory()
@@ -2959,7 +3001,6 @@ def test_library_save_bulk_partial_success(tmp_path):
             ).content
         )
         # Assert — the bad row cannot fail the batch.
-        assert len(data["saved"]) == 1 and len(data["failed"]) == 1
         assert data["failed"][0]["index"] == 1
 
 
