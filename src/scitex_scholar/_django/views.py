@@ -1192,4 +1192,79 @@ def library_import(request):
         return JsonResponse({"error": f"Import failed: {e}"}, status=500)
 
 
+@require_POST
+def library_save(request):
+    """Save ONE paper to the user's local library (explicit user action).
+
+    Body: the paper object (same shape library_list returns per row, or a
+    ``Paper`` dict). The save runs through the file-based primary store
+    (PaperIO) under the request's user-scoped root — no shared store, no
+    database. ``container.created_by`` is stamped with the request user.
+    A missing library_id is derived (DOI/title hash, dedup-friendly).
+    """
+    from scitex_scholar.core.Paper import Paper
+
+    try:
+        payload = json.loads(request.body or b"{}")
+    except (ValueError, TypeError):
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    try:
+        paper = Paper.from_dict(payload)
+    except Exception as e:
+        return JsonResponse({"error": f"Invalid paper: {e}"}, status=400)
+    user = getattr(request, "user", None)
+    paper.container.created_by = _safe_username(user) if user is not None else "user"
+    if not paper.container.library_id:
+        paper.container.library_id = _derived_library_id(paper)
+    root = _library_root_for(request)
+    try:
+        path = _save_library_paper(paper, root)
+    except ValueError as e:
+        return JsonResponse({"error": str(e)}, status=400)
+    except OSError as e:
+        logger.error(f"library save failed: {e}", exc_info=True)
+        return JsonResponse({"error": f"Save failed: {e}"}, status=500)
+    return JsonResponse(
+        {"saved": True, "library_id": paper.container.library_id, "path": str(path)}
+    )
+
+
+@require_POST
+def library_save_bulk(request):
+    """Save MANY papers in one call; per-paper results so one bad row cannot
+    fail the batch. Body: ``{"papers": [...]}``. Same store, scoping, and
+    stamping rules as library_save."""
+    from scitex_scholar.core.Paper import Paper
+
+    try:
+        payload = json.loads(request.body or b"{}")
+    except (ValueError, TypeError):
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    papers = payload.get("papers")
+    if not isinstance(papers, list):
+        return JsonResponse({"error": 'Body must be {"papers": [...]}'}, status=400)
+    user = getattr(request, "user", None)
+    created_by = _safe_username(user) if user is not None else "user"
+    root = _library_root_for(request)
+    saved, failed = [], []
+    for i, item in enumerate(papers):
+        try:
+            paper = Paper.from_dict(item)
+        except Exception as e:
+            failed.append({"index": i, "error": f"Invalid paper: {e}"})
+            continue
+        paper.container.created_by = created_by
+        if not paper.container.library_id:
+            paper.container.library_id = _derived_library_id(paper)
+        try:
+            path = _save_library_paper(paper, root)
+        except (ValueError, OSError) as e:
+            failed.append(
+                {"index": i, "library_id": paper.container.library_id, "error": str(e)}
+            )
+            continue
+        saved.append({"library_id": paper.container.library_id, "path": str(path)})
+    return JsonResponse({"saved": saved, "failed": failed})
+
+
 # EOF
