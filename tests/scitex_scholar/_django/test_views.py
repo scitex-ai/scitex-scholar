@@ -2887,6 +2887,144 @@ def test_graph_limit_has_visible_and_accessible_meaning():
     assert 'aria-label="Maximum papers in citation graph"' in select_tag
 
 
+def _save_payload(paper_id="PID9", doi="10.9/example", title="Saved paper"):
+    return {
+        "metadata": {"id": {"doi": doi}, "basic": {"title": title, "year": 2025}},
+        "container": {"library_id": paper_id},
+    }
+
+
+def test_library_save_returns_saved_true(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        req = rf.post(
+            "/api/library/save",
+            data=_json.dumps(_save_payload()),
+            content_type="application/json",
+        )
+        # Act
+        resp = views.library_save(req)
+        # Assert
+        assert resp.status_code == 200
+
+
+def test_library_save_returns_library_id(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        req = rf.post(
+            "/api/library/save",
+            data=_json.dumps(_save_payload()),
+            content_type="application/json",
+        )
+        # Act
+        data = _json.loads(views.library_save(req).content)
+        # Assert
+        assert data["library_id"] == "PID9"
+
+
+def test_library_save_lists_back(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        req = rf.post(
+            "/api/library/save",
+            data=_json.dumps(_save_payload()),
+            content_type="application/json",
+        )
+        # Act
+        views.library_save(req)
+        listed = _json.loads(views.library_list(rf.get("/api/library")).content)
+        # Assert
+        assert listed["papers"][0]["doi"] == "10.9/example"
+
+
+def test_library_save_derives_id_without_library_id(tmp_path):
+    # Arrange — same DOI twice must not create duplicates.
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        payload = _save_payload()
+        del payload["container"]
+        body = _json.dumps(payload)
+        # Act
+        first = _json.loads(
+            views.library_save(
+                rf.post("/api/library/save", data=body, content_type="application/json")
+            ).content
+        )
+        second = _json.loads(
+            views.library_save(
+                rf.post("/api/library/save", data=body, content_type="application/json")
+            ).content
+        )
+        # Assert
+        assert first["library_id"] == second["library_id"]
+
+
+def test_library_save_rejects_invalid_json(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        # Act
+        resp = views.library_save(
+            rf.post("/api/library/save", data="{bad", content_type="application/json")
+        )
+        # Assert
+        assert resp.status_code == 400
+
+
+def test_library_save_bulk_saves_good_row(tmp_path):
+    # Arrange — one good row, one invalid row.
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        body = _json.dumps({"papers": [_save_payload("PID1"), "NOT-A-DICT"]})
+        # Act
+        data = _json.loads(
+            views.library_save_bulk(
+                rf.post("/api/library/save-bulk", data=body, content_type="application/json")
+            ).content
+        )
+        # Assert
+        assert len(data["saved"]) == 1
+
+
+def test_library_save_bulk_reports_bad_row(tmp_path):
+    # Arrange — one good row, one invalid row.
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        body = _json.dumps({"papers": [_save_payload("PID1"), "NOT-A-DICT"]})
+        # Act
+        data = _json.loads(
+            views.library_save_bulk(
+                rf.post("/api/library/save-bulk", data=body, content_type="application/json")
+            ).content
+        )
+        # Assert — the bad row cannot fail the batch.
+        assert data["failed"][0]["index"] == 1
+
+
+def test_library_save_is_user_scoped(tmp_path):
+    # Arrange — user A saves; user B lists a different root.
+    # Cross-user isolation: B must never see A's rows.
+    root_a = tmp_path / "a"
+    root_b = tmp_path / "b"
+    root_a.mkdir()
+    root_b.mkdir()
+    rf = RequestFactory()
+    save_req = rf.post(
+        "/api/library/save",
+        data=_json.dumps(_save_payload()),
+        content_type="application/json",
+    )
+    save_req.scholar_library_root = root_a
+    list_req = rf.get("/api/library")
+    list_req.scholar_library_root = root_b
+    # Act
+    saved = _json.loads(views.library_save(save_req).content)
+    listed_b = _json.loads(views.library_list(list_req).content)
+    # Assert
+    assert saved["saved"] is True and listed_b["papers"] == []
 def test_searches_save_returns_id(tmp_path):
     # Arrange
     with _library_env(tmp_path):
@@ -2988,6 +3126,9 @@ def test_searches_are_user_scoped(tmp_path):
     listed_b = _json.loads(views.searches_list(list_req).content)
     # Assert — B never sees A's rows.
     assert listed_b["searches"] == []
+
+
+# EOF
 
 
 # EOF
