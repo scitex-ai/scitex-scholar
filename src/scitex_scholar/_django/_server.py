@@ -56,9 +56,11 @@ ALL_EXTRA_HINT = "pip install 'scitex-scholar[all]'"
 # path that needs them refuses by name. Nothing is silently substituted --
 # which is the failure mode the retired try/except base-class swap had.
 try:
-    from scitex_app import hosts_to_allow
-    from scitex_app.embed import run_standalone
-except ImportError:  # scitex-app absent -- the [server] capability only
+    from scitex_sdk import app as _sdk_app
+
+    hosts_to_allow = _sdk_app.hosts_to_allow
+    run_standalone = _sdk_app.embed.run_standalone
+except ImportError:  # scitex-sdk absent -- the [server] capability only
     hosts_to_allow = None  # type: ignore[assignment]
     run_standalone = None  # type: ignore[assignment]
 
