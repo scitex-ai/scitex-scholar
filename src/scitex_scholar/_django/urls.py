@@ -34,6 +34,9 @@ urlpatterns = [
     path("api/library/enrich", views.library_enrich, name="library_enrich"),
     path("api/library/export", views.library_export, name="library_export"),
     path("api/library/import", views.library_import, name="library_import"),
+    path("api/searches/save", views.searches_save, name="searches_save"),
+    path("api/searches/list", views.searches_list, name="searches_list"),
+    path("api/searches/delete", views.searches_delete, name="searches_delete"),
 ]
 
 # EOF
