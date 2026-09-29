@@ -31,6 +31,23 @@ from scitex_scholar.core.Paper import Paper
 logger = logging.getLogger(__name__)
 
 
+def _looks_like_paper(item: Any) -> bool:
+    """Duck-type check for a Paper reached via an import alias.
+
+    The umbrella ``scitex`` package registers ``scitex.scholar.*`` as lazy
+    aliases of ``scitex_scholar.*``; the import system may then materialize
+    the same class under two module identities, defeating ``isinstance``.
+    A Paper always carries ``metadata.basic.title`` (may be None), so check
+    the shape instead of the class.
+    """
+    try:
+        meta = getattr(item, "metadata", None)
+        basic = getattr(meta, "basic", None)
+        return hasattr(basic, "title")
+    except Exception:
+        return False
+
+
 class Papers:
     """A simple collection of Paper objects.
 
@@ -62,7 +79,11 @@ class Papers:
 
         if papers:
             for item in papers:
-                if isinstance(item, Paper):
+                if isinstance(item, Paper) or _looks_like_paper(item):
+                    # isinstance covers the canonical import path; the
+                    # duck-type check covers the same class reached via an
+                    # import alias (e.g. scitex.scholar.* vs scitex_scholar.*,
+                    # which the umbrella registers as separate module objects).
                     self._papers.append(item)
                 elif isinstance(item, dict):
                     # Handle dict input - Pydantic handles validation
