@@ -3025,6 +3025,110 @@ def test_library_save_is_user_scoped(tmp_path):
     listed_b = _json.loads(views.library_list(list_req).content)
     # Assert
     assert saved["saved"] is True and listed_b["papers"] == []
+def test_searches_save_returns_id(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        body = _json.dumps({"name": "ml", "query": "graph nets"})
+        # Act
+        data = _json.loads(
+            views.searches_save(
+                rf.post("/api/searches/save", data=body, content_type="application/json")
+            ).content
+        )
+        # Assert
+        assert data["saved"] is True
+
+
+def test_searches_save_lists_back(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        body = _json.dumps({"name": "ml", "query": "graph nets"})
+        # Act
+        views.searches_save(
+            rf.post("/api/searches/save", data=body, content_type="application/json")
+        )
+        listed = _json.loads(views.searches_list(rf.get("/api/searches")).content)
+        # Assert
+        assert listed["searches"][0]["query"] == "graph nets"
+
+
+def test_searches_save_requires_name_and_query(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        body = _json.dumps({"name": "", "query": ""})
+        # Act
+        resp = views.searches_save(
+            rf.post("/api/searches/save", data=body, content_type="application/json")
+        )
+        # Assert
+        assert resp.status_code == 400
+
+
+def test_searches_delete_removes_row(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        body = _json.dumps({"name": "ml", "query": "graph nets"})
+        saved = _json.loads(
+            views.searches_save(
+                rf.post("/api/searches/save", data=body, content_type="application/json")
+            ).content
+        )
+        # Act
+        views.searches_delete(
+            rf.post(
+                "/api/searches/delete",
+                data=_json.dumps({"id": saved["id"]}),
+                content_type="application/json",
+            )
+        )
+        listed = _json.loads(views.searches_list(rf.get("/api/searches")).content)
+        # Assert
+        assert listed["searches"] == []
+
+
+def test_searches_delete_unknown_id_404(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        # Act
+        resp = views.searches_delete(
+            rf.post(
+                "/api/searches/delete",
+                data=_json.dumps({"id": "nope"}),
+                content_type="application/json",
+            )
+        )
+        # Assert
+        assert resp.status_code == 404
+
+
+def test_searches_are_user_scoped(tmp_path):
+    # Arrange — user A saves; user B lists a different root.
+    root_a = tmp_path / "a"
+    root_b = tmp_path / "b"
+    root_a.mkdir()
+    root_b.mkdir()
+    rf = RequestFactory()
+    save_req = rf.post(
+        "/api/searches/save",
+        data=_json.dumps({"name": "ml", "query": "graph nets"}),
+        content_type="application/json",
+    )
+    save_req.scholar_library_root = root_a
+    list_req = rf.get("/api/searches")
+    list_req.scholar_library_root = root_b
+    # Act
+    views.searches_save(save_req)
+    listed_b = _json.loads(views.searches_list(list_req).content)
+    # Assert — B never sees A's rows.
+    assert listed_b["searches"] == []
+
+
+# EOF
 
 
 # EOF

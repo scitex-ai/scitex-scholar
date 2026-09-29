@@ -1265,6 +1265,99 @@ def library_save_bulk(request):
             continue
         saved.append({"library_id": paper.container.library_id, "path": str(path)})
     return JsonResponse({"saved": saved, "failed": failed})
+def _saved_searches_path(root: Path) -> Path:
+    """Single JSON file holding this user's saved searches."""
+    return root / "SAVED_SEARCHES" / "saved_searches.json"
+
+
+def _load_saved_searches(root: Path) -> list:
+    path = _saved_searches_path(root)
+    if not path.is_file():
+        return []
+    try:
+        data = json.loads(path.read_text())
+    except ValueError:
+        return []
+    return data if isinstance(data, list) else []
+
+
+def _write_saved_searches(root: Path, rows: list) -> None:
+    path = _saved_searches_path(root)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(rows))
+
+
+@require_POST
+def searches_save(request):
+    """Save a named search query for this user (explicit action).
+
+    Body: {"name": ..., "query": ..., "params": {...}}. Stored file-based
+    under the request's user-scoped root — no shared store, no database.
+    """
+    try:
+        payload = json.loads(request.body or b"{}")
+    except (ValueError, TypeError):
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    name = (payload.get("name") or "").strip()
+    query = (payload.get("query") or "").strip()
+    if not name or not query:
+        return JsonResponse({"error": "name and query are required"}, status=400)
+    params = payload.get("params")
+    if params is None:
+        params = {}
+    if not isinstance(params, dict):
+        return JsonResponse({"error": "params must be an object"}, status=400)
+    user = getattr(request, "user", None)
+    root = _library_root_for(request)
+    rows = _load_saved_searches(root)
+    import datetime as _dt
+    import uuid as _uuid
+
+    row = {
+        "id": _uuid.uuid4().hex,
+        "name": name,
+        "query": query,
+        "params": params,
+        "created_by": _safe_username(user) if user is not None else "user",
+        "created_at": _dt.datetime.now(_dt.timezone.utc).isoformat(),
+    }
+    rows.append(row)
+    try:
+        _write_saved_searches(root, rows)
+    except OSError as e:
+        logger.error(f"searches save failed: {e}", exc_info=True)
+        return JsonResponse({"error": f"Save failed: {e}"}, status=500)
+    return JsonResponse({"saved": True, "id": row["id"], "name": name})
+
+
+@require_GET
+def searches_list(request):
+    """List this user's saved searches (user-scoped root only)."""
+    root = _library_root_for(request)
+    return JsonResponse({"searches": _load_saved_searches(root)})
+
+
+@require_POST
+def searches_delete(request):
+    """Delete one saved search by id; 404 when unknown."""
+    try:
+        payload = json.loads(request.body or b"{}")
+    except (ValueError, TypeError):
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    search_id = payload.get("id")
+    if not search_id:
+        return JsonResponse({"error": "id is required"}, status=400)
+    root = _library_root_for(request)
+    rows = _load_saved_searches(root)
+    kept = [r for r in rows if r.get("id") != search_id]
+    if len(kept) == len(rows):
+        return JsonResponse({"error": "Unknown id"}, status=404)
+    try:
+        _write_saved_searches(root, kept)
+    except OSError as e:
+        logger.error(f"searches delete failed: {e}", exc_info=True)
+        return JsonResponse({"error": f"Delete failed: {e}"}, status=500)
+    return JsonResponse({"deleted": True, "id": search_id})
 
 
 # EOF
