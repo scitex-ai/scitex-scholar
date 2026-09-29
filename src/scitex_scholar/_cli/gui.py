@@ -66,7 +66,9 @@ def _embed():
     must not be reported as "install scitex-app".
     """
     try:
-        import scitex_app.embed as embed
+        from scitex_sdk import app as _sdk_app
+
+        embed = _sdk_app.embed
     except ImportError:
         click.secho(
             "scitex-app is not installed -- the GUI lifecycle (serve/status/"
