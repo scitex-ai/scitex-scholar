@@ -44,8 +44,8 @@ CROSS_PACKAGE_IMPORTS = [
     'scitex',
     'scitex.notify',
     'scitex.utils._email',
-    'scitex_app._django',
-    'scitex_app.embed',
+    'scitex_sdk.app._django',
+    'scitex_sdk.app.embed',
     'scitex_browser',
     'scitex_browser.automation',
     'scitex_browser.core',
@@ -65,8 +65,8 @@ CROSS_PACKAGE_IMPORTS = [
     'scitex_plt',
     'scitex_sdk',
     'scitex_session',
-    'scitex_ui',
-    'scitex_ui.project_scope',
+    'scitex_sdk.ui',
+    'scitex_sdk.ui.project_scope',
 ]
 # ===== END AUTO-GENERATED =====
 

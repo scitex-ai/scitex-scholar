@@ -29,7 +29,7 @@ from scitex_scholar._django import _server
 # ---------------------------------------------------------------------------
 def test_server_binds_scitex_apps_public_hosts_helper():
     # Arrange
-    import scitex_app
+    import scitex_sdk.app as scitex_app
 
     from scitex_scholar._django import _server
 

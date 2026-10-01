@@ -87,7 +87,7 @@ def run(
     # actionable sentence instead of an AttributeError on a None sentinel.
     if run_standalone is None or hosts_to_allow is None:
         raise ImportError(
-            "The Scholar GUI server needs scitex-app, which is not installed. "
+            "The Scholar GUI server needs scitex-sdk app, which is not installed. "
             f"Install the optional stack: {ALL_EXTRA_HINT}"
         )
 

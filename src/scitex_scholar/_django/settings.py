@@ -102,21 +102,21 @@ INSTALLED_APPS = [
 # `except` below re-raises with the extra's name, so the failure stays at
 # import time, where the cause is legible.
 try:
-    import scitex_ui  # noqa: F401
+    import scitex_sdk.ui as scitex_ui  # noqa: F401
 except ImportError as exc:  # scitex-ui absent -- the [all]-gated GUI capability only
     raise ImportError(
         "scitex_scholar._django.settings needs scitex-ui, which is not "
         "installed. Install the optional stack: pip install 'scitex-scholar[all]'"
     ) from exc
 
-INSTALLED_APPS.append("scitex_ui")
+INSTALLED_APPS.append("scitex_sdk.ui")
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     # Alt+I / Ctrl+I visual debugging overlay.
-    "scitex_ui.middleware.ElementInspectorMiddleware",
+    "scitex_sdk.ui.middleware.ElementInspectorMiddleware",
 ]
 
 # i18n (operator directive 2026-09-14: EN default, full JA translation).

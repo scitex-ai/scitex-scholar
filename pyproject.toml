@@ -128,15 +128,13 @@ dev = [
     "fastmcp>=2.0.0",
     "aiohttp>=3.8.0",
     "django>=4.2",
-    "scitex-app>=0.11.0",  # hosts_to_allow public name (fleet single implementation)
-    "scitex-sdk>=0.2.1",  # unified facade; new imports resolve through scitex_sdk.app
+    "scitex-sdk>=0.3.0",
     # The rest of the `[all]` feature stack. Its imports in src/ are GUARDED now
     # (PS-233, 2026-09-20), so a `-e .[dev]` install missing these imports
     # fine and then fails every Django test on the guard's message. They stay
     # in `[dev]` so the GUI suite RUNS rather than degrading -- and the guards
     # are deliberately NOT importorskip'd: a skip would hide a genuinely
     # broken GUI install behind a green run.
-    "scitex-ui>=0.22.0",
     "watchdog>=3.0.0",
     # tests/integration/test_clew_integration.py — used (with importorskip)
     # to exercise the optional scitex-clew provenance path in storage/PaperIO.
@@ -176,8 +174,7 @@ all = [
     # reclaim under --force, and `gui_port_holder` gained the frozen
     # three-valued `PortHolder` whose `ours is None` the `gui open` code
     # branches on. Against 0.4.x those branches read a different shape.
-    "scitex-app>=0.11.0",  # hosts_to_allow public name (fleet single implementation)
-    "scitex-sdk>=0.2.1",  # unified facade; new imports resolve through scitex_sdk.app
+    "scitex-sdk>=0.3.0",
     # scholar.html EXTENDS `scitex_ui/standalone_shell.html` (since 1.9.0).
     # >=0.22.0 for the `.stx-app-header__slot--project-selector` guard plus
     # the earlier >=0.19.0 `<html lang>` accessibility floor (screen-reader
@@ -185,7 +182,6 @@ all = [
     # phonetics). Scholar builds its own context and calls render_to_string
     # directly, so it depends on the TEMPLATE-level
     # `{{ shell_lang|default:'en' }}`, not on `shell_context()`'s default.
-    "scitex-ui>=0.22.0",
     "watchdog>=3.0.0",
 ]
 

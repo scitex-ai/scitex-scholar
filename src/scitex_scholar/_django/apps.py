@@ -26,7 +26,7 @@ still cannot be mistaken for a working install.
 """
 
 try:
-    from scitex_app._django import ScitexAppConfig
+    from scitex_sdk.app._django import ScitexAppConfig
 except ImportError as exc:  # scitex-app absent -- the [all]-gated GUI capability only
     raise ImportError(
         "scitex_scholar._django needs scitex-app, which is not installed. "
