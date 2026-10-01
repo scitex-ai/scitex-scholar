@@ -31,8 +31,6 @@ from typing import Optional
 
 import scitex_logging as slogging
 
-console = slogging.getConsole(__name__)
-
 # The single source of truth for scholar's GUI port; `_cli/gui.py` imports
 # it from here rather than restating the literal (they used to "just agree
 # on 31297", which is a coincidence maintained by hand, not a constant).
@@ -63,6 +61,13 @@ try:
 except ImportError:  # scitex-sdk absent -- the [server] capability only
     hosts_to_allow = None  # type: ignore[assignment]
     run_standalone = None  # type: ignore[assignment]
+
+
+def _print_banner(host: str, port: int) -> None:
+    """Announce startup at the currently configured human-output level."""
+    console = slogging.getConsole(f"{__name__}.console", level=slogging.get_level())
+    console.info(f"SciTeX Scholar GUI: http://{host}:{port}")
+    console.info("Press Ctrl+C to stop")
 
 
 def run(
@@ -114,8 +119,7 @@ def run(
 
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "scitex_scholar._django.settings")
 
-    console.info(f"SciTeX Scholar GUI: http://{host}:{port}")
-    console.info("Press Ctrl+C to stop")
+    _print_banner(host, port)
 
     try:
         import django
