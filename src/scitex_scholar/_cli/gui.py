@@ -71,9 +71,9 @@ def _embed():
         embed = _sdk_app.embed
     except ImportError:
         click.secho(
-            "scitex-app is not installed -- the GUI lifecycle (serve/status/"
+            "scitex-sdk app is not installed -- the GUI lifecycle (serve/status/"
             "stop) is delegated to it. Install it with: "
-            "pip install 'scitex-scholar[all]' (needs scitex-app >= 0.11.0).",
+            "pip install 'scitex-scholar[all]' (needs scitex-sdk >= 0.3.0).",
             fg="red",
             err=True,
         )

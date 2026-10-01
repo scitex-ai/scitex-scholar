@@ -93,7 +93,7 @@ def test_standalone_urlconf_serves_shell_static_with_debug_false():
     # Arrange
     client = Client()
     # Act
-    resp = client.get("/static/scitex_ui/img/scitex-favicon.svg")
+    resp = client.get('/static/scitex_sdk/ui/img/scitex-favicon.svg')
     # Assert
     assert resp.status_code == 200
 

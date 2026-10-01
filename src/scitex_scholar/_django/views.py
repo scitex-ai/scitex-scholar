@@ -48,7 +48,7 @@ except ImportError as exc:  # django absent -- the [all]-gated GUI capability on
     ) from exc
 
 try:
-    from scitex_app.embed import mount_prefix
+    from scitex_sdk.app.embed import mount_prefix
 except ImportError as exc:  # scitex-app absent -- the [all]-gated GUI capability only
     raise ImportError(
         "scitex_scholar._django.views needs scitex-app, which is not "
@@ -56,7 +56,7 @@ except ImportError as exc:  # scitex-app absent -- the [all]-gated GUI capabilit
     ) from exc
 
 try:
-    from scitex_ui.project_scope import (
+    from scitex_sdk.ui.project_scope import (
         LocalProjectProvider,
         host_project_provider,
         project_listing_view,

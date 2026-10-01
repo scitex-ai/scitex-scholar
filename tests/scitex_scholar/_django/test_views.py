@@ -31,10 +31,10 @@ import re
 from pathlib import Path
 
 import pytest
-import scitex_ui
+import scitex_sdk.ui as scitex_ui
 import tomllib
 from django.test import RequestFactory, override_settings
-from scitex_ui.project_scope import LocalProjectProvider
+from scitex_sdk.ui.project_scope import LocalProjectProvider
 
 from scitex_scholar._django import views
 
@@ -108,7 +108,7 @@ def test_index_body_contains_shared_branding_favicon():
     # Act
     body = resp.content.decode()
     # Assert
-    assert '<link rel="icon" href="/static/scitex_ui/img/scitex-favicon.svg"' in body
+    assert '<link rel="icon" href="/static/scitex_sdk/ui/img/scitex-favicon.svg"' in body
 
 
 def test_index_does_not_shadow_shared_favicon_with_inline_icon():
@@ -640,11 +640,11 @@ def _scholar_css() -> str:
 
 def _theme_css() -> str:
     """scitex-ui's shell/theme.css, read from the INSTALLED package."""
-    import scitex_ui
+    import scitex_sdk.ui as scitex_ui
 
     path = (
         Path(scitex_ui.__file__).parent
-        / "static" / "scitex_ui" / "css" / "shell" / "theme.css"
+        / "static" / "scitex_sdk" / "ui" / "css" / "shell" / "theme.css"
     )
     # Resolved, not read: theme.css is a leaf TODAY. colors.css was a leaf
     # too until 0.16.0 split it into a barrel, at which point every
@@ -742,7 +742,7 @@ def test_template_links_scitex_ui_theme():
     html = response.content.decode()
 
     # Assert
-    assert "scitex_ui/css/shell/theme.css" in html
+    assert 'scitex_sdk/ui/css/shell/theme.css' in html
 
 
 # ---------------------------------------------------------------------------
@@ -886,7 +886,7 @@ if _marker:
 print("IMPORTED", views.APP_NAME)
 """
 
-_HOST_APPS = ["django.contrib.contenttypes", "django.contrib.staticfiles", "scitex_ui"]
+_HOST_APPS = ["django.contrib.contenttypes", "django.contrib.staticfiles", 'scitex_sdk.ui']
 
 
 def _import_views_in_host(installed_apps, setup=True):
@@ -2401,7 +2401,7 @@ def test_ja_compiled_mo_exists_at_app_locale_path():
 
 _PROJECT_SELECTOR_CSS = (
     Path(scitex_ui.__file__).parent
-    / "static" / "scitex_ui" / "css" / "app" / "project-selector.css"
+    / "static" / "scitex_sdk" / "ui" / "css" / "app" / "project-selector.css"
 )
 
 
@@ -2598,14 +2598,14 @@ def test_manifest_declares_project_scope():
     assert manifest["scope"] == "project"
 
 
-def test_all_extra_requires_header_slot_capable_scitex_ui():
+def test_all_extra_requires_sdk_with_header_slot_capable_ui():
     # Arrange — per-feature extras are retired (PS-225): the GUI/server
     # stack (incl. scitex-ui) ships flat in `[all]`.
     repo_root = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").is_file())
     # Act
     requirements = tomllib.loads((repo_root / "pyproject.toml").read_text())["project"]["optional-dependencies"]["all"]
     # Assert
-    assert "scitex-ui>=0.22.0" in requirements
+    assert "scitex-sdk>=0.3.0" in requirements
 
 
 def test_390px_header_wraps_picker_without_horizontal_overflow():
