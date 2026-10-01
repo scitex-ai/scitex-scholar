@@ -16,8 +16,6 @@ import asyncio
 
 import scitex_logging as logging
 
-console = logging.getConsole(__name__)
-
 logger = logging.getLogger(__name__)
 
 
@@ -69,7 +67,7 @@ async def main_async():
     ) = await browser_manager.get_authenticated_browser_and_context_async()
     page = await context.new_page()
 
-    console.info(f"args.url: {args.url}")
+    logger.info(f"args.url: {args.url}")
 
     logger.info(f"Navigating to {args.url}")
     try:

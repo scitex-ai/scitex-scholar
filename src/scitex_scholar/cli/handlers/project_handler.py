@@ -6,11 +6,28 @@
 
 from pathlib import Path
 
+import click
 import scitex_logging as logging
 
-console = logging.getConsole(__name__)
-
 logger = logging.getLogger(__name__)
+
+
+def _print_project_summary(project, total_papers, pdf_counts):
+    """Write the requested status report without diagnostic filtering."""
+    click.echo(f"\nProject: {project}")
+    click.echo(f"Papers: {total_papers}")
+    click.echo("")
+    click.echo("PDF Status:")
+    click.echo(f"  ✓ Downloaded (PDF-3s): {pdf_counts['PDF-3s']}")
+    click.echo(f"  ✗ Failed (PDF-2f):     {pdf_counts['PDF-2f']}")
+    click.echo(f"  ⧗ Pending (PDF-0p):    {pdf_counts['PDF-0p']}")
+    click.echo(f"  ⟳ Running (PDF-1r):    {pdf_counts['PDF-1r']}")
+    if total_papers > 0:
+        coverage = (pdf_counts["PDF-3s"] / total_papers) * 100
+        click.echo(
+            f"\nCoverage: {pdf_counts['PDF-3s']}/{total_papers} ({coverage:.1f}%)"
+        )
+    click.echo("")
 
 
 async def handle_project_operations(args, scholar):
@@ -152,23 +169,7 @@ async def handle_project_operations(args, scholar):
         total_papers = len(papers)
 
         # Display summary statistics
-        logger.info(f"\nProject: {args.project}")
-        logger.info(f"Papers: {total_papers}")
-        logger.info("")
-        logger.info("PDF Status:")
-        logger.success(f"  ✓ Downloaded (PDF-3s): {pdf_counts['PDF-3s']}")
-        logger.error(f"  ✗ Failed (PDF-2f):     {pdf_counts['PDF-2f']}")
-        logger.warning(f"  ⧗ Pending (PDF-0p):    {pdf_counts['PDF-0p']}")
-        logger.info(f"  ⟳ Running (PDF-1r):    {pdf_counts['PDF-1r']}")
-
-        # Calculate coverage
-        if total_papers > 0:
-            coverage = (pdf_counts["PDF-3s"] / total_papers) * 100
-            logger.info(
-                f"\nCoverage: {pdf_counts['PDF-3s']}/{total_papers} ({coverage:.1f}%)"
-            )
-
-        logger.info("")
+        _print_project_summary(args.project, total_papers, pdf_counts)
 
         # Show paper details
         for i, paper in enumerate(papers[:20], 1):  # Show first 20
@@ -201,12 +202,12 @@ async def handle_project_operations(args, scholar):
 
             info.append(pdf_status)
 
-            console.info(f"{i:3d}. {title}")
+            click.echo(f"{i:3d}. {title}")
             if info:
-                console.info(f"     {' | '.join(info)}")
+                click.echo(f"     {' | '.join(info)}")
 
         if len(papers) > 20:
-            console.info(f"\n... and {len(papers) - 20} more papers")
+            click.echo(f"\n... and {len(papers) - 20} more papers")
 
     # Search in project/library
     if args.search:
@@ -215,15 +216,15 @@ async def handle_project_operations(args, scholar):
         else:
             results = scholar.search_across_projects(args.search)
 
-        logger.info(f"\nSearch results for: {args.search}")
-        logger.info(f"Found: {len(results)} papers")
+        click.echo(f"\nSearch results for: {args.search}")
+        click.echo(f"Found: {len(results)} papers")
 
         for i, paper in enumerate(results[:10], 1):  # Show first 10
             title = paper.metadata.basic.title or "No title"
             if len(title) > 60:
                 title = title[:60] + "..."
             year = paper.metadata.basic.year or "n/a"
-            console.info(f"{i:3d}. {title} ({year})")
+            click.echo(f"{i:3d}. {title} ({year})")
 
     # Export project
     if args.export:
@@ -256,7 +257,7 @@ async def handle_project_operations(args, scholar):
             )
             return 1
 
-        logger.success(f"Exported {len(papers)} papers to: {output_path}")
+        click.echo(f"Exported {len(papers)} papers to: {output_path}")
 
     return 0
 
