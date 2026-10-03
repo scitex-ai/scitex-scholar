@@ -358,7 +358,7 @@ def _project_provider(request):
 project_scope = project_listing_view(_project_provider)
 
 
-def index_context(request):
+def index_context(request, current_project=None):
     """Return the existing Scholar page context for this request."""
     resolved_api = _api_url()
     provider = _project_provider(request)
