@@ -1,0 +1,352 @@
+{% load i18n scitex_project_picker %}
+        <!-- Scholar owns its app header; scitex-ui owns the picker primitive. -->
+        <header class="stx-app-header">
+            <div class="stx-app-header__identity">
+                <h1 class="stx-app-header__title">{% trans "SciTeX Scholar" %}</h1>
+                <span class="stx-app-header__subtitle">{% trans "Scientific Literature Management" %}</span>
+            </div>
+            <div class="stx-app-header__slot--project-selector">
+                {% scitex_project_picker scope=app_scope current=current_project %}
+            </div>
+        </header>
+        <div class="app-container">
+            <!-- Sidebar -->
+            <aside class="app-sidebar">
+                <!-- Service Status -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section__header">
+                        <span class="sidebar-section__title">{% trans "Service Status" %}</span>
+                    </div>
+                    <div class="sidebar-section__content">
+                        <div id="serviceStatus">
+                            <span class="status-indicator status-checking">&#9679; {% trans "Checking..." %}</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Controls (graph interaction, shown only while the Graph tab is active) -->
+                <div class="sidebar-section graph-controls-hint" data-graph-hint>
+                    <div class="sidebar-section__header">
+                        <span class="sidebar-section__title">{% trans "Graph Controls" %}</span>
+                    </div>
+                    <div class="sidebar-section__content"
+                         style="font-size: 11px;
+                                color: var(--text-muted)">
+                        <div style="margin-bottom: 6px;">
+                            <kbd style="background: var(--bg-tertiary);
+                                        border: 1px solid var(--border-default);
+                                        padding: 1px 4px;
+                                        font-size: 10px">{% trans "Scroll" %}</kbd> {% trans "Zoom" %}
+                        </div>
+                        <div style="margin-bottom: 6px;">
+                            <kbd style="background: var(--bg-tertiary);
+                                        border: 1px solid var(--border-default);
+                                        padding: 1px 4px;
+                                        font-size: 10px">{% trans "Drag" %}</kbd> {% trans "Pan" %}
+                        </div>
+                        <div>
+                            <kbd style="background: var(--bg-tertiary);
+                                        border: 1px solid var(--border-default);
+                                        padding: 1px 4px;
+                                        font-size: 10px">{% trans "Click" %}</kbd> {% trans "Select node" %}
+                        </div>
+                    </div>
+                </div>
+                <!--
+                    The CrossRef API status section was moved into the Search
+                    tab's Advanced section (compass 2026-09-10, L653): backend
+                    API infrastructure is no longer the default researcher view.
+                -->
+            </aside>
+            <!-- Main Content -->
+            <main class="app-main">
+                <!-- Tab Navigation: Search is the primary, default action. -->
+                <nav class="tab-nav">
+                    <button class="tab-btn active" data-tab="search">{% trans "Search databases" %}</button>
+                    <button class="tab-btn" data-tab="library">{% trans "Library" %}</button>
+                    <button class="tab-btn" data-tab="graph">{% trans "Citation Graph" %}</button>
+                </nav>
+                <!-- Search Tab (default) -->
+                <div id="tab-search" class="tab-panel active">
+                    <div class="citation-graph-container">
+                        <!-- Input Form -->
+                        <div class="graph-card">
+                            <div class="graph-card__header">
+                                <span class="graph-card__title">{% trans "Search Papers" %}</span>
+                            </div>
+                            <div class="graph-card__body">
+                                <p class="graph-description">
+                                    {% blocktrans %}Search academic databases (OpenAlex, Crossref, PubMed,
+                                    Semantic Scholar, &#8230;) by keyword. This searches
+                                    <strong>external databases</strong>, not your Library
+                                    (a separate tab).{% endblocktrans %}
+                                </p>
+                                <form id="searchForm" class="graph-form">
+                                    <div class="form-row">
+                                        <div class="form-group--doi">
+                                            <label class="form-label" for="searchInput">{% trans "Query" %}</label>
+                                            <div class="input-wrapper">
+                                                <input type="text"
+                                                       id="searchInput"
+                                                       class="form-input"
+                                                       placeholder="e.g. graph neural networks for molecular property prediction">
+                                                <button type="submit" class="btn-primary">{% trans "Search databases" %}</button>
+                                            </div>
+                                        </div>
+                                        <div class="form-group--options">
+                                            <label class="form-label" for="searchMaxResults">{% trans "Results" %}</label>
+                                            <select id="searchMaxResults" class="form-select">
+                                                <option value="10">10</option>
+                                                <option value="20" selected>20</option>
+                                                <option value="50">50</option>
+                                                <option value="100">100</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </form>
+                                <!--
+                                    Advanced: collapsed by default. Houses the
+                                    query-syntax help, the search source (mode),
+                                    the "Ignore cache" control, and the CrossRef
+                                    API status -- things a researcher does not
+                                    need on the first screen (compass L653).
+                                -->
+                                <details class="search-advanced">
+                                    <summary class="search-advanced__summary">{% trans "Advanced" %}</summary>
+                                    <div class="search-advanced__body">
+                                        <p class="search-advanced__syntax">
+                                            {% blocktrans %}Query syntax:
+                                            <code>-word</code> excludes a term,
+                                            <code>year:2020-2024</code> bounds the
+                                            publication year,
+                                            <code>if:&gt;5</code> filters by impact factor.{% endblocktrans %}
+                                        </p>
+                                        <div class="search-advanced__row">
+                                            <label class="form-label" for="searchMode">{% trans "Search source" %}</label>
+                                            <select id="searchMode" class="form-select">
+                                                <option value="parallel" selected>{% trans "All sources (parallel)" %}</option>
+                                                <option value="single">{% trans "Single source" %}</option>
+                                            </select>
+                                        </div>
+                                        <div class="search-advanced__row">
+                                            <label class="search-advanced__check">
+                                                <input type="checkbox" id="searchNoCache">
+                                                {% trans "Ignore cache" %}
+                                            </label>
+                                        </div>
+                                        <div class="search-advanced__row search-advanced__api">
+                                            <span class="form-label">{% trans "CrossRef API" %}</span>
+                                            {% if api_available %}
+                                                <span style="color: var(--accent);">&#9679;</span> {% trans "Configured" %}
+                                            {% else %}
+                                                <span style="color: var(--status-error);">&#9679;</span> {% trans "Not configured" %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </details>
+                            </div>
+                        </div>
+                        <!-- Loading -->
+                        <div id="searchLoading" class="graph-loading hidden">
+                            <div class="loading-spinner">
+                                <div class="spinner-ring"></div>
+                                <div class="spinner-ring"></div>
+                                <div class="spinner-ring"></div>
+                            </div>
+                            <div class="loading-text">{% trans "Searching databases... This may take a moment." %}</div>
+                        </div>
+                        <!-- Error -->
+                        <div id="searchError" class="graph-error hidden">
+                            <p id="searchErrorMessage">{% trans "An error occurred" %}</p>
+                            <button class="btn-build"
+                                    onclick="document.getElementById('searchError').classList.add('hidden')">
+                                {% trans "Dismiss" %}
+                            </button>
+                        </div>
+                        <!-- Results -->
+                        <div id="searchResults" class="hidden related-papers-section">
+                            <div class="graph-card">
+                                <div class="graph-card__header">
+                                    <span class="graph-card__title">
+                                        {% trans "Results" %}
+                                        <small id="searchStats" class="card-subtitle"></small>
+                                    </span>
+                                </div>
+                                <div class="graph-card__body" id="searchResultsContent"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Library Tab: the user's local library, listed here with a
+                     contextual (per-paper) Enrichment action. Enrichment is an
+                     operation ON a library item (#106), not a top-level tab
+                     (#105 kept it off the nav). -->
+                <div id="tab-library" class="tab-panel">
+                    <div class="citation-graph-container">
+                        <div class="graph-card">
+                            <div class="graph-card__header">
+                                <span class="graph-card__title">{% trans "Library" %}</span>
+                                <small id="libraryStats" class="card-subtitle"></small>
+                            </div>
+                            <div class="graph-card__body">
+                                <p class="graph-description">
+                                    {% blocktrans %}Your papers, stored locally. Use <strong>Enrich</strong>
+                                    to fill in metadata (abstract, citations, impact
+                                    factor) from the databases, or
+                                    <strong>Import</strong> BibTeX and
+                                    <strong>Export</strong> your library.{% endblocktrans %}
+                                </p>
+                                <!-- Import / Export (#106 / L327): library-level
+                                     operations, thin wrappers over the package's
+                                     BibTeX handler + formatter. -->
+                                <div class="library-io">
+                                    <label class="library-io__label" for="libraryExportFormat">{% trans "Export" %}</label>
+                                    <select id="libraryExportFormat" class="form-select library-io__select">
+                                        <option value="bibtex" selected">{% trans "BibTeX (.bib)" %}</option>
+                                        <option value="ris">{% trans "RIS (.ris)" %}</option>
+                                        <option value="endnote">{% trans "EndNote (.enw)" %}</option>
+                                    </select>
+                                    <button type="button" id="libraryExportBtn" class="btn-control-library">{% trans "Export" %}</button>
+                                    <span class="library-io__sep"></span>
+                                    <input type="file" id="libraryImportFile" class="library-io__file"
+                                           accept=".bib,.bibtex,.txt" hidden>
+                                    <button type="button" id="libraryImportBtn" class="btn-control-library">{% trans "Import BibTeX" %}</button>
+                                </div>
+                                <div id="libraryIoStatus" class="library-io__status"></div>
+                                <!-- Filter: the Library list's empty state has a
+                                     FILTERED variant ("no papers match"), which
+                                     is unreachable without a real filter control
+                                     (review blocker 2). Filtering happens in
+                                     /api/library?q= (server-side, over the same
+                                     MASTER metadata the list shows). -->
+                                <div class="library-filter">
+                                    <label class="form-label" for="libraryFilter">{% trans "Filter your library" %}</label>
+                                    <input type="search"
+                                           id="libraryFilter"
+                                           class="form-input library-filter__input"
+                                           placeholder="{% trans "Title, author, or DOI" %}"
+                                           autocomplete="off">
+                                    <button type="button"
+                                            id="libraryFilterClear"
+                                            class="btn-control-library hidden">{% trans "Clear filters" %}</button>
+                                </div>
+                                <!-- CSRF: emitted by the standard {% csrf_token %}
+                                     tag. Inert standalone (no CsrfViewMiddleware,
+                                     value empty); when the mounted hub enables
+                                     CSRF, it carries the real token that the
+                                     Library Import POST sends as X-CSRFToken. We
+                                     deliberately do NOT @csrf_exempt the view. -->
+                                {% csrf_token %}
+                                <div id="libraryLoading" class="graph-loading hidden">
+                                    <div class="loading-spinner">
+                                        <div class="spinner-ring"></div>
+                                        <div class="spinner-ring"></div>
+                                        <div class="spinner-ring"></div>
+                                    </div>
+                                    <div class="loading-text">{% trans "Loading your library..." %}</div>
+                                </div>
+                                <div id="libraryError" class="graph-error hidden">
+                                    <p id="libraryErrorMessage">{% trans "An error occurred" %}</p>
+                                    <button class="btn-build"
+                                            onclick="document.getElementById('libraryError').classList.add('hidden')">
+                                        {% trans "Dismiss" %}
+                                    </button>
+                                </div>
+                                <div id="libraryList" class="library-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Citation Graph Tab (demoted: no longer the default) -->
+                <div id="tab-graph" class="tab-panel">
+                    <div class="citation-graph-container">
+                        <!-- Input Form -->
+                        <div class="graph-card">
+                            <div class="graph-card__header">
+                                <span class="graph-card__title">{% trans "Build Citation Network" %}</span>
+                            </div>
+                            <div class="graph-card__body">
+                                <p class="graph-description">
+                                    {% trans "Start with a DOI. Find one by title, topic, or keywords in Search or your Library, then build an interactive citation graph of related papers." %}
+                                </p>
+                                <form id="graphForm" class="graph-form">
+                                    <div class="form-row">
+                                        <div class="form-group--doi">
+                                            <label class="form-label" for="doiInput">{% trans "DOI" %}</label>
+                                            <div class="input-wrapper">
+                                                <input type="text"
+                                                       id="doiInput"
+                                                       class="form-input"
+                                                       required
+                                                       aria-describedby="graphSeedHelp"
+                                                       placeholder="e.g. 10.1038/s41586-020-2008-3">
+                                                <button type="submit" class="btn-build">{% trans "Build Graph" %}</button>
+                                            </div>
+                                            <small id="graphSeedHelp">{% trans "Paste the DOI for one seed paper; titles and keywords belong in Search." %}</small>
+                                        </div>
+                                        <div class="form-group--options">
+                                            <label class="form-label" for="topN">{% trans "Max papers in graph" %}</label>
+                                            <select id="topN" class="form-select" aria-label="Maximum papers in citation graph">
+                                                <option value="10">10</option>
+                                                <option value="20" selected>20</option>
+                                                <option value="30">30</option>
+                                                <option value="50">50</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <!-- Loading -->
+                        <div id="graphLoading" class="graph-loading hidden">
+                            <div class="loading-spinner">
+                                <div class="spinner-ring"></div>
+                                <div class="spinner-ring"></div>
+                                <div class="spinner-ring"></div>
+                            </div>
+                            <div class="loading-text">{% trans "Building citation network... This may take a moment." %}</div>
+                        </div>
+                        <!-- Error -->
+                        <div id="graphError" class="graph-error hidden">
+                            <p id="graphErrorMessage">{% trans "An error occurred" %}</p>
+                            <button class="btn-build"
+                                    onclick="document.getElementById('graphError').classList.add('hidden')">
+                                {% trans "Dismiss" %}
+                            </button>
+                        </div>
+                        <!-- Visualization -->
+                        <div id="graphVisualization" class="hidden">
+                            <div class="graph-card graph-card--full">
+                                <div class="graph-card__header">
+                                    <span class="graph-card__title">
+                                        <span id="graphTitle">{% trans "Citation Network" %}</span>
+                                        <small id="graphStats"
+                                               style="font-weight: 400;
+                                                      color: var(--text-muted);
+                                                      margin-left: 12px"></small>
+                                    </span>
+                                    <div class="graph-controls">
+                                        <button id="fitViewBtn" class="btn-control" title="{% trans "Fit to view" %}">&#8689;</button>
+                                        <button id="resetZoomBtn" class="btn-control" title="{% trans "Reset zoom" %}">&#8634;</button>
+                                        <button id="downloadSvgBtn" class="btn-control" title="{% trans "Download SVG" %}">&#8681;</button>
+                                    </div>
+                                </div>
+                                <div class="graph-card__body" style="padding: 0; position: relative;">
+                                    <div id="graphCanvas" class="graph-canvas-wrapper"></div>
+                                    <div id="nodeDetailsPanel" class="node-details-panel hidden"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Related Papers -->
+                        <div id="relatedPapersList" class="hidden related-papers-section">
+                            <div class="graph-card">
+                                <div class="graph-card__header">
+                                    <span class="graph-card__title">{% trans "Related Papers" %}</span>
+                                </div>
+                                <div class="graph-card__body" id="relatedPapersContent"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+        <!-- Scripts (order matters: ForceSimulation < GraphRenderer < citation-graph) -->
