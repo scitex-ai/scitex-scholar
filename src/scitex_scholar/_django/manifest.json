@@ -25,8 +25,5 @@
   "embedded_package": true,
   "dependencies": {
     "python": ["scitex-scholar", "django"]
-  },
-  "mount_policy": {
-    "login_required": true
   }
 }

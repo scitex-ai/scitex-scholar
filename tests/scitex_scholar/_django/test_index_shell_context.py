@@ -22,6 +22,7 @@ from django.apps import apps
 from django.conf import settings
 from django.middleware.locale import LocaleMiddleware
 from django.test import RequestFactory, override_settings
+from django.urls import resolve
 from django.utils import translation
 
 from scitex_scholar._django import views
@@ -281,13 +282,80 @@ def test_scholar_entrypoint_resolves_existing_app_config():
     assert configs == [type(apps.get_app_config("scholar_editor"))]
 
 
-def test_scholar_manifest_declares_generic_login_boundary():
+def test_scholar_manifest_keeps_host_route_access_policy():
     # Arrange
     config = apps.get_app_config("scholar_editor")
     # Act
-    policy = config.manifest.get("mount_policy")
+    policy = config.manifest.get("mount_policy") or {}
     # Assert
-    assert policy == {"login_required": True}
+    assert policy == {}
+
+
+@pytest.fixture(params=["", "/apps/scholar/v2"], ids=["root", "mounted"])
+def _anonymous_public_results(request, _private_context):
+    """Call real leaf URL callbacks with anonymous root or mounted requests.
+
+    These portable requests exercise the leaf callbacks; host access middleware
+    remains outside this fixture. Health reads configuration and missing-query
+    search returns before selecting an engine.
+    """
+    from django.contrib.auth.models import AnonymousUser
+
+    results = {}
+    with override_settings(
+        SCITEX_SCHOLAR_CROSSREF_API_URL=None,
+        CROSSREF_API_URL=None,
+    ):
+        for endpoint in ("health", "search"):
+            match = resolve(
+                f"/api/{endpoint}", urlconf="scitex_scholar._django.urls"
+            )
+            http_request = RequestFactory().get(f"{request.param}/api/{endpoint}")
+            http_request.user = AnonymousUser()
+            response = match.func(http_request, *match.args, **match.kwargs)
+            results[endpoint] = {
+                "response": response,
+                "body": json.loads(response.content),
+            }
+    return results
+
+
+def test_anonymous_leaf_health_returns_200(_anonymous_public_results):
+    # Arrange
+    response = _anonymous_public_results["health"]["response"]
+    # Act
+    status = response.status_code
+    # Assert
+    assert status == 200
+
+
+def test_anonymous_leaf_health_reports_configuration_unavailable(
+    _anonymous_public_results,
+):
+    # Arrange
+    body = _anonymous_public_results["health"]["body"]
+    # Act
+    available = body["api_available"]
+    # Assert
+    assert available is False
+
+
+def test_anonymous_leaf_search_missing_query_returns_400(_anonymous_public_results):
+    # Arrange
+    response = _anonymous_public_results["search"]["response"]
+    # Act
+    status = response.status_code
+    # Assert
+    assert status == 400
+
+
+def test_anonymous_leaf_search_reports_required_query(_anonymous_public_results):
+    # Arrange
+    body = _anonymous_public_results["search"]["body"]
+    # Act
+    error = body["error"]
+    # Assert
+    assert error == "q parameter required"
 
 
 # EOF
