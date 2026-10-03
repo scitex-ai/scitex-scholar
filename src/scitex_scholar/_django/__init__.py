@@ -11,4 +11,10 @@ viewer.
 
 default_app_config = "scitex_scholar._django.apps.ScholarEditorConfig"
 
+# Keep discovery lazy: the host resolves this leaf-owned context builder
+# only when rendering the existing Scholar page.
+context_builder = "scitex_scholar._django.views.index_context"
+
+__all__ = ["default_app_config", "context_builder"]
+
 # EOF

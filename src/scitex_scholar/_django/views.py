@@ -358,6 +358,42 @@ def _project_provider(request):
 project_scope = project_listing_view(_project_provider)
 
 
+def index_context(request):
+    """Return the existing Scholar page context for this request."""
+    resolved_api = _api_url()
+    provider = _project_provider(request)
+    current_project = resolve_project(
+        request,
+        provider,
+        explicit=request.GET.get("project"),
+    )
+    return {
+        **shell_context("Scholar"),
+        "api_available": resolved_api is not None,
+        "api_url": resolved_api or "Not configured",
+        "stx_mount": mount_prefix(request),
+        "app_label": _app_label("SciTeX Scholar"),
+        "app_scope": "user",
+        "current_project": current_project,
+        # i18n (operator directive 2026-09-14): the whole page flips via
+        # LocaleMiddleware; this carries the strings that live ONLY in
+        # JS, translated server-side for the current request language so
+        # the client never hardcodes a language. Serialized by the
+        # template's json_script filter into <script id="SCHOLAR_I18N">;
+        # the client reads it via JSON.parse (see scholarT in stx-mount.js).
+        "scholar_i18n": _js_i18n_dict(),
+        # The scitex-ui workspace shell renders three side panes
+        # (Console/Chat, Files, Viewer) around the app content. Scholar
+        # has no content for them, and because the template extends the
+        # shell directly (it is not a built SPA shell the SDK wraps) they
+        # would otherwise render empty — the large left gutter on desktop
+        # and the broken reflow on mobile. Declare them unused so the
+        # shell hides them and Scholar is the whole page. This is the
+        # shell's documented contract ("panes ... DECLARED by the app").
+        "panes": {"ai": "unused", "files": "unused", "viewer": "unused"},
+    }
+
+
 def index(request):
     """Serve the Scholar SPA shell page.
 
@@ -367,40 +403,9 @@ def index(request):
     favicon_href when given one) and drift from the rest of the fleet --
     which is what the removed `_favicon_href()` did.
     """
-    resolved_api = _api_url()
-    provider = _project_provider(request)
-    current_project = resolve_project(
-        request,
-        provider,
-        explicit=request.GET.get("project"),
-    )
     html = render_to_string(
         "scholar/scholar.html",
-        {
-            **shell_context("Scholar"),
-            "api_available": resolved_api is not None,
-            "api_url": resolved_api or "Not configured",
-            "stx_mount": mount_prefix(request),
-            "app_label": _app_label("SciTeX Scholar"),
-            "app_scope": "user",
-            "current_project": current_project,
-            # i18n (operator directive 2026-09-14): the whole page flips via
-            # LocaleMiddleware; this carries the strings that live ONLY in
-            # JS, translated server-side for the current request language so
-            # the client never hardcodes a language. Serialized by the
-            # template's json_script filter into <script id="SCHOLAR_I18N">;
-            # the client reads it via JSON.parse (see scholarT in stx-mount.js).
-            "scholar_i18n": _js_i18n_dict(),
-            # The scitex-ui workspace shell renders three side panes
-            # (Console/Chat, Files, Viewer) around the app content. Scholar
-            # has no content for them, and because the template extends the
-            # shell directly (it is not a built SPA shell the SDK wraps) they
-            # would otherwise render empty — the large left gutter on desktop
-            # and the broken reflow on mobile. Declare them unused so the
-            # shell hides them and Scholar is the whole page. This is the
-            # shell's documented contract ("panes ... DECLARED by the app").
-            "panes": {"ai": "unused", "files": "unused", "viewer": "unused"},
-        },
+        index_context(request),
         request=request,
     )
     return HttpResponse(html)
