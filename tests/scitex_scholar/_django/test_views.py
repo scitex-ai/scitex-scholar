@@ -629,12 +629,27 @@ def _resolve_css(entry: Path, _seen: set | None = None) -> str:
 
 
 def _scholar_template_source(template: Path) -> str:
-    """Read the real wrapper and its included canonical workspace body."""
-    return template.read_text().replace(
+    """Read the real wrapper, canonical workspace body and asset stages."""
+    source = template.read_text()
+    head_include = (
+        '{% include "scholar/workspace_assets.html" '
+        'with scholar_asset_stage="head" %}'
+    )
+    if head_include in source:
+        assets = template.with_name("workspace_assets.html").read_text()
+        head, scripts = assets.split(
+            '{% if scholar_asset_stage == "head" %}', 1
+        )[1].split('{% elif scholar_asset_stage == "scripts" %}', 1)
+        scripts = scripts.split("{% endif %}", 1)[0]
+        source = source.replace(head_include, head).replace(
+            '{% include "scholar/workspace_assets.html" '
+            'with scholar_asset_stage="scripts" %}',
+            scripts,
+        )
+    return source.replace(
         '{% include "scholar/workspace_content.html" %}',
         template.with_name("workspace_content.html").read_text(),
     )
-
 
 def _scholar_css() -> str:
     """Everything that can reference a token, as the browser would see it.
