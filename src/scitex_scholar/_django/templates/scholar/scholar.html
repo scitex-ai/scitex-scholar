@@ -82,7 +82,7 @@ API infrastructure.
         <!-- json_script, not a plain variable: autoescape turns " into &quot;, which a script body never decodes. -->
         {{ scholar_i18n|json_script:"SCHOLAR_I18N" }}
         <script src="{% static 'scholar/js/stx-mount.js' %}"></script>
-        <script src="{% static 'scholar/js/app.js' %}"></script>
+        <script type="module" src="{% static 'scholar/js/app.js' %}"></script>
 <script src="{% static 'scholar/js/search.js' %}"></script>
         <script src="{% static 'scholar/js/library.js' %}"></script>
         <script src="{% static 'scholar/js/graph/ForceSimulation.js' %}"></script>

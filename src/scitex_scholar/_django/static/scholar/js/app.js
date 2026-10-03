@@ -10,10 +10,15 @@
  * min-height and the panels share the same container, so nothing jumps
  * horizontally on switch.
  */
-document.addEventListener("DOMContentLoaded", () => {
-  const tabs = document.querySelectorAll(".tab-btn");
-  const panels = document.querySelectorAll(".tab-panel");
-  const graphHint = document.querySelector("[data-graph-hint]");
+const initializedRoots = new WeakSet();
+
+function initScholarTabs(root) {
+  if (initializedRoots.has(root)) return;
+  initializedRoots.add(root);
+
+  const tabs = root.querySelectorAll(".tab-btn");
+  const panels = root.querySelectorAll(".tab-panel");
+  const graphHint = root.querySelector("[data-graph-hint]");
 
   function syncGraphHint(activeTab) {
     if (!graphHint) return;
@@ -28,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
       panels.forEach((p) => p.classList.remove("active"));
 
       tab.classList.add("active");
-      const panel = document.getElementById("tab-" + target);
+      const panel = root.querySelector("#tab-" + target);
       if (panel) panel.classList.add("active");
 
       syncGraphHint(target);
@@ -37,6 +42,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Initial state: the default active tab is Search (see scholar.html), so the
   // graph hint is hidden on load.
-  const initial = document.querySelector(".tab-btn.active");
+  const initial = root.querySelector(".tab-btn.active");
   if (initial) syncGraphHint(initial.dataset.tab);
+}
+
+function initScholarRoots() {
+  document.querySelectorAll("[data-scholar-root]").forEach(initScholarTabs);
+}
+
+// The host replaces the pane before announcing the injected module.
+document.addEventListener("workspace:module-injected", (event) => {
+  if (event.detail?.module === "scholar") initScholarRoots();
 });
+
+// A module may finish loading after the host's injection event or DOM ready.
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initScholarRoots, { once: true });
+} else {
+  initScholarRoots();
+}
