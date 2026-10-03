@@ -628,6 +628,14 @@ def _resolve_css(entry: Path, _seen: set | None = None) -> str:
     return "\n".join(parts)
 
 
+def _scholar_template_source(template: Path) -> str:
+    """Read the real wrapper and its included canonical workspace body."""
+    return template.read_text().replace(
+        '{% include "scholar/workspace_content.html" %}',
+        template.with_name("workspace_content.html").read_text(),
+    )
+
+
 def _scholar_css() -> str:
     """Everything that can reference a token, as the browser would see it.
 
@@ -636,7 +644,7 @@ def _scholar_css() -> str:
     no-fallback `var()` uses. A scan of only stylesheets answers "do the
     STYLESHEETS resolve" while claiming to answer "does the PAGE resolve".
     """
-    return _resolve_css(CSS_ENTRY) + "\n" + TEMPLATE.read_text()
+    return _resolve_css(CSS_ENTRY) + "\n" + _scholar_template_source(TEMPLATE)
 
 
 def _theme_css() -> str:
@@ -679,7 +687,7 @@ def test_token_scan_covers_the_template_too():
     """Control for the template half -- a css-only scan would pass this file's
     other tests while missing every inline `var()` in the rendered page."""
     # Arrange
-    template_only = _referenced_without_fallback(TEMPLATE.read_text())
+    template_only = _referenced_without_fallback(_scholar_template_source(TEMPLATE))
 
     # Act
     seen_by_scan = _referenced_without_fallback(_scholar_css())
@@ -1372,7 +1380,7 @@ def test_search_and_library_content_share_one_container_class():
     # x=256/w=1168 desktop, x=16/w=358 mobile) — both are children of a
     # .citation-graph-container. This pins that shared-wrapper contract for
     # BOTH tabs, not just the placeholder.
-    tpl = COMPASS_TEMPLATE.read_text()
+    tpl = _scholar_template_source(COMPASS_TEMPLATE)
     # Act
     def _panel_wraps_container(panel_id: str) -> bool:
         start = tpl.index(f'id="{panel_id}"')
@@ -1784,7 +1792,7 @@ def test_enrichment_is_a_contextual_library_action_not_a_tab():
     # a top-level tab. The tab bar is unchanged (3 tabs), the Library panel
     # carries the list + Enrich wiring, and the JS posts to the enrich route.
     body = _compass_index_body()
-    tpl = COMPASS_TEMPLATE.read_text()
+    tpl = _scholar_template_source(COMPASS_TEMPLATE)
     js = (COMPASS_SEARCH_JS.parent / "library.js").read_text()
     # Act
     no_enrich_tab = 'data-tab="enrichment"' not in body
@@ -1906,7 +1914,7 @@ def test_library_import_rejects_unsupported_format(tmp_path):
 
 def test_library_template_has_import_export_controls():
     # Arrange
-    tpl = COMPASS_TEMPLATE.read_text()
+    tpl = _scholar_template_source(COMPASS_TEMPLATE)
     js = (COMPASS_SEARCH_JS.parent / "library.js").read_text()
     # Act
     has_controls = (
@@ -2691,7 +2699,7 @@ def test_project_header_keeps_host_provider_url(_rendered_host_scope_header):
 
 def test_header_source_places_picker_after_identity_before_content():
     # Arrange
-    source = TEMPLATE.read_text()
+    source = _scholar_template_source(TEMPLATE)
     # Act
     positions = [
         source.index('class="stx-app-header__identity"'),
