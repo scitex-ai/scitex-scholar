@@ -4,13 +4,12 @@
 
 The launcher used to degrade to bare Django when scitex-app was absent, and
 this file guarded the SHAPE of that degrade (an `ast` check that the `try`
-wrapped only the import). That path was retired 2026-09-03: scitex-app is a
-hard member of the `[server]` extra, `hosts_to_allow` now lives there with a
-public name, and a fallback that silently dropped both the shell and the
-ALLOWED_HOSTS derivation was a quieter way to break, not a kindness.
+wrapped only the import). That path was retired 2026-09-03. The optional
+`[all]` GUI stack now exposes the shared `hosts_to_allow` helper through the
+public `scitex_sdk.app` namespace used by the launcher.
 
-What remains: scholar must bind scitex-app's PUBLIC helper, and must not carry
-a private copy that could drift from it.
+What remains: scholar must bind the public SDK helper, and must not carry a
+private copy that could drift from it.
 """
 
 from __future__ import annotations
@@ -21,22 +20,22 @@ from scitex_scholar._django import _server
 
 
 # ---------------------------------------------------------------------------
-# hosts_to_allow is scitex-app's now (public name since 0.11.0). Scholar wrote
-# the first implementation (#137); it was copied into scitex-app verbatim and
-# became the fleet's single one. The behaviour tests went with it. What stays
-# here is the WIRING: scholar must use the public name, and must not carry a
-# second implementation that could drift from it.
+# Scholar wrote the first hosts_to_allow implementation (#137); it was copied
+# into scitex-app and became the fleet's shared helper. The behaviour tests
+# went with it. The launcher now consumes the public scitex_sdk.app facade, so
+# this WIRING assertion compares against that same public export. Scholar must
+# not carry a second implementation that could drift from it.
 # ---------------------------------------------------------------------------
-def test_server_binds_scitex_apps_public_hosts_helper():
+def test_server_binds_public_sdk_hosts_helper():
     # Arrange
-    import scitex_app
+    from scitex_sdk import app as sdk_app
 
     from scitex_scholar._django import _server
 
     # Act
     bound = _server.hosts_to_allow
     # Assert
-    assert bound is scitex_app.hosts_to_allow
+    assert bound is sdk_app.hosts_to_allow
 
 
 def test_server_carries_no_private_hosts_helper_copy():
