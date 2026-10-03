@@ -33,6 +33,7 @@ from pathlib import Path
 import pytest
 import scitex_ui
 import tomllib
+from django.template.loader import render_to_string
 from django.test import RequestFactory, override_settings
 from scitex_ui.project_scope import LocalProjectProvider
 
@@ -2537,43 +2538,155 @@ def test_reserved_picker_filter_uses_the_storage_contract_set():
     )
 
 
-def test_index_renders_one_picker_in_canonical_scholar_header(tmp_path):
-    # Arrange
+@pytest.fixture(params=["", "?project=Alpha"], ids=["default", "explicit-project"])
+def _rendered_user_scope_header(request, tmp_path):
+    # Arrange -- Scholar is user-scoped. The genuine shared picker still renders
+    # once when the same header is explicitly rendered for project scope.
     (tmp_path / "Alpha").mkdir()
+    manifest = json.loads(
+        (Path(views.__file__).parent / "manifest.json").read_text()
+    )
+    http_request = RequestFactory().get(f"/{request.param}")
     settings_override = override_settings(
         SCITEX_PROJECT_PROVIDER="", SCITEX_PROJECT_PROVIDER_URL="/api/projects"
     )
     # Act
     with _project_root_env(tmp_path), settings_override:
-        html = views.index(RequestFactory().get("/?project=Alpha")).content.decode()
-    # Assert
-    assert html.count("data-stx-project-picker") == 1
+        response = views.index(http_request)
+        html = response.content.decode()
+        project_html = render_to_string(
+            "scholar/scholar.html",
+            {"app_scope": "project", "current_project": "Alpha"},
+            request=http_request,
+        )
+    return {
+        "response": response,
+        "manifest": manifest,
+        "html": html,
+        "project_html": project_html,
+    }
 
 
-def test_index_picker_navigates_with_project_query(tmp_path):
+def test_index_user_scope_returns_200(_rendered_user_scope_header):
     # Arrange
+    # The fixture supplies the response from a genuine index request.
+    # Act
+    # Read that response's status.
+    # Assert
+    assert _rendered_user_scope_header["response"].status_code == 200
+
+
+def test_index_user_scope_agrees_with_manifest(_rendered_user_scope_header):
+    # Arrange
+    # The fixture supplies the owning manifest and genuine rendered index.
+    # Act
+    # Read the manifest's declared scope.
+    # Assert
+    assert _rendered_user_scope_header["manifest"]["scope"] == "user"
+
+
+def test_index_user_scope_keeps_canonical_identity(_rendered_user_scope_header):
+    # Arrange
+    # Act
+    html = _rendered_user_scope_header["html"]
+    # Assert
+    assert html.count('class="stx-app-header__identity"') == 1
+
+
+def test_index_user_scope_keeps_canonical_picker_slot(_rendered_user_scope_header):
+    # Arrange
+    # Act
+    html = _rendered_user_scope_header["html"]
+    # Assert
+    assert html.count('class="stx-app-header__slot--project-selector"') == 1
+
+
+def test_index_user_scope_suppresses_picker(_rendered_user_scope_header):
+    # Arrange
+    # A project query cannot turn the user-level index into a project-scoped page.
+    # Act
+    # Read the actual index markup supplied by the fixture.
+    # Assert
+    assert _rendered_user_scope_header["html"].count("data-stx-project-picker") == 0
+
+
+def test_project_header_renders_one_picker(_rendered_user_scope_header):
+    # Arrange
+    # Positive control: the same template consumes the declared project scope.
+    # Act
+    project_html = _rendered_user_scope_header["project_html"]
+    # Assert
+    assert project_html.count("data-stx-project-picker") == 1
+
+
+@pytest.fixture
+def _rendered_project_query_header(tmp_path):
+    # Arrange -- preserve the shared primitive's navigation assertion as a
+    # project-scope control, rather than requiring a picker on Scholar's index.
     (tmp_path / "Alpha").mkdir()
+    request = RequestFactory().get("/?project=Alpha")
     settings_override = override_settings(
         SCITEX_PROJECT_PROVIDER="", SCITEX_PROJECT_PROVIDER_URL="/api/projects"
     )
     # Act
     with _project_root_env(tmp_path), settings_override:
-        html = views.index(RequestFactory().get("/?project=Alpha")).content.decode()
-    # Assert
-    assert 'data-current="Alpha" data-navigate="?project={id}"' in html
+        html = views.index(request).content.decode()
+        project_html = render_to_string(
+            "scholar/scholar.html",
+            {"app_scope": "project", "current_project": "Alpha"},
+            request=request,
+        )
+    return {"html": html, "project_html": project_html}
 
 
-def test_host_mount_supplies_picker_provider_url(tmp_path):
+def test_user_index_has_no_project_navigation(_rendered_project_query_header):
     # Arrange
+    # Act
+    html = _rendered_project_query_header["html"]
+    # Assert
+    assert 'data-current="Alpha" data-navigate="?project={id}"' not in html
+
+
+def test_project_header_keeps_project_navigation(_rendered_project_query_header):
+    # Arrange
+    # Act
+    project_html = _rendered_project_query_header["project_html"]
+    # Assert
+    assert 'data-current="Alpha" data-navigate="?project={id}"' in project_html
+
+
+@pytest.fixture
+def _rendered_host_scope_header(tmp_path):
+    # Arrange -- the host URL remains authoritative whenever the shared
+    # project-scoped header is rendered; user scope does not render that picker.
+    request = RequestFactory().get("/")
     settings_override = override_settings(
         SCITEX_PROJECT_PROVIDER="",
         SCITEX_PROJECT_PROVIDER_URL="/host/api/project-scope/",
     )
     # Act
     with _project_root_env(tmp_path), settings_override:
-        html = views.index(RequestFactory().get("/")).content.decode()
+        html = views.index(request).content.decode()
+        project_html = render_to_string(
+            "scholar/scholar.html", {"app_scope": "project"}, request=request
+        )
+    return {"html": html, "project_html": project_html}
+
+
+def test_user_index_has_no_host_project_picker(_rendered_host_scope_header):
+    # Arrange
+    # Act
+    html = _rendered_host_scope_header["html"]
     # Assert
-    assert 'data-provider-url="/host/api/project-scope/"' in html
+    assert 'data-provider-url="/host/api/project-scope/"' not in html
+
+
+def test_project_header_keeps_host_provider_url(_rendered_host_scope_header):
+    # Arrange
+    # Act
+    project_html = _rendered_host_scope_header["project_html"]
+    # Assert
+    assert 'data-provider-url="/host/api/project-scope/"' in project_html
 
 
 def test_header_source_places_picker_after_identity_before_content():
@@ -2589,13 +2702,148 @@ def test_header_source_places_picker_after_identity_before_content():
     assert positions == sorted(positions)
 
 
-def test_manifest_declares_project_scope():
+def test_manifest_declares_user_scope():
     # Arrange
     manifest_path = Path(views.__file__).parent / "manifest.json"
     # Act
     manifest = json.loads(manifest_path.read_text())
     # Assert
-    assert manifest["scope"] == "project"
+    assert manifest["scope"] == "user"
+
+
+@pytest.fixture(
+    params=[("", None), ("?project=Alpha", "Alpha")],
+    ids=["default", "explicit-project"],
+)
+def _user_scope_library_outcomes(request, tmp_path):
+    # Arrange -- real unsaved Django users and genuine temporary primary files.
+    # Explicit project selection retains its provider behavior but cannot
+    # redirect either user's request-bound library root.
+    from django.conf import settings
+
+    project_query, expected_current = request.param
+    installed_apps = [*settings.INSTALLED_APPS, "django.contrib.auth"]
+    projects = tmp_path / "projects"
+    (projects / "Alpha").mkdir(parents=True)
+    root_a = tmp_path / "alice"
+    root_b = tmp_path / "bob"
+    _seed_library(root_a, doi="10.9/alice", title="Alice's paper")
+    _seed_library(root_b, doi="10.9/bob", title="Bob's paper")
+    settings_override = override_settings(
+        INSTALLED_APPS=installed_apps,
+        SCITEX_PROJECT_PROVIDER="",
+        SCITEX_PROJECT_PROVIDER_URL="/api/projects",
+    )
+    with _project_root_env(projects), settings_override:
+        from django.contrib.auth import get_user_model
+
+        alice = get_user_model()(username="alice")
+        bob = get_user_model()(username="bob")
+        results = []
+        # Act
+        for user, root in ((alice, root_a), (bob, root_b)):
+            index_request = RequestFactory().get(f"/{project_query}")
+            index_request.user = user
+            index_request.scholar_library_root = root
+            library_request = RequestFactory().get(f"/api/library{project_query}")
+            library_request.user = user
+            library_request.scholar_library_root = root
+            response = views.index(index_request)
+            results.append(
+                {
+                    "status": response.status_code,
+                    "html": response.content.decode(),
+                    "root": views._library_root_for(index_request),
+                    "library": json.loads(
+                        views.library_list(library_request).content
+                    ),
+                }
+            )
+        project_payload = json.loads(
+            views.project_scope(RequestFactory().get("/api/projects")).content
+        )
+    return {
+        "results": results,
+        "root_a": root_a,
+        "root_b": root_b,
+        "project_payload": project_payload,
+        "expected_current": expected_current,
+    }
+
+
+def test_user_index_keeps_request_bound_library_roots(_user_scope_library_outcomes):
+    # Arrange
+    # Act
+    results = _user_scope_library_outcomes["results"]
+    # Assert
+    assert [result["root"] for result in results] == [
+        _user_scope_library_outcomes["root_a"].resolve(),
+        _user_scope_library_outcomes["root_b"].resolve(),
+    ]
+
+
+def test_user_index_keeps_reported_library_roots(_user_scope_library_outcomes):
+    # Arrange
+    # Act
+    results = _user_scope_library_outcomes["results"]
+    # Assert
+    assert [result["library"]["library_root"] for result in results] == [
+        str(_user_scope_library_outcomes["root_a"].resolve()),
+        str(_user_scope_library_outcomes["root_b"].resolve()),
+    ]
+
+
+def test_user_index_keeps_library_papers_isolated(_user_scope_library_outcomes):
+    # Arrange
+    # Act
+    results = _user_scope_library_outcomes["results"]
+    # Assert
+    assert [result["library"]["papers"][0]["doi"] for result in results] == [
+        "10.9/alice",
+        "10.9/bob",
+    ]
+
+
+def test_user_index_keeps_accessible_project_listing(_user_scope_library_outcomes):
+    # Arrange
+    # Act
+    project_payload = _user_scope_library_outcomes["project_payload"]
+    # Assert
+    assert [project["id"] for project in project_payload["projects"]] == ["Alpha"]
+
+
+def test_user_index_keeps_explicit_project_resolution(_user_scope_library_outcomes):
+    # Arrange
+    # Act
+    project_payload = _user_scope_library_outcomes["project_payload"]
+    # Assert
+    assert (
+        project_payload["current"] == _user_scope_library_outcomes["expected_current"]
+    )
+
+
+def test_user_index_returns_200_for_each_bound_user(_user_scope_library_outcomes):
+    # Arrange
+    # Act
+    results = _user_scope_library_outcomes["results"]
+    # Assert
+    assert all(result["status"] == 200 for result in results)
+
+
+def test_user_index_suppresses_picker_for_each_bound_user(_user_scope_library_outcomes):
+    # Arrange
+    # Act
+    results = _user_scope_library_outcomes["results"]
+    # Assert
+    assert all("data-stx-project-picker" not in result["html"] for result in results)
+
+
+def test_user_index_lists_one_paper_for_each_bound_user(_user_scope_library_outcomes):
+    # Arrange
+    # Act
+    results = _user_scope_library_outcomes["results"]
+    # Assert
+    assert all(result["library"]["count"] == 1 for result in results)
 
 
 def test_all_extra_requires_header_slot_capable_scitex_ui():
