@@ -394,6 +394,18 @@ def index_context(request, current_project=None):
     }
 
 
+def render_workspace_content(request, current_project=None, *, stx_mount):
+    """Render the existing workspace content at the host-verified app root."""
+    context = index_context(request, current_project)
+    context["stx_mount"] = stx_mount.rstrip("/")
+    html = render_to_string(
+        "scholar/workspace_renderer.html",
+        context,
+        request=request,
+    )
+    return HttpResponse(html)
+
+
 def index(request):
     """Serve the Scholar SPA shell page.
 
