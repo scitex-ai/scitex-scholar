@@ -13,12 +13,18 @@ import scitex_scholar
 def _run(tmp_path, code, level="info", after_import=""):
     home = tmp_path / "home"
     home.mkdir()
+    # The release SIF layers declared dependencies on PYTHONPATH. Keep that
+    # genuine caller target visible alongside the owning Scholar source.
+    source_root = str(Path(scitex_scholar.__file__).resolve().parents[1])
+    dependency_paths = [
+        path for path in os.environ.get("PYTHONPATH", "").split(os.pathsep) if path
+    ]
     env = {
         "PATH": str(Path(sys.executable).parent) + os.pathsep + os.defpath,
         "HOME": str(home),
         "TMPDIR": str(tmp_path),
         "XDG_CACHE_HOME": str(tmp_path / "cache"),
-        "PYTHONPATH": str(Path(scitex_scholar.__file__).resolve().parents[1]),
+        "PYTHONPATH": os.pathsep.join(dict.fromkeys([source_root, *dependency_paths])),
         "PYTHONDONTWRITEBYTECODE": "1",
         "NO_COLOR": "1",
     }
