@@ -19,6 +19,14 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   via `library_root=` or `SCITEX_DIR`, so mounted web deployments can link
   `<project>/.scitex/scholar/library` without knowing leaf internals.
 
+## [1.13.2] - 2026-10-03
+
+### Fixed
+- Release verification child processes retain the declared dependencies
+  layered by the CI SIF, while preserving their offline controls and assertions.
+- Includes the standalone SDK shell and index-context changes listed below.
+  The `1.13.1` tag did not publish because release verification failed.
+
 ## [1.13.1] - 2026-10-03
 
 ### Fixed
