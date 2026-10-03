@@ -56,6 +56,14 @@ except ImportError as exc:  # scitex-app absent -- the [all]-gated GUI capabilit
     ) from exc
 
 try:
+    from scitex_sdk.ui.branding import shell_context
+except ImportError as exc:  # scitex-sdk absent or below the GUI capability floor
+    raise ImportError(
+        "scitex_scholar._django.views needs scitex-sdk>=0.3.1. "
+        "Install the optional stack: pip install 'scitex-scholar[all]'"
+    ) from exc
+
+try:
     from scitex_ui.project_scope import (
         LocalProjectProvider,
         host_project_provider,
@@ -369,6 +377,7 @@ def index(request):
     html = render_to_string(
         "scholar/scholar.html",
         {
+            **shell_context("Scholar"),
             "api_available": resolved_api is not None,
             "api_url": resolved_api or "Not configured",
             "stx_mount": mount_prefix(request),
