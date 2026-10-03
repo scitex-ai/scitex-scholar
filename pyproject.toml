@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "scitex-scholar"
-version = "1.13.0"
+version = "1.13.2"
 description = "Scientific paper search, enrichment, download, and management for the SciTeX ecosystem"
 readme = "README.md"
 license = "AGPL-3.0-only"
@@ -51,7 +51,7 @@ dependencies = [
     "matplotlib>=3.5.0",
     "scitex-io>=0.2.0",
     "scitex-browser>=0.1.15",
-    "scitex-logging>=0.1.0",
+    "scitex-logging>=0.2.1",
     # playwright is reached at top-level import (ScholarBrowserManager →
     # scitex_browser.debugging → playwright.async_api). Keep it as a core
     # dep so `pip install scitex-scholar` yields an importable package.
@@ -129,6 +129,7 @@ dev = [
     "aiohttp>=3.8.0",
     "django>=4.2",
     "scitex-app>=0.11.0",  # hosts_to_allow public name (fleet single implementation)
+    "scitex-sdk>=0.3.1",  # public SDK UI shell_context (active request language)
     # The rest of the `[all]` feature stack. Its imports in src/ are GUARDED now
     # (PS-233, 2026-09-20), so a `-e .[dev]` install missing these imports
     # fine and then fails every Django test on the guard's message. They stay
@@ -176,13 +177,14 @@ all = [
     # three-valued `PortHolder` whose `ours is None` the `gui open` code
     # branches on. Against 0.4.x those branches read a different shape.
     "scitex-app>=0.11.0",  # hosts_to_allow public name (fleet single implementation)
+    "scitex-sdk>=0.3.1",  # public SDK UI shell_context (active request language)
     # scholar.html EXTENDS `scitex_ui/standalone_shell.html` (since 1.9.0).
     # >=0.22.0 for the `.stx-app-header__slot--project-selector` guard plus
     # the earlier >=0.19.0 `<html lang>` accessibility floor (screen-reader
     # pronunciation follows `lang`, so a wrong value is read with English
     # phonetics). Scholar builds its own context and calls render_to_string
-    # directly, so it depends on the TEMPLATE-level
-    # `{{ shell_lang|default:'en' }}`, not on `shell_context()`'s default.
+    # directly; SDK shell_context supplies the active Django language
+    # consumed by the UI template's `{{ shell_lang|default:'en' }}`.
     "scitex-ui>=0.22.0",
     "watchdog>=3.0.0",
 ]
@@ -195,6 +197,9 @@ Homepage = "https://github.com/scitex-ai/scitex-scholar"
 Documentation = "https://scitex-scholar.readthedocs.io"
 Repository = "https://github.com/scitex-ai/scitex-scholar.git"
 Issues = "https://github.com/scitex-ai/scitex-scholar/issues"
+
+[project.entry-points."scitex.apps"]
+scholar = "scitex_scholar._django.apps:ScholarEditorConfig"
 
 [project.entry-points."scitex_dev.docs"]
 scitex-scholar = "scitex_scholar"

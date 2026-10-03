@@ -22,8 +22,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 
-import scitex_logging as slogging
-
 # `watchdog` gates the optional `watch` capability (the `[watch]` extra):
 # this module is only imported on demand (`_cli/library.py` pulls it inside
 # `open_browser_with_monitoring`, and it also runs as `python -m`), so the
@@ -38,8 +36,6 @@ except ImportError as exc:  # optional dependency: `scitex-scholar[all]`
         "The monitored-browser watcher needs watchdog: "
         "pip install 'scitex-scholar[all]'"
     ) from exc
-
-console = slogging.getConsole(__name__)
 
 # Add parent to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -228,7 +224,8 @@ class DownloadMonitor(FileSystemEventHandler):
         if self.ui is not None:
             self.ui.event(msg, level=level)
         else:
-            console.info(msg)
+            fn_name = TerminalUI._LEVEL_FUNC.get(level, "info")
+            getattr(logger, fn_name, logger.info)(msg)
 
     def on_created(self, event):
         if event.is_directory:

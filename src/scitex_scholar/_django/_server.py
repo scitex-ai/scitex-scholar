@@ -31,8 +31,6 @@ from typing import Optional
 
 import scitex_logging as slogging
 
-console = slogging.getConsole(__name__)
-
 # The single source of truth for scholar's GUI port; `_cli/gui.py` imports
 # it from here rather than restating the literal (they used to "just agree
 # on 31297", which is a coincidence maintained by hand, not a constant).
@@ -56,11 +54,20 @@ ALL_EXTRA_HINT = "pip install 'scitex-scholar[all]'"
 # path that needs them refuses by name. Nothing is silently substituted --
 # which is the failure mode the retired try/except base-class swap had.
 try:
-    from scitex_app import hosts_to_allow
-    from scitex_app.embed import run_standalone
-except ImportError:  # scitex-app absent -- the [server] capability only
+    from scitex_sdk import app as _sdk_app
+
+    hosts_to_allow = _sdk_app.hosts_to_allow
+    run_standalone = _sdk_app.embed.run_standalone
+except ImportError:  # scitex-sdk absent -- the [server] capability only
     hosts_to_allow = None  # type: ignore[assignment]
     run_standalone = None  # type: ignore[assignment]
+
+
+def _print_banner(host: str, port: int) -> None:
+    """Announce startup at the currently configured human-output level."""
+    console = slogging.getConsole(f"{__name__}.console", level=slogging.get_level())
+    console.info(f"SciTeX Scholar GUI: http://{host}:{port}")
+    console.info("Press Ctrl+C to stop")
 
 
 def run(
@@ -112,8 +119,7 @@ def run(
 
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "scitex_scholar._django.settings")
 
-    console.info(f"SciTeX Scholar GUI: http://{host}:{port}")
-    console.info("Press Ctrl+C to stop")
+    _print_banner(host, port)
 
     try:
         import django

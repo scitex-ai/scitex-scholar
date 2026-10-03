@@ -56,6 +56,14 @@ except ImportError as exc:  # scitex-app absent -- the [all]-gated GUI capabilit
     ) from exc
 
 try:
+    from scitex_sdk.ui.branding import shell_context
+except ImportError as exc:  # scitex-sdk absent or below the GUI capability floor
+    raise ImportError(
+        "scitex_scholar._django.views needs scitex-sdk>=0.3.1. "
+        "Install the optional stack: pip install 'scitex-scholar[all]'"
+    ) from exc
+
+try:
     from scitex_ui.project_scope import (
         LocalProjectProvider,
         host_project_provider,
@@ -350,6 +358,42 @@ def _project_provider(request):
 project_scope = project_listing_view(_project_provider)
 
 
+def index_context(request):
+    """Return the existing Scholar page context for this request."""
+    resolved_api = _api_url()
+    provider = _project_provider(request)
+    current_project = resolve_project(
+        request,
+        provider,
+        explicit=request.GET.get("project"),
+    )
+    return {
+        **shell_context("Scholar"),
+        "api_available": resolved_api is not None,
+        "api_url": resolved_api or "Not configured",
+        "stx_mount": mount_prefix(request),
+        "app_label": _app_label("SciTeX Scholar"),
+        "app_scope": "user",
+        "current_project": current_project,
+        # i18n (operator directive 2026-09-14): the whole page flips via
+        # LocaleMiddleware; this carries the strings that live ONLY in
+        # JS, translated server-side for the current request language so
+        # the client never hardcodes a language. Serialized by the
+        # template's json_script filter into <script id="SCHOLAR_I18N">;
+        # the client reads it via JSON.parse (see scholarT in stx-mount.js).
+        "scholar_i18n": _js_i18n_dict(),
+        # The scitex-ui workspace shell renders three side panes
+        # (Console/Chat, Files, Viewer) around the app content. Scholar
+        # has no content for them, and because the template extends the
+        # shell directly (it is not a built SPA shell the SDK wraps) they
+        # would otherwise render empty — the large left gutter on desktop
+        # and the broken reflow on mobile. Declare them unused so the
+        # shell hides them and Scholar is the whole page. This is the
+        # shell's documented contract ("panes ... DECLARED by the app").
+        "panes": {"ai": "unused", "files": "unused", "viewer": "unused"},
+    }
+
+
 def index(request):
     """Serve the Scholar SPA shell page.
 
@@ -359,39 +403,9 @@ def index(request):
     favicon_href when given one) and drift from the rest of the fleet --
     which is what the removed `_favicon_href()` did.
     """
-    resolved_api = _api_url()
-    provider = _project_provider(request)
-    current_project = resolve_project(
-        request,
-        provider,
-        explicit=request.GET.get("project"),
-    )
     html = render_to_string(
         "scholar/scholar.html",
-        {
-            "api_available": resolved_api is not None,
-            "api_url": resolved_api or "Not configured",
-            "stx_mount": mount_prefix(request),
-            "app_label": _app_label("SciTeX Scholar"),
-            "app_scope": "project",
-            "current_project": current_project,
-            # i18n (operator directive 2026-09-14): the whole page flips via
-            # LocaleMiddleware; this carries the strings that live ONLY in
-            # JS, translated server-side for the current request language so
-            # the client never hardcodes a language. Serialized by the
-            # template's json_script filter into <script id="SCHOLAR_I18N">;
-            # the client reads it via JSON.parse (see scholarT in stx-mount.js).
-            "scholar_i18n": _js_i18n_dict(),
-            # The scitex-ui workspace shell renders three side panes
-            # (Console/Chat, Files, Viewer) around the app content. Scholar
-            # has no content for them, and because the template extends the
-            # shell directly (it is not a built SPA shell the SDK wraps) they
-            # would otherwise render empty — the large left gutter on desktop
-            # and the broken reflow on mobile. Declare them unused so the
-            # shell hides them and Scholar is the whole page. This is the
-            # shell's documented contract ("panes ... DECLARED by the app").
-            "panes": {"ai": "unused", "files": "unused", "viewer": "unused"},
-        },
+        index_context(request),
         request=request,
     )
     return HttpResponse(html)
@@ -1190,6 +1204,212 @@ def library_import(request):
     except Exception as e:
         logger.error(f"library import failed: {e}", exc_info=True)
         return JsonResponse({"error": f"Import failed: {e}"}, status=500)
+
+
+def _paper_from_save_payload(payload):
+    """Adapt a library-list row or a nested Paper dict at the HTTP boundary.
+
+    The core Paper schema stays nested; library_list's public row shape is
+    flat. Passing that row straight to Paper.from_dict silently drops its
+    fields, so both save endpoints translate it here before validation.
+    """
+    from scitex_scholar.core.Paper import Paper
+
+    if not isinstance(payload, dict):
+        raise ValueError("Paper must be a JSON object")
+    if "metadata" in payload or "container" in payload:
+        return Paper.from_dict(payload)
+
+    authors = payload.get("authors")
+    if isinstance(authors, list):
+        authors = [
+            author.get("name") if isinstance(author, dict) else author
+            for author in authors
+        ]
+    return Paper.from_dict(
+        {
+            "metadata": {
+                "id": {"doi": payload.get("doi")},
+                "basic": {
+                    "title": payload.get("title"),
+                    "year": payload.get("year"),
+                    "abstract": payload.get("abstract"),
+                    "authors": authors,
+                },
+                "publication": {"journal": payload.get("venue")},
+                "citation_count": {"total": payload.get("citation_count")},
+            },
+            "container": {"library_id": payload.get("paper_id")},
+        }
+    )
+
+
+@require_POST
+def library_save(request):
+    """Save ONE paper to the user's local library (explicit user action).
+
+    Body: the paper object (same shape library_list returns per row, or a
+    ``Paper`` dict). The save runs through the file-based primary store
+    (PaperIO) under the request's user-scoped root — no shared store, no
+    database. ``container.created_by`` is stamped with the request user.
+    A missing library_id is derived (DOI/title hash, dedup-friendly).
+    """
+    try:
+        payload = json.loads(request.body or b"{}")
+    except (ValueError, TypeError):
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    try:
+        paper = _paper_from_save_payload(payload)
+    except Exception as e:
+        return JsonResponse({"error": f"Invalid paper: {e}"}, status=400)
+    user = getattr(request, "user", None)
+    paper.container.created_by = _safe_username(user) if user is not None else "user"
+    if not paper.container.library_id:
+        paper.container.library_id = _derived_library_id(paper)
+    root = _library_root_for(request)
+    try:
+        path = _save_library_paper(paper, root)
+    except ValueError as e:
+        return JsonResponse({"error": str(e)}, status=400)
+    except OSError as e:
+        logger.error(f"library save failed: {e}", exc_info=True)
+        return JsonResponse({"error": f"Save failed: {e}"}, status=500)
+    return JsonResponse(
+        {"saved": True, "library_id": paper.container.library_id, "path": str(path)}
+    )
+
+
+@require_POST
+def library_save_bulk(request):
+    """Save MANY papers in one call; per-paper results so one bad row cannot
+    fail the batch. Body: ``{"papers": [...]}``. Same store, scoping, and
+    stamping rules as library_save."""
+    try:
+        payload = json.loads(request.body or b"{}")
+    except (ValueError, TypeError):
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    if not isinstance(payload, dict):
+        return JsonResponse({"error": 'Body must be {"papers": [...]}'}, status=400)
+    papers = payload.get("papers")
+    if not isinstance(papers, list):
+        return JsonResponse({"error": 'Body must be {"papers": [...]}'}, status=400)
+    user = getattr(request, "user", None)
+    created_by = _safe_username(user) if user is not None else "user"
+    root = _library_root_for(request)
+    saved, failed = [], []
+    for i, item in enumerate(papers):
+        try:
+            paper = _paper_from_save_payload(item)
+        except Exception as e:
+            failed.append({"index": i, "error": f"Invalid paper: {e}"})
+            continue
+        paper.container.created_by = created_by
+        if not paper.container.library_id:
+            paper.container.library_id = _derived_library_id(paper)
+        try:
+            path = _save_library_paper(paper, root)
+        except (ValueError, OSError) as e:
+            failed.append(
+                {"index": i, "library_id": paper.container.library_id, "error": str(e)}
+            )
+            continue
+        saved.append({"library_id": paper.container.library_id, "path": str(path)})
+    return JsonResponse({"saved": saved, "failed": failed})
+
+
+def _saved_searches_path(root: Path) -> Path:
+    """Single JSON file holding this user's saved searches."""
+    return root / "SAVED_SEARCHES" / "saved_searches.json"
+
+
+def _load_saved_searches(root: Path) -> list:
+    path = _saved_searches_path(root)
+    if not path.is_file():
+        return []
+    try:
+        data = json.loads(path.read_text())
+    except ValueError:
+        return []
+    return data if isinstance(data, list) else []
+
+
+def _write_saved_searches(root: Path, rows: list) -> None:
+    path = _saved_searches_path(root)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(rows))
+
+
+@require_POST
+def searches_save(request):
+    """Save a named search query for this user (explicit action).
+
+    Body: {"name": ..., "query": ..., "params": {...}}. Stored file-based
+    under the request's user-scoped root — no shared store, no database.
+    """
+    try:
+        payload = json.loads(request.body or b"{}")
+    except (ValueError, TypeError):
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    name = (payload.get("name") or "").strip()
+    query = (payload.get("query") or "").strip()
+    if not name or not query:
+        return JsonResponse({"error": "name and query are required"}, status=400)
+    params = payload.get("params")
+    if params is None:
+        params = {}
+    if not isinstance(params, dict):
+        return JsonResponse({"error": "params must be an object"}, status=400)
+    user = getattr(request, "user", None)
+    root = _library_root_for(request)
+    rows = _load_saved_searches(root)
+    import datetime as _dt
+    import uuid as _uuid
+
+    row = {
+        "id": _uuid.uuid4().hex,
+        "name": name,
+        "query": query,
+        "params": params,
+        "created_by": _safe_username(user) if user is not None else "user",
+        "created_at": _dt.datetime.now(_dt.timezone.utc).isoformat(),
+    }
+    rows.append(row)
+    try:
+        _write_saved_searches(root, rows)
+    except OSError as e:
+        logger.error(f"searches save failed: {e}", exc_info=True)
+        return JsonResponse({"error": f"Save failed: {e}"}, status=500)
+    return JsonResponse({"saved": True, "id": row["id"], "name": name})
+
+
+@require_GET
+def searches_list(request):
+    """List this user's saved searches (user-scoped root only)."""
+    root = _library_root_for(request)
+    return JsonResponse({"searches": _load_saved_searches(root)})
+
+
+@require_POST
+def searches_delete(request):
+    """Delete one saved search by id; 404 when unknown."""
+    try:
+        payload = json.loads(request.body or b"{}")
+    except (ValueError, TypeError):
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    search_id = payload.get("id")
+    if not search_id:
+        return JsonResponse({"error": "id is required"}, status=400)
+    root = _library_root_for(request)
+    rows = _load_saved_searches(root)
+    kept = [r for r in rows if r.get("id") != search_id]
+    if len(kept) == len(rows):
+        return JsonResponse({"error": "Unknown id"}, status=404)
+    try:
+        _write_saved_searches(root, kept)
+    except OSError as e:
+        logger.error(f"searches delete failed: {e}", exc_info=True)
+        return JsonResponse({"error": f"Delete failed: {e}"}, status=500)
+    return JsonResponse({"deleted": True, "id": search_id})
 
 
 # EOF

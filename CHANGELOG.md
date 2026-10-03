@@ -19,6 +19,28 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   via `library_root=` or `SCITEX_DIR`, so mounted web deployments can link
   `<project>/.scitex/scholar/library` without knowing leaf internals.
 
+## [1.13.2] - 2026-10-03
+
+### Fixed
+- Release verification child processes retain the declared dependencies
+  layered by the CI SIF, while preserving their offline controls and assertions.
+- Includes the standalone SDK shell and index-context changes listed below.
+  The `1.13.1` tag did not publish because release verification failed.
+
+## [1.13.1] - 2026-10-03
+
+### Fixed
+- Single and bulk Library saves preserve flat library rows and nested Paper
+  payloads, and reject malformed bulk JSON envelopes (PR #191).
+- Scholar declares user scope consistently in its index, header, and manifest
+  (PR #192).
+- The standalone shell uses the shared SDK language context and canonical
+  Django app entry point (PR #193).
+
+### Added
+- The existing index context is available through the lazy, leaf-owned
+  `context_builder` declaration for host discovery (PR #194).
+
 ## [1.12.0] - 2026-09-17
 
 ### Fixed

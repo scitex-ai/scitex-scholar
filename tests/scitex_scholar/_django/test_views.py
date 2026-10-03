@@ -33,6 +33,7 @@ from pathlib import Path
 import pytest
 import scitex_ui
 import tomllib
+from django.template.loader import render_to_string
 from django.test import RequestFactory, override_settings
 from scitex_ui.project_scope import LocalProjectProvider
 
@@ -2537,43 +2538,155 @@ def test_reserved_picker_filter_uses_the_storage_contract_set():
     )
 
 
-def test_index_renders_one_picker_in_canonical_scholar_header(tmp_path):
-    # Arrange
+@pytest.fixture(params=["", "?project=Alpha"], ids=["default", "explicit-project"])
+def _rendered_user_scope_header(request, tmp_path):
+    # Arrange -- Scholar is user-scoped. The genuine shared picker still renders
+    # once when the same header is explicitly rendered for project scope.
     (tmp_path / "Alpha").mkdir()
+    manifest = json.loads(
+        (Path(views.__file__).parent / "manifest.json").read_text()
+    )
+    http_request = RequestFactory().get(f"/{request.param}")
     settings_override = override_settings(
         SCITEX_PROJECT_PROVIDER="", SCITEX_PROJECT_PROVIDER_URL="/api/projects"
     )
     # Act
     with _project_root_env(tmp_path), settings_override:
-        html = views.index(RequestFactory().get("/?project=Alpha")).content.decode()
-    # Assert
-    assert html.count("data-stx-project-picker") == 1
+        response = views.index(http_request)
+        html = response.content.decode()
+        project_html = render_to_string(
+            "scholar/scholar.html",
+            {"app_scope": "project", "current_project": "Alpha"},
+            request=http_request,
+        )
+    return {
+        "response": response,
+        "manifest": manifest,
+        "html": html,
+        "project_html": project_html,
+    }
 
 
-def test_index_picker_navigates_with_project_query(tmp_path):
+def test_index_user_scope_returns_200(_rendered_user_scope_header):
     # Arrange
+    # The fixture supplies the response from a genuine index request.
+    # Act
+    # Read that response's status.
+    # Assert
+    assert _rendered_user_scope_header["response"].status_code == 200
+
+
+def test_index_user_scope_agrees_with_manifest(_rendered_user_scope_header):
+    # Arrange
+    # The fixture supplies the owning manifest and genuine rendered index.
+    # Act
+    # Read the manifest's declared scope.
+    # Assert
+    assert _rendered_user_scope_header["manifest"]["scope"] == "user"
+
+
+def test_index_user_scope_keeps_canonical_identity(_rendered_user_scope_header):
+    # Arrange
+    # Act
+    html = _rendered_user_scope_header["html"]
+    # Assert
+    assert html.count('class="stx-app-header__identity"') == 1
+
+
+def test_index_user_scope_keeps_canonical_picker_slot(_rendered_user_scope_header):
+    # Arrange
+    # Act
+    html = _rendered_user_scope_header["html"]
+    # Assert
+    assert html.count('class="stx-app-header__slot--project-selector"') == 1
+
+
+def test_index_user_scope_suppresses_picker(_rendered_user_scope_header):
+    # Arrange
+    # A project query cannot turn the user-level index into a project-scoped page.
+    # Act
+    # Read the actual index markup supplied by the fixture.
+    # Assert
+    assert _rendered_user_scope_header["html"].count("data-stx-project-picker") == 0
+
+
+def test_project_header_renders_one_picker(_rendered_user_scope_header):
+    # Arrange
+    # Positive control: the same template consumes the declared project scope.
+    # Act
+    project_html = _rendered_user_scope_header["project_html"]
+    # Assert
+    assert project_html.count("data-stx-project-picker") == 1
+
+
+@pytest.fixture
+def _rendered_project_query_header(tmp_path):
+    # Arrange -- preserve the shared primitive's navigation assertion as a
+    # project-scope control, rather than requiring a picker on Scholar's index.
     (tmp_path / "Alpha").mkdir()
+    request = RequestFactory().get("/?project=Alpha")
     settings_override = override_settings(
         SCITEX_PROJECT_PROVIDER="", SCITEX_PROJECT_PROVIDER_URL="/api/projects"
     )
     # Act
     with _project_root_env(tmp_path), settings_override:
-        html = views.index(RequestFactory().get("/?project=Alpha")).content.decode()
-    # Assert
-    assert 'data-current="Alpha" data-navigate="?project={id}"' in html
+        html = views.index(request).content.decode()
+        project_html = render_to_string(
+            "scholar/scholar.html",
+            {"app_scope": "project", "current_project": "Alpha"},
+            request=request,
+        )
+    return {"html": html, "project_html": project_html}
 
 
-def test_host_mount_supplies_picker_provider_url(tmp_path):
+def test_user_index_has_no_project_navigation(_rendered_project_query_header):
     # Arrange
+    # Act
+    html = _rendered_project_query_header["html"]
+    # Assert
+    assert 'data-current="Alpha" data-navigate="?project={id}"' not in html
+
+
+def test_project_header_keeps_project_navigation(_rendered_project_query_header):
+    # Arrange
+    # Act
+    project_html = _rendered_project_query_header["project_html"]
+    # Assert
+    assert 'data-current="Alpha" data-navigate="?project={id}"' in project_html
+
+
+@pytest.fixture
+def _rendered_host_scope_header(tmp_path):
+    # Arrange -- the host URL remains authoritative whenever the shared
+    # project-scoped header is rendered; user scope does not render that picker.
+    request = RequestFactory().get("/")
     settings_override = override_settings(
         SCITEX_PROJECT_PROVIDER="",
         SCITEX_PROJECT_PROVIDER_URL="/host/api/project-scope/",
     )
     # Act
     with _project_root_env(tmp_path), settings_override:
-        html = views.index(RequestFactory().get("/")).content.decode()
+        html = views.index(request).content.decode()
+        project_html = render_to_string(
+            "scholar/scholar.html", {"app_scope": "project"}, request=request
+        )
+    return {"html": html, "project_html": project_html}
+
+
+def test_user_index_has_no_host_project_picker(_rendered_host_scope_header):
+    # Arrange
+    # Act
+    html = _rendered_host_scope_header["html"]
     # Assert
-    assert 'data-provider-url="/host/api/project-scope/"' in html
+    assert 'data-provider-url="/host/api/project-scope/"' not in html
+
+
+def test_project_header_keeps_host_provider_url(_rendered_host_scope_header):
+    # Arrange
+    # Act
+    project_html = _rendered_host_scope_header["project_html"]
+    # Assert
+    assert 'data-provider-url="/host/api/project-scope/"' in project_html
 
 
 def test_header_source_places_picker_after_identity_before_content():
@@ -2589,13 +2702,148 @@ def test_header_source_places_picker_after_identity_before_content():
     assert positions == sorted(positions)
 
 
-def test_manifest_declares_project_scope():
+def test_manifest_declares_user_scope():
     # Arrange
     manifest_path = Path(views.__file__).parent / "manifest.json"
     # Act
     manifest = json.loads(manifest_path.read_text())
     # Assert
-    assert manifest["scope"] == "project"
+    assert manifest["scope"] == "user"
+
+
+@pytest.fixture(
+    params=[("", None), ("?project=Alpha", "Alpha")],
+    ids=["default", "explicit-project"],
+)
+def _user_scope_library_outcomes(request, tmp_path):
+    # Arrange -- real unsaved Django users and genuine temporary primary files.
+    # Explicit project selection retains its provider behavior but cannot
+    # redirect either user's request-bound library root.
+    from django.conf import settings
+
+    project_query, expected_current = request.param
+    installed_apps = [*settings.INSTALLED_APPS, "django.contrib.auth"]
+    projects = tmp_path / "projects"
+    (projects / "Alpha").mkdir(parents=True)
+    root_a = tmp_path / "alice"
+    root_b = tmp_path / "bob"
+    _seed_library(root_a, doi="10.9/alice", title="Alice's paper")
+    _seed_library(root_b, doi="10.9/bob", title="Bob's paper")
+    settings_override = override_settings(
+        INSTALLED_APPS=installed_apps,
+        SCITEX_PROJECT_PROVIDER="",
+        SCITEX_PROJECT_PROVIDER_URL="/api/projects",
+    )
+    with _project_root_env(projects), settings_override:
+        from django.contrib.auth import get_user_model
+
+        alice = get_user_model()(username="alice")
+        bob = get_user_model()(username="bob")
+        results = []
+        # Act
+        for user, root in ((alice, root_a), (bob, root_b)):
+            index_request = RequestFactory().get(f"/{project_query}")
+            index_request.user = user
+            index_request.scholar_library_root = root
+            library_request = RequestFactory().get(f"/api/library{project_query}")
+            library_request.user = user
+            library_request.scholar_library_root = root
+            response = views.index(index_request)
+            results.append(
+                {
+                    "status": response.status_code,
+                    "html": response.content.decode(),
+                    "root": views._library_root_for(index_request),
+                    "library": json.loads(
+                        views.library_list(library_request).content
+                    ),
+                }
+            )
+        project_payload = json.loads(
+            views.project_scope(RequestFactory().get("/api/projects")).content
+        )
+    return {
+        "results": results,
+        "root_a": root_a,
+        "root_b": root_b,
+        "project_payload": project_payload,
+        "expected_current": expected_current,
+    }
+
+
+def test_user_index_keeps_request_bound_library_roots(_user_scope_library_outcomes):
+    # Arrange
+    # Act
+    results = _user_scope_library_outcomes["results"]
+    # Assert
+    assert [result["root"] for result in results] == [
+        _user_scope_library_outcomes["root_a"].resolve(),
+        _user_scope_library_outcomes["root_b"].resolve(),
+    ]
+
+
+def test_user_index_keeps_reported_library_roots(_user_scope_library_outcomes):
+    # Arrange
+    # Act
+    results = _user_scope_library_outcomes["results"]
+    # Assert
+    assert [result["library"]["library_root"] for result in results] == [
+        str(_user_scope_library_outcomes["root_a"].resolve()),
+        str(_user_scope_library_outcomes["root_b"].resolve()),
+    ]
+
+
+def test_user_index_keeps_library_papers_isolated(_user_scope_library_outcomes):
+    # Arrange
+    # Act
+    results = _user_scope_library_outcomes["results"]
+    # Assert
+    assert [result["library"]["papers"][0]["doi"] for result in results] == [
+        "10.9/alice",
+        "10.9/bob",
+    ]
+
+
+def test_user_index_keeps_accessible_project_listing(_user_scope_library_outcomes):
+    # Arrange
+    # Act
+    project_payload = _user_scope_library_outcomes["project_payload"]
+    # Assert
+    assert [project["id"] for project in project_payload["projects"]] == ["Alpha"]
+
+
+def test_user_index_keeps_explicit_project_resolution(_user_scope_library_outcomes):
+    # Arrange
+    # Act
+    project_payload = _user_scope_library_outcomes["project_payload"]
+    # Assert
+    assert (
+        project_payload["current"] == _user_scope_library_outcomes["expected_current"]
+    )
+
+
+def test_user_index_returns_200_for_each_bound_user(_user_scope_library_outcomes):
+    # Arrange
+    # Act
+    results = _user_scope_library_outcomes["results"]
+    # Assert
+    assert all(result["status"] == 200 for result in results)
+
+
+def test_user_index_suppresses_picker_for_each_bound_user(_user_scope_library_outcomes):
+    # Arrange
+    # Act
+    results = _user_scope_library_outcomes["results"]
+    # Assert
+    assert all("data-stx-project-picker" not in result["html"] for result in results)
+
+
+def test_user_index_lists_one_paper_for_each_bound_user(_user_scope_library_outcomes):
+    # Arrange
+    # Act
+    results = _user_scope_library_outcomes["results"]
+    # Assert
+    assert all(result["library"]["count"] == 1 for result in results)
 
 
 def test_all_extra_requires_header_slot_capable_scitex_ui():
@@ -2885,6 +3133,532 @@ def test_graph_limit_has_visible_and_accessible_meaning():
     select_tag = re.search(r'<select[^>]+id="topN"[^>]*>', html).group(0)
     # Assert
     assert 'aria-label="Maximum papers in citation graph"' in select_tag
+
+
+def _save_payload(paper_id="PID9", doi="10.9/example", title="Saved paper"):
+    return {
+        "metadata": {"id": {"doi": doi}, "basic": {"title": title, "year": 2025}},
+        "container": {"library_id": paper_id},
+    }
+
+
+def test_library_save_returns_saved_true(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        req = rf.post(
+            "/api/library/save",
+            data=_json.dumps(_save_payload()),
+            content_type="application/json",
+        )
+        # Act
+        resp = views.library_save(req)
+        # Assert
+        assert resp.status_code == 200
+
+
+def test_library_save_returns_library_id(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        req = rf.post(
+            "/api/library/save",
+            data=_json.dumps(_save_payload()),
+            content_type="application/json",
+        )
+        # Act
+        data = _json.loads(views.library_save(req).content)
+        # Assert
+        assert data["library_id"] == "PID9"
+
+
+def test_library_save_lists_back(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        req = rf.post(
+            "/api/library/save",
+            data=_json.dumps(_save_payload()),
+            content_type="application/json",
+        )
+        # Act
+        views.library_save(req)
+        listed = _json.loads(views.library_list(rf.get("/api/library")).content)
+        # Assert
+        assert listed["papers"][0]["doi"] == "10.9/example"
+
+
+def test_library_save_derives_id_without_library_id(tmp_path):
+    # Arrange — same DOI twice must not create duplicates.
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        payload = _save_payload()
+        del payload["container"]
+        body = _json.dumps(payload)
+        # Act
+        first = _json.loads(
+            views.library_save(
+                rf.post("/api/library/save", data=body, content_type="application/json")
+            ).content
+        )
+        second = _json.loads(
+            views.library_save(
+                rf.post("/api/library/save", data=body, content_type="application/json")
+            ).content
+        )
+        # Assert
+        assert first["library_id"] == second["library_id"]
+
+
+def test_library_save_rejects_invalid_json(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        # Act
+        resp = views.library_save(
+            rf.post("/api/library/save", data="{bad", content_type="application/json")
+        )
+        # Assert
+        assert resp.status_code == 400
+
+
+def test_library_save_bulk_saves_good_row(tmp_path):
+    # Arrange — one good row, one invalid row.
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        body = _json.dumps({"papers": [_save_payload("PID1"), "NOT-A-DICT"]})
+        # Act
+        data = _json.loads(
+            views.library_save_bulk(
+                rf.post("/api/library/save-bulk", data=body, content_type="application/json")
+            ).content
+        )
+        # Assert
+        assert len(data["saved"]) == 1
+
+
+def test_library_save_bulk_reports_bad_row(tmp_path):
+    # Arrange — one good row, one invalid row.
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        body = _json.dumps({"papers": [_save_payload("PID1"), "NOT-A-DICT"]})
+        # Act
+        data = _json.loads(
+            views.library_save_bulk(
+                rf.post("/api/library/save-bulk", data=body, content_type="application/json")
+            ).content
+        )
+        # Assert — the bad row cannot fail the batch.
+        assert data["failed"][0]["index"] == 1
+
+
+def test_library_save_is_user_scoped(tmp_path):
+    # Arrange — user A saves; user B lists a different root.
+    # Cross-user isolation: B must never see A's rows.
+    root_a = tmp_path / "a"
+    root_b = tmp_path / "b"
+    root_a.mkdir()
+    root_b.mkdir()
+    rf = RequestFactory()
+    save_req = rf.post(
+        "/api/library/save",
+        data=_json.dumps(_save_payload()),
+        content_type="application/json",
+    )
+    save_req.scholar_library_root = root_a
+    list_req = rf.get("/api/library")
+    list_req.scholar_library_root = root_b
+    # Act
+    saved = _json.loads(views.library_save(save_req).content)
+    listed_b = _json.loads(views.library_list(list_req).content)
+    # Assert
+    assert saved["saved"] is True and listed_b["papers"] == []
+
+
+def _library_save_request(endpoint, payload, root, user=None):
+    """A real JSON request with a server-bound, temporary library root."""
+    body = {"papers": [payload]} if endpoint == "save-bulk" else payload
+    request = RequestFactory().post(
+        f"/api/library/{endpoint}",
+        data=_json.dumps(body),
+        content_type="application/json",
+    )
+    request.scholar_library_root = root
+    if user is not None:
+        request.user = user
+    return request
+
+
+def _library_list_request(root, user=None):
+    request = RequestFactory().get("/api/library")
+    request.scholar_library_root = root
+    if user is not None:
+        request.user = user
+    return request
+
+
+@pytest.mark.parametrize("endpoint", ["save", "save-bulk"])
+def test_library_save_round_trips_actual_flat_library_row(tmp_path, endpoint):
+    # Arrange -- seed through the real save, then use the actual list response.
+    source, target = tmp_path / "source", tmp_path / "target"
+    payload = _save_payload("ROW1", "10.9/row", "Listed paper")
+    payload["metadata"]["basic"].update(
+        {"authors": ["Jane Author", "John Author"], "abstract": "Full abstract"}
+    )
+    payload["metadata"]["publication"] = {"journal": "Example Journal"}
+    payload["metadata"]["citation_count"] = {"total": 17}
+    views.library_save(_library_save_request("save", payload, source))
+    row = _json.loads(views.library_list(_library_list_request(source)).content)[
+        "papers"
+    ][0]
+    save_view = (
+        views.library_save_bulk if endpoint == "save-bulk" else views.library_save
+    )
+    # Act
+    response = save_view(_library_save_request(endpoint, row, target))
+    listed = _json.loads(views.library_list(_library_list_request(target)).content)
+    # Assert -- every field and the existing paper ID survive the HTTP round trip.
+    assert (response.status_code, listed["papers"]) == (200, [row])
+
+
+@pytest.mark.parametrize("endpoint", ["save", "save-bulk"])
+def test_library_save_preserves_full_nested_paper(tmp_path, endpoint):
+    # Arrange -- nested source/provenance fields must not pass through a flat map.
+    from scitex_scholar.core.Paper import Paper
+
+    payload = _save_payload("NESTED1", "10.9/nested", "Nested paper")
+    payload["metadata"]["id"].update(
+        {"arxiv_id": "2501.00001", "doi_engines": ["CrossRef"]}
+    )
+    payload["metadata"]["basic"].update(
+        {"authors": ["Jane Author"], "title_engines": ["CrossRef"]}
+    )
+    payload["metadata"]["publication"] = {
+        "journal": "Journal",
+        "volume": "3",
+        "journal_engines": ["CrossRef"],
+    }
+    payload["metadata"]["citation_count"] = {"total": 17, "2025": 4}
+    payload["metadata"]["access"] = {"is_open_access": True, "license": "CC-BY"}
+    payload["container"].update({"created_by": "untrusted", "projects": ["Alpha"]})
+    expected = Paper.from_dict(payload).to_dict()
+    expected["container"]["created_by"] = "user"
+    save_view = (
+        views.library_save_bulk if endpoint == "save-bulk" else views.library_save
+    )
+    # Act
+    response = save_view(_library_save_request(endpoint, payload, tmp_path))
+    persisted = _json.loads(
+        (tmp_path / "MASTER" / "NESTED1" / "metadata.json").read_text()
+    )
+    # Assert -- the whole validated Paper survives, with the request's creator stamp.
+    assert (response.status_code, persisted) == (200, expected)
+
+
+_FLAT_SAVE_IDENTITY_ROWS = [
+    pytest.param(
+        {"title": "First paper", "year": 2025, "doi": "10.9/first"},
+        {"title": "Second paper", "year": 2025, "doi": "10.9/second"},
+        id="doi",
+    ),
+    pytest.param(
+        {"title": "First paper", "year": 2025},
+        {"title": "Second paper", "year": 2025},
+        id="title",
+    ),
+]
+
+
+@pytest.mark.parametrize("first,second", _FLAT_SAVE_IDENTITY_ROWS)
+def test_library_save_flat_rows_keep_distinct_ids_and_deduplicate(
+    tmp_path, first, second
+):
+    # Arrange -- repeated identity deduplicates; a second identity stays distinct.
+    rows = [first, first, second]
+    # Act
+    saved = [
+        _json.loads(
+            views.library_save(_library_save_request("save", row, tmp_path)).content
+        )
+        for row in rows
+    ]
+    ids = [entry["library_id"] for entry in saved]
+    listed = _json.loads(views.library_list(_library_list_request(tmp_path)).content)
+    # Assert -- verify actual persistence, not just two matching response hashes.
+    assert (
+        ids[0] == ids[1]
+        and ids[0] != ids[2]
+        and {paper["title"] for paper in listed["papers"]}
+        == {"First paper", "Second paper"}
+        and listed["total"] == 2
+    )
+
+
+@pytest.mark.parametrize("first,second", _FLAT_SAVE_IDENTITY_ROWS)
+def test_library_save_bulk_flat_rows_keep_distinct_ids_and_deduplicate(
+    tmp_path, first, second
+):
+    # Arrange -- the same identities are submitted in one genuine bulk request.
+    rows = [first, first, second]
+    request = RequestFactory().post(
+        "/api/library/save-bulk",
+        data=_json.dumps({"papers": rows}),
+        content_type="application/json",
+    )
+    request.scholar_library_root = tmp_path
+    # Act
+    saved = _json.loads(views.library_save_bulk(request).content)["saved"]
+    ids = [entry["library_id"] for entry in saved]
+    listed = _json.loads(views.library_list(_library_list_request(tmp_path)).content)
+    # Assert -- verify actual persistence, not just two matching response hashes.
+    assert (
+        ids[0] == ids[1]
+        and ids[0] != ids[2]
+        and {paper["title"] for paper in listed["papers"]}
+        == {"First paper", "Second paper"}
+        and listed["total"] == 2
+    )
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [None, [], "not an object", 7, True, {}, {"papers": None}, {"papers": {}}],
+)
+def test_library_save_bulk_rejects_malformed_envelope_before_writing(
+    tmp_path, payload
+):
+    # Arrange
+    root = tmp_path / "library"
+    request = RequestFactory().post(
+        "/api/library/save-bulk",
+        data=_json.dumps(payload),
+        content_type="application/json",
+    )
+    request.scholar_library_root = root
+    # Act
+    response = views.library_save_bulk(request)
+    # Assert -- nonobject JSON is a client error and creates no library tree.
+    assert (response.status_code, root.exists()) == (400, False)
+
+
+def test_library_save_bulk_keeps_flat_nested_and_bad_rows_separate(tmp_path):
+    # Arrange -- author objects are one supported library-row author shape.
+    rows = [
+        {
+            "paper_id": "FLAT1",
+            "doi": "10.9/flat",
+            "title": "Flat paper",
+            "authors": ["Jane Author", {"name": "John Author"}],
+        },
+        _save_payload("NESTED1", "10.9/nested", "Nested paper"),
+        "not an object",
+        {"paper_id": "BAD1", "title": "Invalid year", "year": 1800},
+        {"paper_id": "../escape", "title": "Unsafe ID"},
+    ]
+    request = RequestFactory().post(
+        "/api/library/save-bulk",
+        data=_json.dumps({"papers": rows}),
+        content_type="application/json",
+    )
+    request.scholar_library_root = tmp_path / "library"
+    # Act
+    response = views.library_save_bulk(request)
+    result = _json.loads(response.content)
+    listed = _json.loads(
+        views.library_list(_library_list_request(request.scholar_library_root)).content
+    )
+    by_id = {paper["paper_id"]: paper for paper in listed["papers"]}
+    # Assert -- valid rows retain data; each invalid row reports its original index.
+    assert (
+        response.status_code == 200
+        and [entry["library_id"] for entry in result["saved"]]
+        == ["FLAT1", "NESTED1"]
+        and [entry["index"] for entry in result["failed"]] == [2, 3, 4]
+        and set(by_id) == {"FLAT1", "NESTED1"}
+        and by_id["FLAT1"]["authors"] == ["Jane Author", "John Author"]
+        and by_id["NESTED1"]["doi"] == "10.9/nested"
+        and not (tmp_path / "library" / "escape").exists()
+    )
+
+
+def test_library_save_flat_row_rejects_unsafe_id_before_writing(tmp_path):
+    # Arrange
+    root = tmp_path / "library"
+    payload = {"paper_id": "../escape", "doi": "10.9/unsafe", "title": "Unsafe ID"}
+    # Act
+    response = views.library_save(_library_save_request("save", payload, root))
+    rejected = response.status_code == 400
+    # Assert -- no primary tree is created, inside or outside the bound root.
+    assert rejected and not root.exists() and not (tmp_path / "escape").exists()
+
+
+def test_library_save_bulk_flat_row_rejects_unsafe_id_before_writing(tmp_path):
+    # Arrange
+    root = tmp_path / "library"
+    payload = {"paper_id": "../escape", "doi": "10.9/unsafe", "title": "Unsafe ID"}
+    # Act
+    response = views.library_save_bulk(
+        _library_save_request("save-bulk", payload, root)
+    )
+    result = _json.loads(response.content)
+    rejected = result["saved"] == [] and result["failed"][0]["index"] == 0
+    # Assert -- no primary tree is created, inside or outside the bound root.
+    assert rejected and not root.exists() and not (tmp_path / "escape").exists()
+
+
+@pytest.mark.parametrize("endpoint", ["save", "save-bulk"])
+def test_library_save_flat_row_uses_real_request_user_and_bound_root(
+    tmp_path, endpoint
+):
+    # Arrange -- real unsaved Django users require no account or database writes.
+    from django.conf import settings
+
+    installed_apps = [*settings.INSTALLED_APPS, "django.contrib.auth"]
+    root_a = tmp_path / "alice"
+    root_b = tmp_path / "bob"
+    payload_root = tmp_path / "input"
+    payload = {
+        "paper_id": "USER1",
+        "doi": "10.9/user",
+        "title": "Alice's paper",
+        "created_by": "untrusted",
+        "library_root": str(payload_root),
+        "scholar_library_root": str(payload_root),
+        "path": str(payload_root),
+    }
+    save_view = (
+        views.library_save_bulk if endpoint == "save-bulk" else views.library_save
+    )
+    with override_settings(INSTALLED_APPS=installed_apps):
+        from django.contrib.auth import get_user_model
+
+        alice = get_user_model()(username="alice")
+        bob = get_user_model()(username="bob")
+        # Act
+        response = save_view(_library_save_request(endpoint, payload, root_a, alice))
+        stored = _json.loads(
+            (root_a / "MASTER" / "USER1" / "metadata.json").read_text()
+        )
+        alice_rows = _json.loads(
+            views.library_list(_library_list_request(root_a, alice)).content
+        )["papers"]
+        bob_rows = _json.loads(
+            views.library_list(_library_list_request(root_b, bob)).content
+        )["papers"]
+    # Assert -- requester stamps ownership; payload cannot choose a different root.
+    assert (
+        response.status_code == 200
+        and stored["container"]["created_by"] == "alice"
+        and alice_rows[0]["doi"] == "10.9/user"
+        and bob_rows == []
+        and not payload_root.exists()
+    )
+
+
+def test_searches_save_returns_id(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        body = _json.dumps({"name": "ml", "query": "graph nets"})
+        # Act
+        data = _json.loads(
+            views.searches_save(
+                rf.post("/api/searches/save", data=body, content_type="application/json")
+            ).content
+        )
+        # Assert
+        assert data["saved"] is True
+
+
+def test_searches_save_lists_back(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        body = _json.dumps({"name": "ml", "query": "graph nets"})
+        # Act
+        views.searches_save(
+            rf.post("/api/searches/save", data=body, content_type="application/json")
+        )
+        listed = _json.loads(views.searches_list(rf.get("/api/searches")).content)
+        # Assert
+        assert listed["searches"][0]["query"] == "graph nets"
+
+
+def test_searches_save_requires_name_and_query(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        body = _json.dumps({"name": "", "query": ""})
+        # Act
+        resp = views.searches_save(
+            rf.post("/api/searches/save", data=body, content_type="application/json")
+        )
+        # Assert
+        assert resp.status_code == 400
+
+
+def test_searches_delete_removes_row(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        body = _json.dumps({"name": "ml", "query": "graph nets"})
+        saved = _json.loads(
+            views.searches_save(
+                rf.post("/api/searches/save", data=body, content_type="application/json")
+            ).content
+        )
+        # Act
+        views.searches_delete(
+            rf.post(
+                "/api/searches/delete",
+                data=_json.dumps({"id": saved["id"]}),
+                content_type="application/json",
+            )
+        )
+        listed = _json.loads(views.searches_list(rf.get("/api/searches")).content)
+        # Assert
+        assert listed["searches"] == []
+
+
+def test_searches_delete_unknown_id_404(tmp_path):
+    # Arrange
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        # Act
+        resp = views.searches_delete(
+            rf.post(
+                "/api/searches/delete",
+                data=_json.dumps({"id": "nope"}),
+                content_type="application/json",
+            )
+        )
+        # Assert
+        assert resp.status_code == 404
+
+
+def test_searches_are_user_scoped(tmp_path):
+    # Arrange — user A saves; user B lists a different root.
+    root_a = tmp_path / "a"
+    root_b = tmp_path / "b"
+    root_a.mkdir()
+    root_b.mkdir()
+    rf = RequestFactory()
+    save_req = rf.post(
+        "/api/searches/save",
+        data=_json.dumps({"name": "ml", "query": "graph nets"}),
+        content_type="application/json",
+    )
+    save_req.scholar_library_root = root_a
+    list_req = rf.get("/api/searches")
+    list_req.scholar_library_root = root_b
+    # Act
+    views.searches_save(save_req)
+    listed_b = _json.loads(views.searches_list(list_req).content)
+    # Assert — B never sees A's rows.
+    assert listed_b["searches"] == []
+
+
+# EOF
 
 
 # EOF
