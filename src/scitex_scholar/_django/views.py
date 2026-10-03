@@ -1192,6 +1192,44 @@ def library_import(request):
         return JsonResponse({"error": f"Import failed: {e}"}, status=500)
 
 
+def _paper_from_save_payload(payload):
+    """Adapt a library-list row or a nested Paper dict at the HTTP boundary.
+
+    The core Paper schema stays nested; library_list's public row shape is
+    flat. Passing that row straight to Paper.from_dict silently drops its
+    fields, so both save endpoints translate it here before validation.
+    """
+    from scitex_scholar.core.Paper import Paper
+
+    if not isinstance(payload, dict):
+        raise ValueError("Paper must be a JSON object")
+    if "metadata" in payload or "container" in payload:
+        return Paper.from_dict(payload)
+
+    authors = payload.get("authors")
+    if isinstance(authors, list):
+        authors = [
+            author.get("name") if isinstance(author, dict) else author
+            for author in authors
+        ]
+    return Paper.from_dict(
+        {
+            "metadata": {
+                "id": {"doi": payload.get("doi")},
+                "basic": {
+                    "title": payload.get("title"),
+                    "year": payload.get("year"),
+                    "abstract": payload.get("abstract"),
+                    "authors": authors,
+                },
+                "publication": {"journal": payload.get("venue")},
+                "citation_count": {"total": payload.get("citation_count")},
+            },
+            "container": {"library_id": payload.get("paper_id")},
+        }
+    )
+
+
 @require_POST
 def library_save(request):
     """Save ONE paper to the user's local library (explicit user action).
@@ -1202,14 +1240,12 @@ def library_save(request):
     database. ``container.created_by`` is stamped with the request user.
     A missing library_id is derived (DOI/title hash, dedup-friendly).
     """
-    from scitex_scholar.core.Paper import Paper
-
     try:
         payload = json.loads(request.body or b"{}")
     except (ValueError, TypeError):
         return JsonResponse({"error": "Invalid JSON body"}, status=400)
     try:
-        paper = Paper.from_dict(payload)
+        paper = _paper_from_save_payload(payload)
     except Exception as e:
         return JsonResponse({"error": f"Invalid paper: {e}"}, status=400)
     user = getattr(request, "user", None)
@@ -1234,12 +1270,12 @@ def library_save_bulk(request):
     """Save MANY papers in one call; per-paper results so one bad row cannot
     fail the batch. Body: ``{"papers": [...]}``. Same store, scoping, and
     stamping rules as library_save."""
-    from scitex_scholar.core.Paper import Paper
-
     try:
         payload = json.loads(request.body or b"{}")
     except (ValueError, TypeError):
         return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    if not isinstance(payload, dict):
+        return JsonResponse({"error": 'Body must be {"papers": [...]}'}, status=400)
     papers = payload.get("papers")
     if not isinstance(papers, list):
         return JsonResponse({"error": 'Body must be {"papers": [...]}'}, status=400)
@@ -1249,7 +1285,7 @@ def library_save_bulk(request):
     saved, failed = [], []
     for i, item in enumerate(papers):
         try:
-            paper = Paper.from_dict(item)
+            paper = _paper_from_save_payload(item)
         except Exception as e:
             failed.append({"index": i, "error": f"Invalid paper: {e}"})
             continue
@@ -1265,6 +1301,8 @@ def library_save_bulk(request):
             continue
         saved.append({"library_id": paper.container.library_id, "path": str(path)})
     return JsonResponse({"saved": saved, "failed": failed})
+
+
 def _saved_searches_path(root: Path) -> Path:
     """Single JSON file holding this user's saved searches."""
     return root / "SAVED_SEARCHES" / "saved_searches.json"

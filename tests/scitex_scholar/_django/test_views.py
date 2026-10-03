@@ -3025,6 +3025,258 @@ def test_library_save_is_user_scoped(tmp_path):
     listed_b = _json.loads(views.library_list(list_req).content)
     # Assert
     assert saved["saved"] is True and listed_b["papers"] == []
+
+
+def _library_save_request(endpoint, payload, root, user=None):
+    """A real JSON request with a server-bound, temporary library root."""
+    body = {"papers": [payload]} if endpoint == "save-bulk" else payload
+    request = RequestFactory().post(
+        f"/api/library/{endpoint}",
+        data=_json.dumps(body),
+        content_type="application/json",
+    )
+    request.scholar_library_root = root
+    if user is not None:
+        request.user = user
+    return request
+
+
+def _library_list_request(root, user=None):
+    request = RequestFactory().get("/api/library")
+    request.scholar_library_root = root
+    if user is not None:
+        request.user = user
+    return request
+
+
+@pytest.mark.parametrize("endpoint", ["save", "save-bulk"])
+def test_library_save_round_trips_actual_flat_library_row(tmp_path, endpoint):
+    # Arrange -- seed through the real save, then use the actual list response.
+    source, target = tmp_path / "source", tmp_path / "target"
+    payload = _save_payload("ROW1", "10.9/row", "Listed paper")
+    payload["metadata"]["basic"].update(
+        {"authors": ["Jane Author", "John Author"], "abstract": "Full abstract"}
+    )
+    payload["metadata"]["publication"] = {"journal": "Example Journal"}
+    payload["metadata"]["citation_count"] = {"total": 17}
+    views.library_save(_library_save_request("save", payload, source))
+    row = _json.loads(views.library_list(_library_list_request(source)).content)[
+        "papers"
+    ][0]
+    save_view = (
+        views.library_save_bulk if endpoint == "save-bulk" else views.library_save
+    )
+    # Act
+    response = save_view(_library_save_request(endpoint, row, target))
+    listed = _json.loads(views.library_list(_library_list_request(target)).content)
+    # Assert -- every field and the existing paper ID survive the HTTP round trip.
+    assert (response.status_code, listed["papers"]) == (200, [row])
+
+
+@pytest.mark.parametrize("endpoint", ["save", "save-bulk"])
+def test_library_save_preserves_full_nested_paper(tmp_path, endpoint):
+    # Arrange -- nested source/provenance fields must not pass through a flat map.
+    from scitex_scholar.core.Paper import Paper
+
+    payload = _save_payload("NESTED1", "10.9/nested", "Nested paper")
+    payload["metadata"]["id"].update(
+        {"arxiv_id": "2501.00001", "doi_engines": ["CrossRef"]}
+    )
+    payload["metadata"]["basic"].update(
+        {"authors": ["Jane Author"], "title_engines": ["CrossRef"]}
+    )
+    payload["metadata"]["publication"] = {
+        "journal": "Journal",
+        "volume": "3",
+        "journal_engines": ["CrossRef"],
+    }
+    payload["metadata"]["citation_count"] = {"total": 17, "2025": 4}
+    payload["metadata"]["access"] = {"is_open_access": True, "license": "CC-BY"}
+    payload["container"].update({"created_by": "untrusted", "projects": ["Alpha"]})
+    expected = Paper.from_dict(payload).to_dict()
+    expected["container"]["created_by"] = "user"
+    save_view = (
+        views.library_save_bulk if endpoint == "save-bulk" else views.library_save
+    )
+    # Act
+    response = save_view(_library_save_request(endpoint, payload, tmp_path))
+    persisted = _json.loads(
+        (tmp_path / "MASTER" / "NESTED1" / "metadata.json").read_text()
+    )
+    # Assert -- the whole validated Paper survives, with the request's creator stamp.
+    assert (response.status_code, persisted) == (200, expected)
+
+
+@pytest.mark.parametrize("endpoint", ["save", "save-bulk"])
+@pytest.mark.parametrize("identity", ["doi", "title"])
+def test_library_save_flat_rows_keep_distinct_ids_and_deduplicate(
+    tmp_path, endpoint, identity
+):
+    # Arrange -- repeated identity deduplicates; a second identity stays distinct.
+    first = {"title": "First paper", "year": 2025}
+    second = {"title": "Second paper", "year": 2025}
+    if identity == "doi":
+        first["doi"], second["doi"] = "10.9/first", "10.9/second"
+    rows = [first, first, second]
+    # Act
+    if endpoint == "save-bulk":
+        request = RequestFactory().post(
+            "/api/library/save-bulk",
+            data=_json.dumps({"papers": rows}),
+            content_type="application/json",
+        )
+        request.scholar_library_root = tmp_path
+        saved = _json.loads(views.library_save_bulk(request).content)["saved"]
+    else:
+        saved = [
+            _json.loads(
+                views.library_save(
+                    _library_save_request(endpoint, row, tmp_path)
+                ).content
+            )
+            for row in rows
+        ]
+    ids = [entry["library_id"] for entry in saved]
+    listed = _json.loads(views.library_list(_library_list_request(tmp_path)).content)
+    # Assert -- verify actual persistence, not just two matching response hashes.
+    assert (
+        ids[0] == ids[1]
+        and ids[0] != ids[2]
+        and {paper["title"] for paper in listed["papers"]}
+        == {"First paper", "Second paper"}
+        and listed["total"] == 2
+    )
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [None, [], "not an object", 7, True, {}, {"papers": None}, {"papers": {}}],
+)
+def test_library_save_bulk_rejects_malformed_envelope_before_writing(
+    tmp_path, payload
+):
+    # Arrange
+    root = tmp_path / "library"
+    request = RequestFactory().post(
+        "/api/library/save-bulk",
+        data=_json.dumps(payload),
+        content_type="application/json",
+    )
+    request.scholar_library_root = root
+    # Act
+    response = views.library_save_bulk(request)
+    # Assert -- nonobject JSON is a client error and creates no library tree.
+    assert (response.status_code, root.exists()) == (400, False)
+
+
+def test_library_save_bulk_keeps_flat_nested_and_bad_rows_separate(tmp_path):
+    # Arrange -- author objects are one supported library-row author shape.
+    rows = [
+        {
+            "paper_id": "FLAT1",
+            "doi": "10.9/flat",
+            "title": "Flat paper",
+            "authors": ["Jane Author", {"name": "John Author"}],
+        },
+        _save_payload("NESTED1", "10.9/nested", "Nested paper"),
+        "not an object",
+        {"paper_id": "BAD1", "title": "Invalid year", "year": 1800},
+        {"paper_id": "../escape", "title": "Unsafe ID"},
+    ]
+    request = RequestFactory().post(
+        "/api/library/save-bulk",
+        data=_json.dumps({"papers": rows}),
+        content_type="application/json",
+    )
+    request.scholar_library_root = tmp_path / "library"
+    # Act
+    response = views.library_save_bulk(request)
+    result = _json.loads(response.content)
+    listed = _json.loads(
+        views.library_list(_library_list_request(request.scholar_library_root)).content
+    )
+    by_id = {paper["paper_id"]: paper for paper in listed["papers"]}
+    # Assert -- valid rows retain data; each invalid row reports its original index.
+    assert (
+        response.status_code == 200
+        and [entry["library_id"] for entry in result["saved"]]
+        == ["FLAT1", "NESTED1"]
+        and [entry["index"] for entry in result["failed"]] == [2, 3, 4]
+        and set(by_id) == {"FLAT1", "NESTED1"}
+        and by_id["FLAT1"]["authors"] == ["Jane Author", "John Author"]
+        and by_id["NESTED1"]["doi"] == "10.9/nested"
+        and not (tmp_path / "library" / "escape").exists()
+    )
+
+
+@pytest.mark.parametrize("endpoint", ["save", "save-bulk"])
+def test_library_save_flat_row_rejects_unsafe_id_before_writing(tmp_path, endpoint):
+    # Arrange
+    root = tmp_path / "library"
+    payload = {"paper_id": "../escape", "doi": "10.9/unsafe", "title": "Unsafe ID"}
+    save_view = (
+        views.library_save_bulk if endpoint == "save-bulk" else views.library_save
+    )
+    # Act
+    response = save_view(_library_save_request(endpoint, payload, root))
+    result = _json.loads(response.content)
+    if endpoint == "save-bulk":
+        rejected = result["saved"] == [] and result["failed"][0]["index"] == 0
+    else:
+        rejected = response.status_code == 400
+    # Assert -- no primary tree is created, inside or outside the bound root.
+    assert rejected and not root.exists() and not (tmp_path / "escape").exists()
+
+
+@pytest.mark.parametrize("endpoint", ["save", "save-bulk"])
+def test_library_save_flat_row_uses_real_request_user_and_bound_root(
+    tmp_path, endpoint
+):
+    # Arrange -- real unsaved Django users require no account or database writes.
+    from django.conf import settings
+
+    installed_apps = [*settings.INSTALLED_APPS, "django.contrib.auth"]
+    root_a = tmp_path / "alice"
+    root_b = tmp_path / "bob"
+    payload_root = tmp_path / "input"
+    payload = {
+        "paper_id": "USER1",
+        "doi": "10.9/user",
+        "title": "Alice's paper",
+        "created_by": "untrusted",
+        "library_root": str(payload_root),
+        "scholar_library_root": str(payload_root),
+        "path": str(payload_root),
+    }
+    save_view = (
+        views.library_save_bulk if endpoint == "save-bulk" else views.library_save
+    )
+    with override_settings(INSTALLED_APPS=installed_apps):
+        from django.contrib.auth import get_user_model
+
+        alice = get_user_model()(username="alice")
+        bob = get_user_model()(username="bob")
+        # Act
+        response = save_view(_library_save_request(endpoint, payload, root_a, alice))
+        stored = _json.loads(
+            (root_a / "MASTER" / "USER1" / "metadata.json").read_text()
+        )
+        alice_rows = _json.loads(
+            views.library_list(_library_list_request(root_a, alice)).content
+        )["papers"]
+        bob_rows = _json.loads(
+            views.library_list(_library_list_request(root_b, bob)).content
+        )["papers"]
+    # Assert -- requester stamps ownership; payload cannot choose a different root.
+    assert (
+        response.status_code == 200
+        and stored["container"]["created_by"] == "alice"
+        and alice_rows[0]["doi"] == "10.9/user"
+        and bob_rows == []
+        and not payload_root.exists()
+    )
+
+
 def test_searches_save_returns_id(tmp_path):
     # Arrange
     with _library_env(tmp_path):
