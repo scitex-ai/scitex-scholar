@@ -3107,35 +3107,59 @@ def test_library_save_preserves_full_nested_paper(tmp_path, endpoint):
     assert (response.status_code, persisted) == (200, expected)
 
 
-@pytest.mark.parametrize("endpoint", ["save", "save-bulk"])
-@pytest.mark.parametrize("identity", ["doi", "title"])
+_FLAT_SAVE_IDENTITY_ROWS = [
+    pytest.param(
+        {"title": "First paper", "year": 2025, "doi": "10.9/first"},
+        {"title": "Second paper", "year": 2025, "doi": "10.9/second"},
+        id="doi",
+    ),
+    pytest.param(
+        {"title": "First paper", "year": 2025},
+        {"title": "Second paper", "year": 2025},
+        id="title",
+    ),
+]
+
+
+@pytest.mark.parametrize("first,second", _FLAT_SAVE_IDENTITY_ROWS)
 def test_library_save_flat_rows_keep_distinct_ids_and_deduplicate(
-    tmp_path, endpoint, identity
+    tmp_path, first, second
 ):
     # Arrange -- repeated identity deduplicates; a second identity stays distinct.
-    first = {"title": "First paper", "year": 2025}
-    second = {"title": "Second paper", "year": 2025}
-    if identity == "doi":
-        first["doi"], second["doi"] = "10.9/first", "10.9/second"
     rows = [first, first, second]
     # Act
-    if endpoint == "save-bulk":
-        request = RequestFactory().post(
-            "/api/library/save-bulk",
-            data=_json.dumps({"papers": rows}),
-            content_type="application/json",
+    saved = [
+        _json.loads(
+            views.library_save(_library_save_request("save", row, tmp_path)).content
         )
-        request.scholar_library_root = tmp_path
-        saved = _json.loads(views.library_save_bulk(request).content)["saved"]
-    else:
-        saved = [
-            _json.loads(
-                views.library_save(
-                    _library_save_request(endpoint, row, tmp_path)
-                ).content
-            )
-            for row in rows
-        ]
+        for row in rows
+    ]
+    ids = [entry["library_id"] for entry in saved]
+    listed = _json.loads(views.library_list(_library_list_request(tmp_path)).content)
+    # Assert -- verify actual persistence, not just two matching response hashes.
+    assert (
+        ids[0] == ids[1]
+        and ids[0] != ids[2]
+        and {paper["title"] for paper in listed["papers"]}
+        == {"First paper", "Second paper"}
+        and listed["total"] == 2
+    )
+
+
+@pytest.mark.parametrize("first,second", _FLAT_SAVE_IDENTITY_ROWS)
+def test_library_save_bulk_flat_rows_keep_distinct_ids_and_deduplicate(
+    tmp_path, first, second
+):
+    # Arrange -- the same identities are submitted in one genuine bulk request.
+    rows = [first, first, second]
+    request = RequestFactory().post(
+        "/api/library/save-bulk",
+        data=_json.dumps({"papers": rows}),
+        content_type="application/json",
+    )
+    request.scholar_library_root = tmp_path
+    # Act
+    saved = _json.loads(views.library_save_bulk(request).content)["saved"]
     ids = [entry["library_id"] for entry in saved]
     listed = _json.loads(views.library_list(_library_list_request(tmp_path)).content)
     # Assert -- verify actual persistence, not just two matching response hashes.
@@ -3209,21 +3233,27 @@ def test_library_save_bulk_keeps_flat_nested_and_bad_rows_separate(tmp_path):
     )
 
 
-@pytest.mark.parametrize("endpoint", ["save", "save-bulk"])
-def test_library_save_flat_row_rejects_unsafe_id_before_writing(tmp_path, endpoint):
+def test_library_save_flat_row_rejects_unsafe_id_before_writing(tmp_path):
     # Arrange
     root = tmp_path / "library"
     payload = {"paper_id": "../escape", "doi": "10.9/unsafe", "title": "Unsafe ID"}
-    save_view = (
-        views.library_save_bulk if endpoint == "save-bulk" else views.library_save
-    )
     # Act
-    response = save_view(_library_save_request(endpoint, payload, root))
+    response = views.library_save(_library_save_request("save", payload, root))
+    rejected = response.status_code == 400
+    # Assert -- no primary tree is created, inside or outside the bound root.
+    assert rejected and not root.exists() and not (tmp_path / "escape").exists()
+
+
+def test_library_save_bulk_flat_row_rejects_unsafe_id_before_writing(tmp_path):
+    # Arrange
+    root = tmp_path / "library"
+    payload = {"paper_id": "../escape", "doi": "10.9/unsafe", "title": "Unsafe ID"}
+    # Act
+    response = views.library_save_bulk(
+        _library_save_request("save-bulk", payload, root)
+    )
     result = _json.loads(response.content)
-    if endpoint == "save-bulk":
-        rejected = result["saved"] == [] and result["failed"][0]["index"] == 0
-    else:
-        rejected = response.status_code == 400
+    rejected = result["saved"] == [] and result["failed"][0]["index"] == 0
     # Assert -- no primary tree is created, inside or outside the bound root.
     assert rejected and not root.exists() and not (tmp_path / "escape").exists()
 
