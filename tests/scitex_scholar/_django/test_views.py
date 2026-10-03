@@ -2538,39 +2538,66 @@ def test_reserved_picker_filter_uses_the_storage_contract_set():
     )
 
 
-@pytest.mark.parametrize("project_query", ["", "?project=Alpha"])
-def test_index_user_scope_agrees_with_manifest_and_keeps_canonical_header(
-    tmp_path, project_query
-):
+@pytest.fixture(params=["", "?project=Alpha"], ids=["default", "explicit-project"])
+def _rendered_user_scope_header(request, tmp_path):
     # Arrange -- Scholar is user-scoped. The genuine shared picker still renders
     # once when the same header is explicitly rendered for project scope.
     (tmp_path / "Alpha").mkdir()
     manifest = json.loads(
         (Path(views.__file__).parent / "manifest.json").read_text()
     )
-    request = RequestFactory().get(f"/{project_query}")
+    http_request = RequestFactory().get(f"/{request.param}")
     settings_override = override_settings(
         SCITEX_PROJECT_PROVIDER="", SCITEX_PROJECT_PROVIDER_URL="/api/projects"
     )
     # Act
     with _project_root_env(tmp_path), settings_override:
-        response = views.index(request)
+        response = views.index(http_request)
         html = response.content.decode()
         project_html = render_to_string(
             "scholar/scholar.html",
             {"app_scope": "project", "current_project": "Alpha"},
-            request=request,
+            request=http_request,
         )
-    # Assert -- a project query cannot turn the user-level index into a
-    # project-scoped page; the template consumes the view's scope declaration.
-    assert response.status_code == 200 and manifest["scope"] == "user"
+    return {
+        "response": response,
+        "manifest": manifest,
+        "html": html,
+        "project_html": project_html,
+    }
+
+
+def test_index_user_scope_returns_200(_rendered_user_scope_header):
+    assert _rendered_user_scope_header["response"].status_code == 200
+
+
+def test_index_user_scope_agrees_with_manifest(_rendered_user_scope_header):
+    assert _rendered_user_scope_header["manifest"]["scope"] == "user"
+
+
+def test_index_user_scope_keeps_canonical_identity(_rendered_user_scope_header):
+    html = _rendered_user_scope_header["html"]
     assert html.count('class="stx-app-header__identity"') == 1
+
+
+def test_index_user_scope_keeps_canonical_picker_slot(_rendered_user_scope_header):
+    html = _rendered_user_scope_header["html"]
     assert html.count('class="stx-app-header__slot--project-selector"') == 1
-    assert html.count("data-stx-project-picker") == 0
+
+
+def test_index_user_scope_suppresses_picker(_rendered_user_scope_header):
+    # A project query cannot turn the user-level index into a project-scoped page.
+    assert _rendered_user_scope_header["html"].count("data-stx-project-picker") == 0
+
+
+def test_project_header_renders_one_picker(_rendered_user_scope_header):
+    # Positive control: the same template consumes the declared project scope.
+    project_html = _rendered_user_scope_header["project_html"]
     assert project_html.count("data-stx-project-picker") == 1
 
 
-def test_user_index_suppresses_picker_but_project_header_keeps_navigation(tmp_path):
+@pytest.fixture
+def _rendered_project_query_header(tmp_path):
     # Arrange -- preserve the shared primitive's navigation assertion as a
     # project-scope control, rather than requiring a picker on Scholar's index.
     (tmp_path / "Alpha").mkdir()
@@ -2586,14 +2613,21 @@ def test_user_index_suppresses_picker_but_project_header_keeps_navigation(tmp_pa
             {"app_scope": "project", "current_project": "Alpha"},
             request=request,
         )
-    # Assert
+    return {"html": html, "project_html": project_html}
+
+
+def test_user_index_has_no_project_navigation(_rendered_project_query_header):
+    html = _rendered_project_query_header["html"]
     assert 'data-current="Alpha" data-navigate="?project={id}"' not in html
+
+
+def test_project_header_keeps_project_navigation(_rendered_project_query_header):
+    project_html = _rendered_project_query_header["project_html"]
     assert 'data-current="Alpha" data-navigate="?project={id}"' in project_html
 
 
-def test_user_index_suppresses_picker_but_project_header_keeps_host_provider_url(
-    tmp_path,
-):
+@pytest.fixture
+def _rendered_host_scope_header(tmp_path):
     # Arrange -- the host URL remains authoritative whenever the shared
     # project-scoped header is rendered; user scope does not render that picker.
     request = RequestFactory().get("/")
@@ -2607,8 +2641,16 @@ def test_user_index_suppresses_picker_but_project_header_keeps_host_provider_url
         project_html = render_to_string(
             "scholar/scholar.html", {"app_scope": "project"}, request=request
         )
-    # Assert
+    return {"html": html, "project_html": project_html}
+
+
+def test_user_index_has_no_host_project_picker(_rendered_host_scope_header):
+    html = _rendered_host_scope_header["html"]
     assert 'data-provider-url="/host/api/project-scope/"' not in html
+
+
+def test_project_header_keeps_host_provider_url(_rendered_host_scope_header):
+    project_html = _rendered_host_scope_header["project_html"]
     assert 'data-provider-url="/host/api/project-scope/"' in project_html
 
 
@@ -2634,17 +2676,17 @@ def test_manifest_declares_user_scope():
     assert manifest["scope"] == "user"
 
 
-@pytest.mark.parametrize(
-    ("project_query", "expected_current"), [("", None), ("?project=Alpha", "Alpha")]
+@pytest.fixture(
+    params=[("", None), ("?project=Alpha", "Alpha")],
+    ids=["default", "explicit-project"],
 )
-def test_user_index_keeps_request_bound_library_roots_isolated(
-    tmp_path, project_query, expected_current
-):
+def _user_scope_library_outcomes(request, tmp_path):
     # Arrange -- real unsaved Django users and genuine temporary primary files.
     # Explicit project selection retains its provider behavior but cannot
     # redirect either user's request-bound library root.
     from django.conf import settings
 
+    project_query, expected_current = request.param
     installed_apps = [*settings.INSTALLED_APPS, "django.contrib.auth"]
     projects = tmp_path / "projects"
     (projects / "Alpha").mkdir(parents=True)
@@ -2685,27 +2727,64 @@ def test_user_index_keeps_request_bound_library_roots_isolated(
         project_payload = json.loads(
             views.project_scope(RequestFactory().get("/api/projects")).content
         )
-    # Assert -- both users see only their own primary metadata for either query.
+    return {
+        "results": results,
+        "root_a": root_a,
+        "root_b": root_b,
+        "project_payload": project_payload,
+        "expected_current": expected_current,
+    }
+
+
+def test_user_index_keeps_request_bound_library_roots(_user_scope_library_outcomes):
+    results = _user_scope_library_outcomes["results"]
     assert [result["root"] for result in results] == [
-        root_a.resolve(),
-        root_b.resolve(),
+        _user_scope_library_outcomes["root_a"].resolve(),
+        _user_scope_library_outcomes["root_b"].resolve(),
     ]
+
+
+def test_user_index_keeps_reported_library_roots(_user_scope_library_outcomes):
+    results = _user_scope_library_outcomes["results"]
     assert [result["library"]["library_root"] for result in results] == [
-        str(root_a.resolve()),
-        str(root_b.resolve()),
+        str(_user_scope_library_outcomes["root_a"].resolve()),
+        str(_user_scope_library_outcomes["root_b"].resolve()),
     ]
+
+
+def test_user_index_keeps_library_papers_isolated(_user_scope_library_outcomes):
+    results = _user_scope_library_outcomes["results"]
     assert [result["library"]["papers"][0]["doi"] for result in results] == [
         "10.9/alice",
         "10.9/bob",
     ]
+
+
+def test_user_index_keeps_accessible_project_listing(_user_scope_library_outcomes):
+    project_payload = _user_scope_library_outcomes["project_payload"]
     assert [project["id"] for project in project_payload["projects"]] == ["Alpha"]
-    assert project_payload["current"] == expected_current
-    assert all(
-        result["status"] == 200
-        and "data-stx-project-picker" not in result["html"]
-        and result["library"]["count"] == 1
-        for result in results
+
+
+def test_user_index_keeps_explicit_project_resolution(_user_scope_library_outcomes):
+    project_payload = _user_scope_library_outcomes["project_payload"]
+    assert (
+        project_payload["current"] == _user_scope_library_outcomes["expected_current"]
     )
+
+
+def test_user_index_returns_200_for_each_bound_user(_user_scope_library_outcomes):
+    results = _user_scope_library_outcomes["results"]
+    assert all(result["status"] == 200 for result in results)
+
+
+def test_user_index_suppresses_picker_for_each_bound_user(_user_scope_library_outcomes):
+    results = _user_scope_library_outcomes["results"]
+    assert all("data-stx-project-picker" not in result["html"] for result in results)
+
+
+def test_user_index_lists_one_paper_for_each_bound_user(_user_scope_library_outcomes):
+    results = _user_scope_library_outcomes["results"]
+    assert all(result["library"]["count"] == 1 for result in results)
 
 
 def test_all_extra_requires_header_slot_capable_scitex_ui():
