@@ -2568,31 +2568,54 @@ def _rendered_user_scope_header(request, tmp_path):
 
 
 def test_index_user_scope_returns_200(_rendered_user_scope_header):
+    # Arrange
+    # The fixture supplies the response from a genuine index request.
+    # Act
+    # Read that response's status.
+    # Assert
     assert _rendered_user_scope_header["response"].status_code == 200
 
 
 def test_index_user_scope_agrees_with_manifest(_rendered_user_scope_header):
+    # Arrange
+    # The fixture supplies the owning manifest and genuine rendered index.
+    # Act
+    # Read the manifest's declared scope.
+    # Assert
     assert _rendered_user_scope_header["manifest"]["scope"] == "user"
 
 
 def test_index_user_scope_keeps_canonical_identity(_rendered_user_scope_header):
+    # Arrange
+    # Act
     html = _rendered_user_scope_header["html"]
+    # Assert
     assert html.count('class="stx-app-header__identity"') == 1
 
 
 def test_index_user_scope_keeps_canonical_picker_slot(_rendered_user_scope_header):
+    # Arrange
+    # Act
     html = _rendered_user_scope_header["html"]
+    # Assert
     assert html.count('class="stx-app-header__slot--project-selector"') == 1
 
 
 def test_index_user_scope_suppresses_picker(_rendered_user_scope_header):
+    # Arrange
     # A project query cannot turn the user-level index into a project-scoped page.
+    # Act
+    # Read the actual index markup supplied by the fixture.
+    # Assert
     assert _rendered_user_scope_header["html"].count("data-stx-project-picker") == 0
 
 
 def test_project_header_renders_one_picker(_rendered_user_scope_header):
+    # Arrange
     # Positive control: the same template consumes the declared project scope.
+    # Act
     project_html = _rendered_user_scope_header["project_html"]
+    # Assert
     assert project_html.count("data-stx-project-picker") == 1
 
 
@@ -2617,12 +2640,18 @@ def _rendered_project_query_header(tmp_path):
 
 
 def test_user_index_has_no_project_navigation(_rendered_project_query_header):
+    # Arrange
+    # Act
     html = _rendered_project_query_header["html"]
+    # Assert
     assert 'data-current="Alpha" data-navigate="?project={id}"' not in html
 
 
 def test_project_header_keeps_project_navigation(_rendered_project_query_header):
+    # Arrange
+    # Act
     project_html = _rendered_project_query_header["project_html"]
+    # Assert
     assert 'data-current="Alpha" data-navigate="?project={id}"' in project_html
 
 
@@ -2645,12 +2674,18 @@ def _rendered_host_scope_header(tmp_path):
 
 
 def test_user_index_has_no_host_project_picker(_rendered_host_scope_header):
+    # Arrange
+    # Act
     html = _rendered_host_scope_header["html"]
+    # Assert
     assert 'data-provider-url="/host/api/project-scope/"' not in html
 
 
 def test_project_header_keeps_host_provider_url(_rendered_host_scope_header):
+    # Arrange
+    # Act
     project_html = _rendered_host_scope_header["project_html"]
+    # Assert
     assert 'data-provider-url="/host/api/project-scope/"' in project_html
 
 
@@ -2737,7 +2772,10 @@ def _user_scope_library_outcomes(request, tmp_path):
 
 
 def test_user_index_keeps_request_bound_library_roots(_user_scope_library_outcomes):
+    # Arrange
+    # Act
     results = _user_scope_library_outcomes["results"]
+    # Assert
     assert [result["root"] for result in results] == [
         _user_scope_library_outcomes["root_a"].resolve(),
         _user_scope_library_outcomes["root_b"].resolve(),
@@ -2745,7 +2783,10 @@ def test_user_index_keeps_request_bound_library_roots(_user_scope_library_outcom
 
 
 def test_user_index_keeps_reported_library_roots(_user_scope_library_outcomes):
+    # Arrange
+    # Act
     results = _user_scope_library_outcomes["results"]
+    # Assert
     assert [result["library"]["library_root"] for result in results] == [
         str(_user_scope_library_outcomes["root_a"].resolve()),
         str(_user_scope_library_outcomes["root_b"].resolve()),
@@ -2753,7 +2794,10 @@ def test_user_index_keeps_reported_library_roots(_user_scope_library_outcomes):
 
 
 def test_user_index_keeps_library_papers_isolated(_user_scope_library_outcomes):
+    # Arrange
+    # Act
     results = _user_scope_library_outcomes["results"]
+    # Assert
     assert [result["library"]["papers"][0]["doi"] for result in results] == [
         "10.9/alice",
         "10.9/bob",
@@ -2761,29 +2805,44 @@ def test_user_index_keeps_library_papers_isolated(_user_scope_library_outcomes):
 
 
 def test_user_index_keeps_accessible_project_listing(_user_scope_library_outcomes):
+    # Arrange
+    # Act
     project_payload = _user_scope_library_outcomes["project_payload"]
+    # Assert
     assert [project["id"] for project in project_payload["projects"]] == ["Alpha"]
 
 
 def test_user_index_keeps_explicit_project_resolution(_user_scope_library_outcomes):
+    # Arrange
+    # Act
     project_payload = _user_scope_library_outcomes["project_payload"]
+    # Assert
     assert (
         project_payload["current"] == _user_scope_library_outcomes["expected_current"]
     )
 
 
 def test_user_index_returns_200_for_each_bound_user(_user_scope_library_outcomes):
+    # Arrange
+    # Act
     results = _user_scope_library_outcomes["results"]
+    # Assert
     assert all(result["status"] == 200 for result in results)
 
 
 def test_user_index_suppresses_picker_for_each_bound_user(_user_scope_library_outcomes):
+    # Arrange
+    # Act
     results = _user_scope_library_outcomes["results"]
+    # Assert
     assert all("data-stx-project-picker" not in result["html"] for result in results)
 
 
 def test_user_index_lists_one_paper_for_each_bound_user(_user_scope_library_outcomes):
+    # Arrange
+    # Act
     results = _user_scope_library_outcomes["results"]
+    # Assert
     assert all(result["library"]["count"] == 1 for result in results)
 
 
