@@ -373,7 +373,7 @@ def index(request):
             "api_url": resolved_api or "Not configured",
             "stx_mount": mount_prefix(request),
             "app_label": _app_label("SciTeX Scholar"),
-            "app_scope": "project",
+            "app_scope": "user",
             "current_project": current_project,
             # i18n (operator directive 2026-09-14): the whole page flips via
             # LocaleMiddleware; this carries the strings that live ONLY in
