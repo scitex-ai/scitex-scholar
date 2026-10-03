@@ -358,4 +358,148 @@ def test_anonymous_leaf_search_reports_required_query(_anonymous_public_results)
     assert error == "q parameter required"
 
 
+@pytest.fixture(
+    params=[
+        ("en", "/", "standalone", None, "SciTeX Scholar"),
+        ("ja", "/", "standalone", None, "SciTeX Scholar"),
+        (
+            "en",
+            "/apps/scholar/v2/",
+            "hub",
+            "http://127.0.0.1:1",
+            "SciTeX Scholar (hub)",
+        ),
+        (
+            "ja",
+            "/apps/scholar/v2/",
+            "hub",
+            "http://127.0.0.1:1",
+            "SciTeX Scholar (hub)",
+        ),
+    ],
+    ids=["en-root", "ja-root", "en-mounted", "ja-mounted"],
+)
+def _declared_context_result(request, _private_context):
+    """Resolve the real lazy leaf declaration under request-local settings."""
+    from django.template.loader import render_to_string
+    from django.utils.module_loading import import_string
+
+    from scitex_scholar._django import context_builder
+
+    language, path, mode, api_url, title = request.param
+    http_request = RequestFactory().get(path, {"project": "Alpha"})
+    with override_settings(
+        SCITEX_APP_MODE=mode,
+        SCITEX_SCHOLAR_CROSSREF_API_URL=api_url,
+        CROSSREF_API_URL=None,
+    ), translation.override(language):
+        context = import_string(context_builder)(http_request)
+        direct_html = render_to_string(
+            "scholar/scholar.html", context, request=http_request
+        )
+        response = views.index(http_request)
+    return {
+        "context": context,
+        "direct_html": direct_html,
+        "response": response,
+        "language": language,
+        "prefix": path.rstrip("/"),
+        "api_url": api_url,
+        "title": title,
+    }
+
+
+def test_declared_index_context_resolves_public_leaf_callable():
+    # Arrange
+    from django.utils.module_loading import import_string
+
+    from scitex_scholar._django import context_builder
+
+    # Act
+    builder = import_string(context_builder)
+    # Assert
+    assert (context_builder, builder) == (
+        "scitex_scholar._django.views.index_context",
+        views.index_context,
+    )
+
+
+def test_declared_index_context_preserves_request_values(_declared_context_result):
+    # Arrange
+    result = _declared_context_result
+    # Act
+    context = result["context"]
+    expected = {
+        "shell_lang": result["language"],
+        "app_label": result["title"],
+        "stx_mount": result["prefix"],
+        "app_scope": "user",
+        "current_project": "Alpha",
+        "api_available": result["api_url"] is not None,
+        "api_url": result["api_url"] or "Not configured",
+        "panes": {"ai": "unused", "files": "unused", "viewer": "unused"},
+    }
+    actual = {key: context[key] for key in expected}
+    expected_graph_label = {"en": "Build Graph", "ja": "グラフを構築"}
+    expected["graph_label"] = expected_graph_label[result["language"]]
+    actual["graph_label"] = context["scholar_i18n"]["Build Graph"]
+    # Assert
+    assert actual == expected
+
+
+def test_declared_index_context_matches_index_rendering(_declared_context_result):
+    # Arrange
+    result = _declared_context_result
+    # Each real Django rendering masks the same request CSRF secret afresh.
+    csrf_mask = r'(name="csrfmiddlewaretoken" value=")[a-zA-Z0-9]{64}'
+    # Act
+    direct = re.sub(csrf_mask, r"\1<csrf-mask>", result["direct_html"])
+    rendered = re.sub(
+        csrf_mask, r"\1<csrf-mask>", result["response"].content.decode()
+    )
+    csrf_inputs = BeautifulSoup(result["response"].content, "html.parser").find_all(
+        "input", attrs={"name": "csrfmiddlewaretoken", "type": "hidden"}
+    )
+    valid_tokens = [
+        bool(re.fullmatch(r"[a-zA-Z0-9]{64}", field["value"])) for field in csrf_inputs
+    ]
+    # Assert
+    assert (result["response"].status_code, direct, valid_tokens) == (
+        200,
+        rendered,
+        [True],
+    )
+
+
+@pytest.mark.parametrize(
+    ("query", "expected", "remembered"),
+    [
+        ("Beta", "Beta", "Beta"),
+        (None, "Alpha", "Alpha"),
+        ("Missing", None, "Alpha"),
+    ],
+    ids=["explicit-accessible", "remembered-accessible", "explicit-inaccessible"],
+)
+def test_declared_index_context_keeps_project_precedence(
+    _private_context, query, expected, remembered
+):
+    # Arrange
+    from django.utils.module_loading import import_string
+
+    from scitex_scholar._django import context_builder
+
+    project_root = _private_context["paths"]["SCITEX_SCHOLAR_PROJECTS_DIR"]
+    (project_root / "Beta").mkdir()
+    provider = views.ScholarLocalProjectProvider(project_root)
+    http_request = RequestFactory().get("/", {"project": query} if query else {})
+    provider.remember(http_request, "Alpha")
+    # Act
+    context = import_string(context_builder)(http_request)
+    # Assert
+    assert (context["current_project"], provider.last_visited(http_request)) == (
+        expected,
+        remembered,
+    )
+
+
 # EOF
