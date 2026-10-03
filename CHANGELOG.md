@@ -19,6 +19,20 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   via `library_root=` or `SCITEX_DIR`, so mounted web deployments can link
   `<project>/.scitex/scholar/library` without knowing leaf internals.
 
+## [1.13.3] - 2026-10-03
+
+### Fixed
+- The leaf index context accepts the generic host's optional project argument
+  while preserving request-owned scope and Library roots (PR #198).
+- Standalone and embedded Scholar content share the same canonical workspace
+  body within the SDK shell (PR #199).
+- Scholar tabs initialize on initial load and module injection, with repeated
+  events scoped to the current Scholar root (PR #200).
+
+### Added
+- A lazy, leaf-owned `content_renderer` renders the canonical workspace body
+  and assets using the trusted host mount, preserving standalone behavior.
+
 ## [1.13.2] - 2026-10-03
 
 ### Fixed
