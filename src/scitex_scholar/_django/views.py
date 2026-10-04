@@ -931,6 +931,10 @@ def library_list(request):
     from scitex_scholar.storage import _library_index as idx
 
     query = (request.GET.get("q") or "").strip()
+    try:
+        command = _parse_library_query(query)
+    except ValueError as e:
+        return JsonResponse({"error": str(e)}, status=400)
 
     def _payload(papers: list, total: int) -> dict:
         return {
@@ -966,8 +970,81 @@ def library_list(request):
         for r in rows
     ]
     if query:
-        papers = [p for p in papers if _paper_matches(p, query)]
+        papers = _filter_library_papers(papers, query, command)
     return JsonResponse(_payload(papers, len(rows)))
+
+
+def _parse_library_query(query: str):
+    """Adapt existing query parsers to fields present in Library rows."""
+    if not query:
+        return None
+    import re
+
+    # Plain queries keep their existing whole-query substring behavior.
+    operator = r"(?<!\S)(?:--?[\w-]+|(?:year|citations?|impact_factor|if|open_access|oa|type):)"
+    if not re.search(operator, query, re.IGNORECASE):
+        return None
+    unsupported = r"(?<!\S)(?:-ifmin\b|-ifmax\b|--if-min\b|--if-max\b|(?:impact_factor|if|open_access|oa|type):)"
+    if re.search(unsupported, query, re.IGNORECASE):
+        raise ValueError("Library command filters do not support IF, OA or type")
+
+    from scitex_scholar.pipelines.SearchQueryParser import SearchQueryParser
+
+    shell = SearchQueryParser.from_shell_syntax(query)
+    options = {
+        "-t", "--title", "-a", "--author", "-j", "--journal",
+        "-ymin", "--year-min", "-ymax", "--year-max",
+        "-cmin", "--citations-min", "-cmax", "--citations-max",
+    }
+    if any(word.casefold() in options or word.startswith("--") for word in shell.positive_keywords):
+        raise ValueError("Invalid Library command option or value")
+    normal = SearchQueryParser(shell.get_keyword_query())
+    fields = {**normal.get_filters(), **shell.get_filters()}
+    if any(key in fields for key in ("min_impact_factor", "max_impact_factor", "open_access", "document_type")):
+        raise ValueError("Library command filters do not support IF, OA or type")
+    # Numeric filters use apply_filters' explicit None checks, including zero.
+    names = {
+        "year_start": "year_from", "year_end": "year_to",
+        "min_citations": "min_citations", "max_citations": "max_citations",
+    }
+    numeric = {target: fields[source] for source, target in names.items() if source in fields}
+    text = {key: value for key, value in fields.items() if key.endswith(("_includes", "_excludes"))}
+    return {
+        "query": normal.get_keyword_query(),
+        "negative_keywords": normal.negative_keywords,
+        "filters": numeric,
+        "operators": text,
+    }
+
+
+def _filter_library_papers(papers: list, query: str, command) -> list:
+    """Filter temporary scalar projections and return original public rows."""
+    if command is None:
+        return [paper for paper in papers if _paper_matches(paper, query)]
+
+    from scitex_scholar.filters import apply_filters
+
+    selected = []
+    for paper in papers:
+        if command["query"] and not _paper_matches(paper, command["query"]):
+            continue
+        if any(_paper_matches(paper, word) for word in command["negative_keywords"]):
+            continue
+        authors = [
+            str(author if isinstance(author, str) else author.get("name") or "")
+            for author in (paper.get("authors") or [])
+            if isinstance(author, (str, dict))
+        ]
+        projection = {
+            "title": str(paper.get("title") or ""),
+            "authors": authors,
+            "journal": str(paper.get("venue") or ""),
+            "year": paper.get("year"),
+            "citations": paper.get("citation_count"),
+        }
+        if apply_filters([projection], command["filters"], command["operators"]):
+            selected.append(paper)
+    return selected
 
 
 def _paper_matches(paper: dict, query: str) -> bool:
