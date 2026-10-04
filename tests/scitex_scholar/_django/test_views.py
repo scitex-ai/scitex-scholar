@@ -3685,3 +3685,375 @@ def test_searches_are_user_scoped(tmp_path):
 
 
 # EOF
+
+
+# New Library command controls; all existing source above is retained exactly.
+from django.contrib.auth import get_user_model
+from tests.scitex_scholar._django.test_views_shell_context import _private_context
+
+
+def _command_library_request(root, user, query="", **query_hints):
+    request = RequestFactory().get("/api/library", {"q": query, **query_hints})
+    request.user = user
+    request.scholar_library_root = root
+    return request
+
+
+@pytest.fixture
+def _command_library(_private_context):
+    from scitex_scholar.core.Paper import Paper
+    from scitex_scholar.storage.PaperIO import PaperIO
+
+    root = _private_context["temp_root"] / "command-library" / "alice"
+    user = get_user_model()(username="alice")
+    specs = [
+        ("ALPHA", "Sharp wave hippocampus", 2020, 0, "Brain Science",
+         ["Alice Jones", "Bob Smith"]),
+        ("BETA", "Slow wave cortex", 2024, 50, "Neuro Reports", ["Bob Smith"]),
+        ("GAMMA", "Hippocampus after seizure", 2019, 100, "Brain Science",
+         ["Carol Ng"]),
+        ("NULLS", None, None, None, None, []),
+        ("MISSING", None, None, None, None, []),
+        ("DELTA", "Sharp cortex", 2022, 25, "Brain Science", ["Ada Lovelace"]),
+    ]
+    files = []
+    for paper_id, title, year, citations, journal, authors in specs:
+        paper = Paper.from_dict({
+            "metadata": {
+                "id": {"doi": f"10.9999/commands-{paper_id.lower()}"},
+                "basic": {"title": title, "year": year, "authors": authors},
+                "publication": {"journal": journal},
+                "citation_count": {"total": citations},
+            },
+            "container": {"library_id": paper_id, "created_by": "alice"},
+        })
+        path = PaperIO(paper, base_dir=root / "MASTER").save_metadata()
+        record = json.loads(path.read_text())
+        if paper_id == "ALPHA":
+            record["metadata"]["basic"]["authors"] = [
+                "Alice Jones", {"name": "Bob Smith"}, {"name": None}, None,
+            ]
+        if paper_id == "NULLS":
+            record["metadata"]["basic"]["authors"] = [None, {"name": None}]
+        if paper_id == "MISSING":
+            for key in ("title", "year", "authors"):
+                record["metadata"]["basic"].pop(key, None)
+            record["metadata"].pop("citation_count", None)
+            record["metadata"].pop("publication", None)
+        path.write_text(json.dumps(record))
+        files.append(path)
+    response = views.library_list(_command_library_request(root, user))
+    return {
+        "root": root, "user": user, "rows": json.loads(response.content)["papers"],
+        "files": files, "before": [path.read_bytes() for path in files],
+        "private": _private_context,
+    }
+
+
+class TestLibraryCommandQuery:
+    @pytest.mark.parametrize("query,selected", [
+        ("-t Sharp", ["ALPHA", "DELTA"]),
+        ("--title Sharp", ["ALPHA", "DELTA"]),
+        ("-t -Sharp", ["BETA", "GAMMA", "NULLS", "MISSING"]),
+        ("--title -Sharp", ["BETA", "GAMMA", "NULLS", "MISSING"]),
+        ("-a Bob", ["ALPHA", "BETA"]),
+        ("--author Bob", ["ALPHA", "BETA"]),
+        ("-a -Bob", ["GAMMA", "NULLS", "MISSING", "DELTA"]),
+        ("--author -Bob", ["GAMMA", "NULLS", "MISSING", "DELTA"]),
+        ("-j Brain", ["ALPHA", "GAMMA", "DELTA"]),
+        ("--journal Brain", ["ALPHA", "GAMMA", "DELTA"]),
+        ("-j -Brain", ["BETA", "NULLS", "MISSING"]),
+        ("--journal -Brain", ["BETA", "NULLS", "MISSING"]),
+    ])
+    def test_short_and_long_text_commands_keep_original_rows(
+        self, _command_library, query, selected,
+    ):
+        # Arrange
+        fixture = _command_library
+        expected = [row for row in fixture["rows"] if row["paper_id"] in selected]
+        # Act
+        response = views.library_list(_command_library_request(
+            fixture["root"], fixture["user"], query,
+        ))
+        result = json.loads(response.content)
+        # Assert
+        assert (response.status_code, result) == (200, {
+            "papers": expected, "count": len(selected), "total": 6,
+            "filtered": True, "query": query, "library_root": str(fixture["root"]),
+        })
+
+    @pytest.mark.parametrize("query,selected", [
+        ('-t "Sharp wave"', ["ALPHA"]),
+        ("--title 'Sharp wave'", ["ALPHA"]),
+        ('-a "Alice Jones"', ["ALPHA"]),
+        ("--author 'Alice Jones'", ["ALPHA"]),
+        ('-j "Neuro Reports"', ["BETA"]),
+        ("--journal -'Brain Science'", ["BETA", "NULLS", "MISSING"]),
+    ])
+    def test_quoted_multiword_commands_keep_values_and_original_rows(
+        self, _command_library, query, selected,
+    ):
+        # Arrange
+        fixture = _command_library
+        expected = [row for row in fixture["rows"] if row["paper_id"] in selected]
+        # Act
+        response = views.library_list(_command_library_request(
+            fixture["root"], fixture["user"], query,
+        ))
+        result = json.loads(response.content)
+        # Assert
+        assert (response.status_code, result["papers"], result["count"], result["total"]) == (
+            200, expected, len(selected), 6,
+        )
+
+    @pytest.mark.parametrize("query,selected", [
+        ("-ymin 2020", ["ALPHA", "BETA", "DELTA"]),
+        ("--year-min 2020", ["ALPHA", "BETA", "DELTA"]),
+        ("-ymax 2020", ["ALPHA", "GAMMA"]),
+        ("--year-max 2020", ["ALPHA", "GAMMA"]),
+        ("-ymin 0000", ["ALPHA", "BETA", "GAMMA", "DELTA"]),
+        ("year:2020-2024", ["ALPHA", "BETA", "DELTA"]),
+        ("-cmin 0", ["ALPHA", "BETA", "GAMMA", "DELTA"]),
+        ("--citations-min 50", ["BETA", "GAMMA"]),
+        ("-cmax 0", ["ALPHA"]),
+        ("--citations-max 0", ["ALPHA"]),
+        ("citations:>50", ["BETA", "GAMMA"]),
+        ("-ymin 2020 -ymax 2022 -cmin 0 -cmax 25", ["ALPHA", "DELTA"]),
+    ])
+    def test_year_and_citation_bounds_preserve_zero_and_missing_values(
+        self, _command_library, query, selected,
+    ):
+        # Arrange
+        fixture = _command_library
+        expected = [row for row in fixture["rows"] if row["paper_id"] in selected]
+        # Act
+        response = views.library_list(_command_library_request(
+            fixture["root"], fixture["user"], query,
+        ))
+        result = json.loads(response.content)
+        # Assert
+        assert (response.status_code, result["papers"], result["count"], result["total"]) == (
+            200, expected, len(selected), 6,
+        )
+
+    @pytest.mark.parametrize("query,selected", [
+        ("", ["ALPHA", "BETA", "GAMMA", "NULLS", "MISSING", "DELTA"]),
+        ("   ", ["ALPHA", "BETA", "GAMMA", "NULLS", "MISSING", "DELTA"]),
+        ("sHaRp", ["ALPHA", "DELTA"]),
+        ("sharp cortex", ["DELTA"]),
+        ("cortex sharp", []),
+        ("Bob", ["ALPHA", "BETA"]),
+    ])
+    def test_plain_and_empty_queries_keep_existing_substring_and_envelope(
+        self, _command_library, query, selected,
+    ):
+        # Arrange
+        fixture = _command_library
+        query = query.strip()
+        expected = [row for row in fixture["rows"] if row["paper_id"] in selected]
+        # Act
+        response = views.library_list(_command_library_request(
+            fixture["root"], fixture["user"], query,
+        ))
+        result = json.loads(response.content)
+        # Assert
+        assert (response.status_code, result) == (200, {
+            "papers": expected, "count": len(selected), "total": 6,
+            "filtered": bool(query), "query": query,
+            "library_root": str(fixture["root"]),
+        })
+
+    @pytest.mark.parametrize("query", [
+        "-ymin nope", "-cmin -3", "--author", "--foo bar",
+        "-cmin 3.5", "--citations-max 2.1", "-ymin 20202", "--year-max 20202",
+    ])
+    def test_malformed_commands_return_400_without_primary_writes(
+        self, _command_library, query,
+    ):
+        # Arrange
+        fixture = _command_library
+        # Act
+        response = views.library_list(_command_library_request(
+            fixture["root"], fixture["user"], query,
+        ))
+        after = [path.read_bytes() for path in fixture["files"]]
+        # Assert
+        assert (response.status_code, json.loads(response.content), after) == (
+            400, {"error": "Invalid Library command option or value"}, fixture["before"],
+        )
+
+    @pytest.mark.parametrize("query", [
+        "-ifmin 5", "--if-max 10", "if:>5", "impact_factor:>5",
+        "oa:true", "open_access:false", "type:review",
+        "oa:false", "open_access:0", "if:0", "-ifmin 0",
+    ])
+    def test_unavailable_row_filters_return_honest_400(
+        self, _command_library, query,
+    ):
+        # Arrange
+        fixture = _command_library
+        # Act
+        response = views.library_list(_command_library_request(
+            fixture["root"], fixture["user"], query,
+        ))
+        # Assert
+        assert (response.status_code, json.loads(response.content)) == (
+            400, {"error": "Library command filters do not support IF, OA or type"},
+        )
+
+    @pytest.mark.parametrize("query,selected", [
+        ("hippocampus -seizure -ymax 2020", ["ALPHA"]),
+        ("cortex -Slow --year-min 2020", ["DELTA"]),
+        ("unknownword --author Bob", []),
+    ])
+    def test_residual_keywords_and_negatives_are_applied_before_field_filters(
+        self, _command_library, query, selected,
+    ):
+        # Arrange
+        fixture = _command_library
+        expected = [row for row in fixture["rows"] if row["paper_id"] in selected]
+        # Act
+        response = views.library_list(_command_library_request(
+            fixture["root"], fixture["user"], query,
+        ))
+        result = json.loads(response.content)
+        # Assert
+        assert (response.status_code, result["papers"], result["count"], result["total"]) == (
+            200, expected, len(selected), 6,
+        )
+
+    @pytest.mark.parametrize("query", ["oa:false", "-ifmin 0"])
+    def test_unsupported_commands_fail_before_missing_primary_collection(
+        self, _private_context, query,
+    ):
+        # Arrange
+        root = _private_context["temp_root"] / "absent-command-library"
+        user = get_user_model()(username="alice")
+        # Act
+        response = views.library_list(_command_library_request(root, user, query))
+        # Assert
+        assert (response.status_code, json.loads(response.content), root.exists()) == (
+            400, {"error": "Library command filters do not support IF, OA or type"}, False,
+        )
+
+    def test_queries_preserve_bound_root_and_other_user_isolation(self, _command_library):
+        # Arrange
+        fixture = _command_library
+        other_root = fixture["private"]["temp_root"] / "command-library" / "bob"
+        bob = get_user_model()(username="bob")
+        expected = [row for row in fixture["rows"] if row["paper_id"] == "ALPHA"]
+        # Act
+        alice_response = views.library_list(_command_library_request(
+            fixture["root"], fixture["user"], "-t Sharp -cmax 0",
+            project="Foreign", library_root=str(other_root), path=str(other_root),
+        ))
+        bob_response = views.library_list(_command_library_request(other_root, bob, "-t Sharp"))
+        alice_data = json.loads(alice_response.content)
+        bob_data = json.loads(bob_response.content)
+        # Assert
+        assert (alice_response.status_code, alice_data["papers"], alice_data["library_root"],
+                bob_response.status_code, bob_data["papers"], bob_data["library_root"],
+                other_root.exists()) == (
+            200, expected, str(fixture["root"]), 200, [], str(other_root), False,
+        )
+
+    def test_queries_leave_primary_files_and_project_links_untouched(self, _command_library):
+        # Arrange
+        fixture = _command_library
+        project = fixture["private"]["paths"]["SCITEX_SCHOLAR_PROJECTS_DIR"] / "Alpha"
+        link = project / "ALPHA"
+        link.symlink_to(fixture["root"] / "MASTER" / "ALPHA", target_is_directory=True)
+        target = link.readlink()
+        # Act
+        response = views.library_list(_command_library_request(
+            fixture["root"], fixture["user"], "--author Bob", project="Alpha",
+        ))
+        after = [path.read_bytes() for path in fixture["files"]]
+        # Assert
+        assert (response.status_code, after, link.is_symlink(), link.readlink()) == (
+            200, fixture["before"], True, target,
+        )
+
+    @pytest.mark.parametrize("count", [0, 17, None])
+    def test_real_paperio_canonical_citations_are_listed(self, _private_context, count):
+        # Arrange
+        from scitex_scholar.core.Paper import Paper
+        from scitex_scholar.storage.PaperIO import PaperIO
+
+        root = _private_context["temp_root"] / "canonical-citation-library"
+        paper = Paper.from_dict({
+            "metadata": {"basic": {"title": "Real saved paper"},
+                         "citation_count": {"total": count}},
+            "container": {"library_id": "REALCOUNT", "created_by": "alice"},
+        })
+        path = PaperIO(paper, base_dir=root / "MASTER").save_metadata()
+        before = path.read_bytes()
+        user = get_user_model()(username="alice")
+        # Act
+        response = views.library_list(_command_library_request(root, user))
+        data = json.loads(response.content)
+        stored = json.loads(path.read_text())
+        # Assert
+        assert (response.status_code, data["papers"][0]["citation_count"],
+                stored["metadata"]["citation_count"]["total"], path.read_bytes()) == (
+            200, count, count, before,
+        )
+
+    @pytest.mark.parametrize("canonical_metadata,legacy,expected", [
+        ({}, 17, 17),
+        ({"citation_count": {"total": None}}, 17, 17),
+        ({"citation_count": {"total": 0}}, 17, 0),
+        ({"citation_count": {"total": 17}}, 99, 17),
+    ])
+    def test_legacy_citation_fallback_preserves_canonical_zero(
+        self, _private_context, canonical_metadata, legacy, expected,
+    ):
+        # Arrange
+        root = _private_context["temp_root"] / "legacy-citation-library"
+        path = _seed_library(root, paper_id="LEGACY", title="Legacy primary paper")
+        stored = json.loads(path.read_text())
+        stored["metadata"]["citation"] = {"count": legacy}
+        stored["metadata"].update(canonical_metadata)
+        path.write_text(json.dumps(stored))
+        before = path.read_bytes()
+        user = get_user_model()(username="alice")
+        # Act
+        response = views.library_list(_command_library_request(root, user))
+        data = json.loads(response.content)
+        # Assert
+        assert (response.status_code, data["papers"][0]["citation_count"], path.read_bytes()) == (
+            200, expected, before,
+        )
+
+
+class TestLibraryCanonicalCommandParser:
+    @pytest.mark.parametrize("query,field,value", [
+        ('-t "Sharp wave"', "title_includes", "Sharp wave"),
+        ("--title 'Sharp wave'", "title_includes", "Sharp wave"),
+        ('-t -"Sharp wave"', "title_excludes", "Sharp wave"),
+        ('-a "Alice Jones"', "author_includes", "Alice Jones"),
+        ("--author 'Alice Jones'", "author_includes", "Alice Jones"),
+        ('--author -"Alice Jones"', "author_excludes", "Alice Jones"),
+        ('-j "Brain Science"', "journal_includes", "Brain Science"),
+        ("--journal -'Brain Science'", "journal_excludes", "Brain Science"),
+    ])
+    def test_quoted_selector_is_one_value(self, _private_context, query, field, value):
+        # Arrange
+        from scitex_scholar.pipelines.SearchQueryParser import SearchQueryParser
+
+        # Act
+        parsed = SearchQueryParser.from_shell_syntax(query).get_filters()
+        # Assert
+        assert parsed == {field: [value]}
+
+    @pytest.mark.parametrize("query", [
+        "-ymin 20202", "--year-max 20202", "-cmin 3.5", "--citations-max 2.1",
+    ])
+    def test_numeric_suffix_is_not_partially_consumed(self, _private_context, query):
+        # Arrange
+        from scitex_scholar.pipelines.SearchQueryParser import SearchQueryParser
+
+        # Act
+        parsed = SearchQueryParser.from_shell_syntax(query).get_filters()
+        # Assert
+        assert parsed == {"positive_keywords": query.split()}
