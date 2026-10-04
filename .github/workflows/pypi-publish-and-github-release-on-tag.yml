@@ -1,45 +1,6 @@
+# The full legacy SIF gate is retained below. It needs a qualified central
+# Scholar caller/profile before release tagging or publication.
 name: release
-
-# Tag-driven release pipeline — SELF-HOSTED (Spartan CPU) via the scitex-ci SIF.
-#
-# The intended operator flow is:
-#
-#     git tag vX.Y.Z && git push origin vX.Y.Z
-#
-# Everything else fires automatically:
-#
-#   1. verify        — matrix pytest INSIDE the SIF. Must pass or the pipeline
-#                      halts; nothing is published until tests are green on the
-#                      tagged commit. (Job ID is `verify`, not `test`: PS-164
-#                      (c') admits only its pipeline-step vocabulary here.)
-#   2. build         — wheel + sdist built INSIDE the SIF, uploaded as artifact.
-#   3. publish       — PyPI via MANUAL OIDC trusted publishing INSIDE the SIF.
-#   4. release       — GitHub Release with CHANGELOG notes + artifacts.
-#
-# develop→main promotion is a DELIBERATE, separate PR (operator policy);
-# this pipeline never auto-syncs main.
-#
-# WHY the SIF (operator standardization 2026-06-18, fleet canary 2026-06-21):
-# the Spartan compute runners have NO Python on the bare node, so the old
-# `actions/setup-python@v5` step failed at init ("version 3.x not found for
-# this OS"). The working pytest-matrix CI runs INSIDE the pre-built, reused
-# scitex-ci SIF (`apptainer exec ci-cpu.sif`), which bakes python 3.11/3.12/
-# 3.13 + pip + uv + fd at /opt/venv-<ver>. This release pipeline mirrors that:
-#   - test/build run `bash .github/ci/exec-in-sif.sh <inner>.sh <pyver>`.
-#   - publish CANNOT use pypa/gh-action-pypi-publish (a Docker action; the
-#     compute nodes have no Docker), so it does MANUAL OIDC trusted publishing
-#     inside the SIF (.github/ci/publish-in-sif.sh): GitHub OIDC JWT →
-#     PyPI mint-token → twine upload. Trust config on PyPI is unchanged.
-#   - actions/checkout, upload/download-artifact, codecov are JS actions and
-#     run fine on the self-hosted runner.
-# fail-loud: a missing SIF/shim/interpreter is a HARD error, never a
-# bare-runner fallback.
-#
-# runs-on driven by repo Actions Variable CI_RUNS_ON; SIF + apptainer paths
-# come from SCITEX_CI_SIF / SCITEX_CI_APPTAINER (same as pytest-matrix).
-#
-# Manual re-run: the workflow also accepts a `version` input via
-# workflow_dispatch so you can re-publish without re-tagging.
 
 on:
   push:
@@ -47,117 +8,207 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Tag to publish (e.g. v0.10.19) — must already exist on the repo'
+        description: 'Existing release tag to publish (for example v1.13.3)'
         required: true
         type: string
 
-env:
-  SCITEX_CI_APPTAINER: ${{ vars.SCITEX_CI_APPTAINER }}
-  SCITEX_CI_SIF: ${{ vars.SCITEX_CI_SIF }}
+permissions:
+  contents: read
 
 jobs:
+  tag:
+    name: Resolve the existing release tag once
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.source.outputs.version }}
+      source_sha: ${{ steps.source.outputs.source_sha }}
+    steps:
+      - uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        id: source
+        env:
+          RELEASE_TAG: ${{ inputs.version }}
+        with:
+          script: |
+            const {owner, repo} = context.repo;
+            const tag = context.eventName === 'push'
+              ? context.ref.replace(/^refs\/tags\//, '') : process.env.RELEASE_TAG;
+            if (!/^v[0-9]+\.[0-9]+\.[0-9]+(?:[-+][A-Za-z0-9.-]+)?$/.test(tag)) {
+              throw new Error('Expected an existing versioned release tag');
+            }
+            const ref = await github.rest.git.getRef({owner, repo, ref: `tags/${tag}`});
+            let object = ref.data.object;
+            for (let depth = 0; object.type === 'tag' && depth < 5; depth++) {
+              object = (await github.rest.git.getTag({owner, repo, tag_sha: object.sha})).data.object;
+            }
+            if (object.type !== 'commit' || !/^[a-f0-9]{40}$/.test(object.sha)) {
+              throw new Error('Release tag did not resolve to a commit');
+            }
+            if (context.eventName === 'push' && object.sha !== context.sha) {
+              throw new Error('Release tag moved after the triggering event');
+            }
+            core.setOutput('version', tag);
+            core.setOutput('source_sha', object.sha);
+
   verify:
+    # INELIGIBLE legacy seam: preserve full driver and all three Python minors.
+    # Replace only with the actual qualified shared Scholar contract; never
+    # substitute the Dev/SAC profile or a reduced/direct-hosted pytest gate.
+    needs: tag
     runs-on: ${{ fromJSON(vars.CI_RUNS_ON || '["self-hosted","Linux","X64","scitex-ci"]') }}
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.11", "3.12", "3.13"]
+    env:
+      SCITEX_CI_APPTAINER: ${{ vars.SCITEX_CI_APPTAINER }}
+      SCITEX_CI_SIF: ${{ vars.SCITEX_CI_SIF }}
     steps:
-      - name: Resolve version
-        id: ver
-        run: |
-          if [ "${{ github.event_name }}" = "push" ]; then
-            v="${GITHUB_REF#refs/tags/}"
-          else
-            v="${{ inputs.version }}"
-          fi
-          echo "version=$v" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v4
         with:
-          ref: ${{ steps.ver.outputs.version }}
+          ref: ${{ needs.tag.outputs.source_sha }}
           fetch-depth: 0
-      # SIF-based self-hosted test run — mirrors pytest-matrix exactly. No
-      # setup-python (the bare Spartan node has no Python tool cache; that step
-      # failed "version not found for this OS"); no apt fd-install (fd is baked
-      # in the SIF). exec-in-sif.sh apptainer-execs the reused ci-cpu.sif and
-      # run-in-sif.sh layers THIS (tagged) checkout + [all,dev] into a writable
-      # target, then runs pytest. fail-loud on a missing SIF/shim.
-      - name: Run tests in the reused CI SIF (apptainer exec — deps layered, not on the bare runner)
+          persist-credentials: false
+      - name: Run the full legacy SIF suite for the immutable source
         run: bash .github/ci/exec-in-sif.sh run-in-sif.sh ${{ matrix.python-version }}
 
   build:
-    needs: verify
-    runs-on: ${{ fromJSON(vars.CI_RUNS_ON || '["self-hosted","Linux","X64","scitex-ci"]') }}
+    needs: [tag, verify]
+    runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.ver.outputs.version }}
+      artifact_id: ${{ steps.dist.outputs.artifact-id }}
     steps:
-      - name: Resolve version
-        id: ver
-        run: |
-          if [ "${{ github.event_name }}" = "push" ]; then
-            v="${GITHUB_REF#refs/tags/}"
-          else
-            v="${{ inputs.version }}"
-          fi
-          echo "version=$v" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v4
         with:
-          ref: ${{ steps.ver.outputs.version }}
-          fetch-depth: 0
-      # Build INSIDE the SIF (no setup-python on the bare Spartan node).
-      # build-in-sif.sh installs the `build` frontend into a writable --target
-      # inside the SIF, then `python -m build` → dist/. fail-loud on empty dist.
-      - name: Build wheel + sdist in the CI SIF (apptainer exec)
-        run: bash .github/ci/exec-in-sif.sh build-in-sif.sh 3.12
-      # upload-artifact is a JS action — runs fine on the self-hosted runner.
+          ref: ${{ needs.tag.outputs.source_sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: 0.12.9
+      - name: Require package metadata to match the selected release tag
+        env:
+          RELEASE_TAG: ${{ needs.tag.outputs.version }}
+          SOURCE_SHA: ${{ needs.tag.outputs.source_sha }}
+        run: |
+          test "$(git -C "$GITHUB_WORKSPACE" rev-parse HEAD)" = "$SOURCE_SHA"
+          python - <<'PY'
+          import os
+          import tomllib
+          from pathlib import Path
+          project = tomllib.loads(Path('pyproject.toml').read_text())['project']
+          if project['name'] != 'scitex-scholar' or project['version'] != os.environ['RELEASE_TAG'][1:]:
+              raise SystemExit('Selected tag and project metadata disagree')
+          PY
+      - name: Build the selected wheel and source distribution
+        run: |
+          rm -rf dist
+          uv build --no-sources --python 3.12
+      - name: Require both distributions to contain the selected package version
+        env:
+          RELEASE_TAG: ${{ needs.tag.outputs.version }}
+        run: |
+          python - <<'PY'
+          import os
+          import tarfile
+          import zipfile
+          from email.parser import BytesParser
+          from pathlib import Path
+          files = sorted(Path('dist').iterdir())
+          wheels = [p for p in files if p.name.endswith('.whl')]
+          sdists = [p for p in files if p.name.endswith('.tar.gz')]
+          if len(files) != 2 or len(wheels) != 1 or len(sdists) != 1 or any(p.is_symlink() or not p.is_file() for p in files):
+              raise SystemExit('Expected one regular wheel and one regular source distribution')
+          with zipfile.ZipFile(wheels[0]) as archive:
+              names = [n for n in archive.namelist() if n.endswith('.dist-info/METADATA')]
+              if len(names) != 1:
+                  raise SystemExit('Ambiguous wheel metadata')
+              wheel_metadata = archive.read(names[0])
+          with tarfile.open(sdists[0], 'r:gz') as archive:
+              members = [m for m in archive.getmembers() if m.isfile() and m.name.count('/') == 1 and m.name.endswith('/PKG-INFO')]
+              if len(members) != 1:
+                  raise SystemExit('Ambiguous source-distribution metadata')
+              with archive.extractfile(members[0]) as stream:
+                  sdist_metadata = stream.read()
+          for data in (wheel_metadata, sdist_metadata):
+              metadata = BytesParser().parsebytes(data)
+              if metadata['Name'] != 'scitex-scholar' or metadata['Version'] != os.environ['RELEASE_TAG'][1:]:
+                  raise SystemExit('Distribution metadata differs from the selected release')
+          PY
       - uses: actions/upload-artifact@v4
+        id: dist
         with:
           name: dist
           path: dist/
+          if-no-files-found: error
 
   publish:
-    needs: build
-    runs-on: ${{ fromJSON(vars.CI_RUNS_ON || '["self-hosted","Linux","X64","scitex-ci"]') }}
+    needs: [tag, build]
+    runs-on: ubuntu-latest
     environment:
       name: pypi
       url: https://pypi.org/p/scitex-scholar
-    # id-token: write is what populates ACTIONS_ID_TOKEN_REQUEST_{TOKEN,URL},
-    # which publish-in-sif.sh uses to mint the OIDC JWT. Keep it.
     permissions:
+      contents: read
       id-token: write
     steps:
-      # Need the repo checked out so .github/ci/exec-in-sif.sh +
-      # publish-in-sif.sh are on disk (the build job uploaded only dist/).
-      - uses: actions/checkout@v4
+      - name: Require the selected tag to retain its verified commit
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        env:
+          RELEASE_TAG: ${{ needs.tag.outputs.version }}
+          SOURCE_SHA: ${{ needs.tag.outputs.source_sha }}
+        with:
+          script: |
+            const {owner, repo} = context.repo;
+            let object = (await github.rest.git.getRef({owner, repo, ref: `tags/${process.env.RELEASE_TAG}`})).data.object;
+            for (let depth = 0; object.type === 'tag' && depth < 5; depth++) {
+              object = (await github.rest.git.getTag({owner, repo, tag_sha: object.sha})).data.object;
+            }
+            if (object.type !== 'commit' || object.sha !== process.env.SOURCE_SHA) throw new Error('Verified release tag moved');
       - uses: actions/download-artifact@v4
         with:
-          name: dist
+          artifact-ids: ${{ needs.build.outputs.artifact_id }}
+          merge-multiple: true
           path: dist
-      # Manual OIDC trusted publishing INSIDE the SIF — pypa/gh-action-pypi-
-      # publish is a Docker action and the Spartan compute nodes have no Docker.
-      # publish-in-sif.sh: GitHub OIDC JWT (audience=pypi) → PyPI mint-token →
-      # twine upload dist/*. apptainer exec (no --cleanenv) passes the
-      # ACTIONS_ID_TOKEN_REQUEST_* env vars into the SIF. fail-loud at each step.
-      - name: Publish to PyPI via manual OIDC trusted publishing in the SIF
-        run: bash .github/ci/exec-in-sif.sh publish-in-sif.sh 3.12
+      - name: Publish through the existing PyPI environment and OIDC mechanism
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          attestations: false
 
   release:
-    needs: [build, publish]
-    runs-on: ${{ fromJSON(vars.CI_RUNS_ON || '["self-hosted","Linux","X64","scitex-ci"]') }}
+    needs: [tag, build, publish]
+    runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ needs.build.outputs.version }}
+          ref: ${{ needs.tag.outputs.source_sha }}
+          persist-credentials: false
+      - name: Require the selected tag to retain its verified commit
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        env:
+          RELEASE_TAG: ${{ needs.tag.outputs.version }}
+          SOURCE_SHA: ${{ needs.tag.outputs.source_sha }}
+        with:
+          script: |
+            const {owner, repo} = context.repo;
+            let object = (await github.rest.git.getRef({owner, repo, ref: `tags/${process.env.RELEASE_TAG}`})).data.object;
+            for (let depth = 0; object.type === 'tag' && depth < 5; depth++) {
+              object = (await github.rest.git.getTag({owner, repo, tag_sha: object.sha})).data.object;
+            }
+            if (object.type !== 'commit' || object.sha !== process.env.SOURCE_SHA) throw new Error('Verified release tag moved');
       - uses: actions/download-artifact@v4
         with:
-          name: dist
+          artifact-ids: ${{ needs.build.outputs.artifact_id }}
+          merge-multiple: true
           path: dist
       - name: Extract release notes from CHANGELOG.md
+        env:
+          RELEASE_TAG: ${{ needs.tag.outputs.version }}
         run: |
-          VERSION="${{ needs.build.outputs.version }}"
-          VERSION="${VERSION#v}"
+          VERSION="${RELEASE_TAG#v}"
           awk -v v="$VERSION" '
             $0 ~ "^## \\[" v "\\]" {p=1; next}
             p && /^## \[/ {exit}
@@ -166,24 +217,11 @@ jobs:
           if [ ! -s release-notes.md ]; then
             echo "Release v${VERSION}. See CHANGELOG.md for details." > release-notes.md
           fi
-      # The `release` job runs on the self-hosted Spartan runner, where
-      # $HOME=/home/ywatanabe is shared with the operator's account. `gh` loads
-      # that account's machine-local config at startup, and there it ABORTS:
-      #   failed to create root command: failed to read configuration:
-      #   invalid config file /home/ywatanabe/.config/gh/config.yml: invalid yaml
-      # That happens during config-load, BEFORE gh ever reads GH_TOKEN -- which
-      # is why the token below (already the correct built-in one) never helped,
-      # and why no PAT would help either. The cure is to stop depending on the
-      # runner's `gh` at all: this JS action calls the GitHub Releases API
-      # directly with the built-in per-run ${{ github.token }} that Actions
-      # injects (the job already grants `permissions: contents: write`).
-      # Same fix as scitex-ui#68 / scitex-writer / scitex-todo / scitex-dev /
-      # scitex-agent-container (ci-gh-selfhosted-release-guard).
-      - name: Create GitHub Release
+      - name: Create GitHub Release from the same run's distribution artifact
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ needs.build.outputs.version }}
-          name: ${{ needs.build.outputs.version }}
+          tag_name: ${{ needs.tag.outputs.version }}
+          name: ${{ needs.tag.outputs.version }}
           body_path: release-notes.md
           files: dist/*
           fail_on_unmatched_files: true
