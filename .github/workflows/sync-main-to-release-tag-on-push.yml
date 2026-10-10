@@ -1,40 +1,66 @@
-name: Sync main to release tag on push
+name: Propose main promotion for a release tag
 
-# When a v* tag is pushed (created on develop at release time),
-# fast-forward main to that tag so `main` always = "the latest released
-# commit". Branch-protection-friendly release shim: tags (not direct
-# pushes) move main, and the pypi-publish pipeline runs off the same tag.
-# PS-165 required baseline; filename per PS-164 naming grammar.
-
+# Normal protected-main promotion uses an exact-source branch and PR.
+# This workflow never pushes or merges protected main.
+# GITHUB_TOKEN-created PRs do not themselves trigger fresh required workflows;
+# the maintainer retains normal fresh-check qualification and matched-head merge.
 on:
   push:
     tags: ['v*']
 
 jobs:
   sync:
-    name: Sync main to release tag
-    # PS-169: self-hosted like the rest of CI, not GitHub-hosted.
-    runs-on: ${{ fromJSON(vars.CI_RUNS_ON || '["self-hosted","Linux","X64","scitex-ci"]') }}
+    name: Propose main promotion for the event's exact release source
+    runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Prepare the exact tag promotion PR
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
         with:
-          ref: main
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Sync main to tag ${{ github.ref_name }}
-        run: |
-          set -e
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          TAG="${{ github.ref_name }}"
-          git fetch origin --tags
-          if git merge --ff-only "$TAG"; then
-            echo "Fast-forwarded main to $TAG."
-          else
-            git merge --no-ff "$TAG" -m "merge: sync main with $TAG"
-            echo "Created merge commit for $TAG."
-          fi
-          git push origin main
+          script: |
+            const {owner, repo} = context.repo;
+            const tag = process.env.RELEASE_TAG;
+            if (!/^v[0-9]+\.[0-9]+\.[0-9]+(?:[-+][A-Za-z0-9.-]+)?$/.test(tag)) {
+              throw new Error(`Unsupported release tag: ${tag}`);
+            }
+            const ref = await github.rest.git.getRef({owner, repo, ref: `tags/${tag}`});
+            let object = ref.data.object;
+            for (let depth = 0; object.type === 'tag' && depth < 5; depth++) {
+              object = (await github.rest.git.getTag({owner, repo, tag_sha: object.sha})).data.object;
+            }
+            if (object.type !== 'commit') throw new Error('Tag did not resolve to a commit');
+            const sha = object.sha;
+            if (sha !== context.sha) throw new Error('Tag moved after the triggering event');
+            const main = await github.rest.git.getRef({owner, repo, ref: 'heads/main'});
+            const comparison = await github.rest.repos.compareCommitsWithBasehead({
+              owner, repo, basehead: `${main.data.object.sha}...${sha}`
+            });
+            if (['identical', 'behind'].includes(comparison.data.status)) {
+              await core.summary.addRaw(`main already contains ${tag} (${sha}); no promotion needed.`).write();
+              return;
+            }
+            const branch = `feature/release-main-${tag}`;
+            let head;
+            try {
+              head = await github.rest.git.getRef({owner, repo, ref: `heads/${branch}`});
+            } catch (error) {
+              if (error.status !== 404) throw error;
+              head = await github.rest.git.createRef({owner, repo, ref: `refs/heads/${branch}`, sha});
+            }
+            if (head.data.object.sha !== sha) throw new Error('Existing promotion branch differs; no overwrite');
+            const existing = await github.rest.pulls.list({owner, repo, state: 'open', base: 'main', head: `${owner}:${branch}`});
+            if (existing.data.length > 1) throw new Error('Multiple matching promotion PRs');
+            let pr = existing.data[0];
+            if (!pr) {
+              pr = (await github.rest.pulls.create({
+                owner, repo, base: 'main', head: branch,
+                title: `Promote ${tag} to main`,
+                body: `Promote the exact release source ${tag} (${sha}) through protected main.\n\nThe maintainer must confirm genuine current required checks and perform the normal matched-head merge. This workflow does not merge or push main; GITHUB_TOKEN-created PRs do not themselves trigger fresh workflows.`
+              })).data;
+            }
+            if (pr.head.sha !== sha || pr.base.ref !== 'main') throw new Error('Promotion PR source mismatch');
+            await core.summary.addRaw(`Prepared ${pr.html_url} for ${sha}; normal required checks and matched-head merge remain with the maintainer.`).write();

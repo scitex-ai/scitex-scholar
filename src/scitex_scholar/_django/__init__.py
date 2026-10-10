@@ -15,6 +15,9 @@ default_app_config = "scitex_scholar._django.apps.ScholarEditorConfig"
 # only when rendering the existing Scholar page.
 context_builder = "scitex_scholar._django.views.index_context"
 
-__all__ = ["default_app_config", "context_builder"]
+# The generic host supplies the verified app root when calling this renderer.
+content_renderer = "scitex_scholar._django.views.render_workspace_content"
+
+__all__ = ["default_app_config", "context_builder", "content_renderer"]
 
 # EOF
