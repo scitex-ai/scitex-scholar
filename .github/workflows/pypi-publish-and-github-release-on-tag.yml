@@ -115,7 +115,11 @@ jobs:
           import zipfile
           from email.parser import BytesParser
           from pathlib import Path
-          files = sorted(Path('dist').iterdir())
+          # uv build writes a dotfile stub (dist/.gitignore, content `*`)
+          # next to the artifacts; it is builder noise, not a distribution.
+          files = sorted(
+              p for p in Path('dist').iterdir() if not p.name.startswith('.')
+          )
           wheels = [p for p in files if p.name.endswith('.whl')]
           sdists = [p for p in files if p.name.endswith('.tar.gz')]
           if len(files) != 2 or len(wheels) != 1 or len(sdists) != 1 or any(p.is_symlink() or not p.is_file() for p in files):
