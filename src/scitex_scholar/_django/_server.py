@@ -2,14 +2,14 @@
 # -*- coding: utf-8 -*-
 """Standalone local-dev launcher for the Scholar GUI.
 
-Delegates to `scitex_app.embed.run_standalone`, which pre-wires
-scitex-ui static assets + the workspace shell so the same local server
+Delegates to `scitex_sdk.app.embed.run_standalone`, which pre-wires
+scitex-sdk UI static assets + the workspace shell so the same local server
 looks like scitex.ai/apps/scholar. There is no bare-Django fallback
 (retired 2026-09-03, see the Removed entry in CHANGELOG), because a
 fallback that silently drops the shell AND the ALLOWED_HOSTS derivation
 is a second, quieter way to break.
 
-scitex-app is an OPTIONAL dependency of the DISTRIBUTION (`[server]`), not
+scitex-sdk is an OPTIONAL dependency of the DISTRIBUTION (`[server]`), not
 of this MODULE. `_cli/gui.py` imports `DEFAULT_PORT` from here at module
 top, so this file sits on the console-script launch path and must import
 with or without the GUI stack installed. The capability is still not
@@ -42,10 +42,11 @@ ALL_EXTRA_HINT = "pip install 'scitex-scholar[all]'"
 
 # `hosts_to_allow` lived here first (#137) and was copied verbatim into
 # scitex-app, which made it the fleet's single implementation and gave it a
-# PUBLIC name in 0.11.0. The copy is gone; the import is the whole point.
+# PUBLIC name in 0.11.0, now owned by scitex-sdk.
+# The copy is gone; the import is the whole point.
 #
 # GUARDED (2026-09-20). It used to be a hard import, on the reasoning that
-# the server extra requires scitex-app so a missing one is a broken install
+# the server extra requires scitex-sdk so a missing one is a broken install
 # -- true of `gui serve`, false of THIS MODULE, which the console script
 # imports at launch (`_cli/gui.py` -> `DEFAULT_PORT`). An unguarded import
 # here made `scitex-scholar --version` fail on a bare install.
@@ -80,8 +81,8 @@ def run(
 ) -> None:
     """Launch the Django Scholar GUI server locally on exactly ``port``.
 
-    Runs through `scitex_app.embed.run_standalone` (the full workspace
-    shell from scitex-ui). No fallback: scitex-app is required.
+    Runs through `scitex_sdk.app.embed.run_standalone` (the full workspace
+    shell from scitex-sdk UI). No fallback: scitex-sdk is required.
 
     The requested port is bound as given: when it is already in use the
     server fails instead of drifting to the next free port.
@@ -92,7 +93,7 @@ def run(
     # actionable sentence instead of an AttributeError on a None sentinel.
     if run_standalone is None or hosts_to_allow is None:
         raise ImportError(
-            "The Scholar GUI server needs scitex-app, which is not installed. "
+            "The Scholar GUI server needs scitex-sdk, which is not installed. "
             f"Install the optional stack: {ALL_EXTRA_HINT}"
         )
 

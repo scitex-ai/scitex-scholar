@@ -267,9 +267,9 @@ class CitationGraphManager {
     tip.className = "graph-tooltip";
     tip.innerHTML = `
       <div class="tooltip-title">${this.esc(node.title)}</div>
-      <div class="tooltip-authors">${(node.authors || []).slice(0, 3).join(", ")}${(node.authors || []).length > 3 ? "..." : ""}</div>
+      <div class="tooltip-authors">${this.esc((node.authors || []).slice(0, 3).join(", "))}${(node.authors || []).length > 3 ? "..." : ""}</div>
       <div class="tooltip-meta">
-        <span class="tooltip-year">${node.year || "?"}</span>
+        <span class="tooltip-year">${this.esc(node.year || "?")}</span>
         ${node.similarity_score ? '<span class="tooltip-score">Score: ' + node.similarity_score.toFixed(1) + "</span>" : ""}
       </div>
       <div class="tooltip-hint">Click to view details</div>
@@ -291,7 +291,7 @@ class CitationGraphManager {
     document
       .querySelectorAll(".graph-node")
       .forEach((el) => el.classList.remove("selected"));
-    const el = document.querySelector(`[data-id="${node.id}"]`);
+    const el = document.querySelector(`[data-id="${CSS.escape(node.id)}"]`);
     if (el) el.classList.add("selected");
     this.showNodeDetails(node);
   }
@@ -307,10 +307,10 @@ class CitationGraphManager {
       </div>
       <div class="node-details-content">
         <div class="detail-title">${this.esc(node.title)}</div>
-        <div class="detail-authors">${(node.authors || []).join(", ")}</div>
-        <div class="detail-year">Published: ${node.year || "?"}</div>
+        <div class="detail-authors">${this.esc((node.authors || []).join(", "))}</div>
+        <div class="detail-year">Published: ${this.esc(node.year || "?")}</div>
         ${node.similarity_score ? '<div class="detail-score">Similarity: <strong>' + node.similarity_score.toFixed(2) + "</strong></div>" : ""}
-        <div class="detail-doi"><a href="https://doi.org/${node.id}" target="_blank" rel="noopener">View on DOI.org &#8599;</a></div>
+        <div class="detail-doi"><a href="https://doi.org/${encodeURIComponent(node.id)}" target="_blank" rel="noopener">View on DOI.org &#8599;</a></div>
       </div>
     `;
   }
@@ -334,13 +334,13 @@ class CitationGraphManager {
           : papers
               .map(
                 (p, i) => `
-            <div class="related-paper-item" data-doi="${p.id}">
+            <div class="related-paper-item" data-doi="${this.esc(p.id)}">
               <div class="paper-rank">${i + 1}</div>
               <div class="paper-info">
                 <div class="paper-title">${this.esc(p.title)}</div>
                 <div class="paper-meta">
-                  <span class="paper-authors">${(p.authors || []).slice(0, 2).join(", ")}${(p.authors || []).length > 2 ? " et al." : ""}</span>
-                  <span class="paper-year">${p.year || "?"}</span>
+                  <span class="paper-authors">${this.esc((p.authors || []).slice(0, 2).join(", "))}${(p.authors || []).length > 2 ? " et al." : ""}</span>
+                  <span class="paper-year">${this.esc(p.year || "?")}</span>
                 </div>
               </div>
               <div class="paper-score">

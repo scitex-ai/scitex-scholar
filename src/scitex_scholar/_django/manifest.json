@@ -25,5 +25,14 @@
   "embedded_package": true,
   "dependencies": {
     "python": ["scitex-scholar", "django"]
+  },
+  "mount_policy": {
+    "login_required": true,
+    "touches_files": true,
+    "jail": {
+      "scope": "user",
+      "working_dir_param": "working_dir",
+      "path_params": []
+    }
   }
 }

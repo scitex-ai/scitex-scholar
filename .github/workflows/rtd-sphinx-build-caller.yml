@@ -169,7 +169,12 @@ jobs:
           fi
 
       - name: Commit refreshed HTML if it changed
-        continue-on-error: true
+        # NO continue-on-error here by decision (scholar-docs-vendor-bot-
+        # push-rejected, option c): a rejected push must go RED, not green.
+        # A rejected push and an identical tree both produce "no commit" —
+        # silence is the failure mode. If this step fails on a protected
+        # branch hook, the durable fix is an operator call: allow the bot
+        # as a pusher on develop, or vendor through a PR instead.
         run: |
           set -euo pipefail
           if [ -n "$(git status --porcelain src/scitex_scholar/_sphinx_html)" ]; then

@@ -1,7 +1,7 @@
 {% load static %}
 {% if scholar_asset_stage == "head" %}
         {% comment %}
-        scitex-app's `stx-mount` contract: the server declares where this app
+        scitex-sdk's `stx-mount` contract: the server declares where this app
         is mounted so client code never has to guess. Always ends in "/", so
         JS joins endpoint names WITHOUT a leading slash and never normalises.
         Emitted here rather than by the SDK because `scitex_editor_page` --
@@ -9,7 +9,7 @@
         a Django-rendered template.
         {% endcomment %}
         {% comment %}
-        NO |default FILTER. The root prefix is "" under scitex-app >= 0.8.0,
+        NO |default FILTER. The root prefix is "" under scitex-sdk,
         and Django's `default` fires on FALSY -- so `|default:'/'` silently
         rewrote the correct "" back into the old "/", making every root
         request build "//api/..." : protocol-relative, off-origin. That is

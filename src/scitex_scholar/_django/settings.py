@@ -6,7 +6,7 @@ Used only by the standalone launcher; cloud deployments ignore this
 module and mount `scitex_scholar._django.urls` under their own prefix.
 
 Mirrors the `scitex_writer._django.settings` pattern: bare-minimum
-installed apps, optional `scitex_ui` for the shared workspace shell, and
+installed apps, optional `scitex_sdk.ui` for the shared workspace shell, and
 the fleet PostgreSQL so any future models work out of the box.
 
 `SCITEX_SCHOLAR_CROSSREF_API_URL` is resolved ONCE here at settings-load time (mirroring
@@ -90,33 +90,33 @@ INSTALLED_APPS = [
     "scitex_scholar._django.apps.ScholarEditorConfig",
 ]
 
-# scitex-ui supplies the shared SciTeX branding partial that
-# `scholar.html` includes in its <head>. It is a REQUIRED member of the
+# scitex-sdk supplies the shared SciTeX branding shell that
+# `scholar.html` extends in its <head>. It is a REQUIRED member of the
 # `server` extra (alongside django itself), so it is not optional AT RUN
 # TIME -- but it IS optional for the DISTRIBUTION, so the import is GUARDED
 # (2026-09-20) and the guard FAILS LOUDLY.
 #
 # A silent guard would be the worst option here: it would swallow a broken
 # install and resurface it later as a TemplateDoesNotExist pointing at
-# scitex-ui's template -- sending the reader to the wrong package. The
+# scitex-sdk's template -- sending the reader to the wrong package. The
 # `except` below re-raises with the extra's name, so the failure stays at
 # import time, where the cause is legible.
 try:
-    import scitex_ui  # noqa: F401
-except ImportError as exc:  # scitex-ui absent -- the [all]-gated GUI capability only
+    import scitex_sdk.ui  # noqa: F401
+except ImportError as exc:  # scitex-sdk absent -- the [all]-gated GUI capability only
     raise ImportError(
-        "scitex_scholar._django.settings needs scitex-ui, which is not "
+        "scitex_scholar._django.settings needs scitex-sdk, which is not "
         "installed. Install the optional stack: pip install 'scitex-scholar[all]'"
     ) from exc
 
-INSTALLED_APPS.append("scitex_ui")
+INSTALLED_APPS.append("scitex_sdk.ui")
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     # Alt+I / Ctrl+I visual debugging overlay.
-    "scitex_ui.middleware.ElementInspectorMiddleware",
+    "scitex_sdk.ui.middleware.ElementInspectorMiddleware",
 ]
 
 # i18n (operator directive 2026-09-14: EN default, full JA translation).
