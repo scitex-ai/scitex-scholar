@@ -89,11 +89,11 @@ def test_standalone_urlconf_serves_static_with_debug_false():
 
 @override_settings(DEBUG=False, ROOT_URLCONF="scitex_scholar._django._standalone_urls")
 def test_standalone_urlconf_serves_shell_static_with_debug_false():
-    """The shell's assets come from a DIFFERENT package (scitex_ui) via finders."""
+    """The shell's assets come from a DIFFERENT package (scitex_sdk.ui) via finders."""
     # Arrange
     client = Client()
     # Act
-    resp = client.get("/static/scitex_ui/img/scitex-favicon.svg")
+    resp = client.get("/static/scitex_sdk/ui/img/scitex-favicon.svg")
     # Assert
     assert resp.status_code == 200
 

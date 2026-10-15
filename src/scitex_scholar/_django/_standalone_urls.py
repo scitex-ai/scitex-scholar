@@ -14,8 +14,8 @@ on an app with no authentication. Measured 2026-09-02 on the published 1.9.0
 wheel under DJANGO_DEBUG=false: GET / -> 200, every /static/ asset -> 404.
 
 `django.contrib.staticfiles.views.serve(insecure=True)` resolves through the
-same finders runserver uses (the app's own static/, scitex_ui's, scitex-app's
-shell static) and does not consult DEBUG. It is documented as unsuitable for
+same finders runserver uses (the app's own static/, scitex-sdk UI's shell
+static) and does not consult DEBUG. It is documented as unsuitable for
 production, which is exactly right: this urlconf is the LOCAL-DEV launcher and
 nothing else routes through it. Hub mounts `urls.py`, not this file.
 """

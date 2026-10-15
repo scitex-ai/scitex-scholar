@@ -11,13 +11,13 @@ import importlib.util
 
 from scitex_scholar._django import settings
 
-_SCITEX_UI_INSTALLED = importlib.util.find_spec("scitex_ui") is not None
+_SCITEX_SDK_INSTALLED = importlib.util.find_spec("scitex_sdk.ui") is not None
 
 
-def test_element_inspector_middleware_present_when_scitex_ui_installed():
+def test_element_inspector_middleware_present_when_scitex_sdk_installed():
     # Arrange
-    target = "scitex_ui.middleware.ElementInspectorMiddleware"
+    target = "scitex_sdk.ui.middleware.ElementInspectorMiddleware"
     # Act
     has_middleware = target in settings.MIDDLEWARE
     # Assert
-    assert has_middleware == _SCITEX_UI_INSTALLED
+    assert has_middleware == _SCITEX_SDK_INSTALLED

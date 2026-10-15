@@ -3,7 +3,7 @@
 """Django AppConfig for the scitex-scholar editor app.
 
 `scitex_scholar._django.apps` only exists inside the `server` extra's world:
-the module IS the AppConfig a running Django project loads. scitex-app is
+the module IS the AppConfig a running Django project loads. scitex-sdk is
 therefore not optional AT RUN TIME -- but it IS optional for the
 distribution (a bare `pip install scitex-scholar` must not pull Django), so
 the import is GUARDED and the guard FAILS LOUDLY.
@@ -26,10 +26,10 @@ still cannot be mistaken for a working install.
 """
 
 try:
-    from scitex_app._django import ScitexAppConfig
-except ImportError as exc:  # scitex-app absent -- the [all]-gated GUI capability only
+    from scitex_sdk.app.embed import ScitexAppConfig
+except ImportError as exc:  # scitex-sdk absent -- the [all]-gated GUI capability only
     raise ImportError(
-        "scitex_scholar._django needs scitex-app, which is not installed. "
+        "scitex_scholar._django needs scitex-sdk, which is not installed. "
         "Install the optional stack: pip install 'scitex-scholar[all]'"
     ) from exc
 
