@@ -5,6 +5,26 @@ All notable changes to `scitex-scholar` are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.13.5] - 2026-10-15
+
+### Fixed
+- Live-search abstracts served raw JATS tags (`<jats:p>`); stripped via
+  `TextNormalizer.strip_html_tags` in `_strip_markup_from_search_abstracts`,
+  with regression test (PR #209).
+- Removed `scitex-app`/`scitex-ui` shims: Django views, server, apps,
+  settings, and templates now import `scitex_sdk.app.embed` +
+  `scitex_sdk.ui`; zero `scitex_app`/`scitex_ui` imports remain
+  (AST-verified) (PR #209).
+- Hardened leaf responses: per-user search/graph cache scope + cap, bulk
+  body caps, no untrusted-input echo or endpoint-address disclosure, JS
+  escaping (PR #209).
+- Regenerated PS-140 cross-package import gate for `scitex-sdk` (PR #209).
+- Release artifact assertion ignores the `uv build` dotfile stub
+  (`dist/.gitignore`) instead of failing a correct wheel+sdist pair
+  (PR #208).
+- Docs-vendor push step no longer masks a rejected push green: removed
+  `continue-on-error` so a protected-branch rejection goes RED (PR #209).
+
 ## [1.13.4] - 2026-10-10
 
 ### Added
