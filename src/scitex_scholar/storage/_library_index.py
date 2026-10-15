@@ -180,6 +180,7 @@ def _row_from_metadata(
     pub = m.get("publication", {}) or {}
     access = m.get("access", {}) or {}
     citation = m.get("citation", {}) or {}
+    citation_total = (m.get("citation_count", {}) or {}).get("total")
     authors = basic.get("authors")
     authors_json = json.dumps(authors) if isinstance(authors, list) else None
     return {
@@ -194,7 +195,9 @@ def _row_from_metadata(
         "is_oa": _is_oa_int(access),
         "authors_json": authors_json,
         "abstract": basic.get("abstract"),
-        "citation_count": citation.get("count"),
+        "citation_count": (
+            citation_total if citation_total is not None else citation.get("count")
+        ),
         "updated_at": meta_path.stat().st_mtime,
     }
 

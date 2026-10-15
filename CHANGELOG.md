@@ -5,7 +5,7 @@ All notable changes to `scitex-scholar` are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.13.4] - 2026-10-10
 
 ### Added
 - **`storage.master_*` primary file-store verbs for thin web layers**
