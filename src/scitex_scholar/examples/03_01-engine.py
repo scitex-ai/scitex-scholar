@@ -38,6 +38,8 @@ import argparse
 import asyncio
 import time
 from pprint import pprint
+import scitex_logging as slogging
+_console = slogging.getPlainConsole(__name__)
 
 try:
     import scitex as stx
@@ -76,25 +78,25 @@ async def search_by_queries(
     search_title = title or "Attention is All You Need"
     search_doi = doi or "10.1038/nature14539"
 
-    print(f"🔍 Initializing ScholarEngine (cache: {use_cache})...")
+    _console.print(f"🔍 Initializing ScholarEngine (cache: {use_cache})...")
     engine = ScholarEngine(use_cache=use_cache)
     outputs = {}
 
-    print("🔍 Searching by title...")
+    _console.print("🔍 Searching by title...")
     outputs["metadata_by_title"] = await engine.search_async(
         title=search_title,
     )
 
-    print("🔍 Searching by DOI...")
+    _console.print("🔍 Searching by DOI...")
     outputs["metadata_by_doi"] = await engine.search_async(
         doi=search_doi,
     )
 
     for k, v in outputs.items():
-        print("=" * 50)
-        print(f"📊 {k.replace('_', ' ').title()}")
-        print("=" * 50)
-        pprint(v)
+        _console.print("=" * 50)
+        _console.print(f"📊 {k.replace('_', ' ').title()}")
+        _console.print("=" * 50)
+        _console.print(v)
         time.sleep(1)
 
     # Semantic_Scholar returned title: Attention is All you Need
@@ -392,14 +394,14 @@ async def main_async(args) -> dict:
     dict
         Search results
     """
-    print("🔍 Scholar Engine Demonstration")
-    print("=" * 40)
+    _console.print("🔍 Scholar Engine Demonstration")
+    _console.print("=" * 40)
 
     results = await search_by_queries(
         title=args.title, doi=args.doi, use_cache=not args.no_cache
     )
 
-    print("✅ Engine demonstration completed")
+    _console.print("✅ Engine demonstration completed")
     return results
 
 
@@ -420,7 +422,7 @@ def main(args) -> int:
         asyncio.run(main_async(args))
         return 0
     except Exception as e:
-        print(f"❌ Error: {e}")
+        _console.print(f"❌ Error: {e}")
         return 1
 
 

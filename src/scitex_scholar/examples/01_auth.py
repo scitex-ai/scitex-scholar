@@ -35,6 +35,8 @@ Output:
 """Imports"""
 import argparse
 import asyncio
+import scitex_logging as slogging
+_console = slogging.getPlainConsole(__name__)
 
 try:
     import scitex as stx
@@ -66,13 +68,13 @@ async def setup_authentication() -> bool:
 
     auth_manager = ScholarAuthManager()
 
-    print("Setting up authentication...")
+    _console.print("Setting up authentication...")
     await auth_manager.ensure_authenticate_async()
 
-    print("Checking authentication status...")
+    _console.print("Checking authentication status...")
     is_authenticated = await auth_manager.is_authenticate_async()
 
-    print(
+    _console.print(
         f"Authentication status: {'✓ Authenticated' if is_authenticated else '✗ Not authenticated'}"
     )
 
@@ -92,16 +94,16 @@ async def main_async(args) -> bool:
     bool
         Authentication success status
     """
-    print("🔐 Scholar Authentication Example")
-    print("=" * 40)
+    _console.print("🔐 Scholar Authentication Example")
+    _console.print("=" * 40)
 
     auth_success = await setup_authentication()
 
     if auth_success:
-        print("✅ Authentication workflow completed successfully")
+        _console.print("✅ Authentication workflow completed successfully")
     else:
-        print("❌ Authentication workflow failed")
-        print("Please check your credentials and try again")
+        _console.print("❌ Authentication workflow failed")
+        _console.print("Please check your credentials and try again")
 
     return auth_success
 

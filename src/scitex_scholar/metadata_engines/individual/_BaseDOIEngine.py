@@ -449,7 +449,7 @@ if __name__ == "__main__":
             # authors=["John Doe"],
         )
         logger.info("Mock engine metadata:")
-        print(json.dumps(result, indent=2))
+        logger.info(json.dumps(result, indent=2))
 
     main()
 

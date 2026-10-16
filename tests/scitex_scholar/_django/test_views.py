@@ -4846,20 +4846,28 @@ class TestLibraryCommandQuery:
             400, {"error": "Library command filters do not support IF, OA or type"}, False,
         )
 
-    def test_queries_preserve_bound_root_and_other_user_isolation(self, _command_library):
-        # Arrange
+    def _isolation_probe(self, _command_library):
         fixture = _command_library
         other_root = fixture["private"]["temp_root"] / "command-library" / "bob"
         bob = get_user_model()(username="bob")
         expected = [row for row in fixture["rows"] if row["paper_id"] == "ALPHA"]
-        # Act
         alice_response = views.library_list(_command_library_request(
             fixture["root"], fixture["user"], "-t Sharp -cmax 0",
             project="Foreign", library_root=str(other_root), path=str(other_root),
         ))
         bob_response = views.library_list(_command_library_request(other_root, bob, "-t Sharp"))
-        alice_data = json.loads(alice_response.content)
-        bob_data = json.loads(bob_response.content)
+        return (
+            alice_response, json.loads(alice_response.content),
+            bob_response, json.loads(bob_response.content),
+            other_root, expected,
+        )
+
+    def test_queries_preserve_bound_root_and_other_user_isolation(self, _command_library):
+        # Arrange
+        # Act
+        alice_response, alice_data, bob_response, bob_data, other_root, expected = (
+            self._isolation_probe(_command_library)
+        )
         # Assert
         # Isolation rides on the bound root: alice asked with other_root hints
         # yet is served the fixture root's ALPHA, bob's absent root stays
@@ -4870,8 +4878,26 @@ class TestLibraryCommandQuery:
                 other_root.exists()) == (
             200, expected, 200, [], False,
         )
+
+    def test_isolation_envelope_hides_library_root_from_alice(self, _command_library):
+        # Arrange
+        # Act
+        _, alice_data, _, _, _, _ = self._isolation_probe(_command_library)
+        # Assert
         assert "library_root" not in alice_data
+
+    def test_isolation_envelope_hides_library_root_from_bob(self, _command_library):
+        # Arrange
+        # Act
+        _, _, _, bob_data, _, _ = self._isolation_probe(_command_library)
+        # Assert
         assert "library_root" not in bob_data
+
+    def test_isolation_envelope_hides_query_echo(self, _command_library):
+        # Arrange
+        # Act
+        _, alice_data, _, _, _, _ = self._isolation_probe(_command_library)
+        # Assert
         assert "query" not in alice_data
 
     def test_queries_leave_primary_files_and_project_links_untouched(self, _command_library):

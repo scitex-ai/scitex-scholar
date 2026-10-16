@@ -36,6 +36,8 @@ Output:
 """Imports"""
 import argparse
 import asyncio
+import scitex_logging as slogging
+_console = slogging.getPlainConsole(__name__)
 
 try:
     import scitex as stx
@@ -83,7 +85,7 @@ async def demonstrate_pdf_download(
     download_url = pdf_url or default_url
     save_path = output_path or default_output
 
-    print(f"🌐 Initializing browser manager ({browser_mode} mode)...")
+    _console.print(f"🌐 Initializing browser manager ({browser_mode} mode)...")
     browser_manager = ScholarBrowserManager(
         chrome_profile_name="system",
         browser_mode=browser_mode,
@@ -94,11 +96,11 @@ async def demonstrate_pdf_download(
         context,
     ) = await browser_manager.get_authenticated_browser_and_context_async()
 
-    print("📥 Initializing PDF downloader...")
+    _console.print("📥 Initializing PDF downloader...")
     pdf_downloader = ScholarPDFDownloader(context)
 
-    print(f"📄 Downloading PDF from: {download_url}")
-    print(f"💾 Saving to: {save_path}")
+    _console.print(f"📄 Downloading PDF from: {download_url}")
+    _console.print(f"💾 Saving to: {save_path}")
 
     saved_path = await pdf_downloader.download_from_url(
         download_url,
@@ -106,9 +108,9 @@ async def demonstrate_pdf_download(
     )
 
     if saved_path:
-        print(f"✅ Successfully downloaded: {saved_path}")
+        _console.print(f"✅ Successfully downloaded: {saved_path}")
     else:
-        print("❌ Download failed")
+        _console.print("❌ Download failed")
 
     return saved_path
 
@@ -126,8 +128,8 @@ async def main_async(args) -> str:
     str
         Path to downloaded file
     """
-    print("📥 Scholar PDF Downloader Demonstration")
-    print("=" * 40)
+    _console.print("📥 Scholar PDF Downloader Demonstration")
+    _console.print("=" * 40)
 
     result = await demonstrate_pdf_download(
         pdf_url=args.pdf_url,
@@ -135,7 +137,7 @@ async def main_async(args) -> str:
         browser_mode=args.browser_mode,
     )
 
-    print("✅ PDF download demonstration completed")
+    _console.print("✅ PDF download demonstration completed")
     return result
 
 
@@ -156,7 +158,7 @@ def main(args) -> int:
         result = asyncio.run(main_async(args))
         return 0 if result else 1
     except Exception as e:
-        print(f"❌ Error: {e}")
+        _console.print(f"❌ Error: {e}")
         return 1
 
 

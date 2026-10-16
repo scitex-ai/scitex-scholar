@@ -228,7 +228,7 @@ class CrossRefEngine(BaseDOIEngine):
 if __name__ == "__main__":
 
     def main():
-        from pprint import pprint
+        from pprint import pformat
 
         TITLE = "Attention is All You Need"
         # DOI = "https://doi.org/10.48550/arXiv.1706.03762"
@@ -255,7 +255,7 @@ if __name__ == "__main__":
             logger.info("----------------------------------------")
             logger.info(k)
             logger.info("----------------------------------------")
-            pprint(v)
+            logger.info(pformat(v))
             time.sleep(1)
 
     main()

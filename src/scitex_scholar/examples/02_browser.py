@@ -35,6 +35,8 @@ Output:
 """Imports"""
 import argparse
 import asyncio
+import scitex_logging as slogging
+_console = slogging.getPlainConsole(__name__)
 
 try:
     import scitex as stx
@@ -59,7 +61,7 @@ async def demonstrate_browser_usage() -> bool:
     from scitex_scholar.auth import ScholarAuthManager
     from scitex_scholar.browser import ScholarBrowserManager
 
-    print("🌐 Initializing browser with authentication...")
+    _console.print("🌐 Initializing browser with authentication...")
 
     browser_manager = ScholarBrowserManager(
         chrome_profile_name="system",
@@ -74,13 +76,13 @@ async def demonstrate_browser_usage() -> bool:
 
     page = await context.new_page()
 
-    print("📖 Navigating to scitex.ai...")
+    _console.print("📖 Navigating to scitex.ai...")
     await page.goto("https://scitex.ai")
 
-    print("⏳ Waiting 10 seconds for demonstration...")
+    _console.print("⏳ Waiting 10 seconds for demonstration...")
     await asyncio.sleep(10)
 
-    print("✅ Browser demonstration completed")
+    _console.print("✅ Browser demonstration completed")
     return True
 
 
@@ -97,15 +99,15 @@ async def main_async(args) -> bool:
     bool
         Success status
     """
-    print("🌐 Scholar Browser Manager Example")
-    print("=" * 40)
+    _console.print("🌐 Scholar Browser Manager Example")
+    _console.print("=" * 40)
 
     success = await demonstrate_browser_usage()
 
     if success:
-        print("✅ Browser workflow completed successfully")
+        _console.print("✅ Browser workflow completed successfully")
     else:
-        print("❌ Browser workflow failed")
+        _console.print("❌ Browser workflow failed")
 
     return success
 

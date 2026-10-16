@@ -556,7 +556,7 @@ class ScholarEngine:
 
 if __name__ == "__main__":
     import asyncio
-    from pprint import pprint
+    from pprint import pformat
 
     from scitex_scholar import ScholarEngine
 
@@ -584,7 +584,7 @@ if __name__ == "__main__":
             logger.info("----------------------------------------")
             logger.info(k)
             logger.info("----------------------------------------")
-            pprint(v)
+            logger.info(pformat(v))
             time.sleep(1)
 
     asyncio.run(main_async())

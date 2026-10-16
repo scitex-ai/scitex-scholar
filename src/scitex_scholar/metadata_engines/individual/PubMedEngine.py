@@ -269,7 +269,7 @@ class PubMedEngine(BaseDOIEngine):
 
 
 if __name__ == "__main__":
-    from pprint import pprint
+    from pprint import pformat
 
     TITLE = "Hippocampal ripples down-regulate synapses"
     DOI = "10.1126/science.aao0702"
@@ -299,7 +299,7 @@ if __name__ == "__main__":
         logger.info("----------------------------------------")
         logger.info(k)
         logger.info("----------------------------------------")
-        pprint(v)
+        logger.info(pformat(v))
         time.sleep(1)
 
 # python -m scitex_scholar.engines.individual.PubMedEngine

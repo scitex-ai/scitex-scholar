@@ -38,6 +38,8 @@ Output:
 import argparse
 import asyncio
 from pprint import pprint
+import scitex_logging as slogging
+_console = slogging.getPlainConsole(__name__)
 
 try:
     import numpy as np
@@ -95,21 +97,21 @@ async def process_bibtex_urls(
     )
     from scitex_scholar._utils import parse_bibtex
 
-    print(f"📚 Parsing BibTeX file: {bibtex_path}")
+    _console.print(f"📚 Parsing BibTeX file: {bibtex_path}")
     entries = parse_bibtex(bibtex_path)
 
     if n_samples:
         entries = np.random.permutation(entries)[:n_samples].tolist()
-        print(f"🔢 Sampling {n_samples} entries")
+        _console.print(f"🔢 Sampling {n_samples} entries")
 
     query_titles = [entry.get("title") for entry in entries]
-    print(f"📝 Found {len(query_titles)} paper titles")
-    pprint(query_titles)
+    _console.print(f"📝 Found {len(query_titles)} paper titles")
+    _console.print(query_titles)
 
-    print("⚙️ Initializing configuration...")
+    _console.print("⚙️ Initializing configuration...")
     config = ScholarConfig()
 
-    print(f"🌐 Initializing browser ({browser_mode} mode)...")
+    _console.print(f"🌐 Initializing browser ({browser_mode} mode)...")
     browser_manager = ScholarBrowserManager(
         chrome_profile_name="system",
         browser_mode=browser_mode,
@@ -121,7 +123,7 @@ async def process_bibtex_urls(
         context,
     ) = await browser_manager.get_authenticated_browser_and_context_async()
 
-    print("🔧 Initializing components...")
+    _console.print("🔧 Initializing components...")
     engine = ScholarEngine(config=config, use_cache=use_cache_engine)
     url_finder = ScholarURLFinder(
         context,
@@ -129,22 +131,22 @@ async def process_bibtex_urls(
         use_cache=use_cache_url,
     )
 
-    print("=" * 50)
-    print("🔍 1. Searching for metadata...")
-    print("=" * 50)
+    _console.print("=" * 50)
+    _console.print("🔍 1. Searching for metadata...")
+    _console.print("=" * 50)
     batched_metadata = await engine.search_batch_async(titles=query_titles)
-    pprint(batched_metadata)
+    _console.print(batched_metadata)
 
-    print("=" * 50)
-    print("🔗 2. Finding URLs...")
-    print("=" * 50)
+    _console.print("=" * 50)
+    _console.print("🔗 2. Finding URLs...")
+    _console.print("=" * 50)
     dois = [
         metadata.get("id", {}).get("doi")
         for metadata in batched_metadata
         if metadata and metadata.get("id")
     ]
     batched_urls = await url_finder.find_urls_batch(dois=dois)
-    pprint(batched_urls)
+    _console.print(batched_urls)
 
     return batched_metadata, batched_urls
 
@@ -162,8 +164,8 @@ async def main_async(args) -> tuple:
     tuple
         (metadata_results, url_results)
     """
-    print("🔗 Scholar BibTeX URL Finding Demonstration")
-    print("=" * 40)
+    _console.print("🔗 Scholar BibTeX URL Finding Demonstration")
+    _console.print("=" * 40)
 
     bibtex_files = [
         "./data/scholar/openaccess.bib",
@@ -181,7 +183,7 @@ async def main_async(args) -> tuple:
         browser_mode=args.browser_mode,
     )
 
-    print("✅ BibTeX URL finding demonstration completed")
+    _console.print("✅ BibTeX URL finding demonstration completed")
     return results
 
 
@@ -202,7 +204,7 @@ def main(args) -> int:
         asyncio.run(main_async(args))
         return 0
     except Exception as e:
-        print(f"❌ Error: {e}")
+        _console.print(f"❌ Error: {e}")
         return 1
 
 
