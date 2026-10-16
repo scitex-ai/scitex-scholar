@@ -37,6 +37,8 @@ Output:
 import argparse
 import asyncio
 from pprint import pprint
+import scitex_logging as slogging
+_console = slogging.getPlainConsole(__name__)
 
 try:
     import scitex as stx
@@ -73,7 +75,7 @@ async def demonstrate_url_finding(doi: str = None, use_cache: bool = False) -> d
 
     search_doi = doi or "10.1016/j.smrv.2020.101353"
 
-    print("🌐 Initializing authenticated browser context...")
+    _console.print("🌐 Initializing authenticated browser context...")
     auth_manager = ScholarAuthManager()
     browser_manager = ScholarBrowserManager(
         auth_manager=auth_manager,
@@ -85,15 +87,15 @@ async def demonstrate_url_finding(doi: str = None, use_cache: bool = False) -> d
         context,
     ) = await browser_manager.get_authenticated_browser_and_context_async()
 
-    print(f"🔍 Creating URL finder (cache: {use_cache})...")
+    _console.print(f"🔍 Creating URL finder (cache: {use_cache})...")
     url_finder = ScholarURLFinder(context, use_cache=use_cache)
 
-    print(f"🔗 Finding URLs for DOI: {search_doi}")
+    _console.print(f"🔗 Finding URLs for DOI: {search_doi}")
     urls = await url_finder.find_urls(doi=search_doi)
 
-    print("📊 URL Finding Results:")
-    print("=" * 50)
-    pprint(urls)
+    _console.print("📊 URL Finding Results:")
+    _console.print("=" * 50)
+    _console.print(urls)
 
     return urls
 
@@ -111,12 +113,12 @@ async def main_async(args) -> dict:
     dict
         URL finding results
     """
-    print("🔗 Scholar URL Finder Demonstration")
-    print("=" * 40)
+    _console.print("🔗 Scholar URL Finder Demonstration")
+    _console.print("=" * 40)
 
     results = await demonstrate_url_finding(doi=args.doi, use_cache=not args.no_cache)
 
-    print("✅ URL finding demonstration completed")
+    _console.print("✅ URL finding demonstration completed")
     return results
 
 
@@ -137,7 +139,7 @@ def main(args) -> int:
         asyncio.run(main_async(args))
         return 0
     except Exception as e:
-        print(f"❌ Error: {e}")
+        _console.print(f"❌ Error: {e}")
         return 1
 
 

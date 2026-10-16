@@ -39,6 +39,8 @@ Output:
 """Imports"""
 import argparse
 from pathlib import Path
+import scitex_logging as slogging
+_console = slogging.getPlainConsole(__name__)
 
 try:
     import scitex as stx
@@ -60,17 +62,17 @@ def demonstrate_basic_paths(config) -> None:
     config : ScholarConfig
         Configuration instance
     """
-    print("=== Basic Directory Paths ===")
-    print(f"Scholar base directory: {config.paths.scholar_dir}")
-    print(f"Cache directory: {config.get_cache_file('example', 'search')}")
-    print(f"Auth cache: {config.get_cache_auth_dir()}")
-    print(f"Chrome cache (system): {config.get_cache_chrome_dir('system')}")
-    print(f"Downloads: {config.get_library_downloads_dir()}")
-    print(f"Screenshots: {config.get_workspace_screenshots_dir()}")
-    print(
+    _console.print("=== Basic Directory Paths ===")
+    _console.print(f"Scholar base directory: {config.paths.scholar_dir}")
+    _console.print(f"Cache directory: {config.get_cache_file('example', 'search')}")
+    _console.print(f"Auth cache: {config.get_cache_auth_dir()}")
+    _console.print(f"Chrome cache (system): {config.get_cache_chrome_dir('system')}")
+    _console.print(f"Downloads: {config.get_library_downloads_dir()}")
+    _console.print(f"Screenshots: {config.get_workspace_screenshots_dir()}")
+    _console.print(
         f"Screenshots (category): {config.get_workspace_screenshots_dir('test_category')}"
     )
-    print()
+    _console.print()
 
 
 def demonstrate_library_system(config) -> None:
@@ -81,10 +83,10 @@ def demonstrate_library_system(config) -> None:
     config : ScholarConfig
         Configuration instance
     """
-    print("=== Library System ===")
-    print(f"Library base: {config.get_library_project_dir()}")
-    print(f"Project library: {config.get_library_project_dir('my_project')}")
-    print(f"Master storage: {config.get_library_master_dir()}")
+    _console.print("=== Library System ===")
+    _console.print(f"Library base: {config.get_library_project_dir()}")
+    _console.print(f"Project library: {config.get_library_project_dir('my_project')}")
+    _console.print(f"Master storage: {config.get_library_master_dir()}")
 
     storage_path, readable_name, paper_id = config.paths.get_paper_storage_paths(
         doi="10.1038/nature12373",
@@ -95,11 +97,11 @@ def demonstrate_library_system(config) -> None:
         project="transformer_papers",
     )
 
-    print("Paper storage example:")
-    print(f"  Storage path: {storage_path}")
-    print(f"  Readable name: {readable_name}")
-    print(f"  Paper ID: {paper_id}")
-    print()
+    _console.print("Paper storage example:")
+    _console.print(f"  Storage path: {storage_path}")
+    _console.print(f"  Readable name: {readable_name}")
+    _console.print(f"  Paper ID: {paper_id}")
+    _console.print()
 
 
 def demonstrate_config_resolution(config) -> None:
@@ -110,21 +112,21 @@ def demonstrate_config_resolution(config) -> None:
     config : ScholarConfig
         Configuration instance
     """
-    print("=== Configuration Resolution ===")
+    _console.print("=== Configuration Resolution ===")
 
     debug_mode = config.resolve("debug_mode", default=False, type=bool)
     project = config.resolve("project", default="default")
     api_key = config.resolve("semantic_scholar_api_key", default="not_set")
 
-    print(f"Debug mode: {debug_mode}")
-    print(f"Project: {project}")
-    print(
+    _console.print(f"Debug mode: {debug_mode}")
+    _console.print(f"Project: {project}")
+    _console.print(
         f"API key status: {'configured' if api_key != 'not_set' else 'not configured'}"
     )
 
-    print("\nResolution log:")
+    _console.print("\nResolution log:")
     config.print()
-    print()
+    _console.print()
 
 
 def demonstrate_storage_stats(config) -> None:
@@ -135,22 +137,22 @@ def demonstrate_storage_stats(config) -> None:
     config : ScholarConfig
         Configuration instance
     """
-    print("=== Storage Statistics ===")
+    _console.print("=== Storage Statistics ===")
     stats = config.paths.get_storage_stats()
 
     for directory, info in stats.items():
-        print(f"{directory.capitalize()}:")
-        print(f"  Size: {info['size_mb']:.2f} MB")
-        print(f"  Files: {info['file_count']:,}")
-        print(f"  Path: {info['path']}")
+        _console.print(f"{directory.capitalize()}:")
+        _console.print(f"  Size: {info['size_mb']:.2f} MB")
+        _console.print(f"  Files: {info['file_count']:,}")
+        _console.print(f"  Path: {info['path']}")
 
-    print("\nPerforming maintenance...")
+    _console.print("\nPerforming maintenance...")
     maintenance_results = config.paths.perform_maintenance()
 
     for operation, count in maintenance_results.items():
         if count > 0:
-            print(f"  {operation}: {count:,}")
-    print()
+            _console.print(f"  {operation}: {count:,}")
+    _console.print()
 
 
 def demonstrate_advanced_features(config) -> None:
@@ -161,20 +163,20 @@ def demonstrate_advanced_features(config) -> None:
     config : ScholarConfig
         Configuration instance
     """
-    print("=== Advanced Features ===")
+    _console.print("=== Advanced Features ===")
 
     progress_file = config.paths.get_doi_resolution_progress_path()
-    print(f"Auto-generated progress file: {progress_file}")
+    _console.print(f"Auto-generated progress file: {progress_file}")
 
     bibtex_dir = config.get_library_project_info_bibtex_dir("example_project")
-    print(f"Project BibTeX directory: {bibtex_dir}")
+    _console.print(f"Project BibTeX directory: {bibtex_dir}")
 
     unresolved_dir = config.get_unresolved_entries_dir("example_project")
-    print(f"Unresolved entries: {unresolved_dir}")
+    _console.print(f"Unresolved entries: {unresolved_dir}")
 
     logs_dir = config.get_library_project_logs_dir("example_project")
-    print(f"Project logs: {logs_dir}")
-    print()
+    _console.print(f"Project logs: {logs_dir}")
+    _console.print()
 
 
 def main(args) -> int:
@@ -184,7 +186,7 @@ def main(args) -> int:
     config = ScholarConfig(config_path)
 
     if args.structure:
-        print("=== Expected Directory Structure ===")
+        _console.print("=== Expected Directory Structure ===")
         config.paths.print_expected_structure()
         return 0
 

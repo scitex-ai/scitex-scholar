@@ -242,14 +242,14 @@ def test_index_shell_context_preserves_private_request_roots(_private_library_re
 
 
 def test_index_shell_context_hides_server_library_roots(_private_library_results):
-    # Arrange — server-side scoping still holds (roots differ per user);
-    # the PAYLOAD must not carry the filesystem path (see
+    # Arrange — server-side scoping still holds (roots differ per user;
+    # pinned by test_index_shell_context_preserves_private_request_roots
+    # above); the PAYLOAD must not carry the filesystem path (see
     # test_library_list_hides_server_filesystem_path).
     results = _private_library_results["results"]
     # Act
     payloads = [result["library"] for result in results]
     # Assert
-    assert [result["root"] for result in results] == _private_library_results["roots"]
     assert all("library_root" not in payload for payload in payloads)
 
 

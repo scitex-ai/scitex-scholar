@@ -221,77 +221,96 @@ def test_graph_paper_returns_503_with_no_api_configured():
     assert resp.status_code == 503
 
 
-def test_graph_endpoints_reject_overlong_doi_param(monkeypatch):
+class _StubGraph:
+    def to_dict(self):
+        return {"nodes": [], "metadata": {}}
+
+
+class _StubBuilder:
+    def build(self, **kwargs):
+        return _StubGraph()
+
+    def get_paper_summary(self, doi):
+        return {"doi": doi}
+
+
+_GRAPH_ENDPOINT_ROWS = (
+    (views.graph_network, "/api/graph/network"),
+    (views.graph_related, "/api/graph/related"),
+    (views.graph_paper, "/api/graph/paper"),
+)
+
+
+@pytest.mark.parametrize("endpoint,path", _GRAPH_ENDPOINT_ROWS)
+def test_graph_endpoints_reject_overlong_doi_param(endpoint, path):
     # Arrange — the three graph endpoints never bound doi: a 100k doi
     # would sail past validation into the cache key, the builder, and
-    # the error log. The stub builder proves the request reaches
-    # execution (200) instead of failing closed (400).
-    class _StubGraph:
-        def to_dict(self):
-            return {"nodes": [], "metadata": {}}
+    # the error log. The 400 precedes any builder use, so no stub is
+    # needed for this lane.
+    # Act
+    resp = endpoint(RequestFactory().get(path, {"doi": "10.1000/" + "x" * 100_000}))
+    # Assert
+    assert resp.status_code == 400
 
-    class _StubBuilder:
-        def build(self, **kwargs):
-            return _StubGraph()
 
-        def get_paper_summary(self, doi):
-            return {"doi": doi}
-
-    monkeypatch.setattr(views, "_get_builder", lambda: _StubBuilder())
-    rf = RequestFactory()
-    long_doi = "10.1000/" + "x" * 100_000
-    # Act + Assert — one behavior on all three endpoints
-    for endpoint, path in (
-        (views.graph_network, "/api/graph/network"),
-        (views.graph_related, "/api/graph/related"),
-        (views.graph_paper, "/api/graph/paper"),
-    ):
-        resp = endpoint(rf.get(path, {"doi": long_doi}))
-        assert resp.status_code == 400
-    # Boundary — a 500-char doi still reaches the builder (200), 501 fails closed
+@pytest.mark.parametrize("endpoint,path", _GRAPH_ENDPOINT_ROWS)
+def test_graph_endpoints_reach_builder_at_doi_cap(endpoint, path):
+    # Arrange — a 500-char doi is the boundary: it must still reach the
+    # builder (200 via the stub) rather than fail closed early.
+    # Act
     at_limit = "10.1/" + "y" * (views._MAX_DOI_CHARS - len("10.1/"))
-    assert len(at_limit) == views._MAX_DOI_CHARS
-    for endpoint, path in (
-        (views.graph_network, "/api/graph/network"),
-        (views.graph_related, "/api/graph/related"),
-        (views.graph_paper, "/api/graph/paper"),
-    ):
-        assert endpoint(rf.get(path, {"doi": at_limit})).status_code == 200
-        assert endpoint(rf.get(path, {"doi": at_limit + "y"})).status_code == 400
+    resp = endpoint(
+        RequestFactory().get(path, {"doi": at_limit}), _builder=_StubBuilder()
+    )
+    # Assert
+    assert resp.status_code == 200
 
 
-def test_numeric_param_errors_do_not_echo_the_value():
+@pytest.mark.parametrize("endpoint,path", _GRAPH_ENDPOINT_ROWS)
+def test_graph_endpoints_reject_doi_past_cap(endpoint, path):
+    # Arrange — one char past the cap fails closed before any builder use.
+    # Act
+    over = "10.1/" + "y" * (views._MAX_DOI_CHARS - len("10.1/") + 1)
+    resp = endpoint(RequestFactory().get(path, {"doi": over}))
+    # Assert
+    assert resp.status_code == 400
+
+
+@pytest.mark.parametrize(
+    "endpoint,path,params",
+    (
+        (
+            views.graph_network,
+            "/api/graph/network",
+            {"doi": "10.1038/x", "top_n": "n" * 100_000},
+        ),
+        (
+            views.graph_network,
+            "/api/graph/network",
+            {"doi": "10.1038/x", "weight_coupling": "n" * 100_000},
+        ),
+        (
+            views.graph_related,
+            "/api/graph/related",
+            {"doi": "10.1038/x", "limit": "n" * 100_000},
+        ),
+        (
+            views.search,
+            "/api/search",
+            {"q": "hippocampus", "max_results": "n" * 100_000},
+        ),
+    ),
+)
+def test_numeric_param_errors_do_not_echo_the_value(endpoint, path, params):
     # Arrange — int()/float() ValueErrors embed the raw input
     # ("invalid literal ...: '<input>'"), so a garbage numeric param
     # would be echoed back whole in the 400 body. The parse happens
-    # before any builder/engine use, so no stub is needed: 400 either
-    # way, but the body must carry a fixed message, not the value.
-    rf = RequestFactory()
-    garbage = "n" * 100_000
-    # Act + Assert — one behavior on all three numeric-param sinks
-    resp = views.graph_network(
-        rf.get("/api/graph/network", {"doi": "10.1038/x", "top_n": garbage})
-    )
-    assert resp.status_code == 400
-    assert garbage not in resp.content.decode()
-    resp = views.graph_network(
-        rf.get(
-            "/api/graph/network",
-            {"doi": "10.1038/x", "weight_coupling": garbage},
-        )
-    )
-    assert resp.status_code == 400
-    assert garbage not in resp.content.decode()
-    resp = views.graph_related(
-        rf.get("/api/graph/related", {"doi": "10.1038/x", "limit": garbage})
-    )
-    assert resp.status_code == 400
-    assert garbage not in resp.content.decode()
-    resp = views.search(
-        rf.get("/api/search", {"q": "hippocampus", "max_results": garbage})
-    )
-    assert resp.status_code == 400
-    assert garbage not in resp.content.decode()
+    # before any builder/engine use, so no stub is needed.
+    # Act
+    resp = endpoint(RequestFactory().get(path, params))
+    # Assert
+    garbage_key = next(k for k in params if k not in ("doi", "q"))
+    assert resp.status_code == 400 and params[garbage_key][:100] not in resp.content.decode()
 
 
 @override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL=None)
@@ -554,15 +573,10 @@ def test_search_marks_cached_results_as_cached():
     assert json.loads(resp.content)["metadata"]["cached"] is True
 
 
-def test_search_cache_returns_only_same_user_results():
-    # Arrange — the mounted per-user roots mean the SAME query from two
-    # users must not share cached payloads: prime the cache under one
-    # request, then ask the identical query as another user.
+def _prime_search_cache_as_alice():
+    # Arrange helper (not a test): prime the cache under alice's identity
+    # so the isolation probes below have a cached payload to collide with.
     from types import SimpleNamespace
-
-    class _Anon:
-        is_authenticated = False
-        is_anonymous = True
 
     views._cache.clear()
     views._cache_timestamps.clear()
@@ -576,16 +590,50 @@ def test_search_cache_returns_only_same_user_results():
 
     body_alice = json.loads(views.search(req_alice, _engine=_UserEngine()).content)
     assert body_alice["metadata"]["served_user"] == "alice"
-    # Act — bob asks the identical query with cache enabled; an anonymous
-    # caller must likewise never receive alice's cached payload.
+    return rf, _UserEngine
+
+
+def test_search_cache_serves_owner_their_own_payload():
+    # Arrange — the mounted per-user roots mean the SAME query from two
+    # users must not share cached payloads: prime the cache under one
+    # request, then ask the identical query as another user.
+    # Act — alice re-asks her own query with cache enabled.
+    from types import SimpleNamespace
+
+    rf, engine = _prime_search_cache_as_alice()
+    req_again = rf.get("/api/search?q=shared-query")
+    req_again.user = SimpleNamespace(username="alice", is_authenticated=True)
+    body_again = json.loads(views.search(req_again, _engine=engine()).content)
+    # Assert
+    assert body_again["metadata"].get("served_user") == "alice" and body_again["metadata"].get("cached") is True
+
+
+def test_search_cache_does_not_serve_alice_payload_to_bob():
+    # Arrange — prime the cache under alice's identity.
+    # Act — bob asks the identical query with cache enabled.
+    rf, engine = _prime_search_cache_as_alice()
+    from types import SimpleNamespace
+
     req_bob = rf.get("/api/search?q=shared-query")
     req_bob.user = SimpleNamespace(username="bob", is_authenticated=True)
-    body_bob = json.loads(views.search(req_bob, _engine=_UserEngine()).content)
+    body_bob = json.loads(views.search(req_bob, _engine=engine()).content)
+    # Assert — bob is never served alice's cached payload.
+    assert body_bob["metadata"].get("served_user") != "alice" or body_bob["metadata"].get("cached") is not True
+
+
+def test_search_cache_does_not_serve_alice_payload_to_anonymous():
+    # Arrange — prime the cache under alice's identity.
+    # Act — an anonymous caller asks the identical query.
+    rf, engine = _prime_search_cache_as_alice()
+
+    class _Anon:
+        is_authenticated = False
+        is_anonymous = True
+
     req_anon = rf.get("/api/search?q=shared-query")
     req_anon.user = _Anon()
-    body_anon = json.loads(views.search(req_anon, _engine=_UserEngine()).content)
-    # Assert — neither bob nor anonymous is served alice's cached payload.
-    assert body_bob["metadata"].get("served_user") != "alice" or body_bob["metadata"].get("cached") is not True
+    body_anon = json.loads(views.search(req_anon, _engine=engine()).content)
+    # Assert — anonymous is never served alice's cached payload.
     assert body_anon["metadata"].get("served_user") != "alice" or body_anon["metadata"].get("cached") is not True
 
 
@@ -2041,11 +2089,28 @@ def test_library_enrich_404_for_unknown_paper(tmp_path):
         assert resp.status_code == 404
 
 
-def test_library_enrich_400_for_traversal_paper_id(tmp_path):
+_TRAVERSAL_IDS = ("../OUTSIDE", "..", ".", "a/b", "a\\b", "/etc/hostname")
+
+
+@pytest.mark.parametrize("evil", _TRAVERSAL_IDS)
+def test_library_enrich_400_for_traversal_paper_id(tmp_path, evil):
     # Arrange — paper_id is a body-key path sink
-    # (MASTER/<paper_id>/metadata.json). Plant a valid record OUTSIDE the
-    # MASTER tree; a traversal or absolute id must fail closed (400) and
-    # leave the planted record untouched, never escape the user root.
+    # (MASTER/<paper_id>/metadata.json). A traversal or absolute id must
+    # fail closed (400), never escape the user root.
+    # Act
+    with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="PID1")
+        resp = views.library_enrich(
+            RequestFactory().post("/api/library/enrich", {"paper_id": evil}),
+            _pipeline=_OfflineEnrich(),
+        )
+    # Assert
+    assert resp.status_code == 400
+
+
+def test_library_enrich_traversal_leaves_planted_record_untouched(tmp_path):
+    # Arrange — plant a valid record OUTSIDE the MASTER tree; a traversal
+    # id naming it must fail closed and leave the record untouched.
     with _library_env(tmp_path):
         _seed_library(tmp_path, paper_id="PID1")
         outside = tmp_path / "OUTSIDE"
@@ -2057,15 +2122,13 @@ def test_library_enrich_400_for_traversal_paper_id(tmp_path):
             )
         )
         before = planted.read_text()
-        rf = RequestFactory()
-        # Act + Assert — one behavior: every non-component id fails closed.
-        for evil in ("../OUTSIDE", "..", ".", "a/b", "a\\b", str(outside), "/etc/hostname"):
-            resp = views.library_enrich(
-                rf.post("/api/library/enrich", {"paper_id": evil}),
-                _pipeline=_OfflineEnrich(),
-            )
-            assert resp.status_code == 400, evil
-        assert planted.read_text() == before
+        # Act
+        resp = views.library_enrich(
+            RequestFactory().post("/api/library/enrich", {"paper_id": "../OUTSIDE"}),
+            _pipeline=_OfflineEnrich(),
+        )
+    # Assert
+    assert resp.status_code == 400 and planted.read_text() == before
 
 
 def test_library_enrich_rejects_overlong_paper_id(tmp_path):
@@ -2073,39 +2136,66 @@ def test_library_enrich_rejects_overlong_paper_id(tmp_path):
     # can never exceed the filesystem's 255-byte NAME_MAX. An unbounded id
     # sails past validation into the stat call and crashes it (OSError: File
     # name too long), and the 400/404 bodies echo the value back whole.
+    # Act — a 100k id fails closed before any filesystem touch.
     with _library_env(tmp_path):
         _seed_library(tmp_path, paper_id="PID1")
-        rf = RequestFactory()
-        # Act — a 100k id, plus the live boundary on both sides of the cap.
-        resp = views.library_enrich(rf.post("/api/library/enrich", {"paper_id": "P" * 100_000}))
-        edge_ok = views.library_enrich(rf.post("/api/library/enrich", {"paper_id": "P" * 255}))
-        edge_over = views.library_enrich(rf.post("/api/library/enrich", {"paper_id": "P" * 256}))
-    # Assert — fail closed before any filesystem touch, without echoing it.
-    assert resp.status_code == 400
-    assert "P" * 100 not in resp.content.decode()
-    assert edge_ok.status_code == 404  # passes validation, names no record
+        resp = views.library_enrich(
+            RequestFactory().post("/api/library/enrich", {"paper_id": "P" * 100_000})
+        )
+    # Assert — fail closed without echoing the value back.
+    assert resp.status_code == 400 and "P" * 100 not in resp.content.decode()
+
+
+def test_library_enrich_accepts_cap_length_paper_id(tmp_path):
+    # Arrange — 255 chars is the boundary: it passes validation (then 404s
+    # naming no record) rather than failing closed as overlong.
+    # Act
+    with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="PID1")
+        edge_ok = views.library_enrich(
+            RequestFactory().post("/api/library/enrich", {"paper_id": "P" * 255})
+        )
+    # Assert
+    assert edge_ok.status_code == 404
+
+
+def test_library_enrich_rejects_one_past_cap_paper_id(tmp_path):
+    # Arrange — 256 chars is one past the single-component bound.
+    # Act
+    with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="PID1")
+        edge_over = views.library_enrich(
+            RequestFactory().post("/api/library/enrich", {"paper_id": "P" * 256})
+        )
+    # Assert
     assert edge_over.status_code == 400
 
 
-def test_library_enrich_error_bodies_do_not_echo_paper_id(tmp_path):
-    # Arrange — same echo class as the overlong-id 400 (slice 16) and the
-    # import/export format 400s (slice 19/20): the invalid-id 400 and the
-    # unknown-id 404 interpolate the raw paper_id back whole, so a probing
-    # value sails back to the client in the error body.
+def test_library_enrich_invalid_id_error_does_not_echo_paper_id(tmp_path):
+    # Arrange — the invalid-id 400 used to interpolate the raw paper_id
+    # back whole, so a probing value sailed back to the client.
+    # Act
     with _library_env(tmp_path):
         _seed_library(tmp_path, paper_id="PID1")
-        rf = RequestFactory()
-        # Act
         bad = views.library_enrich(
-            rf.post("/api/library/enrich", {"paper_id": "../OUTSIDE"}),
+            RequestFactory().post("/api/library/enrich", {"paper_id": "../OUTSIDE"}),
             _pipeline=_OfflineEnrich(),
         )
-        missing = views.library_enrich(rf.post("/api/library/enrich", {"paper_id": "MISSING9Z"}))
     # Assert — fail closed, without carrying the value back.
-    assert bad.status_code == 400
-    assert "OUTSIDE" not in bad.content.decode()
-    assert missing.status_code == 404
-    assert "MISSING9Z" not in missing.content.decode()
+    assert bad.status_code == 400 and "OUTSIDE" not in bad.content.decode()
+
+
+def test_library_enrich_unknown_id_error_does_not_echo_paper_id(tmp_path):
+    # Arrange — the unknown-id 404 used to interpolate the raw paper_id
+    # back whole (same echo class as the invalid-id 400 above).
+    # Act
+    with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="PID1")
+        missing = views.library_enrich(
+            RequestFactory().post("/api/library/enrich", {"paper_id": "MISSING9Z"})
+        )
+    # Assert — 404, without carrying the value back.
+    assert missing.status_code == 404 and "MISSING9Z" not in missing.content.decode()
 
 
 def test_library_enrich_success_does_not_echo_paper_id(tmp_path):
@@ -2127,19 +2217,17 @@ def test_library_enrich_success_does_not_echo_paper_id(tmp_path):
         data = _json.loads(resp.content)
     # Assert — state + server-computed enrichment only; the caller-known
     # handle stays client-side.
-    assert resp.status_code == 200
-    assert "paper_id" not in data
-    assert "ENRICH7" not in resp.content.decode()
-    assert data["ok"] is True and data["title"] == "A paper"
+    assert resp.status_code == 200 and "paper_id" not in data and "ENRICH7" not in resp.content.decode() and data["ok"] is True and data["title"] == "A paper"
 
 
-def test_load_library_paper_refuses_unsafe_id(tmp_path):
+@pytest.mark.parametrize("evil", ("../escape", "a/b", "..", "."))
+def test_load_library_paper_refuses_unsafe_id(tmp_path, evil):
     # Arrange — the loader is the choke point every paper_id flows through;
     # it must refuse non-component ids itself, not rely on each caller.
-    # Act + Assert
-    for evil in ("../escape", "a/b", "..", "."):
-        with pytest.raises(ValueError):
-            views._load_library_paper(tmp_path, evil)
+    # Act — invoke the loader with a non-component id.
+    # Assert — it refuses with ValueError.
+    with pytest.raises(ValueError):
+        views._load_library_paper(tmp_path, evil)
 
 
 def test_enrichment_is_a_contextual_library_action_not_a_tab():
@@ -2260,8 +2348,7 @@ def test_library_import_success_does_not_echo_paper_ids(tmp_path):
             "/api/library/import", {"format": "bibtex", "bibtex": _SAMPLE_BIB}
         )).content)
     # Assert — state only: the count stays (toast needs it), the ids go.
-    assert body.get("ok") is True and body.get("imported") == 1
-    assert "paper_ids" not in body
+    assert body.get("ok") is True and body.get("imported") == 1 and "paper_ids" not in body
 
 
 def test_library_import_rejects_oversized_batch(tmp_path):
@@ -2315,8 +2402,7 @@ def test_library_import_rejects_oversized_bibtex_text(tmp_path):
         master = tmp_path / "MASTER"
         writes = list(master.rglob("metadata.json")) if master.exists() else []
     # Assert — fail closed before any parse or write.
-    assert resp.status_code == 413
-    assert writes == []
+    assert resp.status_code == 413 and writes == []
 
 
 def test_library_import_format_error_does_not_echo_the_value(tmp_path):
@@ -2332,8 +2418,7 @@ def test_library_import_format_error_does_not_echo_the_value(tmp_path):
         ))
         body = resp.content.decode()
     # Assert
-    assert resp.status_code == 400
-    assert garbage[:100] not in body
+    assert resp.status_code == 400 and garbage[:100] not in body
 
 
 def test_library_export_format_error_does_not_echo_the_value(tmp_path):
@@ -2349,8 +2434,7 @@ def test_library_export_format_error_does_not_echo_the_value(tmp_path):
         resp = views.library_export(rf.get("/api/library/export", {"format": garbage}))
         body = resp.content.decode()
     # Assert
-    assert resp.status_code == 400
-    assert garbage[:100] not in body
+    assert resp.status_code == 400 and garbage[:100] not in body
 
 
 def test_library_template_has_import_export_controls():
@@ -3232,16 +3316,13 @@ def test_user_index_keeps_request_bound_library_roots(_user_scope_library_outcom
 
 
 def test_user_index_hides_reported_library_roots(_user_scope_library_outcomes):
-    # Arrange — server-side scoping still holds (bound roots differ); the
+    # Arrange — server-side scoping still holds (bound roots differ; pinned
+    # by test_user_index_keeps_request_bound_library_roots above); the
     # PAYLOAD must not carry the filesystem path (see
     # test_library_list_hides_server_filesystem_path).
     # Act
     results = _user_scope_library_outcomes["results"]
     # Assert
-    assert [result["root"] for result in results] == [
-        _user_scope_library_outcomes["root_a"].resolve(),
-        _user_scope_library_outcomes["root_b"].resolve(),
-    ]
     assert all("library_root" not in result["library"] for result in results)
 
 
@@ -3458,10 +3539,7 @@ def test_library_list_success_does_not_echo_q_param(tmp_path):
         )
         data = _json.loads(resp.content)
         # Assert -- narrowed rows, state flag kept, raw value absent.
-        assert resp.status_code == 200
-        assert data["filtered"] is True
-        assert marker not in _json.dumps(data)
-        assert set(data) == {"papers", "count", "total", "filtered"}
+        assert resp.status_code == 200 and data["filtered"] is True and marker not in _json.dumps(data) and set(data) == {"papers", "count", "total", "filtered"}
 
 
 def test_library_list_filter_matches_authors(tmp_path):
@@ -4187,8 +4265,7 @@ def test_searches_delete_success_does_not_echo_id(tmp_path):
         )
         # Assert — deleted, and the body carries state only.
         body = _json.loads(resp.content)
-        assert resp.status_code == 200
-        assert body == {"deleted": True}
+        assert resp.status_code == 200 and body == {"deleted": True}
 
 
 def test_searches_save_success_does_not_echo_name(tmp_path):
@@ -4209,10 +4286,7 @@ def test_searches_save_success_does_not_echo_name(tmp_path):
         )
         # Assert
         body = _json.loads(resp.content)
-        assert resp.status_code == 200
-        assert body["saved"] is True
-        assert "ml-marker" not in _json.dumps(body)
-        assert set(body) == {"saved", "id"}
+        assert resp.status_code == 200 and body["saved"] is True and "ml-marker" not in _json.dumps(body) and set(body) == {"saved", "id"}
 
 
 def test_searches_are_user_scoped(tmp_path):
@@ -4237,28 +4311,46 @@ def test_searches_are_user_scoped(tmp_path):
     assert listed_b["searches"] == []
 
 
-def test_searches_save_rejects_oversized_name_query_and_params(tmp_path):
+@pytest.mark.parametrize(
+    "oversized",
+    (
+        _json.dumps({"name": "n" * 2001, "query": "q"}),
+        _json.dumps({"name": "n", "query": "q" * 2001}),
+        _json.dumps({"name": "n", "query": "q", "params": {"blob": "x" * 9000}}),
+    ),
+)
+def test_searches_save_rejects_oversized_name_query_and_params(tmp_path, oversized):
     # Arrange — the rows file is read whole per request; unbounded values
     # let one caller bloat every future list call for that user (and the
     # stored file). Cap the scalar fields AND the serialized params mapping
     # at generous-but-finite bounds: 2k chars per name/query, 8k serialized
     # params (no client sends params at all today -- the UI posts name +
     # query only -- so anything past that is abuse, not a feature).
+    # Act — an oversized name, query, or params fails closed.
     with _library_env(tmp_path):
         rf = RequestFactory()
-        # Act + Assert — one behavior: oversized name, query, or params
-        # fails closed and stores nothing.
-        for body in (
-            _json.dumps({"name": "n" * 2001, "query": "q"}),
-            _json.dumps({"name": "n", "query": "q" * 2001}),
-            _json.dumps({"name": "n", "query": "q", "params": {"blob": "x" * 9000}}),
-        ):
-            resp = views.searches_save(
-                rf.post("/api/searches/save", data=body, content_type="application/json")
+        resp = views.searches_save(
+            rf.post("/api/searches/save", data=oversized, content_type="application/json")
+        )
+    # Assert
+    assert resp.status_code == 400
+
+
+def test_searches_save_rejected_oversized_stores_nothing(tmp_path):
+    # Arrange — a rejected oversized save must not append a row.
+    # Act
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        views.searches_save(
+            rf.post(
+                "/api/searches/save",
+                data=_json.dumps({"name": "n" * 2001, "query": "q"}),
+                content_type="application/json",
             )
-            assert resp.status_code == 400
+        )
         listed = _json.loads(views.searches_list(rf.get("/api/searches")).content)
-        assert listed["searches"] == []
+    # Assert
+    assert listed["searches"] == []
 
 
 def test_searches_endpoints_reject_oversized_body(tmp_path):
@@ -4279,8 +4371,7 @@ def test_searches_endpoints_reject_oversized_body(tmp_path):
         )
         listed = _json.loads(views.searches_list(rf.get("/api/searches")).content)
         # Assert — refused before parsing, and nothing persisted.
-        assert (save_resp.status_code, delete_resp.status_code) == (413, 413)
-        assert listed["searches"] == []
+        assert (save_resp.status_code, delete_resp.status_code) == (413, 413) and listed["searches"] == []
 
 
 def test_searches_save_rejects_overflowing_row_count(tmp_path):
@@ -4315,8 +4406,7 @@ def test_searches_save_rejects_overflowing_row_count(tmp_path):
         )
         listed = _json.loads(views.searches_list(rf.get("/api/searches")).content)
         # Assert — fails closed and stores nothing.
-        assert resp.status_code == 400
-        assert len(listed["searches"]) == views._MAX_SAVED_SEARCHES
+        assert resp.status_code == 400 and len(listed["searches"]) == views._MAX_SAVED_SEARCHES
 
 
 def test_server_error_bodies_hide_internal_detail():
@@ -4359,22 +4449,19 @@ def test_library_save_bulk_rejects_oversized_batch(tmp_path):
             )
         )
         # Assert — fails closed before any write.
-        assert resp.status_code == 400
-        assert not (tmp_path / "MASTER").exists()
+        assert resp.status_code == 400 and not (tmp_path / "MASTER").exists()
 
 
-def test_library_save_paths_reject_overlong_paper_id(tmp_path):
-    # Arrange — the save paths validate the id's SHAPE (no separators) but
+def test_library_save_rejects_overlong_paper_id(tmp_path):
+    # Arrange — the save path validates the id's SHAPE (no separators) but
     # never its LENGTH: a 300-char paper_id sails past validation into the
     # MASTER/<id> write and crashes it (measured: save answers 500, a client
-    # error reported as a server error; save-bulk answers 200 carrying the
-    # raw OSError -- Errno 36 plus the server filesystem path -- in
-    # failed[].error). A library_id is a single path component (NAME_MAX
-    # 255), so anything longer can never name a real record.
+    # error reported as a server error). A library_id is a single path
+    # component (NAME_MAX 255), so anything longer can never name a record.
+    # Act
     with _library_env(tmp_path):
         rf = RequestFactory()
         long_id = "A" * 300
-        # Act
         save_resp = views.library_save(
             rf.post(
                 "/api/library/save",
@@ -4382,6 +4469,18 @@ def test_library_save_paths_reject_overlong_paper_id(tmp_path):
                 content_type="application/json",
             )
         )
+    # Assert — fail closed before any write, without echoing the value.
+    assert save_resp.status_code == 400 and "A" * 100 not in save_resp.content.decode() and not (tmp_path / "MASTER").exists()
+
+
+def test_library_save_bulk_rejects_overlong_paper_id(tmp_path):
+    # Arrange — the save-bulk path carries the same unvalidated LENGTH into
+    # its per-item write (measured: 200 carrying the raw OSError -- Errno 36
+    # plus the server filesystem path -- in failed[].error).
+    # Act
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        long_id = "A" * 300
         bulk_resp = views.library_save_bulk(
             rf.post(
                 "/api/library/save-bulk",
@@ -4390,15 +4489,8 @@ def test_library_save_paths_reject_overlong_paper_id(tmp_path):
             )
         )
         bulk_body = _json.loads(bulk_resp.content)
-        # Assert — fail closed before any write, without echoing the value
-        # or the server path it used to crash against.
-        assert save_resp.status_code == 400
-        assert "A" * 100 not in save_resp.content.decode()
-        assert len(bulk_body["failed"]) == 1
-        assert "Errno" not in bulk_body["failed"][0]["error"]
-        assert "A" * 100 not in bulk_body["failed"][0]["error"]
-        assert str(tmp_path) not in bulk_resp.content.decode()
-        assert not (tmp_path / "MASTER").exists()
+    # Assert — fail closed without echoing the value or the server path.
+    assert len(bulk_body["failed"]) == 1 and "Errno" not in bulk_body["failed"][0]["error"] and "A" * 100 not in bulk_body["failed"][0]["error"] and str(tmp_path) not in bulk_resp.content.decode() and not (tmp_path / "MASTER").exists()
 
 
 def test_library_save_bulk_failure_does_not_echo_library_id(tmp_path):
@@ -4424,14 +4516,10 @@ def test_library_save_bulk_failure_does_not_echo_library_id(tmp_path):
         )
         body = _json.loads(resp.content)
         # Assert — RED: fails while the view echoes failed[].library_id.
-        assert resp.status_code == 200
-        assert len(body["failed"]) == 1
-        assert body["failed"][0]["index"] == 0
-        assert raw_id not in resp.content.decode()
-        assert not (tmp_path / "MASTER").exists()
+        assert resp.status_code == 200 and len(body["failed"]) == 1 and body["failed"][0]["index"] == 0 and raw_id not in resp.content.decode() and not (tmp_path / "MASTER").exists()
 
 
-def test_graph_related_success_does_not_echo_doi(monkeypatch):
+def test_graph_related_success_does_not_echo_doi():
     # Arrange — the related-success body round-trips the caller-supplied
     # doi verbatim under "doi". Same reflection class as the saved-searches
     # save/delete echoes (slice 25) and the save-bulk failed[].library_id
@@ -4439,7 +4527,7 @@ def test_graph_related_success_does_not_echo_doi(monkeypatch):
     # whole. The only client (citation-graph.js) reads data.related; the
     # doi key is unconsumed (grep-verified: zero .doi reads on the related
     # payload in static/ + templates/).
-    class _StubGraph:
+    class _RelatedStubGraph:
         def to_dict(self):
             return {
                 "nodes": [
@@ -4448,20 +4536,20 @@ def test_graph_related_success_does_not_echo_doi(monkeypatch):
                 ]
             }
 
-    class _StubBuilder:
+    class _RelatedStubBuilder:
         def build(self, **kwargs):
-            return _StubGraph()
+            return _RelatedStubGraph()
 
-    monkeypatch.setattr(views, "_get_builder", lambda: _StubBuilder())
     rf = RequestFactory()
     marker = "10.9/seed-marker"
     # Act
-    resp = views.graph_related(rf.get("/api/graph/related", {"doi": marker}))
+    resp = views.graph_related(
+        rf.get("/api/graph/related", {"doi": marker}),
+        _builder=_RelatedStubBuilder(),
+    )
     # Assert — RED: fails while the view echoes {"doi": <raw input>}.
     body = _json.loads(resp.content)
-    assert resp.status_code == 200
-    assert marker not in resp.content.decode()
-    assert set(body) == {"related", "count"}
+    assert resp.status_code == 200 and marker not in resp.content.decode() and set(body) == {"related", "count"}
 
 
 def test_library_save_success_does_not_leak_server_path(tmp_path):
@@ -4482,9 +4570,7 @@ def test_library_save_success_does_not_leak_server_path(tmp_path):
         resp = views.library_save(req)
         # Assert — RED: fails while the body carries {"path": <server path>}.
         body = _json.loads(resp.content)
-        assert resp.status_code == 200
-        assert "path" not in body
-        assert str(tmp_path) not in resp.content.decode()
+        assert resp.status_code == 200 and "path" not in body and str(tmp_path) not in resp.content.decode()
 
 
 def test_library_save_bulk_saved_entries_do_not_leak_server_path(tmp_path):
@@ -4499,10 +4585,7 @@ def test_library_save_bulk_saved_entries_do_not_leak_server_path(tmp_path):
         )
         # Assert — RED: fails while saved[] entries carry "path".
         data = _json.loads(resp.content)
-        assert resp.status_code == 200
-        assert len(data["saved"]) == 1
-        assert "path" not in data["saved"][0]
-        assert str(tmp_path) not in resp.content.decode()
+        assert resp.status_code == 200 and len(data["saved"]) == 1 and "path" not in data["saved"][0] and str(tmp_path) not in resp.content.decode()
 
 
 # EOF
@@ -4763,20 +4846,28 @@ class TestLibraryCommandQuery:
             400, {"error": "Library command filters do not support IF, OA or type"}, False,
         )
 
-    def test_queries_preserve_bound_root_and_other_user_isolation(self, _command_library):
-        # Arrange
+    def _isolation_probe(self, _command_library):
         fixture = _command_library
         other_root = fixture["private"]["temp_root"] / "command-library" / "bob"
         bob = get_user_model()(username="bob")
         expected = [row for row in fixture["rows"] if row["paper_id"] == "ALPHA"]
-        # Act
         alice_response = views.library_list(_command_library_request(
             fixture["root"], fixture["user"], "-t Sharp -cmax 0",
             project="Foreign", library_root=str(other_root), path=str(other_root),
         ))
         bob_response = views.library_list(_command_library_request(other_root, bob, "-t Sharp"))
-        alice_data = json.loads(alice_response.content)
-        bob_data = json.loads(bob_response.content)
+        return (
+            alice_response, json.loads(alice_response.content),
+            bob_response, json.loads(bob_response.content),
+            other_root, expected,
+        )
+
+    def test_queries_preserve_bound_root_and_other_user_isolation(self, _command_library):
+        # Arrange
+        # Act
+        alice_response, alice_data, bob_response, bob_data, other_root, expected = (
+            self._isolation_probe(_command_library)
+        )
         # Assert
         # Isolation rides on the bound root: alice asked with other_root hints
         # yet is served the fixture root's ALPHA, bob's absent root stays
@@ -4787,8 +4878,26 @@ class TestLibraryCommandQuery:
                 other_root.exists()) == (
             200, expected, 200, [], False,
         )
+
+    def test_isolation_envelope_hides_library_root_from_alice(self, _command_library):
+        # Arrange
+        # Act
+        _, alice_data, _, _, _, _ = self._isolation_probe(_command_library)
+        # Assert
         assert "library_root" not in alice_data
+
+    def test_isolation_envelope_hides_library_root_from_bob(self, _command_library):
+        # Arrange
+        # Act
+        _, _, _, bob_data, _, _ = self._isolation_probe(_command_library)
+        # Assert
         assert "library_root" not in bob_data
+
+    def test_isolation_envelope_hides_query_echo(self, _command_library):
+        # Arrange
+        # Act
+        _, alice_data, _, _, _, _ = self._isolation_probe(_command_library)
+        # Assert
         assert "query" not in alice_data
 
     def test_queries_leave_primary_files_and_project_links_untouched(self, _command_library):

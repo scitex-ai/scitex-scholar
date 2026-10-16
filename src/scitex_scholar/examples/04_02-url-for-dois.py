@@ -179,20 +179,20 @@ def generate_report(results: List[Dict], output_dir: Path):
     df.to_csv(csv_path, index=False)
 
     # Print summary
-    print("\n" + "=" * 60)
-    print("📊 URL Finding Summary")
-    print("=" * 60)
-    print(f"Total DOIs tested: {total}")
-    print(f"Successful: {successful} ({report['summary']['success_rate']})")
-    print(
+    _console.print("\n" + "=" * 60)
+    _console.print("📊 URL Finding Summary")
+    _console.print("=" * 60)
+    _console.print(f"Total DOIs tested: {total}")
+    _console.print(f"Successful: {successful} ({report['summary']['success_rate']})")
+    _console.print(
         f"Reached article: {reached_article} ({report['summary']['article_reach_rate']})"
     )
-    print(f"Stopped at auth: {stopped_at_auth}")
-    print(f"Errors: {errors}")
-    print(f"Average time: {avg_time:.2f} seconds")
-    print("\nReports saved to:")
-    print(f"  - {report_path}")
-    print(f"  - {csv_path}")
+    _console.print(f"Stopped at auth: {stopped_at_auth}")
+    _console.print(f"Errors: {errors}")
+    _console.print(f"Average time: {avg_time:.2f} seconds")
+    _console.print("\nReports saved to:")
+    _console.print(f"  - {report_path}")
+    _console.print(f"  - {csv_path}")
 
     return report
 
@@ -224,8 +224,8 @@ async def main():
 
     args = parser.parse_args()
 
-    print("🔗 Multi-DOI URL Finding Test")
-    print("=" * 60)
+    _console.print("🔗 Multi-DOI URL Finding Test")
+    _console.print("=" * 60)
 
     # Setup output directory
     if args.output_dir:
@@ -235,7 +235,7 @@ async def main():
         output_dir = Path(f"./url_test_results_{timestamp}")
 
     output_dir.mkdir(parents=True, exist_ok=True)
-    print(f"Output directory: {output_dir}")
+    _console.print(f"Output directory: {output_dir}")
 
     # Load DOIs
     csv_path = Path(args.csv)
@@ -249,11 +249,11 @@ async def main():
         logger.error("No DOIs found in CSV")
         return
 
-    print(f"Testing {len(dois)} DOIs from {csv_path.name}")
-    print("-" * 60)
+    _console.print(f"Testing {len(dois)} DOIs from {csv_path.name}")
+    _console.print("-" * 60)
 
     # Initialize browser
-    print("🌐 Initializing authenticated browser...")
+    _console.print("🌐 Initializing authenticated browser...")
     auth_manager = ScholarAuthManager()
     browser_manager = ScholarBrowserManager(
         auth_manager=auth_manager,
@@ -267,12 +267,12 @@ async def main():
     ) = await browser_manager.get_authenticated_browser_and_context_async()
 
     # Create URL finder
-    print("🔍 Creating URL finder...")
+    _console.print("🔍 Creating URL finder...")
     url_finder = ScholarURLFinder(context=context, use_cache=not args.no_cache)
 
     # Process DOIs
-    print(f"\n📋 Processing {len(dois)} DOIs in batches of {args.batch_size}...")
-    print("-" * 60)
+    _console.print(f"\n📋 Processing {len(dois)} DOIs in batches of {args.batch_size}...")
+    _console.print("-" * 60)
 
     results = await process_dois_batch(
         dois, url_finder, batch_size=args.batch_size, use_cache=not args.no_cache
@@ -282,19 +282,19 @@ async def main():
     generate_report(results, output_dir)
 
     # Show problematic DOIs
-    print("\n⚠️ DOIs that stopped at authentication:")
+    _console.print("\n⚠️ DOIs that stopped at authentication:")
     for r in results:
         if r.get("stopped_at_auth"):
-            print(f"  - {r.get('doi')}: {r.get('url_openurl_resolved', 'N/A')[:60]}...")
+            _console.print(f"  - {r.get('doi')}: {r.get('url_openurl_resolved', 'N/A')[:60]}...")
 
-    print("\n❌ DOIs with errors:")
+    _console.print("\n❌ DOIs with errors:")
     for r in results:
         if r.get("error"):
-            print(f"  - {r.get('doi')}: {r.get('error')[:60]}...")
+            _console.print(f"  - {r.get('doi')}: {r.get('error')[:60]}...")
 
     # Cleanup
     await browser.close()
-    print("\n✅ Testing complete!")
+    _console.print("\n✅ Testing complete!")
 
 
 if __name__ == "__main__":

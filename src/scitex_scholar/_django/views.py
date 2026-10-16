@@ -549,8 +549,13 @@ def health(request):
 
 
 @require_GET
-def graph_network(request):
-    """Build citation network for a DOI."""
+def graph_network(request, _builder=None):
+    """Build citation network for a DOI.
+
+    `_builder` is a test-injection seam: the collaborator is a PARAMETER,
+    not a monkeypatch (PA-306), exactly as `search(request, _engine=)`.
+    Django routes call it with only `request`.
+    """
     doi = request.GET.get("doi")
     if not doi:
         return JsonResponse({"error": "DOI parameter required"}, status=400)
@@ -593,7 +598,7 @@ def graph_network(request):
             return JsonResponse(cached)
 
     # Build network
-    builder = _get_builder()
+    builder = _builder or _get_builder()
     if not builder:
         return JsonResponse(_not_configured_payload(), status=503)
 
@@ -621,8 +626,13 @@ def graph_network(request):
 
 
 @require_GET
-def graph_related(request):
-    """Get related papers for a DOI."""
+def graph_related(request, _builder=None):
+    """Get related papers for a DOI.
+
+    `_builder` is a test-injection seam: the collaborator is a PARAMETER,
+    not a monkeypatch (PA-306), exactly as `search(request, _engine=)`.
+    Django routes call it with only `request`.
+    """
     doi = request.GET.get("doi")
     if not doi:
         return JsonResponse({"error": "DOI parameter required"}, status=400)
@@ -637,7 +647,7 @@ def graph_related(request):
             {"error": "limit must be an integer"}, status=400
         )
 
-    builder = _get_builder()
+    builder = _builder or _get_builder()
     if not builder:
         return JsonResponse(_not_configured_payload(), status=503)
 
@@ -665,15 +675,20 @@ def graph_related(request):
 
 
 @require_GET
-def graph_paper(request):
-    """Get paper summary."""
+def graph_paper(request, _builder=None):
+    """Get paper summary.
+
+    `_builder` is a test-injection seam: the collaborator is a PARAMETER,
+    not a monkeypatch (PA-306), exactly as `search(request, _engine=)`.
+    Django routes call it with only `request`.
+    """
     doi = request.GET.get("doi")
     if not doi:
         return JsonResponse({"error": "DOI parameter required"}, status=400)
     if len(doi) > _MAX_DOI_CHARS:
         return _overlong_doi_response()
 
-    builder = _get_builder()
+    builder = _builder or _get_builder()
     if not builder:
         return JsonResponse(_not_configured_payload(), status=503)
 

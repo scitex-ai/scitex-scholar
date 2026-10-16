@@ -312,7 +312,7 @@ if __name__ == "__main__":
     import asyncio
 
     async def main_async():
-        from pprint import pprint
+        from pprint import pformat
 
         from scitex_scholar import ScholarAuthManager, ScholarBrowserManager
 
@@ -333,7 +333,7 @@ if __name__ == "__main__":
         pdfs = await url_finder.find_pdf_urls(args.url)
 
         logger.info(f"\nFound {len(pdfs)} PDF URLs:")
-        pprint(pdfs)
+        logger.info(pformat(pdfs))
 
         await browser_manager.close()
 

@@ -39,6 +39,8 @@ import argparse
 import asyncio
 from pathlib import Path
 from pprint import pprint
+import scitex_logging as slogging
+_console = slogging.getPlainConsole(__name__)
 
 try:
     import scitex as stx
@@ -87,7 +89,7 @@ async def run_full_pipeline(
         ScholarURLFinder,
     )
 
-    print(
+    _console.print(
         f"🌐 Initializing browser ({browser_mode} mode, profile: {chrome_profile})..."
     )
     browser_manager = ScholarBrowserManager(
@@ -100,63 +102,63 @@ async def run_full_pipeline(
         context,
     ) = await browser_manager.get_authenticated_browser_and_context_async()
 
-    print("🔧 Initializing Scholar components...")
+    _console.print("🔧 Initializing Scholar components...")
     engine = ScholarEngine()
     url_finder = ScholarURLFinder(context, use_cache=use_cache)
     pdf_downloader = ScholarPDFDownloader(context, use_cache=use_cache)
 
-    print("=" * 50)
-    print("🔍 1. Searching for metadata...")
-    print("=" * 50)
-    print(f"📝 Query title: {title}")
+    _console.print("=" * 50)
+    _console.print("🔍 1. Searching for metadata...")
+    _console.print("=" * 50)
+    _console.print(f"📝 Query title: {title}")
 
     metadata = await engine.search_async(title=title)
     doi = metadata.get("id", {}).get("doi")
 
     if not doi:
-        print("❌ No DOI found for the paper")
+        _console.print("❌ No DOI found for the paper")
         return []
 
-    print(f"🆔 Found DOI: {doi}")
+    _console.print(f"🆔 Found DOI: {doi}")
 
-    print("=" * 50)
-    print("🔗 2. Finding URLs...")
-    print("=" * 50)
+    _console.print("=" * 50)
+    _console.print("🔗 2. Finding URLs...")
+    _console.print("=" * 50)
 
     urls = await url_finder.find_urls(doi=doi)
-    print("📊 URL Finding Results:")
-    pprint(urls)
+    _console.print("📊 URL Finding Results:")
+    _console.print(urls)
 
     if not urls.get("urls_pdf"):
-        print("❌ No PDF URLs found")
+        _console.print("❌ No PDF URLs found")
         return []
 
-    print("=" * 50)
-    print("📥 3. Downloading PDFs...")
-    print("=" * 50)
+    _console.print("=" * 50)
+    _console.print("📥 3. Downloading PDFs...")
+    _console.print("=" * 50)
 
     # Ensure output directory exists
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
 
     urls_pdf = [url_info["url"] for url_info in urls["urls_pdf"]]
-    print(f"📄 Found {len(urls_pdf)} PDF URLs to download")
+    _console.print(f"📄 Found {len(urls_pdf)} PDF URLs to download")
 
     downloaded_paths = []
     for i_pdf_url, pdf_url in enumerate(urls_pdf):
         output_file = output_path / f"paper_{i_pdf_url:02d}.pdf"
 
-        print(f"📥 Downloading PDF {i_pdf_url + 1}/{len(urls_pdf)}: {pdf_url}")
+        _console.print(f"📥 Downloading PDF {i_pdf_url + 1}/{len(urls_pdf)}: {pdf_url}")
 
         saved_path = await pdf_downloader.download_from_url(pdf_url, output_file)
 
         if saved_path:
             downloaded_paths.append(saved_path)
-            print(f"✅ Downloaded: {saved_path}")
+            _console.print(f"✅ Downloaded: {saved_path}")
         else:
-            print(f"❌ Failed to download: {pdf_url}")
+            _console.print(f"❌ Failed to download: {pdf_url}")
 
-    print(
+    _console.print(
         f"\n📊 Download Summary: {len(downloaded_paths)}/{len(urls_pdf)} PDFs downloaded"
     )
     return downloaded_paths
@@ -175,8 +177,8 @@ async def main_async(args) -> list:
     list
         List of downloaded PDF paths
     """
-    print("🚀 Scholar Full Pipeline Demonstration")
-    print("=" * 40)
+    _console.print("🚀 Scholar Full Pipeline Demonstration")
+    _console.print("=" * 40)
 
     results = await run_full_pipeline(
         title=args.title,
@@ -187,10 +189,10 @@ async def main_async(args) -> list:
     )
 
     if results:
-        print("✅ Full pipeline completed successfully")
-        print(f"📁 Downloaded files: {results}")
+        _console.print("✅ Full pipeline completed successfully")
+        _console.print(f"📁 Downloaded files: {results}")
     else:
-        print("❌ No files were downloaded")
+        _console.print("❌ No files were downloaded")
 
     return results
 
@@ -212,7 +214,7 @@ def main(args) -> int:
         results = asyncio.run(main_async(args))
         return 0 if results else 1
     except Exception as e:
-        print(f"❌ Error: {e}")
+        _console.print(f"❌ Error: {e}")
         return 1
 
 

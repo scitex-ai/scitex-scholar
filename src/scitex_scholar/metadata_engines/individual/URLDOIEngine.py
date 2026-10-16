@@ -368,7 +368,7 @@ class URLDOIEngine(BaseDOIEngine):
 
 
 if __name__ == "__main__":
-    from pprint import pprint
+    from pprint import pformat
 
     TITLE = "Test Paper"
     DOI = "10.1038/nature14539"
@@ -395,7 +395,7 @@ if __name__ == "__main__":
         logger.info("----------------------------------------")
         logger.info(k)
         logger.info("----------------------------------------")
-        pprint(v)
+        logger.info(pformat(v))
         time.sleep(1)
 
 # python -m scitex_scholar.engines.individual.URLDOIEngine
