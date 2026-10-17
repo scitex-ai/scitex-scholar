@@ -654,6 +654,74 @@ def test_graph_marks_have_light_values():
     assert themed == (True, True)
 
 
+def test_header_links_sdk_ssot_stylesheet():
+    """The header row is styled by the SDK SSoT sheet, as writer does.
+
+    Operator mandate 2026-10-17 (element-debug proof): scholar header must
+    use stx-app-header from scitex_sdk/ui/css/app/app-header.css — the leaf
+    links the sheet exactly like writer/_app_header.html does.
+    """
+    # Arrange
+    assets = (
+        Path(views.__file__).parent
+        / "templates"
+        / "scholar"
+        / "workspace_assets.html"
+    ).read_text()
+    # Act
+    linked = "scitex_sdk/ui/css/app/app-header.css" in assets
+    # Assert
+    assert linked
+
+
+def test_header_does_not_redefine_the_row():
+    """Scholar carries no .stx-app-header rules: the shared sheet owns shape."""
+    # Arrange
+    layout = (
+        Path(views.__file__).parent
+        / "static"
+        / "scholar"
+        / "css"
+        / "_partials"
+        / "_layout.css"
+    ).read_text()
+    # Act — a RULE (selector + block), not a prose mention in a comment.
+    redefined = re.search(r"\.stx-app-header[\w-]*\s*\{", layout)
+    # Assert
+    assert redefined is None
+
+
+def test_header_shows_leaf_version_without_subtitle():
+    """Title + leaf version (writer shape), no subtitle element."""
+    # Arrange
+    template = (
+        Path(views.__file__).parent
+        / "templates"
+        / "scholar"
+        / "workspace_content.html"
+    ).read_text()
+    # Act
+    shaped = (
+        "stx-app-header__version" in template and "scholar_version" in template,
+        "stx-app-header__subtitle" not in template,
+    )
+    # Assert
+    assert shaped == (True, True)
+
+
+def test_header_version_matches_installed_package():
+    """The rendered header shows the leaf's OWN installed version, live."""
+    # Arrange
+    import importlib.metadata
+
+    rf = RequestFactory()
+    request = rf.get("/")
+    # Act
+    html = views.index(request).content.decode()
+    # Assert
+    assert ("v" + importlib.metadata.version("scitex-scholar")) in html
+
+
 def test_client_distinguishes_configured_from_ready():
     """`configured` must render as its own state, never as available."""
     # Arrange
@@ -3066,7 +3134,7 @@ def test_main_page_renders_in_english_by_default():
     # Act
     en = _render_index_in("en")
     # Assert -- the EN default carries the English header and the i18n JS dict.
-    assert "Scientific Literature Management" in en and "SCHOLAR_I18N" in en
+    assert "SciTeX Scholar" in en and "SCHOLAR_I18N" in en
 
 
 def _i18n_script_body(page: str) -> str:
@@ -3136,9 +3204,9 @@ def test_main_page_ja_render_has_no_untranslated_labels():
     # Arrange
     # Act
     ja = _render_index_in("ja")
-    # Assert -- the EN source of the page header is absent (replaced by JA) and
+    # Assert -- the EN source of a header label is absent (replaced by JA) and
     # the JA catalog produced Japanese text on the page.
-    assert "Scientific Literature Management" not in ja and "科学文献管理" in ja
+    assert "Service Status" not in ja and "サービス状態" in ja
 
 
 def test_ja_catalog_translates_every_msgid():
@@ -3163,10 +3231,10 @@ def test_ja_catalog_translates_every_msgid():
         (i, m) for i, m in pairs
         if i != "" and i not in proper_nouns and (m == "" or m == i)
     ]
-    # Assert -- at least one msgid (the header, known JA) and zero untranslated
-    # (proper nouns excluded by the explicit list above).
+    # Assert -- at least one msgid (the status strip title, known JA) and zero
+    # untranslated (proper nouns excluded by the explicit list above).
     assert (
-        any("科学文献管理" in m for _, m in pairs) and not untranslated
+        any("サービス状態" in m for _, m in pairs) and not untranslated
     )
 
 
@@ -3657,13 +3725,25 @@ def test_all_extra_requires_header_slot_capable_scitex_ui():
 
 def test_390px_header_wraps_picker_without_horizontal_overflow():
     # Arrange
-    css = (CSS_DIR / "_partials" / "_layout.css").read_text()
-    # Act
-    mobile = css.split("@media (max-width: 600px)", 1)[1]
+    # The SHARED sheet owns the phone behaviour now (operator header mandate
+    # 2026-10-17): read what the browser reads, resolved off the installed
+    # scitex-ui exactly as the template's {% static %} link does.
+    import scitex_ui
+
+    shared = (
+        Path(scitex_ui.__file__).parent
+        / "static"
+        / "scitex_ui"
+        / "css"
+        / "app"
+        / "app-header.css"
+    ).read_text()
+    # Act — the wrap rule that puts the picker on its own row (the slot's own
+    # geometry is the picker primitive's contract, pinned elsewhere).
+    mobile = shared.split("@media (max-width: 600px)", 1)[1]
     wraps = re.search(r"\.stx-app-header\s*\{[^}]*flex-wrap:\s*wrap", mobile)
-    full_width = re.search(r"\.stx-app-header__slot--project-selector\s*\{[^}]*width:\s*100%", mobile)
     # Assert
-    assert wraps is not None and full_width is not None
+    assert wraps is not None
 
 
 def test_shared_desktop_slot_pins_picker_left_before_actions():

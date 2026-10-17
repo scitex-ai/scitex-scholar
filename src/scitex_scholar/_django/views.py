@@ -396,6 +396,21 @@ def _project_provider(request):
 project_scope = project_listing_view(_project_provider)
 
 
+def _leaf_identity() -> dict:
+    """Title + version for the leaf header, read from the leaf's own dist.
+
+    Mirrors writer's `_leaf_identity` in SHAPE (operator header mandate
+    2026-10-17: `<title> + v<version>`) while reading the version from the
+    package's own `__version__` (importlib.metadata, stdlib-only) instead of
+    the app registry: the same installed-version source the SDK's
+    `app_version` resolves, with no new imports and no registry dependency.
+    Never a hand-written string and never the host's version.
+    """
+    from scitex_scholar import __version__
+
+    return {"scholar_version": __version__}
+
+
 def index_context(request, current_project=None):
     """Return the existing Scholar page context for this request."""
     resolved_api = _api_url()
@@ -407,6 +422,7 @@ def index_context(request, current_project=None):
     )
     return {
         **shell_context("Scholar", theme_default="light"),
+        **_leaf_identity(),
         "api_available": resolved_api is not None,
         "api_url": resolved_api or "Not configured",
         "stx_mount": mount_prefix(request),
