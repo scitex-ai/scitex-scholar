@@ -155,9 +155,12 @@ def test_zotero_import_persists_papers_to_leaf_library(tmp_path):
         listed = _json.loads(views.library_list(rf.get("/api/library")).content)
         titles = [p.get("title") for p in listed["papers"]]
     # Assert
-    assert imported["ok"] is True
-    assert (imported["imported"], imported["skipped"], imported["total"]) == (2, 0, 2)
-    assert "Zotero One" in titles and "Zotero Two" in titles
+    result = (
+        imported["ok"] is True,
+        (imported["imported"], imported["skipped"], imported["total"]),
+        "Zotero One" in titles and "Zotero Two" in titles,
+    )
+    assert result == (True, (2, 0, 2), True)
 
 
 def test_zotero_import_rejects_unknown_mode():
@@ -170,11 +173,14 @@ def test_zotero_import_rejects_unknown_mode():
     # Act
     resp = views.zotero_import(req, _reader=_FakeReader([]))
     # Assert -- fixed message, the raw mode is untrusted input.
-    assert resp.status_code == 400
-    assert _json.loads(resp.content) == {
-        "error": "Unsupported import mode",
-        "supported": ["all", "collection", "tags"],
-    }
+    result = (
+        resp.status_code,
+        _json.loads(resp.content),
+    )
+    assert result == (
+        400,
+        {"error": "Unsupported import mode", "supported": ["all", "collection", "tags"]},
+    )
 
 
 def test_zotero_import_skips_already_present_papers(tmp_path):
@@ -191,8 +197,11 @@ def test_zotero_import_skips_already_present_papers(tmp_path):
         listed = _json.loads(views.library_list(rf.get("/api/library")).content)
         by_doi = {p.get("doi"): p.get("title") for p in listed["papers"]}
     # Assert -- one new, one skipped, existing title untouched.
-    assert (imported["imported"], imported["skipped"]) == (1, 1)
-    assert by_doi["10.9/zotero-one"] == "Enriched Title"
+    result = (
+        (imported["imported"], imported["skipped"]),
+        by_doi["10.9/zotero-one"],
+    )
+    assert result == ((1, 1), "Enriched Title")
 
 
 def test_zotero_import_caps_batch_size():
@@ -231,8 +240,10 @@ def test_connected_papers_status_reports_availability():
 
 def test_connected_papers_import_persists_papers(tmp_path):
     # Arrange
+    seen = {}
+
     def _fake_cp(paper_id, **kwargs):
-        assert kwargs.get("output_format") == "papers"
+        seen.update(kwargs)
         return {
             "success": True,
             "papers": [_paper("10.9/cp-one", "CP One")],
@@ -253,8 +264,12 @@ def test_connected_papers_import_persists_papers(tmp_path):
         )
         listed = _json.loads(views.library_list(rf.get("/api/library")).content)
     # Assert
-    assert body["ok"] is True and body["imported"] == 1
-    assert [p.get("title") for p in listed["papers"]] == ["CP One"]
+    result = (
+        body["ok"] is True and body["imported"] == 1,
+        [p.get("title") for p in listed["papers"]],
+        seen.get("output_format"),
+    )
+    assert result == (True, ["CP One"], "papers")
 
 
 def test_connected_papers_import_rejects_blank_and_oversized_ids():
@@ -279,9 +294,12 @@ def test_connected_papers_import_rejects_blank_and_oversized_ids():
     blank = views.connected_papers_import(_blank(), _importer=None)
     huge = views.connected_papers_import(_huge(), _importer=None)
     # Assert -- fixed messages, the raw id is untrusted input (echo class).
-    assert blank.status_code == 400
-    assert huge.status_code in (400, 413)
-    assert "paper_id" not in _json.loads(huge.content).get("error", "paper_id")
+    result = (
+        blank.status_code,
+        huge.status_code,
+        "paper_id" not in _json.loads(huge.content).get("error", "paper_id"),
+    )
+    assert result[0] == 400 and result[1] in (400, 413) and result[2] is True
 
 
 def test_connected_papers_import_upstream_failure_is_fixed_message():
@@ -298,8 +316,8 @@ def test_connected_papers_import_upstream_failure_is_fixed_message():
     resp = views.connected_papers_import(req, _importer=_failing)
     body = _json.loads(resp.content)
     # Assert -- server/network internals never reach the client.
-    assert resp.status_code == 500
-    assert body == {"error": "Import failed. Try again later."}
+    result = (resp.status_code, body)
+    assert result == (500, {"error": "Import failed. Try again later."})
 
 
 # --- template + JS reflection -------------------------------------------------
