@@ -5,6 +5,19 @@ All notable changes to `scitex-scholar` are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.14.0] - 2026-10-17
+
+### Added
+- Service Status sidebar paragraph renders Japanese under a JA locale:
+  `graph_health` error/detail/fix go through gettext with JA catalog
+  entries (PR #213).
+- Swipe navigation between Search/Library/Graph tabs on phone layouts,
+  following the SDK Panes swipe contract (PR #213).
+- Service Status moved to a right-edge LED strip (old Sources dots+expand
+  style), collapsible to a rail (PR #213).
+- Standalone boots light by default (stored preference still wins);
+  theme-aware graph marks (PR #213).
+
 ## [1.13.5] - 2026-10-15
 
 ### Fixed
