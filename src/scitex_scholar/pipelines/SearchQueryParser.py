@@ -244,9 +244,9 @@ class SearchQueryParser:
 
         # Text filters: -t/-a/-j  (value may be prefixed with - for exclude)
         text_patterns = [
-            (r'(?:-t|--title)\s+(-?)([^\s]+|"[^"]+"|\'[^\']+\')', "title"),
-            (r'(?:-a|--author)\s+(-?)([^\s]+|"[^"]+"|\'[^\']+\')', "author"),
-            (r'(?:-j|--journal)\s+(-?)([^\s]+|"[^"]+"|\'[^\']+\')', "journal"),
+            (r'(?:-t|--title)\s+(-?)("[^"]+"|\'[^\']+\'|[^\s]+)', "title"),
+            (r'(?:-a|--author)\s+(-?)("[^"]+"|\'[^\']+\'|[^\s]+)', "author"),
+            (r'(?:-j|--journal)\s+(-?)("[^"]+"|\'[^\']+\'|[^\s]+)', "journal"),
         ]
 
         for pattern, field_name in text_patterns:
@@ -261,10 +261,10 @@ class SearchQueryParser:
 
         # Numeric filters
         numeric_patterns = [
-            (r"(?:-ymin|--year-min)\s+(\d{4})", "year_min"),
-            (r"(?:-ymax|--year-max)\s+(\d{4})", "year_max"),
-            (r"(?:-cmin|--citations-min)\s+(\d+)", "citations_min"),
-            (r"(?:-cmax|--citations-max)\s+(\d+)", "citations_max"),
+            (r"(?:-ymin|--year-min)\s+(\d{4})(?!\S)", "year_min"),
+            (r"(?:-ymax|--year-max)\s+(\d{4})(?!\S)", "year_max"),
+            (r"(?:-cmin|--citations-min)\s+(\d+)(?!\S)", "citations_min"),
+            (r"(?:-cmax|--citations-max)\s+(\d+)(?!\S)", "citations_max"),
             (r"(?:-ifmin|--if-min)\s+(\d+(?:\.\d+)?)", "impact_factor_min"),
             (r"(?:-ifmax|--if-max)\s+(\d+(?:\.\d+)?)", "impact_factor_max"),
         ]

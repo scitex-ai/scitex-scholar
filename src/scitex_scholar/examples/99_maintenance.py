@@ -46,6 +46,8 @@ IO:
 import argparse
 
 import pandas as pd
+import scitex_logging as slogging
+_console = slogging.getPlainConsole(__name__)
 
 """Warnings"""
 # stx.pd.ignore_SettingWithCopyWarning()
@@ -62,8 +64,8 @@ import pandas as pd
 
 def split_metadata(metadata_json_path):
     metadata = stx.io.load(metadata_json_path)
-    print(len(metadata))
-    print(metadata[0].keys())
+    _console.print(len(metadata))
+    _console.print(metadata[0].keys())
 
     out = stx.dict.listed_dict()
     for meta in metadata:

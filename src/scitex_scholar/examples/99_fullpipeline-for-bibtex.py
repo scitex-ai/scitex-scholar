@@ -39,6 +39,8 @@ import argparse
 import asyncio
 from pathlib import Path
 from pprint import pprint
+import scitex_logging as slogging
+_console = slogging.getPlainConsole(__name__)
 
 try:
     import numpy as _np
@@ -103,8 +105,8 @@ async def process_bibtex_entries(
         entries = _np.random.permutation(entries)[:n_samples].tolist()
 
     query_titles = [entry.get("title") for entry in entries]
-    print(f"Processing {len(query_titles)} entries from {bibtex_path}")
-    pprint(query_titles[:5])  # Show first 5 titles
+    _console.print(f"Processing {len(query_titles)} entries from {bibtex_path}")
+    _console.print(query_titles[:5])  # Show first 5 titles
 
     # Initialize configuration
     config = ScholarConfig()
@@ -129,34 +131,34 @@ async def process_bibtex_entries(
     results = {}
 
     # Step 1: Search for metadata
-    print("=" * 50)
-    print("1. Searching for metadata...")
-    print("=" * 50)
+    _console.print("=" * 50)
+    _console.print("1. Searching for metadata...")
+    _console.print("=" * 50)
     batched_metadata = await engine.search_batch_async(titles=query_titles)
     results["metadata"] = batched_metadata
-    print(f"Found metadata for {len([m for m in batched_metadata if m])} papers")
+    _console.print(f"Found metadata for {len([m for m in batched_metadata if m])} papers")
 
     # Step 2: Find URLs
-    print("=" * 50)
-    print("2. Finding URLs...")
-    print("=" * 50)
+    _console.print("=" * 50)
+    _console.print("2. Finding URLs...")
+    _console.print("=" * 50)
     dois = [
         metadata.get("id", {}).get("doi")
         for metadata in batched_metadata
         if metadata and metadata.get("id")
     ]
-    print(f"Extracted {len([d for d in dois if d])} DOIs")
+    _console.print(f"Extracted {len([d for d in dois if d])} DOIs")
 
     batched_urls = await url_finder.find_urls_batch(dois=dois)
     results["urls"] = batched_urls
 
     pdf_urls_found = sum(len(urls.get("urls_pdf", [])) for urls in batched_urls if urls)
-    print(f"Found {pdf_urls_found} PDF URLs")
+    _console.print(f"Found {pdf_urls_found} PDF URLs")
 
     # Step 3: Download PDFs
-    print("=" * 50)
-    print("3. Downloading PDFs...")
-    print("=" * 50)
+    _console.print("=" * 50)
+    _console.print("3. Downloading PDFs...")
+    _console.print("=" * 50)
 
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
@@ -175,7 +177,7 @@ async def process_bibtex_entries(
             continue
 
         file_path = output_path / f"paper_{idx_url:02d}.pdf"
-        print(f"Downloading {idx_url + 1}/{len(batched_urls_pdf)}: {pdf_url}")
+        _console.print(f"Downloading {idx_url + 1}/{len(batched_urls_pdf)}: {pdf_url}")
 
         # Reinitialize browser context for each download
         browser_manager_download = ScholarBrowserManager(
@@ -198,11 +200,11 @@ async def process_bibtex_entries(
             )
             if is_downloaded:
                 downloaded_paths.append(str(file_path))
-                print(f"✅ Downloaded: {file_path.name}")
+                _console.print(f"✅ Downloaded: {file_path.name}")
             else:
-                print(f"❌ Failed to download: {pdf_url}")
+                _console.print(f"❌ Failed to download: {pdf_url}")
         except Exception as ee:
-            print(f"❌ Error downloading {pdf_url}: {ee}")
+            _console.print(f"❌ Error downloading {pdf_url}: {ee}")
         finally:
             # Clean up browser context
             await context_dl.close()
@@ -210,9 +212,9 @@ async def process_bibtex_entries(
 
     results["downloaded_paths"] = downloaded_paths
 
-    print("=" * 50)
-    print(f"Pipeline completed: {len(downloaded_paths)} PDFs downloaded")
-    print("=" * 50)
+    _console.print("=" * 50)
+    _console.print(f"Pipeline completed: {len(downloaded_paths)} PDFs downloaded")
+    _console.print("=" * 50)
 
     # Clean up main browser
     await context.close()
@@ -242,10 +244,10 @@ async def main_async(args) -> dict:
         output_dir=args.output_dir,
     )
 
-    print("Final Results Summary:")
-    print(f"- Metadata entries: {len([m for m in results['metadata'] if m])}")
-    print(f"- URL batches: {len(results['urls'])}")
-    print(f"- Downloaded PDFs: {len(results['downloaded_paths'])}")
+    _console.print("Final Results Summary:")
+    _console.print(f"- Metadata entries: {len([m for m in results['metadata'] if m])}")
+    _console.print(f"- URL batches: {len(results['urls'])}")
+    _console.print(f"- Downloaded PDFs: {len(results['downloaded_paths'])}")
 
     return results
 
@@ -267,7 +269,7 @@ def main(args) -> int:
         asyncio.run(main_async(args))
         return 0
     except Exception as ee:
-        print(f"❌ Error: {ee}")
+        _console.print(f"❌ Error: {ee}")
         return 1
 
 

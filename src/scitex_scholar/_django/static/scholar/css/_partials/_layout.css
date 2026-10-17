@@ -3,37 +3,13 @@
  */
 
 /* ── Layout ────────────────────────────────────────────────── */
-.stx-app-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  min-height: 49px;
-  padding: 12px 24px;
-  background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-default);
-}
-
-.stx-app-header__identity {
-  display: flex;
-  align-items: baseline;
-  gap: 16px;
-  flex: 0 0 auto;
-}
-
-.stx-app-header__title {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.stx-app-header__subtitle {
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
+/* The header ROW is the SDK SSoT sheet (scitex_sdk/ui/css/app/app-header.css,
+ * writer shape): no header selectors live here at all — the shared sheet owns
+ * the row, the identity grouping, the title/version spans, and the phone
+ * behaviour. Scholar keeps only its container height below. */
 .app-container {
   display: flex;
-  height: calc(100vh - 49px);
+  height: calc(100vh - 40px);
 }
 
 .app-sidebar {
@@ -163,30 +139,9 @@
   }
 }
 
-/* The shared selector's own 600px rules provide 44px targets. Scholar owns
- * the header row, so it also owns making that row wrap at a 390px viewport. */
+/* The shared sheet owns the header's phone behaviour (wrap at 600px, touch
+ * targets); scholar keeps only its container height fix. */
 @media (max-width: 600px) {
-  .stx-app-header {
-    flex-wrap: wrap;
-    gap: 8px;
-    min-height: 0;
-    padding: 8px 12px;
-    overflow: visible;
-    position: relative;
-    z-index: 20;
-  }
-
-  .stx-app-header__identity,
-  .stx-app-header__slot--project-selector {
-    width: 100%;
-    min-width: 0;
-  }
-
-  .stx-app-header__identity {
-    justify-content: space-between;
-    gap: 8px;
-  }
-
   .app-container {
     height: auto;
     min-height: calc(100dvh - 118px);

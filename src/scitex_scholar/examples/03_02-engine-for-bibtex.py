@@ -38,6 +38,8 @@ Output:
 import argparse
 import asyncio
 from pprint import pprint
+import scitex_logging as slogging
+_console = slogging.getPlainConsole(__name__)
 
 try:
     import numpy as _np
@@ -71,14 +73,14 @@ async def search_bibtex_metadata(
         entries = _np.random.permutation(entries)[:n_samples].tolist()
 
     query_titles = [entry.get("title") for entry in entries]
-    pprint(query_titles)
+    _console.print(query_titles)
 
     config = ScholarConfig()
     engine = ScholarEngine(config=config, use_cache=use_cache)
 
-    print("----------------------------------------")
-    print("1. Searching for metadata...")
-    print("----------------------------------------")
+    _console.print("----------------------------------------")
+    _console.print("1. Searching for metadata...")
+    _console.print("----------------------------------------")
 
     batched_metadata = await engine.search_batch_async(titles=query_titles)
     return batched_metadata
@@ -99,7 +101,7 @@ async def main_async(args):
         n_samples=args.n_samples,
     )
 
-    pprint(batched_metadata)
+    _console.print(batched_metadata)
 
     output_name = selected_path.split("/")[-1].replace(".bib", "_metadata.json")
     output_path = f"./data/scholar/{output_name}"

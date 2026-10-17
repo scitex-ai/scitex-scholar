@@ -241,13 +241,16 @@ def test_index_shell_context_preserves_private_request_roots(_private_library_re
     assert roots == _private_library_results["roots"]
 
 
-def test_index_shell_context_reports_private_library_roots(_private_library_results):
-    # Arrange
+def test_index_shell_context_hides_server_library_roots(_private_library_results):
+    # Arrange — server-side scoping still holds (roots differ per user;
+    # pinned by test_index_shell_context_preserves_private_request_roots
+    # above); the PAYLOAD must not carry the filesystem path (see
+    # test_library_list_hides_server_filesystem_path).
     results = _private_library_results["results"]
     # Act
-    roots = [result["library"]["library_root"] for result in results]
+    payloads = [result["library"] for result in results]
     # Assert
-    assert roots == [str(root) for root in _private_library_results["roots"]]
+    assert all("library_root" not in payload for payload in payloads)
 
 
 def test_index_shell_context_keeps_user_libraries_distinct(_private_library_results):
@@ -282,13 +285,21 @@ def test_scholar_entrypoint_resolves_existing_app_config():
     assert configs == [type(apps.get_app_config("scholar_editor"))]
 
 
-def test_scholar_manifest_keeps_host_route_access_policy():
+def test_scholar_manifest_declares_mount_policy_with_jail():
     # Arrange
     config = apps.get_app_config("scholar_editor")
     # Act
     policy = config.manifest.get("mount_policy") or {}
     # Assert
-    assert policy == {}
+    assert policy == {
+        "login_required": True,
+        "touches_files": True,
+        "jail": {
+            "scope": "user",
+            "working_dir_param": "working_dir",
+            "path_params": [],
+        },
+    }
 
 
 @pytest.fixture(params=["", "/apps/scholar/v2"], ids=["root", "mounted"])

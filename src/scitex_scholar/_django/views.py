@@ -48,10 +48,10 @@ except ImportError as exc:  # django absent -- the [all]-gated GUI capability on
     ) from exc
 
 try:
-    from scitex_app.embed import mount_prefix
-except ImportError as exc:  # scitex-app absent -- the [all]-gated GUI capability only
+    from scitex_sdk.app.embed import mount_prefix
+except ImportError as exc:  # scitex-sdk absent -- the [all]-gated GUI capability only
     raise ImportError(
-        "scitex_scholar._django.views needs scitex-app, which is not "
+        "scitex_scholar._django.views needs scitex-sdk, which is not "
         "installed. Install the optional stack: pip install 'scitex-scholar[all]'"
     ) from exc
 
@@ -64,15 +64,15 @@ except ImportError as exc:  # scitex-sdk absent or below the GUI capability floo
     ) from exc
 
 try:
-    from scitex_ui.project_scope import (
+    from scitex_sdk.ui.project_scope import (
         LocalProjectProvider,
         host_project_provider,
         project_listing_view,
         resolve_project,
     )
-except ImportError as exc:  # scitex-ui absent -- the [all]-gated GUI capability only
+except ImportError as exc:  # scitex-sdk absent -- the [all]-gated GUI capability only
     raise ImportError(
-        "scitex_scholar._django.views needs scitex-ui, which is not "
+        "scitex_scholar._django.views needs scitex-sdk, which is not "
         "installed. Install the optional stack: pip install 'scitex-scholar[all]'"
     ) from exc
 
@@ -136,16 +136,26 @@ _refuse_unless_app_installed()
 
 logger = slogging.getLogger(__name__)
 
-# Simple in-memory cache (framework-agnostic, ported verbatim)
+# Simple in-memory cache (framework-agnostic, ported verbatim, then capped).
+#
+# The cap is load-bearing on a mounted host: one server process serves many
+# users x queries, and without eviction every distinct query accumulates for
+# the TTL hour (measured: 3000 sets -> 3000 live entries, expired rows kept
+# until re-accessed). 500 entries x a result payload is ample for a GUI cache
+# and keeps per-process memory flat. Eviction is insertion-order (oldest
+# first); a hit refreshes recency via re-insertion.
 _cache: Dict[str, dict] = {}
 _cache_timestamps: Dict[str, float] = {}
 _CACHE_TTL = 3600  # 1 hour
+_CACHE_MAX_ENTRIES = 500
 
 
 def _cache_get(key: str) -> Optional[dict]:
     """Get value from cache if not expired."""
     if key in _cache:
         if time.time() - _cache_timestamps.get(key, 0) < _CACHE_TTL:
+            # Refresh recency so live entries survive eviction pressure.
+            _cache[key] = _cache.pop(key)
             return _cache[key]
         del _cache[key]
         del _cache_timestamps[key]
@@ -153,14 +163,35 @@ def _cache_get(key: str) -> Optional[dict]:
 
 
 def _cache_set(key: str, value: dict, ttl: int = _CACHE_TTL):
-    """Set value in cache."""
+    """Set value in cache, evicting oldest entries past the cap."""
+    if key in _cache:
+        del _cache[key]
     _cache[key] = value
     _cache_timestamps[key] = time.time()
+    while len(_cache) > _CACHE_MAX_ENTRIES:
+        oldest, _ = next(iter(_cache.items()))
+        del _cache[oldest]
+        _cache_timestamps.pop(oldest, None)
 
 
-def _make_cache_key(prefix: str, doi: str, **kwargs) -> str:
+def _cache_scope(request) -> str:
+    """The cache partition a request's payloads belong to.
+
+    The mounted per-user library roots mean the same query from two users
+    is NOT the same answer: a process-wide cache keyed on query alone
+    serves one user's payload to another. Partition on the request user so
+    each identity (and anonymous) has its own cache lane.
+    """
+    user = getattr(request, "user", None)
+    name = getattr(user, "username", None)
+    if not name and getattr(user, "is_authenticated", False):
+        name = str(getattr(user, "pk", "") or "user")
+    return f"user:{name}" if name else "anon"
+
+
+def _make_cache_key(prefix: str, doi: str, scope: str = "", **kwargs) -> str:
     """Create cache key from parameters."""
-    parts = [prefix, doi.lower()]
+    parts = [prefix, scope, doi.lower()]
     for k, v in sorted(kwargs.items()):
         parts.append(f"{k}={v}")
     return f"cg:{hashlib.md5(':'.join(parts).encode()).hexdigest()}"
@@ -222,21 +253,28 @@ def _api_url() -> Optional[str]:
 # step (measured 2026-09-02 as a standalone first-run blocker). Built once and
 # shared so the routes cannot drift into different explanations.
 def _not_configured_payload() -> dict:
-    """The 'no crossref-local endpoint' body, with the fix in it."""
+    """The 'no crossref-local endpoint' body, with the fix in it.
+
+    All user-facing strings go through gettext so the Service Status
+    sidebar paragraph renders JA under a JA locale instead of staying
+    English (operator screenshot 2026-10-16). The setting name travels
+    as a %(setting)s placeholder so the msgid stays stable.
+    """
     return {
-        "error": "CrossRef API not configured",
-        "detail": (
+        "error": _i18n("CrossRef API not configured"),
+        "detail": _i18n(
             "The citation graph reads its data from a crossref-local HTTP API; "
             "scholar never opens the corpus files itself. No endpoint is "
             "configured, so there is nothing to query."
         ),
-        "fix": (
-            f"Set {CROSSREF_API_URL_SETTING} to a running crossref-local "
-            "endpoint (env var of the same name, or the Django setting when "
-            "scholar is mounted in a host project), then restart the server. "
-            "Installing the `crossref-local` package supplies a default "
-            "endpoint, which scholar falls back to when the variable is unset."
-        ),
+        "fix": _i18n(
+            "Set %(setting)s to a running crossref-local endpoint (env var of "
+            "the same name, or the Django setting when scholar is mounted in "
+            "a host project), then restart the server. Installing the "
+            "`crossref-local` package supplies a default endpoint, which "
+            "scholar falls back to when the variable is unset."
+        )
+        % {"setting": CROSSREF_API_URL_SETTING},
         "setting": CROSSREF_API_URL_SETTING,
         "docs": "src/scitex_scholar/citation_graph/README.md",
     }
@@ -314,15 +352,15 @@ def _standalone_projects_root() -> Path:
 
 
 class ScholarLocalProjectProvider(LocalProjectProvider):
-    """scitex-ui's standalone provider, minus the library's reserved dirs.
+    """scitex-sdk's standalone provider, minus the library's reserved dirs.
 
-    scitex-ui's ::class:`LocalProjectProvider` treats EVERY non-hidden folder
+    scitex-sdk's ::class:`LocalProjectProvider` treats EVERY non-hidden folder
     under its root as a selectable project. Scholar's standalone root IS the
     library root, whose direct children also include ``MASTER/`` (the
     deduplicated paper store) and ``downloads/`` (the PDF staging area), so the
     stock provider offered the internal store as if it were a user project.
 
-    Subclassing (rather than reimplementing) keeps scitex-ui authoritative for
+    Subclassing (rather than reimplementing) keeps scitex-sdk authoritative for
     the picker's id/name/detail shape and for the stored last-visited file,
     while the LISTING follows Scholar's own storage contract. The reserved
     names come from ``storage._project_reconcile`` -- the same set the library
@@ -346,19 +384,34 @@ class ScholarLocalProjectProvider(LocalProjectProvider):
 
 
 def _project_provider(request):
-    """Use the mounted host provider, or scitex-ui's local provider standalone."""
+    """Use the mounted host provider, or scitex-sdk's local provider standalone."""
     return host_project_provider() or ScholarLocalProjectProvider(
         _standalone_projects_root()
     )
 
 
-# Shared scitex-ui GET-list / POST-remember endpoint. The provider factory is
+# Shared scitex-sdk GET-list / POST-remember endpoint. The provider factory is
 # request-time so mounted hosts remain authoritative for permissions and
 # project identity; Scholar contains no Hub model or authorization logic.
 project_scope = project_listing_view(_project_provider)
 
 
-def index_context(request):
+def _leaf_identity() -> dict:
+    """Title + version for the leaf header, read from the leaf's own dist.
+
+    Mirrors writer's `_leaf_identity` in SHAPE (operator header mandate
+    2026-10-17: `<title> + v<version>`) while reading the version from the
+    package's own `__version__` (importlib.metadata, stdlib-only) instead of
+    the app registry: the same installed-version source the SDK's
+    `app_version` resolves, with no new imports and no registry dependency.
+    Never a hand-written string and never the host's version.
+    """
+    from scitex_scholar import __version__
+
+    return {"scholar_version": __version__}
+
+
+def index_context(request, current_project=None):
     """Return the existing Scholar page context for this request."""
     resolved_api = _api_url()
     provider = _project_provider(request)
@@ -368,7 +421,8 @@ def index_context(request):
         explicit=request.GET.get("project"),
     )
     return {
-        **shell_context("Scholar"),
+        **shell_context("Scholar", theme_default="light"),
+        **_leaf_identity(),
         "api_available": resolved_api is not None,
         "api_url": resolved_api or "Not configured",
         "stx_mount": mount_prefix(request),
@@ -382,7 +436,7 @@ def index_context(request):
         # template's json_script filter into <script id="SCHOLAR_I18N">;
         # the client reads it via JSON.parse (see scholarT in stx-mount.js).
         "scholar_i18n": _js_i18n_dict(),
-        # The scitex-ui workspace shell renders three side panes
+        # The scitex-sdk workspace shell renders three side panes
         # (Console/Chat, Files, Viewer) around the app content. Scholar
         # has no content for them, and because the template extends the
         # shell directly (it is not a built SPA shell the SDK wraps) they
@@ -394,10 +448,22 @@ def index_context(request):
     }
 
 
+def render_workspace_content(request, current_project=None, *, stx_mount):
+    """Render the existing workspace content at the host-verified app root."""
+    context = index_context(request, current_project)
+    context["stx_mount"] = stx_mount.rstrip("/")
+    html = render_to_string(
+        "scholar/workspace_renderer.html",
+        context,
+        request=request,
+    )
+    return HttpResponse(html)
+
+
 def index(request):
     """Serve the Scholar SPA shell page.
 
-    No `favicon_href` is supplied: the template includes scitex-ui's
+    No `favicon_href` is supplied: the template includes scitex-sdk's
     branding partial, which ships the shared SciTeX mark. A locally
     hand-rolled icon here would SHADOW that mark (the partial honours
     favicon_href when given one) and drift from the rest of the fleet --
@@ -491,23 +557,33 @@ def health(request):
     """
     from scitex_scholar import __version__
 
-    resolved_api = _api_url()
+    # The body reports STATE (api_available), never the endpoint ADDRESS:
+    # the raw crossref-local URL names server infrastructure, which is not
+    # a client concern (same disclosure class as the graph_health `api_url`
+    # leak and the library_root list payload). No JS or template reads this
+    # key; api_available already answers the configured question.
     return JsonResponse(
         {
             "status": "ok",
             "version": __version__,
-            "api_available": resolved_api is not None,
-            "api_url": resolved_api,
+            "api_available": _api_url() is not None,
         }
     )
 
 
 @require_GET
-def graph_network(request):
-    """Build citation network for a DOI."""
+def graph_network(request, _builder=None):
+    """Build citation network for a DOI.
+
+    `_builder` is a test-injection seam: the collaborator is a PARAMETER,
+    not a monkeypatch (PA-306), exactly as `search(request, _engine=)`.
+    Django routes call it with only `request`.
+    """
     doi = request.GET.get("doi")
     if not doi:
         return JsonResponse({"error": "DOI parameter required"}, status=400)
+    if len(doi) > _MAX_DOI_CHARS:
+        return _overlong_doi_response()
 
     try:
         top_n = int(request.GET.get("top_n", 20))
@@ -515,8 +591,16 @@ def graph_network(request):
         weight_coupling = float(request.GET.get("weight_coupling", 2.0))
         weight_cocitation = float(request.GET.get("weight_cocitation", 2.0))
         weight_direct = float(request.GET.get("weight_direct", 1.0))
-    except ValueError as e:
-        return JsonResponse({"error": f"Invalid parameter: {e}"}, status=400)
+    except ValueError:
+        return JsonResponse(
+            {
+                "error": (
+                    "top_n, weight_coupling, weight_cocitation, and "
+                    "weight_direct must be numbers"
+                )
+            },
+            status=400,
+        )
 
     use_cache = request.GET.get("no_cache", "false").lower() != "true"
 
@@ -524,6 +608,7 @@ def graph_network(request):
     cache_key = _make_cache_key(
         "net",
         doi,
+        _cache_scope(request),
         top_n=top_n,
         wc=weight_coupling,
         wco=weight_cocitation,
@@ -536,7 +621,7 @@ def graph_network(request):
             return JsonResponse(cached)
 
     # Build network
-    builder = _get_builder()
+    builder = _builder or _get_builder()
     if not builder:
         return JsonResponse(_not_configured_payload(), status=503)
 
@@ -560,23 +645,32 @@ def graph_network(request):
 
     except Exception as e:
         logger.error(f"Error building network for {doi}: {e}", exc_info=True)
-        return JsonResponse({"error": f"Failed to build network: {e}"}, status=500)
+        return JsonResponse({"error": "Failed to build network. Try again later."}, status=500)
 
 
 @require_GET
-def graph_related(request):
-    """Get related papers for a DOI."""
+def graph_related(request, _builder=None):
+    """Get related papers for a DOI.
+
+    `_builder` is a test-injection seam: the collaborator is a PARAMETER,
+    not a monkeypatch (PA-306), exactly as `search(request, _engine=)`.
+    Django routes call it with only `request`.
+    """
     doi = request.GET.get("doi")
     if not doi:
         return JsonResponse({"error": "DOI parameter required"}, status=400)
+    if len(doi) > _MAX_DOI_CHARS:
+        return _overlong_doi_response()
 
     try:
         limit = int(request.GET.get("limit", 10))
         limit = max(1, min(30, limit))
-    except ValueError as e:
-        return JsonResponse({"error": f"Invalid parameter: {e}"}, status=400)
+    except ValueError:
+        return JsonResponse(
+            {"error": "limit must be an integer"}, status=400
+        )
 
-    builder = _get_builder()
+    builder = _builder or _get_builder()
     if not builder:
         return JsonResponse(_not_configured_payload(), status=503)
 
@@ -591,21 +685,33 @@ def graph_related(request):
             reverse=True,
         )[:limit]
 
-        return JsonResponse({"doi": doi, "related": related, "count": len(related)})
+        # The success body carries the server-computed result only (related +
+        # count), never the caller-supplied doi back whole: a 200 body must
+        # not round-trip untrusted input (same reflection class as the
+        # saved-searches save/delete echoes). The only client
+        # (citation-graph.js) reads data.related; nothing reads the doi key.
+        return JsonResponse({"related": related, "count": len(related)})
 
     except Exception as e:
         logger.error(f"Error getting related papers for {doi}: {e}", exc_info=True)
-        return JsonResponse({"error": f"Failed to get related papers: {e}"}, status=500)
+        return JsonResponse({"error": "Failed to get related papers. Try again later."}, status=500)
 
 
 @require_GET
-def graph_paper(request):
-    """Get paper summary."""
+def graph_paper(request, _builder=None):
+    """Get paper summary.
+
+    `_builder` is a test-injection seam: the collaborator is a PARAMETER,
+    not a monkeypatch (PA-306), exactly as `search(request, _engine=)`.
+    Django routes call it with only `request`.
+    """
     doi = request.GET.get("doi")
     if not doi:
         return JsonResponse({"error": "DOI parameter required"}, status=400)
+    if len(doi) > _MAX_DOI_CHARS:
+        return _overlong_doi_response()
 
-    builder = _get_builder()
+    builder = _builder or _get_builder()
     if not builder:
         return JsonResponse(_not_configured_payload(), status=503)
 
@@ -617,7 +723,7 @@ def graph_paper(request):
 
     except Exception as e:
         logger.error(f"Error getting paper summary for {doi}: {e}", exc_info=True)
-        return JsonResponse({"error": f"Failed to get summary: {e}"}, status=500)
+        return JsonResponse({"error": "Failed to get paper summary. Try again later."}, status=500)
 
 
 @require_GET
@@ -654,13 +760,13 @@ def graph_health(request):
             {
                 "status": "configured",
                 "probed": False,
-                "error": "Citation Graph: not checked",
-                "detail": (
+                "error": _i18n("Citation Graph: not checked"),
+                "detail": _i18n(
                     "A crossref-local endpoint is configured. The graph backend "
                     "is probed when you open the Citation Graph tab, so a slow "
                     "or unreachable backend cannot delay the rest of the page."
                 ),
-                "fix": "Open the Citation Graph tab to check it.",
+                "fix": _i18n("Open the Citation Graph tab to check it."),
             }
         )
 
@@ -682,12 +788,12 @@ def graph_health(request):
             {
                 "status": "unavailable",
                 "probed": True,
-                "error": "Citation Graph: unavailable",
-                "detail": (
+                "error": _i18n("Citation Graph: unavailable"),
+                "detail": _i18n(
                     "The crossref-local endpoint is configured but could not "
                     "be reached right now, so citation graphs cannot be built."
                 ),
-                "fix": (
+                "fix": _i18n(
                     "Verify the crossref-local service is running and that "
                     "the endpoint is reachable, then retry."
                 ),
@@ -704,17 +810,38 @@ def _degraded_payload() -> dict:
     """
     return {
         "status": "degraded",
-        "error": "Citation Graph: limited",
-        "detail": (
+        "error": _i18n("Citation Graph: limited"),
+        "detail": _i18n(
             "The crossref-local endpoint is configured and reachable, but the "
             "probe returned no data for the canary paper. Citation graphs may "
             "be incomplete."
         ),
-        "fix": (
+        "fix": _i18n(
             "Check that the crossref-local endpoint is serving the corpus you "
             "expect; the citation graph depends on it."
         ),
     }
+
+
+def _strip_markup_from_search_abstracts(result: dict) -> None:
+    """Strip JATS/HTML markup from live-search abstracts, in place.
+
+    WHY (CCT 2759/2760, 2026-10-15): EuropePMC/PMC abstracts arrive with
+    raw JATS XML tags (e.g. ``<jats:p>``); the leaf served them verbatim
+    and the client renders via textContent, so researchers saw raw markup.
+    The package already owns ``TextNormalizer.strip_html_tags`` (also the
+    metadata-enrichment choke point); the live-search path never funnels
+    through it, so the leaf view strips at its own serialization boundary
+    instead. Only non-empty str abstracts are touched; None/missing pass
+    through untouched.
+    """
+    from scitex_scholar._utils.text import TextNormalizer
+
+    for row in result.get("results") or []:
+        if isinstance(row, dict):
+            abstract = row.get("abstract")
+            if isinstance(abstract, str) and abstract:
+                row["abstract"] = TextNormalizer.strip_html_tags(abstract)
 
 
 @require_GET
@@ -732,12 +859,19 @@ def search(request, _engine=None):
     query = request.GET.get("q", "").strip()
     if not query:
         return JsonResponse({"error": "q parameter required"}, status=400)
+    if len(query) > _MAX_QUERY_CHARS:
+        return JsonResponse(
+            {"error": f"q must be at most {_MAX_QUERY_CHARS} characters"},
+            status=400,
+        )
 
     try:
         max_results = int(request.GET.get("max_results", 20))
         max_results = max(1, min(100, max_results))
-    except ValueError as e:
-        return JsonResponse({"error": f"Invalid parameter: {e}"}, status=400)
+    except ValueError:
+        return JsonResponse(
+            {"error": "max_results must be an integer"}, status=400
+        )
 
     mode = request.GET.get("mode", "parallel")
     if mode not in ("parallel", "single"):
@@ -746,7 +880,9 @@ def search(request, _engine=None):
         )
 
     use_cache = request.GET.get("no_cache", "false").lower() != "true"
-    cache_key = _make_cache_key("search", query, mode=mode, max_results=max_results)
+    cache_key = _make_cache_key(
+        "search", query, _cache_scope(request), mode=mode, max_results=max_results
+    )
     if use_cache:
         cached = _cache_get(cache_key)
         if cached:
@@ -758,13 +894,14 @@ def search(request, _engine=None):
         result = asyncio.run(
             engine.search(query=query, mode=mode, max_results=max_results)
         )
+        _strip_markup_from_search_abstracts(result)
         result.setdefault("metadata", {})["cached"] = False
         _cache_set(cache_key, result)
         return JsonResponse(result)
 
     except Exception as e:
         logger.error(f"Search failed for {query!r}: {e}", exc_info=True)
-        return JsonResponse({"error": f"Search failed: {e}"}, status=500)
+        return JsonResponse({"error": "Search failed. Try again later."}, status=500)
 
 
 # ---------------------------------------------------------------------------
@@ -785,6 +922,71 @@ def search(request, _engine=None):
 # process, not an HTTP parameter, so an unauthenticated client cannot redirect
 # the API to another user's library.
 # ---------------------------------------------------------------------------
+
+
+#: Largest accepted search query on the live search endpoint, the library
+#: list filter, and the saved-search name/query fields. The rows file behind
+#: saved searches is re-read whole per list call, the library filter casefolds
+#: per row, and the live query fans out to the search engines and the result
+#: cache key -- so an unbounded value is per-request engine + cache pressure.
+#: 2k chars is far past any real query.
+_MAX_QUERY_CHARS = 2000
+
+#: Largest accepted JSON body on the write endpoints (save/save-bulk,
+#: searches save+delete, enrich, import). Bodies parse whole before any
+#: check, so an unbounded body is memory + disk pressure per request; 256k
+#: is far past any legitimate payload (a paper abstract is bytes-to-low-kb,
+#: bulk stays usable for 100+ papers).
+_MAX_JSON_BODY_BYTES = 256 * 1024
+
+#: Largest accepted save-bulk batch and BibTeX import. Both loops do one file
+#: write per item, so an unbounded list is write amplification per request
+#: even under the body-bytes cap (~1000 tiny papers fit in 256k); 500 items
+#: is far past the documented 100+ legitimate bulk use.
+_MAX_BULK_ITEMS = 500
+
+#: Largest accepted DOI on the three graph endpoints. The value fans out to
+#: the cache key, the graph builder, and the error log -- so an unbounded
+#: value is per-request cache + engine + log pressure; 500 chars is far past
+#: any real DOI (tens of chars).
+_MAX_DOI_CHARS = 500
+
+#: Largest accepted library paper_id on every endpoint that resolves one
+#: (enrich, save, save-bulk, import, load). The id is a single path
+#: component under MASTER/, so it can never exceed the filesystem's
+#: 255-byte NAME_MAX -- anything longer names no real record, and
+#: unclamped it crashes the stat/write call (OSError: File name too long)
+#: while the 400/404 bodies echo the value back whole.
+_MAX_LIBRARY_ID_CHARS = 255
+
+#: Largest accepted raw BibTeX text on library_import. The import arrives
+#: form-encoded, so the JSON body-bytes guard never sees it, and a single
+#: giant entry parses whole before the _MAX_BULK_ITEMS count cap can
+#: engage -- so unbounded text is per-request parse + memory pressure.
+#: 1M chars admits the documented 500-entry bulk use (~2k chars/entry)
+#: with headroom.
+_MAX_IMPORT_TEXT_CHARS = 1_000_000
+
+#: Largest accepted saved-search row count per user. Per-row values are
+#: already capped, but the rows file is re-read whole per list call, so an
+#: unbounded row count lets one scripted caller bloat every future list
+#: call for that user; 500 rows is far past any curated set of searches.
+_MAX_SAVED_SEARCHES = 500
+
+
+def _overlong_doi_response():
+    return JsonResponse(
+        {"error": f"doi must be at most {_MAX_DOI_CHARS} characters"},
+        status=400,
+    )
+
+
+def _json_body(request):
+    """Parse the JSON body, refusing oversized payloads before parsing."""
+    raw = request.body or b"{}"
+    if len(raw) > _MAX_JSON_BODY_BYTES:
+        raise ValueError("Request body too large")
+    return json.loads(raw)
 
 
 def _library_root() -> Path:
@@ -855,10 +1057,20 @@ def _assert_safe_library_id(library_id: str) -> str:
     """A persisted library_id is a single path component under MASTER/.
 
     It must not contain a path separator, NUL, or be a traversal token --
-    otherwise ``MASTER/<library_id>`` could escape the library root.
+    otherwise ``MASTER/<library_id>`` could escape the library root. It
+    must also fit in one component (NAME_MAX 255): anything longer names
+    no real record, and unclamped it crashes the stat/write call while the
+    error bodies echo the value (and the server path) back whole. The
+    refusal message is FIXED -- it never carries the value.
     """
+    if not isinstance(library_id, str):
+        raise ValueError("unsafe library_id: not a string")
+    if len(library_id) > _MAX_LIBRARY_ID_CHARS:
+        raise ValueError(
+            f"unsafe library_id: longer than {_MAX_LIBRARY_ID_CHARS} characters"
+        )
     if not library_id or "/" in library_id or "\\" in library_id or "\x00" in library_id:
-        raise ValueError(f"unsafe library_id: {library_id!r}")
+        raise ValueError("unsafe library_id: not a single path component")
     if library_id in (".", ".."):
         raise ValueError("unsafe library_id: traversal token")
     return library_id
@@ -873,6 +1085,7 @@ def _load_library_paper(root: Path, paper_id: str):
     """
     from scitex_scholar.core.Paper import Paper
 
+    paper_id = _assert_safe_library_id(paper_id)
     meta_path = root / "MASTER" / paper_id / "metadata.json"
     data = json.loads(meta_path.read_text())
     paper = Paper.from_dict(data)
@@ -903,11 +1116,14 @@ def _save_library_paper(paper, root: Path) -> Path:
 def library_list(request):
     """List the user's local library papers, optionally filtered by ``?q=``.
 
-    Returns {papers: [...], count, total, filtered, query, library_root}.
+    Returns {papers: [...], count, total, filtered, query}.
     Reads the user's primary metadata files directly (``collect_rows`` -- "no
     store involved"), scoped to the request's user (see ``_library_root_for``),
     so a mounted hub never exposes one shared service-account library to every
-    user. An empty or missing library is an empty list, not an error.
+    user. The server-side root stays server-side: the payload carries paper
+    rows only, never the filesystem path (it names the service account and
+    jail layout on a mounted host). An empty or missing library is an empty
+    list, not an error.
 
     ``filtered`` says whether a filter was APPLIED, and ``total`` how many
     papers the library holds before it. The client needs both to tell "you have
@@ -919,15 +1135,26 @@ def library_list(request):
     from scitex_scholar.storage import _library_index as idx
 
     query = (request.GET.get("q") or "").strip()
+    if len(query) > _MAX_QUERY_CHARS:
+        return JsonResponse(
+            {"error": f"q must be at most {_MAX_QUERY_CHARS} characters"},
+            status=400,
+        )
+    try:
+        command = _parse_library_query(query)
+    except ValueError as e:
+        return JsonResponse({"error": str(e)}, status=400)
 
     def _payload(papers: list, total: int) -> dict:
+        # Success body carries server-computed result only: the client
+        # already holds the filter text in its own input box, and no
+        # JS/template consumer reads a `query` key -- echoing raw caller
+        # input back whole is pure reflection surface.
         return {
             "papers": papers,
             "count": len(papers),
             "total": total,
             "filtered": bool(query),
-            "query": query,
-            "library_root": str(root),
         }
 
     try:
@@ -938,7 +1165,7 @@ def library_list(request):
         # Duplicate DOIs across primary entries == library corruption; surface it
         # rather than silently listing an inconsistent view.
         logger.error(f"library list: {e}")
-        return JsonResponse({"error": f"Library index inconsistent: {e}"}, status=500)
+        return JsonResponse({"error": "Library index inconsistent. Rebuild or repair the library."}, status=500)
 
     papers = [
         {
@@ -954,8 +1181,81 @@ def library_list(request):
         for r in rows
     ]
     if query:
-        papers = [p for p in papers if _paper_matches(p, query)]
+        papers = _filter_library_papers(papers, query, command)
     return JsonResponse(_payload(papers, len(rows)))
+
+
+def _parse_library_query(query: str):
+    """Adapt existing query parsers to fields present in Library rows."""
+    if not query:
+        return None
+    import re
+
+    # Plain queries keep their existing whole-query substring behavior.
+    operator = r"(?<!\S)(?:--?[\w-]+|(?:year|citations?|impact_factor|if|open_access|oa|type):)"
+    if not re.search(operator, query, re.IGNORECASE):
+        return None
+    unsupported = r"(?<!\S)(?:-ifmin\b|-ifmax\b|--if-min\b|--if-max\b|(?:impact_factor|if|open_access|oa|type):)"
+    if re.search(unsupported, query, re.IGNORECASE):
+        raise ValueError("Library command filters do not support IF, OA or type")
+
+    from scitex_scholar.pipelines.SearchQueryParser import SearchQueryParser
+
+    shell = SearchQueryParser.from_shell_syntax(query)
+    options = {
+        "-t", "--title", "-a", "--author", "-j", "--journal",
+        "-ymin", "--year-min", "-ymax", "--year-max",
+        "-cmin", "--citations-min", "-cmax", "--citations-max",
+    }
+    if any(word.casefold() in options or word.startswith("--") for word in shell.positive_keywords):
+        raise ValueError("Invalid Library command option or value")
+    normal = SearchQueryParser(shell.get_keyword_query())
+    fields = {**normal.get_filters(), **shell.get_filters()}
+    if any(key in fields for key in ("min_impact_factor", "max_impact_factor", "open_access", "document_type")):
+        raise ValueError("Library command filters do not support IF, OA or type")
+    # Numeric filters use apply_filters' explicit None checks, including zero.
+    names = {
+        "year_start": "year_from", "year_end": "year_to",
+        "min_citations": "min_citations", "max_citations": "max_citations",
+    }
+    numeric = {target: fields[source] for source, target in names.items() if source in fields}
+    text = {key: value for key, value in fields.items() if key.endswith(("_includes", "_excludes"))}
+    return {
+        "query": normal.get_keyword_query(),
+        "negative_keywords": normal.negative_keywords,
+        "filters": numeric,
+        "operators": text,
+    }
+
+
+def _filter_library_papers(papers: list, query: str, command) -> list:
+    """Filter temporary scalar projections and return original public rows."""
+    if command is None:
+        return [paper for paper in papers if _paper_matches(paper, query)]
+
+    from scitex_scholar.filters import apply_filters
+
+    selected = []
+    for paper in papers:
+        if command["query"] and not _paper_matches(paper, command["query"]):
+            continue
+        if any(_paper_matches(paper, word) for word in command["negative_keywords"]):
+            continue
+        authors = [
+            str(author if isinstance(author, str) else author.get("name") or "")
+            for author in (paper.get("authors") or [])
+            if isinstance(author, (str, dict))
+        ]
+        projection = {
+            "title": str(paper.get("title") or ""),
+            "authors": authors,
+            "journal": str(paper.get("venue") or ""),
+            "year": paper.get("year"),
+            "citations": paper.get("citation_count"),
+        }
+        if apply_filters([projection], command["filters"], command["operators"]):
+            selected.append(paper)
+    return selected
 
 
 def _paper_matches(paper: dict, query: str) -> bool:
@@ -999,12 +1299,28 @@ def library_enrich(request, _pipeline=None):
     paper_id = (request.POST.get("paper_id") or "").strip()
     if not paper_id:
         return JsonResponse({"error": "paper_id required"}, status=400)
+    # paper_id is a single path component under MASTER/ (NAME_MAX 255), so a
+    # longer value can never name a real record -- fail closed BEFORE any
+    # filesystem touch, and without echoing the value (the 400/404 bodies
+    # would otherwise carry it back whole).
+    if len(paper_id) > _MAX_LIBRARY_ID_CHARS:
+        return JsonResponse(
+            {"error": f"paper_id must be at most {_MAX_LIBRARY_ID_CHARS} characters"},
+            status=400,
+        )
+    # paper_id is a body-key path sink (MASTER/<paper_id>/metadata.json):
+    # fail closed BEFORE any filesystem touch, so a traversal or absolute
+    # value can neither probe nor load records outside the user root.
+    try:
+        paper_id = _assert_safe_library_id(paper_id)
+    except ValueError:
+        return JsonResponse({"error": "invalid paper_id"}, status=400)
     force = (request.POST.get("force") or "").lower() in ("1", "true", "yes")
 
     root = _library_root_for(request)
     meta_path = root / "MASTER" / paper_id / "metadata.json"
     if not meta_path.is_file():
-        return JsonResponse({"error": f"library paper not found: {paper_id}"}, status=404)
+        return JsonResponse({"error": "library paper not found"}, status=404)
 
     try:
         paper = _load_library_paper(root, paper_id)
@@ -1019,10 +1335,16 @@ def library_enrich(request, _pipeline=None):
         _save_library_paper(enriched, root)
 
         m = enriched.metadata
+        # The success body carries state + server-computed enrichment only
+        # (doi/title/year resolved from the databases), never the
+        # caller-supplied paper_id back: the only client (library.js) posts
+        # the id from its own row state and reads abstract_chars,
+        # citation_count, and title -- nothing reads a paper_id key, so the
+        # echo is pure round-trip (same reflection class as the save path
+        # leak, the list query echo, and the import paper_ids echo).
         return JsonResponse(
             {
                 "ok": True,
-                "paper_id": paper_id,
                 "doi": m.id.doi,
                 "title": m.basic.title,
                 "year": m.basic.year,
@@ -1032,7 +1354,7 @@ def library_enrich(request, _pipeline=None):
         )
     except Exception as e:
         logger.error(f"library enrich failed for {paper_id!r}: {e}", exc_info=True)
-        return JsonResponse({"error": f"Enrichment failed: {e}"}, status=500)
+        return JsonResponse({"error": "Enrichment failed. Try again later."}, status=500)
 
 
 # ---------------------------------------------------------------------------
@@ -1097,9 +1419,12 @@ def library_export(request):
     """
     fmt = (request.GET.get("format") or "bibtex").strip().lower()
     if fmt not in LIBRARY_EXPORT_FORMATS:
+        # Fixed message: the raw value is untrusted input and must never be
+        # echoed back whole (same echo class as the import-format 400).
+        # ?format= travels by GET, so no body cap applies.
         return JsonResponse(
             {
-                "error": f"Unsupported export format: {fmt}",
+                "error": "Unsupported export format",
                 "supported": list(LIBRARY_EXPORT_FORMATS),
             },
             status=400,
@@ -1114,13 +1439,13 @@ def library_export(request):
     except FileNotFoundError:
         rows = []
     except ValueError as e:
-        return JsonResponse({"error": f"Library inconsistent: {e}"}, status=500)
+        return JsonResponse({"error": "Library inconsistent. Rebuild or repair the library."}, status=500)
 
     try:
         content = papers_to_format([_row_to_formatting_dict(r) for r in rows], fmt)
     except Exception as e:
         logger.error(f"library export ({fmt}) failed: {e}", exc_info=True)
-        return JsonResponse({"error": f"Export failed: {e}"}, status=500)
+        return JsonResponse({"error": "Export failed. Try again later."}, status=500)
 
     content_type = {
         "bibtex": "application/x-bibtex",
@@ -1159,9 +1484,11 @@ def library_import(request):
     """
     fmt = (request.POST.get("format") or "bibtex").strip().lower()
     if fmt not in LIBRARY_IMPORT_FORMATS:
+        # Fixed message: the raw value is untrusted input and must never be
+        # echoed back whole (same echo class as the numeric-param 400s).
         return JsonResponse(
             {
-                "error": f"Unsupported import format: {fmt}",
+                "error": "Unsupported import format",
                 "supported": list(LIBRARY_IMPORT_FORMATS),
             },
             status=400,
@@ -1169,6 +1496,11 @@ def library_import(request):
     bibtex_text = (request.POST.get("bibtex") or "").strip()
     if not bibtex_text:
         return JsonResponse({"error": "bibtex field required"}, status=400)
+    if len(bibtex_text) > _MAX_IMPORT_TEXT_CHARS:
+        return JsonResponse(
+            {"error": f"bibtex text must be at most {_MAX_IMPORT_TEXT_CHARS} characters"},
+            status=413,
+        )
 
     root = _library_root_for(request)
     try:
@@ -1190,6 +1522,11 @@ def library_import(request):
                 {"error": "No papers found in the provided BibTeX", "imported": 0},
                 status=400,
             )
+        if len(papers) > _MAX_BULK_ITEMS:
+            return JsonResponse(
+                {"error": f"Too many entries: at most {_MAX_BULK_ITEMS} per import"},
+                status=400,
+            )
 
         imported = []
         for paper in papers:
@@ -1200,10 +1537,15 @@ def library_import(request):
             _save_library_paper(paper, root)
             imported.append(library_id)
 
-        return JsonResponse({"ok": True, "imported": len(imported), "paper_ids": imported})
+        # The success body reports STATE ONLY: the imported count (the toast
+        # reads data.imported, then loadLibrary refreshes authoritative
+        # state). The per-paper ids are derived from caller-supplied BibTeX
+        # content and are unread in static/ + templates/ -- echoing them is
+        # the same reflection class as the save-bulk library_id echo.
+        return JsonResponse({"ok": True, "imported": len(imported)})
     except Exception as e:
         logger.error(f"library import failed: {e}", exc_info=True)
-        return JsonResponse({"error": f"Import failed: {e}"}, status=500)
+        return JsonResponse({"error": "Import failed. Try again later."}, status=500)
 
 
 def _paper_from_save_payload(payload):
@@ -1253,10 +1595,15 @@ def library_save(request):
     (PaperIO) under the request's user-scoped root — no shared store, no
     database. ``container.created_by`` is stamped with the request user.
     A missing library_id is derived (DOI/title hash, dedup-friendly).
+    Bodies over 256k are refused with 413 before parsing.
     """
     try:
-        payload = json.loads(request.body or b"{}")
-    except (ValueError, TypeError):
+        payload = _json_body(request)
+    except ValueError as e:
+        if "too large" in str(e):
+            return JsonResponse({"error": str(e)}, status=413)
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    except TypeError:
         return JsonResponse({"error": "Invalid JSON body"}, status=400)
     try:
         paper = _paper_from_save_payload(payload)
@@ -1268,14 +1615,17 @@ def library_save(request):
         paper.container.library_id = _derived_library_id(paper)
     root = _library_root_for(request)
     try:
-        path = _save_library_paper(paper, root)
+        _save_library_paper(paper, root)
     except ValueError as e:
         return JsonResponse({"error": str(e)}, status=400)
     except OSError as e:
         logger.error(f"library save failed: {e}", exc_info=True)
-        return JsonResponse({"error": f"Save failed: {e}"}, status=500)
+        return JsonResponse({"error": "Save failed. Try again later."}, status=500)
+    # The body reports STATE + the validated library_id handle only, never
+    # the server filesystem path: str(path) names the service account + jail
+    # layout (same disclosure class as the library_root list payload).
     return JsonResponse(
-        {"saved": True, "library_id": paper.container.library_id, "path": str(path)}
+        {"saved": True, "library_id": paper.container.library_id}
     )
 
 
@@ -1283,16 +1633,30 @@ def library_save(request):
 def library_save_bulk(request):
     """Save MANY papers in one call; per-paper results so one bad row cannot
     fail the batch. Body: ``{"papers": [...]}``. Same store, scoping, and
-    stamping rules as library_save."""
+    stamping rules as library_save. Bodies over 256k are refused with
+    413 before parsing; batches over 500 items are refused with 400
+    before any write (one file write per item would otherwise amplify
+    a single request into hundreds of writes). Per-row failures carry
+    the row index and a fixed error only -- never the caller-supplied
+    library_id back."""
     try:
-        payload = json.loads(request.body or b"{}")
-    except (ValueError, TypeError):
+        payload = _json_body(request)
+    except ValueError as e:
+        if "too large" in str(e):
+            return JsonResponse({"error": str(e)}, status=413)
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    except TypeError:
         return JsonResponse({"error": "Invalid JSON body"}, status=400)
     if not isinstance(payload, dict):
         return JsonResponse({"error": 'Body must be {"papers": [...]}'}, status=400)
     papers = payload.get("papers")
     if not isinstance(papers, list):
         return JsonResponse({"error": 'Body must be {"papers": [...]}'}, status=400)
+    if len(papers) > _MAX_BULK_ITEMS:
+        return JsonResponse(
+            {"error": f"papers must contain at most {_MAX_BULK_ITEMS} items"},
+            status=400,
+        )
     user = getattr(request, "user", None)
     created_by = _safe_username(user) if user is not None else "user"
     root = _library_root_for(request)
@@ -1307,13 +1671,19 @@ def library_save_bulk(request):
         if not paper.container.library_id:
             paper.container.library_id = _derived_library_id(paper)
         try:
-            path = _save_library_paper(paper, root)
+            _save_library_paper(paper, root)
         except (ValueError, OSError) as e:
-            failed.append(
-                {"index": i, "library_id": paper.container.library_id, "error": str(e)}
-            )
+            # The failure object identifies the row by index only. The
+            # caller-supplied library_id is NEVER reflected: echoing it back
+            # whole is the same reflection class as the enrich 400/404
+            # paper_id echoes, and the bulk 200 status would otherwise
+            # round-trip an arbitrary value verbatim. The error text is the
+            # fixed validator message (see _assert_safe_library_id).
+            failed.append({"index": i, "error": str(e)})
             continue
-        saved.append({"library_id": paper.container.library_id, "path": str(path)})
+        # Saved entries carry the validated library_id handle only, never
+        # the server filesystem path (same disclosure class as above).
+        saved.append({"library_id": paper.container.library_id})
     return JsonResponse({"saved": saved, "failed": failed})
 
 
@@ -1345,23 +1715,50 @@ def searches_save(request):
 
     Body: {"name": ..., "query": ..., "params": {...}}. Stored file-based
     under the request's user-scoped root — no shared store, no database.
+    Bodies over 256k are refused with 413 before parsing. At most 500 rows
+    are stored per user: the rows file is read whole per list call.
     """
     try:
-        payload = json.loads(request.body or b"{}")
-    except (ValueError, TypeError):
+        payload = _json_body(request)
+    except ValueError as e:
+        if "too large" in str(e):
+            return JsonResponse({"error": str(e)}, status=413)
         return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    except TypeError:
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    # Bound both: the rows file is read whole per request, so an unbounded
+    # value bloats every future list call for that user (and the file).
+    # 2k chars each is far past any real saved-search name or query.
     name = (payload.get("name") or "").strip()
     query = (payload.get("query") or "").strip()
     if not name or not query:
         return JsonResponse({"error": "name and query are required"}, status=400)
+    if len(name) > _MAX_QUERY_CHARS or len(query) > _MAX_QUERY_CHARS:
+        return JsonResponse(
+            {"error": f"name and query must each be at most {_MAX_QUERY_CHARS} characters"},
+            status=400,
+        )
     params = payload.get("params")
     if params is None:
         params = {}
     if not isinstance(params, dict):
         return JsonResponse({"error": "params must be an object"}, status=400)
+    # Bound the serialized params too: no client sends params today (the UI
+    # posts name + query only), so an 8k serialized mapping is already far
+    # past any legitimate use -- and the rows file is re-read whole per list.
+    if len(json.dumps(params)) > 8000:
+        return JsonResponse(
+            {"error": "params must serialize to at most 8000 characters"},
+            status=400,
+        )
     user = getattr(request, "user", None)
     root = _library_root_for(request)
     rows = _load_saved_searches(root)
+    if len(rows) >= _MAX_SAVED_SEARCHES:
+        return JsonResponse(
+            {"error": f"at most {_MAX_SAVED_SEARCHES} saved searches per user"},
+            status=400,
+        )
     import datetime as _dt
     import uuid as _uuid
 
@@ -1378,8 +1775,13 @@ def searches_save(request):
         _write_saved_searches(root, rows)
     except OSError as e:
         logger.error(f"searches save failed: {e}", exc_info=True)
-        return JsonResponse({"error": f"Save failed: {e}"}, status=500)
-    return JsonResponse({"saved": True, "id": row["id"], "name": name})
+        return JsonResponse({"error": "Save failed. Try again later."}, status=500)
+    # The success body carries the server-issued id only (the delete
+    # handle). The caller-supplied name is NEVER reflected: echoing it back
+    # whole is the same reflection class as the delete-id echo below and
+    # the save-bulk failed[].library_id echo (slice 23) -- a 200 body
+    # round-tripping untrusted input verbatim. No client reads the key.
+    return JsonResponse({"saved": True, "id": row["id"]})
 
 
 @require_GET
@@ -1391,10 +1793,17 @@ def searches_list(request):
 
 @require_POST
 def searches_delete(request):
-    """Delete one saved search by id; 404 when unknown."""
+    """Delete one saved search by id; 404 when unknown. Bodies over 256k are
+    refused with 413 before parsing. The success body carries state only:
+    the caller-supplied id is NEVER reflected (same reflection class as
+    the save-bulk failed[].library_id echo, slice 23)."""
     try:
-        payload = json.loads(request.body or b"{}")
-    except (ValueError, TypeError):
+        payload = _json_body(request)
+    except ValueError as e:
+        if "too large" in str(e):
+            return JsonResponse({"error": str(e)}, status=413)
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    except TypeError:
         return JsonResponse({"error": "Invalid JSON body"}, status=400)
     search_id = payload.get("id")
     if not search_id:
@@ -1408,8 +1817,134 @@ def searches_delete(request):
         _write_saved_searches(root, kept)
     except OSError as e:
         logger.error(f"searches delete failed: {e}", exc_info=True)
-        return JsonResponse({"error": f"Delete failed: {e}"}, status=500)
-    return JsonResponse({"deleted": True, "id": search_id})
+        return JsonResponse({"error": "Delete failed. Try again later."}, status=500)
+    return JsonResponse({"deleted": True})
+
+
+# Old-direct parity slice 1 (operator mandate 2026-10-17): hub scholar_app
+# keeps SavedGraph rows (name + rebuild recipe); the leaf keeps the same
+# shape file-based under the user-scoped root, mirroring saved searches.
+# Reload needs no endpoint: GET api/graph/network?doi=<seed_doi> rebuilds.
+_MAX_SAVED_GRAPHS = 500
+_MAX_GRAPH_NAME_CHARS = 200
+
+
+def _saved_graphs_path(root: Path) -> Path:
+    """Single JSON file holding this user's saved graphs."""
+    return root / "SAVED_GRAPHS" / "saved_graphs.json"
+
+
+def _load_saved_graphs(root: Path) -> list:
+    path = _saved_graphs_path(root)
+    if not path.is_file():
+        return []
+    try:
+        data = json.loads(path.read_text())
+    except ValueError:
+        return []
+    return data if isinstance(data, list) else []
+
+
+def _write_saved_graphs(root: Path, rows: list) -> None:
+    path = _saved_graphs_path(root)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(rows))
+
+
+@require_POST
+def graphs_save(request):
+    """Save a named graph rebuild recipe for this user (explicit action).
+
+    Body: {"name": ..., "seed_doi": ...}. Stored file-based under the
+    request's user-scoped root — no shared store, no database. Bodies over
+    256k are refused with 413 before parsing. At most 500 rows per user.
+    Names cap at 200 (hub SavedGraph.name); seed DOIs reuse the 500-char
+    leaf DOI bound. A nameless or seedless row cannot rebuild: 400.
+    """
+    try:
+        payload = _json_body(request)
+    except ValueError as e:
+        if "too large" in str(e):
+            return JsonResponse({"error": str(e)}, status=413)
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    except TypeError:
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    name = (payload.get("name") or "").strip()
+    seed_doi = (payload.get("seed_doi") or "").strip()
+    if not name or not seed_doi:
+        return JsonResponse({"error": "name and seed_doi are required"}, status=400)
+    if len(name) > _MAX_GRAPH_NAME_CHARS:
+        return JsonResponse(
+            {"error": f"name must be at most {_MAX_GRAPH_NAME_CHARS} characters"},
+            status=400,
+        )
+    if len(seed_doi) > _MAX_DOI_CHARS:
+        return JsonResponse(
+            {"error": f"seed_doi must be at most {_MAX_DOI_CHARS} characters"},
+            status=400,
+        )
+    user = getattr(request, "user", None)
+    root = _library_root_for(request)
+    rows = _load_saved_graphs(root)
+    if len(rows) >= _MAX_SAVED_GRAPHS:
+        return JsonResponse(
+            {"error": f"at most {_MAX_SAVED_GRAPHS} saved graphs per user"},
+            status=400,
+        )
+    import datetime as _dt
+    import uuid as _uuid
+
+    row = {
+        "id": _uuid.uuid4().hex,
+        "name": name,
+        "seed_doi": seed_doi,
+        "created_by": _safe_username(user) if user is not None else "user",
+        "created_at": _dt.datetime.now(_dt.timezone.utc).isoformat(),
+    }
+    rows.append(row)
+    try:
+        _write_saved_graphs(root, rows)
+    except OSError as e:
+        logger.error(f"graphs save failed: {e}", exc_info=True)
+        return JsonResponse({"error": "Save failed. Try again later."}, status=500)
+    # Success body carries the server-issued id only (the delete handle);
+    # caller input is never reflected (same reflection class as searches).
+    return JsonResponse({"saved": True, "id": row["id"]})
+
+
+@require_GET
+def graphs_list(request):
+    """List this user's saved graphs (user-scoped root only)."""
+    root = _library_root_for(request)
+    return JsonResponse({"graphs": _load_saved_graphs(root)})
+
+
+@require_POST
+def graphs_delete(request):
+    """Delete one saved graph by id; 404 when unknown. Bodies over 256k are
+    refused with 413 before parsing. The success body carries state only."""
+    try:
+        payload = _json_body(request)
+    except ValueError as e:
+        if "too large" in str(e):
+            return JsonResponse({"error": str(e)}, status=413)
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    except TypeError:
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    graph_id = payload.get("id")
+    if not graph_id:
+        return JsonResponse({"error": "id is required"}, status=400)
+    root = _library_root_for(request)
+    rows = _load_saved_graphs(root)
+    kept = [r for r in rows if r.get("id") != graph_id]
+    if len(kept) == len(rows):
+        return JsonResponse({"error": "Unknown id"}, status=404)
+    try:
+        _write_saved_graphs(root, kept)
+    except OSError as e:
+        logger.error(f"graphs delete failed: {e}", exc_info=True)
+        return JsonResponse({"error": "Delete failed. Try again later."}, status=500)
+    return JsonResponse({"deleted": True})
 
 
 # EOF

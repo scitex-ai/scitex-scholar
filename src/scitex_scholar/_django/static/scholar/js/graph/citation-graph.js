@@ -69,13 +69,19 @@ class CitationGraphManager {
     // Render helper: a status dot + label, and (when limited) the explanation
     // of what is limited and what the user can DO. The health endpoint returns
     // {status, error, detail, fix}; `detail`/`fix` are the answer, `error` the
-    // one-line label (item 150-152, hub live audit 2026-09-14).
-    const set = (cls, label, detail, fix) => {
+    // one-line label (item 150-152, hub live audit 2026-09-14). The strip's
+    // graph LED mirrors the same state (old Sources style: dots + expand).
+    const set = (cls, label, detail, fix, led) => {
       let html =
         '<span class="status-indicator ' + cls + '">&#9679; ' + label + "</span>";
       if (detail) html += '<small class="status-detail">' + detail + "</small>";
       if (fix) html += '<small class="status-fix">' + fix + "</small>";
       el.innerHTML = html;
+      const dot = document.querySelector('.status-led[data-source="graph"]');
+      if (dot) {
+        dot.dataset.status = led;
+        dot.title = label;
+      }
     };
 
     // `probe` is the ONLY difference between the initial-load report and the
@@ -87,9 +93,9 @@ class CitationGraphManager {
       const resp = await fetch(url);
       const data = await resp.json();
       if (data.status === "healthy") {
-        set("status-healthy", scholarT("Service available"));
+        set("status-healthy", scholarT("Service available"), undefined, undefined, "ready");
       } else if (data.status === "degraded") {
-        set("status-warning", data.error || scholarT("Service limited"), data.detail, data.fix);
+        set("status-warning", data.error || scholarT("Service limited"), data.detail, data.fix, "limited");
       } else if (data.status === "configured") {
         // Endpoint present, not probed yet — deliberately NOT "available":
         // claiming ready before the backend answered is the failure this
@@ -99,6 +105,7 @@ class CitationGraphManager {
           data.error || scholarT("Not checked yet"),
           data.detail,
           data.fix,
+          "checking",
         );
       } else if (data.status === "unconfigured") {
         set(
@@ -106,14 +113,15 @@ class CitationGraphManager {
           data.error || scholarT("Service limited"),
           data.detail,
           data.fix,
+          "limited",
         );
       } else {
-        set("status-error", data.error || scholarT("Service unavailable"), data.detail, data.fix);
+        set("status-error", data.error || scholarT("Service unavailable"), data.detail, data.fix, "unavailable");
       }
     } catch {
       // The report itself could not be read — a genuine failure, reported as
       // unavailable rather than as limited or ready.
-      set("status-error", scholarT("Service unavailable"));
+      set("status-error", scholarT("Service unavailable"), undefined, undefined, "error");
     }
   }
 
@@ -267,9 +275,9 @@ class CitationGraphManager {
     tip.className = "graph-tooltip";
     tip.innerHTML = `
       <div class="tooltip-title">${this.esc(node.title)}</div>
-      <div class="tooltip-authors">${(node.authors || []).slice(0, 3).join(", ")}${(node.authors || []).length > 3 ? "..." : ""}</div>
+      <div class="tooltip-authors">${this.esc((node.authors || []).slice(0, 3).join(", "))}${(node.authors || []).length > 3 ? "..." : ""}</div>
       <div class="tooltip-meta">
-        <span class="tooltip-year">${node.year || "?"}</span>
+        <span class="tooltip-year">${this.esc(node.year || "?")}</span>
         ${node.similarity_score ? '<span class="tooltip-score">Score: ' + node.similarity_score.toFixed(1) + "</span>" : ""}
       </div>
       <div class="tooltip-hint">Click to view details</div>
@@ -291,7 +299,7 @@ class CitationGraphManager {
     document
       .querySelectorAll(".graph-node")
       .forEach((el) => el.classList.remove("selected"));
-    const el = document.querySelector(`[data-id="${node.id}"]`);
+    const el = document.querySelector(`[data-id="${CSS.escape(node.id)}"]`);
     if (el) el.classList.add("selected");
     this.showNodeDetails(node);
   }
@@ -307,10 +315,10 @@ class CitationGraphManager {
       </div>
       <div class="node-details-content">
         <div class="detail-title">${this.esc(node.title)}</div>
-        <div class="detail-authors">${(node.authors || []).join(", ")}</div>
-        <div class="detail-year">Published: ${node.year || "?"}</div>
+        <div class="detail-authors">${this.esc((node.authors || []).join(", "))}</div>
+        <div class="detail-year">Published: ${this.esc(node.year || "?")}</div>
         ${node.similarity_score ? '<div class="detail-score">Similarity: <strong>' + node.similarity_score.toFixed(2) + "</strong></div>" : ""}
-        <div class="detail-doi"><a href="https://doi.org/${node.id}" target="_blank" rel="noopener">View on DOI.org &#8599;</a></div>
+        <div class="detail-doi"><a href="https://doi.org/${encodeURIComponent(node.id)}" target="_blank" rel="noopener">View on DOI.org &#8599;</a></div>
       </div>
     `;
   }
@@ -334,13 +342,13 @@ class CitationGraphManager {
           : papers
               .map(
                 (p, i) => `
-            <div class="related-paper-item" data-doi="${p.id}">
+            <div class="related-paper-item" data-doi="${this.esc(p.id)}">
               <div class="paper-rank">${i + 1}</div>
               <div class="paper-info">
                 <div class="paper-title">${this.esc(p.title)}</div>
                 <div class="paper-meta">
-                  <span class="paper-authors">${(p.authors || []).slice(0, 2).join(", ")}${(p.authors || []).length > 2 ? " et al." : ""}</span>
-                  <span class="paper-year">${p.year || "?"}</span>
+                  <span class="paper-authors">${this.esc((p.authors || []).slice(0, 2).join(", "))}${(p.authors || []).length > 2 ? " et al." : ""}</span>
+                  <span class="paper-year">${this.esc(p.year || "?")}</span>
                 </div>
               </div>
               <div class="paper-score">

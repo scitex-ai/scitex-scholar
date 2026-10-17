@@ -39,6 +39,12 @@
   stroke: #f59e0b;
 }
 
+/* Edge arrowheads resolve through the theme token (light/dark surfaces),
+ * never a fixed literal. */
+.graph-arrowhead {
+  fill: var(--edge-color);
+}
+
 .graph-node {
   cursor: pointer;
 }
@@ -46,8 +52,15 @@
   filter: brightness(1.3);
 }
 .graph-node.selected .node-circle {
-  stroke: #fff;
+  stroke: var(--text-primary);
   stroke-width: 3;
+}
+
+/* Dark canvas: the ring reads through the theme token in light mode and
+ * falls back to white on dark, where text-primary sits too close to the
+ * near-black canvas to mark selection. */
+[data-theme="dark"] .graph-node.selected .node-circle {
+  stroke: #fff;
 }
 
 .node-circle {

@@ -38,6 +38,8 @@ Output:
 """Imports"""
 import argparse
 import asyncio
+import scitex_logging as slogging
+_console = slogging.getPlainConsole(__name__)
 
 try:
     import scitex as stx
@@ -57,7 +59,7 @@ async def demonstrate_paper_storage() -> None:
     from scitex_scholar.core.Paper import Paper
     from scitex_scholar.storage import ScholarLibrary
 
-    print("=== Paper Storage Demo ===")
+    _console.print("=== Paper Storage Demo ===")
 
     # Create a sample paper with Pydantic structure
     paper = Paper()
@@ -73,28 +75,28 @@ async def demonstrate_paper_storage() -> None:
     paper.metadata.set_doi("10.1038/nature.ai.2025.001")  # Auto-syncs DOI and URL
     paper.container.projects = ["storage_demo"]
 
-    print(f"Created paper with title: {paper.metadata.basic.title}")
-    print(f"DOI: {paper.metadata.id.doi}")
-    print(f"DOI URL (auto-synced): {paper.metadata.url.doi}")
-    print(f"Impact Factor: {paper.metadata.publication.impact_factor}")
-    print(f"Citation Count: {paper.metadata.citation_count.total}")
+    _console.print(f"Created paper with title: {paper.metadata.basic.title}")
+    _console.print(f"DOI: {paper.metadata.id.doi}")
+    _console.print(f"DOI URL (auto-synced): {paper.metadata.url.doi}")
+    _console.print(f"Impact Factor: {paper.metadata.publication.impact_factor}")
+    _console.print(f"Citation Count: {paper.metadata.citation_count.total}")
 
     # Save to library using project name
     library = ScholarLibrary(project="storage_demo")
     library_id = library.save_paper(paper=paper)
-    print(f"✓ Saved to library with ID: {library_id}")
+    _console.print(f"✓ Saved to library with ID: {library_id}")
 
     # Verify saved location
     from scitex_scholar.config import ScholarConfig
 
     master_dir = ScholarConfig().path_manager.get_library_master_paper_dir(library_id)
     if master_dir.exists():
-        print(f"✓ Paper stored at: {master_dir}")
+        _console.print(f"✓ Paper stored at: {master_dir}")
         metadata_file = master_dir / "metadata.json"
         if metadata_file.exists():
-            print(f"✓ Metadata file exists: {metadata_file}")
+            _console.print(f"✓ Metadata file exists: {metadata_file}")
 
-    print()
+    _console.print()
 
 
 async def demonstrate_papers_collection() -> None:
@@ -106,7 +108,7 @@ async def demonstrate_papers_collection() -> None:
 
     project = "storage_demo"
 
-    print("=== Papers Collection Demo ===")
+    _console.print("=== Papers Collection Demo ===")
 
     # Create a collection of papers using Pydantic structure
     papers_list = []
@@ -142,7 +144,7 @@ async def demonstrate_papers_collection() -> None:
     papers_list.append(p3)
 
     collection = Papers(papers_list)
-    print(f"Created collection with {len(collection)} papers")
+    _console.print(f"Created collection with {len(collection)} papers")
 
     # Save to library - using Path is also supported
     from scitex_scholar.config import ScholarConfig
@@ -156,15 +158,15 @@ async def demonstrate_papers_collection() -> None:
         library_id = library.save_paper(paper=paper)
         saved_ids.append(library_id)
 
-    print(f"Saved {len(saved_ids)} papers to library")
+    _console.print(f"Saved {len(saved_ids)} papers to library")
 
-    print()
+    _console.print()
 
 
 async def demonstrate_scholar_global() -> None:
     """Demonstrate Scholar global library management."""
 
-    print("=== Scholar Global Management Demo ===")
+    _console.print("=== Scholar Global Management Demo ===")
 
     from scitex_scholar.config import ScholarConfig
 
@@ -179,36 +181,36 @@ async def demonstrate_scholar_global() -> None:
             for d in library_dir.iterdir()
             if d.is_dir() and d.name != "MASTER" and not d.name.startswith(".")
         ]
-        print(f"Available projects ({len(projects)}):")
+        _console.print(f"Available projects ({len(projects)}):")
         for project in projects:
             # Count symlinks in each project
             symlinks = [f for f in project.iterdir() if f.is_symlink()]
-            print(f"  - {project.name}: {len(symlinks)} papers")
+            _console.print(f"  - {project.name}: {len(symlinks)} papers")
 
     # Count papers in MASTER storage
     master_dir = library_dir / "MASTER"
     if master_dir.exists():
         paper_count = len([d for d in master_dir.iterdir() if d.is_dir()])
-        print(f"\n✓ Total papers in MASTER storage: {paper_count}")
+        _console.print(f"\n✓ Total papers in MASTER storage: {paper_count}")
 
-    print()
+    _console.print()
 
 
 async def main_async(args) -> bool:
     """Main async function for storage integration demo."""
-    print("🗄️  Scholar Storage Integration Demo")
-    print("=" * 50)
+    _console.print("🗄️  Scholar Storage Integration Demo")
+    _console.print("=" * 50)
 
     try:
         await demonstrate_paper_storage()
         await demonstrate_papers_collection()
         await demonstrate_scholar_global()
 
-        print("✅ Storage integration demo completed successfully")
+        _console.print("✅ Storage integration demo completed successfully")
         return True
 
     except Exception as e:
-        print(f"❌ Demo failed: {e}")
+        _console.print(f"❌ Demo failed: {e}")
         return False
 
 

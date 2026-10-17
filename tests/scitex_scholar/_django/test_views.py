@@ -7,8 +7,9 @@ existed under tests/scitex_scholar/gui/ beyond a smoke-import mirror, so
 this is new coverage written directly against the ported views):
 
   GET /               -> 200, title + favicon link present
-  GET /api/health      -> JSON {"status": "ok", "version", "api_available",
-                                "api_url"}
+  GET /api/health      -> JSON {"status": "ok", "version", "api_available"}
+                          (state only -- the endpoint address is never served;
+                          cf. test_health_endpoint_does_not_leak_api_url)
   GET /api/graph/network   -> 400 without ?doi=, 503 with no API configured
   GET /api/graph/related   -> 503 with no API configured
   GET /api/graph/paper     -> 503 with no API configured
@@ -31,11 +32,11 @@ import re
 from pathlib import Path
 
 import pytest
-import scitex_ui
+import scitex_sdk.ui
 import tomllib
 from django.template.loader import render_to_string
 from django.test import RequestFactory, override_settings
-from scitex_ui.project_scope import LocalProjectProvider
+from scitex_sdk.ui.project_scope import LocalProjectProvider
 
 from scitex_scholar._django import views
 
@@ -109,13 +110,13 @@ def test_index_body_contains_shared_branding_favicon():
     # Act
     body = resp.content.decode()
     # Assert
-    assert '<link rel="icon" href="/static/scitex_ui/img/scitex-favicon.svg"' in body
+    assert '<link rel="icon" href="/static/scitex_sdk/ui/img/scitex-favicon.svg"' in body
 
 
 def test_index_does_not_shadow_shared_favicon_with_inline_icon():
     """Regression guard: a locally hand-rolled icon SHADOWS the shared mark.
 
-    scitex-ui's partial honours a `favicon_href` context var, so
+    scitex-sdk's partial honours a `favicon_href` context var, so
     reintroducing a `data:` URI here would silently win and drift scholar's
     tab away from the rest of the fleet -- the exact bug this replaced.
     """
@@ -151,7 +152,10 @@ def test_health_response_shape():
     # accidentally-added field fails here rather than reaching callers. It did
     # its job on 2026-08-23 -- adding "version" broke this test before it broke
     # anyone else, which is the whole point of asserting equality.
-    assert set(data.keys()) == {"status", "version", "api_available", "api_url"}
+    # 2026-10-12: "api_url" DELIBERATELY removed -- the raw endpoint address
+    # is server infrastructure, not a client concern (same disclosure class
+    # as the graph_health leak); api_available carries the state.
+    assert set(data.keys()) == {"status", "version", "api_available"}
 
 
 def test_graph_network_requires_doi_param():
@@ -217,6 +221,98 @@ def test_graph_paper_returns_503_with_no_api_configured():
     assert resp.status_code == 503
 
 
+class _StubGraph:
+    def to_dict(self):
+        return {"nodes": [], "metadata": {}}
+
+
+class _StubBuilder:
+    def build(self, **kwargs):
+        return _StubGraph()
+
+    def get_paper_summary(self, doi):
+        return {"doi": doi}
+
+
+_GRAPH_ENDPOINT_ROWS = (
+    (views.graph_network, "/api/graph/network"),
+    (views.graph_related, "/api/graph/related"),
+    (views.graph_paper, "/api/graph/paper"),
+)
+
+
+@pytest.mark.parametrize("endpoint,path", _GRAPH_ENDPOINT_ROWS)
+def test_graph_endpoints_reject_overlong_doi_param(endpoint, path):
+    # Arrange — the three graph endpoints never bound doi: a 100k doi
+    # would sail past validation into the cache key, the builder, and
+    # the error log. The 400 precedes any builder use, so no stub is
+    # needed for this lane.
+    # Act
+    resp = endpoint(RequestFactory().get(path, {"doi": "10.1000/" + "x" * 100_000}))
+    # Assert
+    assert resp.status_code == 400
+
+
+@pytest.mark.parametrize("endpoint,path", _GRAPH_ENDPOINT_ROWS)
+def test_graph_endpoints_reach_builder_at_doi_cap(endpoint, path):
+    # Arrange — a 500-char doi is the boundary: it must still reach the
+    # builder (200 via the stub) rather than fail closed early.
+    # Act
+    at_limit = "10.1/" + "y" * (views._MAX_DOI_CHARS - len("10.1/"))
+    resp = endpoint(
+        RequestFactory().get(path, {"doi": at_limit}), _builder=_StubBuilder()
+    )
+    # Assert
+    assert resp.status_code == 200
+
+
+@pytest.mark.parametrize("endpoint,path", _GRAPH_ENDPOINT_ROWS)
+def test_graph_endpoints_reject_doi_past_cap(endpoint, path):
+    # Arrange — one char past the cap fails closed before any builder use.
+    # Act
+    over = "10.1/" + "y" * (views._MAX_DOI_CHARS - len("10.1/") + 1)
+    resp = endpoint(RequestFactory().get(path, {"doi": over}))
+    # Assert
+    assert resp.status_code == 400
+
+
+@pytest.mark.parametrize(
+    "endpoint,path,params",
+    (
+        (
+            views.graph_network,
+            "/api/graph/network",
+            {"doi": "10.1038/x", "top_n": "n" * 100_000},
+        ),
+        (
+            views.graph_network,
+            "/api/graph/network",
+            {"doi": "10.1038/x", "weight_coupling": "n" * 100_000},
+        ),
+        (
+            views.graph_related,
+            "/api/graph/related",
+            {"doi": "10.1038/x", "limit": "n" * 100_000},
+        ),
+        (
+            views.search,
+            "/api/search",
+            {"q": "hippocampus", "max_results": "n" * 100_000},
+        ),
+    ),
+)
+def test_numeric_param_errors_do_not_echo_the_value(endpoint, path, params):
+    # Arrange — int()/float() ValueErrors embed the raw input
+    # ("invalid literal ...: '<input>'"), so a garbage numeric param
+    # would be echoed back whole in the 400 body. The parse happens
+    # before any builder/engine use, so no stub is needed.
+    # Act
+    resp = endpoint(RequestFactory().get(path, params))
+    # Assert
+    garbage_key = next(k for k in params if k not in ("doi", "q"))
+    assert resp.status_code == 400 and params[garbage_key][:100] not in resp.content.decode()
+
+
 @override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL=None)
 def test_graph_health_reports_unconfigured_without_a_5xx():
     """The initial-load path must never emit a same-origin 5xx (2026-09-17)."""
@@ -277,6 +373,81 @@ def test_graph_health_probe_answers_200_even_when_the_backend_fails():
     assert resp.status_code == 200
 
 
+@override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL=None)
+def test_graph_health_unconfigured_paragraph_is_translated_in_japanese():
+    """The Service Status sidebar paragraph must not stay English on a JA page.
+
+    Operator screenshot 2026-10-16: error/detail/fix were hardcoded EN, so the
+    JA page mixed languages. They now go through gettext.
+    """
+    # Arrange
+    from django.utils import translation
+
+    request = RequestFactory().get("/api/graph/health")
+    # Act
+    with translation.override("ja"):
+        body = json.loads(views.graph_health(request).content)
+    # Assert — the whole paragraph reads JA: error exact, detail/fix keyed
+    # on their JA-only phrases so an EN fallback fails loudly.
+    assert (
+        body["error"],
+        "引用グラフは crossref-local" in body["detail"],
+        "再起動してください" in body["fix"],
+    ) == ("CrossRef API 未設定", True, True)
+
+
+def test_graph_health_configured_paragraph_is_translated_in_japanese():
+    # Arrange
+    from django.utils import translation
+
+    request = RequestFactory().get("/api/graph/health")
+    # Act
+    with translation.override("ja"), override_settings(
+        SCITEX_SCHOLAR_CROSSREF_API_URL="http://127.0.0.1:1"
+    ):
+        body = json.loads(views.graph_health(request).content)
+    # Assert — status envelope plus the JA paragraph in one comparison.
+    assert (
+        (body["status"], body["probed"]),
+        body["error"],
+        "引用グラフタブを開いて確認してください" in body["fix"],
+    ) == (("configured", False), "引用グラフ：未確認", True)
+
+
+def test_graph_health_degraded_paragraph_is_translated_in_japanese():
+    # Arrange
+    from django.utils import translation
+
+    # Act
+    with translation.override("ja"):
+        body = views._degraded_payload()
+    # Assert — error exact, detail/fix keyed on JA-only phrases.
+    assert (
+        body["error"],
+        "確認用の論文" in body["detail"],
+        "想定どおりのコーパス" in body["fix"],
+    ) == ("引用グラフ：制限あり", True, True)
+
+
+@override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL="http://127.0.0.1:1")
+def test_graph_health_unavailable_paragraph_is_translated_in_japanese():
+    """A refused probe on a JA page reports the cause and the fix in JA."""
+    # Arrange
+    from django.utils import translation
+
+    request = RequestFactory().get("/api/graph/health", {"probe": "1"})
+    # Act
+    with translation.override("ja"):
+        body = json.loads(views.graph_health(request).content)
+    # Assert — status envelope plus the JA paragraph in one comparison.
+    assert (
+        (body["status"], body["probed"]),
+        body["error"],
+        "到達できないため" in body["detail"],
+        "再試行してください" in body["fix"],
+    ) == (("unavailable", True), "引用グラフ：利用不可", True, True)
+
+
 def test_initial_load_checks_configuration_without_probing():
     """The initial-load path asks the server for CONFIGURATION only."""
     # Arrange
@@ -303,6 +474,350 @@ def test_live_probe_is_bound_to_opening_the_graph_tab():
     assert lazy
 
 
+def test_mobile_swipe_wires_tab_switching():
+    """Phone users can swipe between Search/Library/Graph, like figrecipe panes.
+
+    Operator request 2026-10-16: Scholar tabs are tap-only; figrecipe's phone
+    panes switch by tap AND swipe (SDK Panes, opt-in swipeToSwitch). The tab
+    manager must listen for touchstart/touchend and step the tab order.
+    """
+    # Arrange
+    script = (
+        Path(views.__file__).parent / "static" / "scholar" / "js" / "app.js"
+    ).read_text()
+    # Act
+    wired = (
+        "touchstart" in script,
+        "touchend" in script,
+        "dataset.tab" in script,
+    )
+    # Assert
+    assert wired == (True, True, True)
+
+
+def test_mobile_swipe_ignores_graph_and_form_gestures():
+    """A swipe starting inside interactive content must not switch tabs.
+
+    Mirrors the SDK Panes NO_SWIPE_SELECTOR contract (operator mobile ruling
+    7724-7725): the citation-graph svg/canvas, form fields, and horizontal
+    scrollers own their gestures; only swipes starting on plain panel
+    content may change the active tab.
+    """
+    # Arrange
+    script = (
+        Path(views.__file__).parent / "static" / "scholar" / "js" / "app.js"
+    ).read_text()
+    # Act
+    guarded = (
+        "svg" in script and "canvas" in script,
+        "input" in script and "textarea" in script,
+        "scrollWidth" in script or "overflow" in script,
+    )
+    # Assert
+    assert guarded == (True, True, True)
+
+
+def test_mobile_swipe_needs_minimum_horizontal_travel():
+    """Vertical scrolls and taps must not flip tabs: SDK thresholds apply.
+
+    A minimum horizontal distance (60px) with a horizontal-over-vertical
+    dominance ratio (1.5x), exactly the SDK Panes SWIPE_MIN_PX /
+    SWIPE_AXIS_RATIO contract figrecipe inherits.
+    """
+    # Arrange
+    script = (
+        Path(views.__file__).parent / "static" / "scholar" / "js" / "app.js"
+    ).read_text()
+    # Act
+    gated = ("60" in script, "1.5" in script, "changedTouches" in script)
+    # Assert
+    assert gated == (True, True, True)
+
+
+def test_mobile_swipe_only_on_phone_layout():
+    """Swipe switching applies at phone widths, never on desktop.
+
+    The SDK Panes swipe runs only in single-pane (phone) mode so desktop
+    horizontal gestures (table scroll, graph pan) never flip sections.
+    Scholar gates on its own 768px mobile breakpoint (its stacked layout).
+    """
+    # Arrange
+    script = (
+        Path(views.__file__).parent / "static" / "scholar" / "js" / "app.js"
+    ).read_text()
+    # Act
+    gated = ("matchMedia" in script, "768" in script)
+    # Assert
+    assert gated == (True, True)
+
+
+def test_status_strip_sits_at_right_edge():
+    """Service Status lives at the RIGHT edge, not in the left sidebar.
+
+    Operator mandates 2026-10-16/17 + layout rule: status minutiae ALWAYS in
+    the rightmost column AND collapsible. The left sidebar keeps only the
+    Graph Controls hint; #serviceStatus (the JS health-render target) moves
+    into a right-edge strip placed after <main>.
+    """
+    # Arrange
+    template = (
+        Path(views.__file__).parent
+        / "templates"
+        / "scholar"
+        / "workspace_content.html"
+    ).read_text()
+    # Act
+    placed = (
+        '<aside class="app-status-strip"' in template,
+        template.index("app-status-strip") > template.index("</main>"),
+        "serviceStatus" not in template.split("</aside>")[0],
+    )
+    # Assert
+    assert placed == (True, True, True)
+
+
+def test_status_strip_uses_led_dots_with_expand():
+    """The strip follows the old Sources style: LED dots + expandable detail.
+
+    Hub's old Scholar UI (scholar_base.html) shows per-source LED dots
+    (data-source + data-status) synced with an expandable Sources panel.
+    The strip renders one dot per backend (CrossRef API, citation graph) and
+    the translated detail/fix paragraph inside <details> expanders; the
+    #serviceStatus id stays so checkServiceHealth keeps rendering into it.
+    """
+    # Arrange
+    template = (
+        Path(views.__file__).parent
+        / "templates"
+        / "scholar"
+        / "workspace_content.html"
+    ).read_text()
+    # Act
+    styled = (
+        'data-source="crossref"' in template and 'data-source="graph"' in template,
+        "<details" in template and 'id="serviceStatus"' in template,
+        "data-status" in template,
+    )
+    # Assert
+    assert styled == (True, True, True)
+
+
+def test_status_strip_is_collapsible():
+    """The right strip minimizes to a rail: template toggle + CSS + JS."""
+    # Arrange
+    base = Path(views.__file__).parent
+    template = (base / "templates" / "scholar" / "workspace_content.html").read_text()
+    css = (base / "static" / "scholar" / "css" / "_partials" / "_sidebar.css").read_text()
+    script = (base / "static" / "scholar" / "js" / "app.js").read_text()
+    # Act
+    collapsible = (
+        "status-strip-toggle" in template,
+        "status-strip--collapsed" in css,
+        "status-strip--collapsed" in script,
+    )
+    # Assert
+    assert collapsible == (True, True, True)
+
+
+def test_standalone_boots_light_by_default():
+    """LIGHT mode delivered: standalone boots light unless stored otherwise.
+
+    The SDK shell reads the visitor's stored preference first; the default
+    (no preference) was dark. Scholar now declares light.
+    """
+    # Arrange
+    rf = RequestFactory()
+    request = rf.get("/")
+    # Act
+    html = views.index(request).content.decode()
+    # Assert
+    assert 'data-theme-default="light"' in html
+
+
+def test_graph_marks_have_light_values():
+    """No UNQUALIFIED dark-only literals left in graph marks.
+
+    #fff (selected-node ring) survives only inside a [data-theme="dark"]
+    block, with the light value reading through a theme token; the edge
+    arrowhead's #3a3a3a literal is gone entirely (class + token rule).
+    """
+    # Arrange
+    base = Path(views.__file__).parent / "static" / "scholar"
+    graph_css = (base / "css" / "_partials" / "_graph.css").read_text()
+    renderer = (base / "js" / "graph" / "GraphRenderer.js").read_text()
+    # Act
+    themed = (
+        graph_css.count("#fff") == 1 and '[data-theme="dark"]' in graph_css,
+        '"#3a3a3a"' not in renderer and "graph-arrowhead" in renderer,
+    )
+    # Assert
+    assert themed == (True, True)
+
+
+def test_header_links_sdk_ssot_stylesheet():
+    """The header row is styled by the SDK SSoT sheet, as writer does.
+
+    Operator mandate 2026-10-17 (element-debug proof): scholar header must
+    use stx-app-header from scitex_sdk/ui/css/app/app-header.css — the leaf
+    links the sheet exactly like writer/_app_header.html does.
+    """
+    # Arrange
+    assets = (
+        Path(views.__file__).parent
+        / "templates"
+        / "scholar"
+        / "workspace_assets.html"
+    ).read_text()
+    # Act
+    linked = "scitex_sdk/ui/css/app/app-header.css" in assets
+    # Assert
+    assert linked
+
+
+def test_header_does_not_redefine_the_row():
+    """Scholar carries no .stx-app-header rules: the shared sheet owns shape."""
+    # Arrange
+    layout = (
+        Path(views.__file__).parent
+        / "static"
+        / "scholar"
+        / "css"
+        / "_partials"
+        / "_layout.css"
+    ).read_text()
+    # Act — a RULE (selector + block), not a prose mention in a comment.
+    redefined = re.search(r"\.stx-app-header[\w-]*\s*\{", layout)
+    # Assert
+    assert redefined is None
+
+
+def test_header_shows_leaf_version_without_subtitle():
+    """Title + leaf version (writer shape), no subtitle element."""
+    # Arrange
+    template = (
+        Path(views.__file__).parent
+        / "templates"
+        / "scholar"
+        / "workspace_content.html"
+    ).read_text()
+    # Act
+    shaped = (
+        "stx-app-header__version" in template and "scholar_version" in template,
+        "stx-app-header__subtitle" not in template,
+    )
+    # Assert
+    assert shaped == (True, True)
+
+
+def test_header_version_matches_installed_package():
+    """The rendered header shows the leaf's OWN installed version, live."""
+    # Arrange
+    import importlib.metadata
+
+    rf = RequestFactory()
+    request = rf.get("/")
+    # Act
+    html = views.index(request).content.decode()
+    # Assert
+    assert ("v" + importlib.metadata.version("scitex-scholar")) in html
+
+
+def test_saved_graphs_roundtrip_through_list(tmp_path):
+    """Old-direct parity slice 1: a saved graph persists and lists back.
+
+    Hub scholar_app keeps SavedGraph rows (name + rebuild recipe); the leaf
+    keeps the same shape file-based under the user root, mirroring the
+    saved-searches pattern. Reload = GET api/graph/network?doi=<seed_doi>.
+    """
+    # Arrange
+    rf = RequestFactory()
+    # Act
+    with _library_env(tmp_path):
+        saved = views.graphs_save(
+            rf.post(
+                "/api/graphs/save",
+                data=_json.dumps({"name": "g", "seed_doi": "10.1038/s41586-020-2008-3"}),
+                content_type="application/json",
+            )
+        )
+        listed = _json.loads(views.graphs_list(rf.get("/api/graphs/list")).content)
+    # Assert
+    assert (saved.status_code, [g["name"] for g in listed["graphs"]]) == (200, ["g"])
+
+
+def test_saved_graphs_delete_removes_the_row(tmp_path):
+    # Arrange
+    rf = RequestFactory()
+    # Act
+    with _library_env(tmp_path):
+        row_id = _json.loads(
+            views.graphs_save(
+                rf.post(
+                    "/api/graphs/save",
+                    data=_json.dumps({"name": "g", "seed_doi": "10.1/a"}),
+                    content_type="application/json",
+                )
+            ).content
+        )["id"]
+        deleted = views.graphs_delete(
+            rf.post(
+                "/api/graphs/delete",
+                data=_json.dumps({"id": row_id}),
+                content_type="application/json",
+            )
+        )
+        listed = _json.loads(views.graphs_list(rf.get("/api/graphs/list")).content)
+    # Assert
+    assert (deleted.status_code, listed["graphs"]) == (200, [])
+
+
+def test_saved_graphs_reject_overlong_name_and_doi(tmp_path):
+    # Arrange — hub caps names at 200; DOIs reuse the leaf 500 bound.
+    rf = RequestFactory()
+    # Act
+    with _library_env(tmp_path):
+        long_name = views.graphs_save(
+            rf.post(
+                "/api/graphs/save",
+                data=_json.dumps({"name": "n" * 201, "seed_doi": "10.1/a"}),
+                content_type="application/json",
+            )
+        )
+        long_doi = views.graphs_save(
+            rf.post(
+                "/api/graphs/save",
+                data=_json.dumps({"name": "g", "seed_doi": "x" * 501}),
+                content_type="application/json",
+            )
+        )
+        listed = _json.loads(views.graphs_list(rf.get("/api/graphs/list")).content)
+    # Assert
+    assert (long_name.status_code, long_doi.status_code, listed["graphs"]) == (400, 400, [])
+
+
+def test_saved_graphs_reject_missing_recipe(tmp_path):
+    # Arrange — a nameless or seedless row cannot rebuild, so it is refused.
+    rf = RequestFactory()
+    # Act
+    with _library_env(tmp_path):
+        no_name = views.graphs_save(
+            rf.post(
+                "/api/graphs/save",
+                data=_json.dumps({"seed_doi": "10.1/a"}),
+                content_type="application/json",
+            )
+        )
+        no_seed = views.graphs_save(
+            rf.post(
+                "/api/graphs/save",
+                data=_json.dumps({"name": "g"}),
+                content_type="application/json",
+            )
+        )
+    # Assert
+    assert (no_name.status_code, no_seed.status_code) == (400, 400)
+
+
 def test_client_distinguishes_configured_from_ready():
     """`configured` must render as its own state, never as available."""
     # Arrange
@@ -314,6 +829,53 @@ def test_client_distinguishes_configured_from_ready():
     handled = 'data.status === "configured"' in script
     # Assert
     assert handled
+
+
+def test_graph_client_escapes_third_party_fields_in_html_templates():
+    """Every third-party field interpolated into an HTML template is escaped.
+
+    Titles/authors come from the corpus (crossref-local/OpenAlex), not from
+    us: an interpolated ``${...}`` that skips ``this.esc()`` is a stored-XSS
+    channel served same-origin under the hub session. The audit pins the
+    interpolation sites, so a future template edit that adds an unescaped
+    field fails here instead of shipping silently.
+    """
+    # Arrange
+    script = (
+        Path(views.__file__).parent / "static" / "scholar" / "js" / "graph"
+        / "citation-graph.js"
+    ).read_text()
+    # Act — ${...} interpolations inside the four innerHTML render sites
+    # (status dot, tooltip, node-details panel, related-papers list) that
+    # are NOT escaped. Safe without escaping: our own mount prefix and
+    # numeric/pagination expressions (toFixed/ternary/Math.min/lengths),
+    # encodeURIComponent() outputs (percent-encoding is not HTML-significant),
+    # static entity/markup literals, and the loop index. Everything else --
+    # corpus fields (node./p. titles, authors, years, ids/DOIs) and server
+    # strings rendered as HTML (error/detail/fix) -- must go through
+    # this.esc() (or land via textContent, which these four sites don't).
+    import re
+
+    safe_shape = re.compile(
+        r"^(STX_MOUNT|topN|limit|i \+ 1|Math\..*|data\.nodes\.length|"
+        r"data\.edges\.length|encodeURIComponent\(.*\)|"
+        r"CSS\.escape\(.*\)|"
+        r"[\d.\s()+\-*/]+|"
+        r"'.*'|"
+        r'".*"|'
+        r"`.*`|"
+        r".*\?.*|"
+        r".*toFixed\(.*\)|"
+        r"node\.similarity_score|p\.similarity_score)$"
+    )
+    unescaped = []
+    for match in re.finditer(r"\$\{([^}]*)\}", script):
+        expr = match.group(1).strip()
+        if "this.esc(" in expr or safe_shape.fullmatch(expr):
+            continue
+        unescaped.append(expr)
+    # Assert
+    assert unescaped == [], unescaped
 
 
 def test_not_checked_label_is_translatable():
@@ -365,11 +927,52 @@ def test_search_rejects_unknown_mode():
     assert resp.status_code == 400
 
 
+def test_search_rejects_overlong_q_param():
+    # Arrange — saved searches cap query at 2000 chars, but the live
+    # endpoint never bounds q: a 100k query would sail past validation
+    # into the engines and the cache key. The stub engine proves the
+    # request reaches execution (200) instead of failing closed (400).
+    class _StubEngine:
+        async def search(self, query, mode=None, max_results=20):
+            return {"results": [], "metadata": {}}
+
+    rf = RequestFactory()
+    request = rf.get("/api/search?q=" + "x" * 100_000)
+    # Act
+    resp = views.search(request, _engine=_StubEngine())
+    # Assert
+    assert resp.status_code == 400
+
+
+def test_search_strips_jats_markup_from_abstracts():
+    # Arrange — EuropePMC/PMC abstracts arrive with raw JATS XML tags
+    # (e.g. <jats:p>); the leaf must serve plain text (CCT 2759/2760).
+    class _StubEngine:
+        async def search(self, query, mode=None, max_results=20):
+            return {
+                "results": [
+                    {
+                        "title": "Some paper",
+                        "abstract": "<jats:p>Hippocampal <italic>replay</italic> &amp; memory.</jats:p>",
+                    }
+                ],
+                "metadata": {},
+            }
+
+    request = RequestFactory().get("/api/search?q=hippocampus&no_cache=true")
+    # Act
+    body = json.loads(views.search(request, _engine=_StubEngine()).content)
+    # Assert
+    assert body["results"][0]["abstract"] == "Hippocampal replay & memory."
+
+
 def test_search_serves_cached_result_without_calling_engine():
     # Arrange -- prime the cache so the engine is never constructed
-    key = views._make_cache_key("search", "hippocampus", mode="parallel", max_results=20)
-    views._cache_set(key, {"results": [{"title": "Cached paper"}], "metadata": {}})
     request = RequestFactory().get("/api/search?q=hippocampus")
+    key = views._make_cache_key(
+        "search", "hippocampus", views._cache_scope(request), mode="parallel", max_results=20
+    )
+    views._cache_set(key, {"results": [{"title": "Cached paper"}], "metadata": {}})
     # Act
     resp = views.search(request)
     # Assert
@@ -378,13 +981,95 @@ def test_search_serves_cached_result_without_calling_engine():
 
 def test_search_marks_cached_results_as_cached():
     # Arrange
-    key = views._make_cache_key("search", "sharp wave", mode="parallel", max_results=20)
-    views._cache_set(key, {"results": [], "metadata": {}})
     request = RequestFactory().get("/api/search?q=sharp%20wave")
+    key = views._make_cache_key(
+        "search", "sharp wave", views._cache_scope(request), mode="parallel", max_results=20
+    )
+    views._cache_set(key, {"results": [], "metadata": {}})
     # Act
     resp = views.search(request)
     # Assert
     assert json.loads(resp.content)["metadata"]["cached"] is True
+
+
+def _prime_search_cache_as_alice():
+    # Arrange helper (not a test): prime the cache under alice's identity
+    # so the isolation probes below have a cached payload to collide with.
+    from types import SimpleNamespace
+
+    views._cache.clear()
+    views._cache_timestamps.clear()
+    rf = RequestFactory()
+    req_alice = rf.get("/api/search?q=shared-query&no_cache=true")
+    req_alice.user = SimpleNamespace(username="alice", is_authenticated=True)
+
+    class _UserEngine:
+        async def search(self, query, mode=None, max_results=20):
+            return {"results": [], "metadata": {"served_user": "alice"}}
+
+    body_alice = json.loads(views.search(req_alice, _engine=_UserEngine()).content)
+    assert body_alice["metadata"]["served_user"] == "alice"
+    return rf, _UserEngine
+
+
+def test_search_cache_serves_owner_their_own_payload():
+    # Arrange — the mounted per-user roots mean the SAME query from two
+    # users must not share cached payloads: prime the cache under one
+    # request, then ask the identical query as another user.
+    # Act — alice re-asks her own query with cache enabled.
+    from types import SimpleNamespace
+
+    rf, engine = _prime_search_cache_as_alice()
+    req_again = rf.get("/api/search?q=shared-query")
+    req_again.user = SimpleNamespace(username="alice", is_authenticated=True)
+    body_again = json.loads(views.search(req_again, _engine=engine()).content)
+    # Assert
+    assert body_again["metadata"].get("served_user") == "alice" and body_again["metadata"].get("cached") is True
+
+
+def test_search_cache_does_not_serve_alice_payload_to_bob():
+    # Arrange — prime the cache under alice's identity.
+    # Act — bob asks the identical query with cache enabled.
+    rf, engine = _prime_search_cache_as_alice()
+    from types import SimpleNamespace
+
+    req_bob = rf.get("/api/search?q=shared-query")
+    req_bob.user = SimpleNamespace(username="bob", is_authenticated=True)
+    body_bob = json.loads(views.search(req_bob, _engine=engine()).content)
+    # Assert — bob is never served alice's cached payload.
+    assert body_bob["metadata"].get("served_user") != "alice" or body_bob["metadata"].get("cached") is not True
+
+
+def test_search_cache_does_not_serve_alice_payload_to_anonymous():
+    # Arrange — prime the cache under alice's identity.
+    # Act — an anonymous caller asks the identical query.
+    rf, engine = _prime_search_cache_as_alice()
+
+    class _Anon:
+        is_authenticated = False
+        is_anonymous = True
+
+    req_anon = rf.get("/api/search?q=shared-query")
+    req_anon.user = _Anon()
+    body_anon = json.loads(views.search(req_anon, _engine=engine()).content)
+    # Assert — anonymous is never served alice's cached payload.
+    assert body_anon["metadata"].get("served_user") != "alice" or body_anon["metadata"].get("cached") is not True
+
+
+def test_result_cache_stays_bounded():
+    # Arrange — the cache is process-wide with a 1h TTL and no eviction:
+    # distinct queries accumulate (measured: 3000 sets -> 3000 entries,
+    # expired rows survive until re-accessed). A mounted hub serves many
+    # users × queries per process, so growth must be capped.
+    views._cache.clear()
+    views._cache_timestamps.clear()
+    # Act
+    for i in range(1200):
+        views._cache_set(f"cg:probe-{i}", {"results": [], "metadata": {}})
+    # Assert — bounded well under the insertion count.
+    assert len(views._cache) <= 500
+    views._cache.clear()
+    views._cache_timestamps.clear()
 
 
 # --- source tiers (review blocker 1): the GUI must run local corpora first ---
@@ -473,7 +1158,7 @@ def test_search_stats_labels_both_tiers_in_the_ui():
 
 
 # ---------------------------------------------------------------------------
-# stx-mount marker (scitex-app >= 0.7.0 mount-prefix contract)
+# stx-mount marker (scitex-sdk mount-prefix contract)
 #
 # The SDK injects this marker only for shells served through
 # `scitex_editor_page`. Scholar renders its own Django template, so nothing
@@ -628,6 +1313,29 @@ def _resolve_css(entry: Path, _seen: set | None = None) -> str:
     return "\n".join(parts)
 
 
+def _scholar_template_source(template: Path) -> str:
+    """Read the real wrapper, canonical workspace body and asset stages."""
+    source = template.read_text()
+    head_include = (
+        '{% include "scholar/workspace_assets.html" '
+        'with scholar_asset_stage="head" %}'
+    )
+    if head_include in source:
+        assets = template.with_name("workspace_assets.html").read_text()
+        head, scripts = assets.split(
+            '{% if scholar_asset_stage == "head" %}', 1
+        )[1].split('{% elif scholar_asset_stage == "scripts" %}', 1)
+        scripts = scripts.split("{% endif %}", 1)[0]
+        source = source.replace(head_include, head).replace(
+            '{% include "scholar/workspace_assets.html" '
+            'with scholar_asset_stage="scripts" %}',
+            scripts,
+        )
+    return source.replace(
+        '{% include "scholar/workspace_content.html" %}',
+        template.with_name("workspace_content.html").read_text(),
+    )
+
 def _scholar_css() -> str:
     """Everything that can reference a token, as the browser would see it.
 
@@ -636,16 +1344,16 @@ def _scholar_css() -> str:
     no-fallback `var()` uses. A scan of only stylesheets answers "do the
     STYLESHEETS resolve" while claiming to answer "does the PAGE resolve".
     """
-    return _resolve_css(CSS_ENTRY) + "\n" + TEMPLATE.read_text()
+    return _resolve_css(CSS_ENTRY) + "\n" + _scholar_template_source(TEMPLATE)
 
 
 def _theme_css() -> str:
-    """scitex-ui's shell/theme.css, read from the INSTALLED package."""
-    import scitex_ui
+    """scitex-sdk's shell/theme.css, read from the INSTALLED package."""
+    import scitex_sdk.ui
 
     path = (
-        Path(scitex_ui.__file__).parent
-        / "static" / "scitex_ui" / "css" / "shell" / "theme.css"
+        Path(scitex_sdk.ui.__file__).parent
+        / "static" / "scitex_sdk" / "ui" / "css" / "shell" / "theme.css"
     )
     # Resolved, not read: theme.css is a leaf TODAY. colors.css was a leaf
     # too until 0.16.0 split it into a barrel, at which point every
@@ -679,7 +1387,7 @@ def test_token_scan_covers_the_template_too():
     """Control for the template half -- a css-only scan would pass this file's
     other tests while missing every inline `var()` in the rendered page."""
     # Arrange
-    template_only = _referenced_without_fallback(TEMPLATE.read_text())
+    template_only = _referenced_without_fallback(_scholar_template_source(TEMPLATE))
 
     # Act
     seen_by_scan = _referenced_without_fallback(_scholar_css())
@@ -699,13 +1407,13 @@ def test_every_referenced_token_resolves():
     # Assert
     assert not dangling, (
         f"referenced with no fallback and declared nowhere: {dangling}. "
-        f"Either scholar deleted a token it still uses, or scitex-ui dropped "
+        f"Either scholar deleted a token it still uses, or scitex-sdk dropped "
         f"one scholar depends on."
     )
 
 
 @pytest.mark.parametrize("token", SHADOWED_TOKENS)
-def test_shadowed_token_comes_from_scitex_ui(token):
+def test_shadowed_token_comes_from_scitex_sdk(token):
     """The seven deleted tokens must still be available -- from upstream."""
     # Arrange
     theme = _theme_css()
@@ -729,12 +1437,12 @@ def test_scholar_does_not_redeclare_shadowed_token(token):
     # Assert
     assert not redeclared, (
         f"{token} is declared in scholar's CSS again. It must come from "
-        f"scitex-ui's shell/theme.css; redeclaring it means whichever "
+        f"scitex-sdk's shell/theme.css; redeclaring it means whichever "
         f"stylesheet loads last wins."
     )
 
 
-def test_template_links_scitex_ui_theme():
+def test_template_links_scitex_sdk_theme():
     """The tokens are only available if the page actually links the file."""
     # Arrange
     response = views.index(RequestFactory().get("/"))
@@ -743,7 +1451,7 @@ def test_template_links_scitex_ui_theme():
     html = response.content.decode()
 
     # Assert
-    assert "scitex_ui/css/shell/theme.css" in html
+    assert "scitex_sdk/ui/css/shell/theme.css" in html
 
 
 # ---------------------------------------------------------------------------
@@ -887,7 +1595,7 @@ if _marker:
 print("IMPORTED", views.APP_NAME)
 """
 
-_HOST_APPS = ["django.contrib.contenttypes", "django.contrib.staticfiles", "scitex_ui"]
+_HOST_APPS = ["django.contrib.contenttypes", "django.contrib.staticfiles", "scitex_sdk.ui"]
 
 
 def _import_views_in_host(installed_apps, setup=True):
@@ -1139,9 +1847,14 @@ def test_graph_health_keeps_its_status_field_alongside_the_fix():
 # ---------------------------------------------------------------------------
 
 
+@override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL=None)
 def test_template_does_not_render_the_crossref_endpoint_url():
     # Arrange — the not-configured render (default test settings) must show the
     # state label without the endpoint address or the old explanation line.
+    # The None pin is load-bearing: settings resolve the endpoint once at
+    # load, falling back to crossref_local's default when installed, so
+    # without it this test renders "Configured" in [all]-installed
+    # environments (incl. this container) instead of the state under test.
     body = _compass_index_body()
     # Act
     url_var_removed = "{{ api_url }}" not in body
@@ -1192,6 +1905,23 @@ def test_graph_health_degraded_state_explains_and_does_not_leak():
         and "api_url" not in body
         and not any("://" in str(v) for v in body.values())
     ), body
+
+
+def test_health_endpoint_does_not_leak_api_url():
+    # Arrange — a configured endpoint with a marker address: the old body
+    # carried it back whole under `api_url` (same disclosure class as the
+    # graph_health leak fixed above and the library_root list payload).
+    # No JS or template reads this key (grep-verified); `api_available`
+    # already answers the configured question without the address.
+    with override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL="http://crossref-local.internal:3000"):
+        request = RequestFactory().get("/api/health")
+        response = views.health(request)
+    # Act
+    body = json.loads(response.content)
+    # Assert — state without the address.
+    no_leak = "api_url" not in body and "crossref-local.internal" not in json.dumps(body)
+    keeps_state = body.get("status") == "ok" and body.get("api_available") is True
+    assert no_leak and keeps_state, body
 
 
 def test_the_four_routes_give_one_explanation_not_four():
@@ -1372,7 +2102,7 @@ def test_search_and_library_content_share_one_container_class():
     # x=256/w=1168 desktop, x=16/w=358 mobile) — both are children of a
     # .citation-graph-container. This pins that shared-wrapper contract for
     # BOTH tabs, not just the placeholder.
-    tpl = COMPASS_TEMPLATE.read_text()
+    tpl = _scholar_template_source(COMPASS_TEMPLATE)
     # Act
     def _panel_wraps_container(panel_id: str) -> bool:
         start = tpl.index(f'id="{panel_id}"')
@@ -1778,13 +2508,154 @@ def test_library_enrich_404_for_unknown_paper(tmp_path):
         assert resp.status_code == 404
 
 
+_TRAVERSAL_IDS = ("../OUTSIDE", "..", ".", "a/b", "a\\b", "/etc/hostname")
+
+
+@pytest.mark.parametrize("evil", _TRAVERSAL_IDS)
+def test_library_enrich_400_for_traversal_paper_id(tmp_path, evil):
+    # Arrange — paper_id is a body-key path sink
+    # (MASTER/<paper_id>/metadata.json). A traversal or absolute id must
+    # fail closed (400), never escape the user root.
+    # Act
+    with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="PID1")
+        resp = views.library_enrich(
+            RequestFactory().post("/api/library/enrich", {"paper_id": evil}),
+            _pipeline=_OfflineEnrich(),
+        )
+    # Assert
+    assert resp.status_code == 400
+
+
+def test_library_enrich_traversal_leaves_planted_record_untouched(tmp_path):
+    # Arrange — plant a valid record OUTSIDE the MASTER tree; a traversal
+    # id naming it must fail closed and leave the record untouched.
+    with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="PID1")
+        outside = tmp_path / "OUTSIDE"
+        outside.mkdir()
+        planted = outside / "metadata.json"
+        planted.write_text(
+            _json.dumps(
+                {"metadata": {"id": {"doi": "10.9/outside"}, "basic": {"title": "Outside", "year": 2024}}}
+            )
+        )
+        before = planted.read_text()
+        # Act
+        resp = views.library_enrich(
+            RequestFactory().post("/api/library/enrich", {"paper_id": "../OUTSIDE"}),
+            _pipeline=_OfflineEnrich(),
+        )
+    # Assert
+    assert resp.status_code == 400 and planted.read_text() == before
+
+
+def test_library_enrich_rejects_overlong_paper_id(tmp_path):
+    # Arrange — a library_id is a single path component under MASTER/, so it
+    # can never exceed the filesystem's 255-byte NAME_MAX. An unbounded id
+    # sails past validation into the stat call and crashes it (OSError: File
+    # name too long), and the 400/404 bodies echo the value back whole.
+    # Act — a 100k id fails closed before any filesystem touch.
+    with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="PID1")
+        resp = views.library_enrich(
+            RequestFactory().post("/api/library/enrich", {"paper_id": "P" * 100_000})
+        )
+    # Assert — fail closed without echoing the value back.
+    assert resp.status_code == 400 and "P" * 100 not in resp.content.decode()
+
+
+def test_library_enrich_accepts_cap_length_paper_id(tmp_path):
+    # Arrange — 255 chars is the boundary: it passes validation (then 404s
+    # naming no record) rather than failing closed as overlong.
+    # Act
+    with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="PID1")
+        edge_ok = views.library_enrich(
+            RequestFactory().post("/api/library/enrich", {"paper_id": "P" * 255})
+        )
+    # Assert
+    assert edge_ok.status_code == 404
+
+
+def test_library_enrich_rejects_one_past_cap_paper_id(tmp_path):
+    # Arrange — 256 chars is one past the single-component bound.
+    # Act
+    with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="PID1")
+        edge_over = views.library_enrich(
+            RequestFactory().post("/api/library/enrich", {"paper_id": "P" * 256})
+        )
+    # Assert
+    assert edge_over.status_code == 400
+
+
+def test_library_enrich_invalid_id_error_does_not_echo_paper_id(tmp_path):
+    # Arrange — the invalid-id 400 used to interpolate the raw paper_id
+    # back whole, so a probing value sailed back to the client.
+    # Act
+    with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="PID1")
+        bad = views.library_enrich(
+            RequestFactory().post("/api/library/enrich", {"paper_id": "../OUTSIDE"}),
+            _pipeline=_OfflineEnrich(),
+        )
+    # Assert — fail closed, without carrying the value back.
+    assert bad.status_code == 400 and "OUTSIDE" not in bad.content.decode()
+
+
+def test_library_enrich_unknown_id_error_does_not_echo_paper_id(tmp_path):
+    # Arrange — the unknown-id 404 used to interpolate the raw paper_id
+    # back whole (same echo class as the invalid-id 400 above).
+    # Act
+    with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="PID1")
+        missing = views.library_enrich(
+            RequestFactory().post("/api/library/enrich", {"paper_id": "MISSING9Z"})
+        )
+    # Assert — 404, without carrying the value back.
+    assert missing.status_code == 404 and "MISSING9Z" not in missing.content.decode()
+
+
+def test_library_enrich_success_does_not_echo_paper_id(tmp_path):
+    # Arrange — same reflection class as the save path leak (slice 27),
+    # the list query echo (slice 28), and the import paper_ids echo
+    # (slice 29): the enrich 200 body carries the caller-supplied
+    # paper_id back whole under the paper_id key. The only client
+    # (library.js) posts the id from its own row state and reads
+    # abstract_chars, citation_count, and title from the response --
+    # nothing reads the paper_id key, so the echo is pure round-trip.
+    with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="ENRICH7")
+        rf = RequestFactory()
+        # Act
+        resp = views.library_enrich(
+            rf.post("/api/library/enrich", {"paper_id": "ENRICH7"}),
+            _pipeline=_OfflineEnrich(),
+        )
+        data = _json.loads(resp.content)
+    # Assert — state + server-computed enrichment only; the caller-known
+    # handle stays client-side.
+    assert resp.status_code == 200 and "paper_id" not in data and "ENRICH7" not in resp.content.decode() and data["ok"] is True and data["title"] == "A paper"
+
+
+@pytest.mark.parametrize("evil", ("../escape", "a/b", "..", "."))
+def test_load_library_paper_refuses_unsafe_id(tmp_path, evil):
+    # Arrange — the loader is the choke point every paper_id flows through;
+    # it must refuse non-component ids itself, not rely on each caller.
+    # Act — invoke the loader with a non-component id.
+    # Assert — it refuses with ValueError.
+    with pytest.raises(ValueError):
+        views._load_library_paper(tmp_path, evil)
+
+
 def test_enrichment_is_a_contextual_library_action_not_a_tab():
     # Arrange
     # #106 + #105: enrichment is a per-row action inside the Library tab, never
     # a top-level tab. The tab bar is unchanged (3 tabs), the Library panel
     # carries the list + Enrich wiring, and the JS posts to the enrich route.
     body = _compass_index_body()
-    tpl = COMPASS_TEMPLATE.read_text()
+    tpl = _scholar_template_source(COMPASS_TEMPLATE)
     js = (COMPASS_SEARCH_JS.parent / "library.js").read_text()
     # Act
     no_enrich_tab = 'data-tab="enrichment"' not in body
@@ -1883,6 +2754,39 @@ def test_library_import_bibtex_makes_paper_visible(tmp_path):
     assert imported["ok"] is True and imported["imported"] == 1 and "Imported Paper Title" in titles
 
 
+def test_library_import_success_does_not_echo_paper_ids(tmp_path):
+    # Arrange — paper_ids are derived from caller-supplied BibTeX content
+    # via _derived_library_id (same reflection class as the save-bulk
+    # failed[].library_id echo and the saved-searches save/delete echoes).
+    # The only client reads data.imported for its toast and refreshes via
+    # loadLibrary(true), so the ids are unread in static/ + templates/.
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        # Act
+        body = _json.loads(views.library_import(rf.post(
+            "/api/library/import", {"format": "bibtex", "bibtex": _SAMPLE_BIB}
+        )).content)
+    # Assert — state only: the count stays (toast needs it), the ids go.
+    assert body.get("ok") is True and body.get("imported") == 1 and "paper_ids" not in body
+
+
+def test_library_import_rejects_oversized_batch(tmp_path):
+    # Arrange — one entry past the bulk cap; each parsed entry costs one
+    # file write, so an unbounded import is write amplification per request.
+    big_bib = "".join(
+        f"@article{{bulk{i},\n title = {{Bulk Paper {i}}},\n year = {{2024}}\n}}\n"
+        for i in range(views._MAX_BULK_ITEMS + 1)
+    )
+    rf = RequestFactory()
+    # Act
+    with _library_env(tmp_path):
+        resp = views.library_import(rf.post(
+            "/api/library/import", {"format": "bibtex", "bibtex": big_bib}
+        ))
+    # Assert — fail closed before any write.
+    assert resp.status_code == 400
+
+
 def test_library_import_requires_bibtex_body(tmp_path):
     # Arrange
     rf = RequestFactory()
@@ -1904,9 +2808,57 @@ def test_library_import_rejects_unsupported_format(tmp_path):
     assert resp.status_code == 400
 
 
+def test_library_import_rejects_oversized_bibtex_text(tmp_path):
+    # Arrange — one giant entry: the slice-13 entry-count cap never engages
+    # (a single entry parses whole), so raw text size is the remaining sink.
+    giant_bib = "@article{giant,\n title = {" + "A" * (views._MAX_IMPORT_TEXT_CHARS + 1) + "},\n year = {2024}\n}\n"
+    rf = RequestFactory()
+    # Act
+    with _library_env(tmp_path):
+        resp = views.library_import(rf.post(
+            "/api/library/import", {"format": "bibtex", "bibtex": giant_bib}
+        ))
+        master = tmp_path / "MASTER"
+        writes = list(master.rglob("metadata.json")) if master.exists() else []
+    # Assert — fail closed before any parse or write.
+    assert resp.status_code == 413 and writes == []
+
+
+def test_library_import_format_error_does_not_echo_the_value(tmp_path):
+    # Arrange — the 400 body must name the problem, not the raw input.
+    # (Lowercase: the view lowercases fmt before interpolating it, so an
+    # uppercase probe would miss the echo.)
+    rf = RequestFactory()
+    garbage = "x" * 100000
+    # Act
+    with _library_env(tmp_path):
+        resp = views.library_import(rf.post(
+            "/api/library/import", {"format": garbage, "bibtex": _SAMPLE_BIB}
+        ))
+        body = resp.content.decode()
+    # Assert
+    assert resp.status_code == 400 and garbage[:100] not in body
+
+
+def test_library_export_format_error_does_not_echo_the_value(tmp_path):
+    # Arrange — the 400 body must name the problem, not the raw input.
+    # (Lowercase: the view lowercases fmt before interpolating it, so an
+    # uppercase probe would miss the echo — same trap as the import side,
+    # slice 19. The export ?format= travels by GET, so no body cap applies
+    # and the raw value sailed back whole.)
+    rf = RequestFactory()
+    garbage = "x" * 100000
+    # Act
+    with _library_env(tmp_path):
+        resp = views.library_export(rf.get("/api/library/export", {"format": garbage}))
+        body = resp.content.decode()
+    # Assert
+    assert resp.status_code == 400 and garbage[:100] not in body
+
+
 def test_library_template_has_import_export_controls():
     # Arrange
-    tpl = COMPASS_TEMPLATE.read_text()
+    tpl = _scholar_template_source(COMPASS_TEMPLATE)
     js = (COMPASS_SEARCH_JS.parent / "library.js").read_text()
     # Act
     has_controls = (
@@ -2278,7 +3230,7 @@ def test_main_page_renders_in_english_by_default():
     # Act
     en = _render_index_in("en")
     # Assert -- the EN default carries the English header and the i18n JS dict.
-    assert "Scientific Literature Management" in en and "SCHOLAR_I18N" in en
+    assert "SciTeX Scholar" in en and "SCHOLAR_I18N" in en
 
 
 def _i18n_script_body(page: str) -> str:
@@ -2348,9 +3300,9 @@ def test_main_page_ja_render_has_no_untranslated_labels():
     # Arrange
     # Act
     ja = _render_index_in("ja")
-    # Assert -- the EN source of the page header is absent (replaced by JA) and
+    # Assert -- the EN source of a header label is absent (replaced by JA) and
     # the JA catalog produced Japanese text on the page.
-    assert "Scientific Literature Management" not in ja and "科学文献管理" in ja
+    assert "Service Status" not in ja and "サービス状態" in ja
 
 
 def test_ja_catalog_translates_every_msgid():
@@ -2375,10 +3327,10 @@ def test_ja_catalog_translates_every_msgid():
         (i, m) for i, m in pairs
         if i != "" and i not in proper_nouns and (m == "" or m == i)
     ]
-    # Assert -- at least one msgid (the header, known JA) and zero untranslated
-    # (proper nouns excluded by the explicit list above).
+    # Assert -- at least one msgid (the status strip title, known JA) and zero
+    # untranslated (proper nouns excluded by the explicit list above).
     assert (
-        any("科学文献管理" in m for _, m in pairs) and not untranslated
+        any("サービス状態" in m for _, m in pairs) and not untranslated
     )
 
 
@@ -2401,8 +3353,8 @@ def test_ja_compiled_mo_exists_at_app_locale_path():
 # --- first leaf-migration slice: canonical app header + project picker -------
 
 _PROJECT_SELECTOR_CSS = (
-    Path(scitex_ui.__file__).parent
-    / "static" / "scitex_ui" / "css" / "app" / "project-selector.css"
+    Path(scitex_sdk.ui.__file__).parent
+    / "static" / "scitex_sdk" / "ui" / "css" / "app" / "project-selector.css"
 )
 
 
@@ -2419,14 +3371,14 @@ def _project_root_env(root: Path):
             os.environ["SCITEX_SCHOLAR_PROJECTS_DIR"] = old
 
 
-def test_standalone_uses_scitex_ui_local_project_provider(tmp_path):
+def test_standalone_uses_scitex_sdk_local_project_provider(tmp_path):
     # Arrange
     request = RequestFactory().get("/")
     # Act
     with _project_root_env(tmp_path), override_settings(SCITEX_PROJECT_PROVIDER=""):
         provider = views._project_provider(request)
-    # Assert -- still scitex-ui's provider (Scholar adds only the reserved-dir
-    # filter below); the picker's id/state contract stays scitex-ui's.
+    # Assert -- still scitex-sdk's provider (Scholar adds only the reserved-dir
+    # filter below); the picker's id/state contract stays scitex-sdk's.
     assert isinstance(provider, LocalProjectProvider)
 
 
@@ -2691,7 +3643,7 @@ def test_project_header_keeps_host_provider_url(_rendered_host_scope_header):
 
 def test_header_source_places_picker_after_identity_before_content():
     # Arrange
-    source = TEMPLATE.read_text()
+    source = _scholar_template_source(TEMPLATE)
     # Act
     positions = [
         source.index('class="stx-app-header__identity"'),
@@ -2782,15 +3734,15 @@ def test_user_index_keeps_request_bound_library_roots(_user_scope_library_outcom
     ]
 
 
-def test_user_index_keeps_reported_library_roots(_user_scope_library_outcomes):
-    # Arrange
+def test_user_index_hides_reported_library_roots(_user_scope_library_outcomes):
+    # Arrange — server-side scoping still holds (bound roots differ; pinned
+    # by test_user_index_keeps_request_bound_library_roots above); the
+    # PAYLOAD must not carry the filesystem path (see
+    # test_library_list_hides_server_filesystem_path).
     # Act
     results = _user_scope_library_outcomes["results"]
     # Assert
-    assert [result["library"]["library_root"] for result in results] == [
-        str(_user_scope_library_outcomes["root_a"].resolve()),
-        str(_user_scope_library_outcomes["root_b"].resolve()),
-    ]
+    assert all("library_root" not in result["library"] for result in results)
 
 
 def test_user_index_keeps_library_papers_isolated(_user_scope_library_outcomes):
@@ -2802,6 +3754,17 @@ def test_user_index_keeps_library_papers_isolated(_user_scope_library_outcomes):
         "10.9/alice",
         "10.9/bob",
     ]
+
+
+def test_library_list_hides_server_filesystem_path(_user_scope_library_outcomes):
+    # Arrange — each bound user gets a payload carrying THEIR OWN papers.
+    # Act
+    results = _user_scope_library_outcomes["results"]
+    # Assert — no payload discloses the server-side library root (a mounted
+    # hub path names the service account + jail layout; the client never
+    # needs it — paper rows carry paper_id/doi/title already).
+    for result in results:
+        assert "library_root" not in result["library"]
 
 
 def test_user_index_keeps_accessible_project_listing(_user_scope_library_outcomes):
@@ -2858,13 +3821,25 @@ def test_all_extra_requires_header_slot_capable_scitex_ui():
 
 def test_390px_header_wraps_picker_without_horizontal_overflow():
     # Arrange
-    css = (CSS_DIR / "_partials" / "_layout.css").read_text()
-    # Act
-    mobile = css.split("@media (max-width: 600px)", 1)[1]
+    # The SHARED sheet owns the phone behaviour now (operator header mandate
+    # 2026-10-17): read what the browser reads, resolved off the installed
+    # scitex-ui exactly as the template's {% static %} link does.
+    import scitex_ui
+
+    shared = (
+        Path(scitex_ui.__file__).parent
+        / "static"
+        / "scitex_ui"
+        / "css"
+        / "app"
+        / "app-header.css"
+    ).read_text()
+    # Act — the wrap rule that puts the picker on its own row (the slot's own
+    # geometry is the picker primitive's contract, pinned elsewhere).
+    mobile = shared.split("@media (max-width: 600px)", 1)[1]
     wraps = re.search(r"\.stx-app-header\s*\{[^}]*flex-wrap:\s*wrap", mobile)
-    full_width = re.search(r"\.stx-app-header__slot--project-selector\s*\{[^}]*width:\s*100%", mobile)
     # Assert
-    assert wraps is not None and full_width is not None
+    assert wraps is not None
 
 
 def test_shared_desktop_slot_pins_picker_left_before_actions():
@@ -2968,14 +3943,34 @@ def test_library_list_filter_narrows_rows_and_says_so(tmp_path):
         data = _json.loads(
             views.library_list(RequestFactory().get("/api/library", {"q": "hippocampal"})).content
         )
-        # Assert -- narrowed rows, and the client is TOLD it is a filtered view.
+        # Assert -- narrowed rows, and the client is TOLD it is a filtered view
+        # via the flag; the raw filter value is never echoed back (the
+        # client already holds it in its own input box).
         assert (
             [p["title"] for p in data["papers"]] == ["Hippocampal Ripples"]
             and data["count"] == 1
             and data["total"] == 2
             and data["filtered"] is True
-            and data["query"] == "hippocampal"
+            and "query" not in data
         )
+
+
+def test_library_list_success_does_not_echo_q_param(tmp_path):
+    # Arrange -- the filter value is caller input: the success body must
+    # carry server-computed result only (papers/count/total + the
+    # filtered flag), never the raw q back whole. The client already
+    # holds the filter text in its own input box; zero JS/template
+    # consumers read a `query` key on this payload (grep-verified).
+    marker = "hippocampal-marker-xyz"
+    with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="P1", title="Hippocampal Ripples")
+        # Act
+        resp = views.library_list(
+            RequestFactory().get("/api/library", {"q": marker})
+        )
+        data = _json.loads(resp.content)
+        # Assert -- narrowed rows, state flag kept, raw value absent.
+        assert resp.status_code == 200 and data["filtered"] is True and marker not in _json.dumps(data) and set(data) == {"papers", "count", "total", "filtered"}
 
 
 def test_library_list_filter_matches_authors(tmp_path):
@@ -3010,6 +4005,22 @@ def test_library_list_filter_matches_dois(tmp_path):
         )
         # Assert
         assert [p["paper_id"] for p in data["papers"]] == ["P2"]
+
+
+def test_library_list_rejects_overlong_q_param(tmp_path):
+    # Arrange -- live search q and saved-search queries cap at 2000 chars,
+    # but the library filter never bounds q: a 100k filter would fan out
+    # to a per-row casefold over the whole library and echo back in the
+    # `query` payload field. The seeded library proves the request reaches
+    # execution (200) instead of failing closed (400).
+    with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="P1", title="A paper")
+        # Act
+        resp = views.library_list(
+            RequestFactory().get("/api/library", {"q": "x" * 100_000})
+        )
+        # Assert
+        assert resp.status_code == 400
 
 
 def test_library_filtered_empty_state_is_reachable(tmp_path):
@@ -3441,6 +4452,28 @@ def test_library_save_bulk_rejects_malformed_envelope_before_writing(
     assert (response.status_code, root.exists()) == (400, False)
 
 
+@pytest.mark.parametrize("endpoint", ["save", "save-bulk"])
+def test_library_save_rejects_oversized_body(tmp_path, endpoint):
+    # Arrange — request bodies are parsed whole before any check; a 500k
+    # abstract sailed through (measured: 200 on both endpoints). One paper
+    # with a realistic abstract is bytes-to-low-kb; 256k per body is far
+    # past any legitimate save while keeping bulk usable (100+ papers).
+    root = tmp_path / "library"
+    big = {"paper_id": "P1", "doi": "10.9/x", "title": "T", "abstract": "a" * 300000}
+    body = _json.dumps(big if endpoint == "save" else {"papers": [big]})
+    request = RequestFactory().post(
+        f"/api/library/{endpoint}",
+        data=body,
+        content_type="application/json",
+    )
+    request.scholar_library_root = root
+    view = views.library_save if endpoint == "save" else views.library_save_bulk
+    # Act
+    response = view(request)
+    # Assert — client error, and nothing persisted.
+    assert (response.status_code, root.exists()) == (413, False)
+
+
 def test_library_save_bulk_keeps_flat_nested_and_bad_rows_separate(tmp_path):
     # Arrange -- author objects are one supported library-row author shape.
     rows = [
@@ -3636,6 +4669,57 @@ def test_searches_delete_unknown_id_404(tmp_path):
         assert resp.status_code == 404
 
 
+def test_searches_delete_success_does_not_echo_id(tmp_path):
+    # Arrange — seed one row, then delete it by its server-issued id. The
+    # success body must not round-trip the caller-supplied id whole: same
+    # reflection class as the save-bulk failed[].library_id echo (slice 23)
+    # and the enrich 404 paper_id echo (slice 21). No client reads the key
+    # (grep-verified: zero references in static/ + templates/).
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        saved = _json.loads(
+            views.searches_save(
+                rf.post(
+                    "/api/searches/save",
+                    data=_json.dumps({"name": "ml", "query": "graph nets"}),
+                    content_type="application/json",
+                )
+            ).content
+        )
+        # Act
+        resp = views.searches_delete(
+            rf.post(
+                "/api/searches/delete",
+                data=_json.dumps({"id": saved["id"]}),
+                content_type="application/json",
+            )
+        )
+        # Assert — deleted, and the body carries state only.
+        body = _json.loads(resp.content)
+        assert resp.status_code == 200 and body == {"deleted": True}
+
+
+def test_searches_save_success_does_not_echo_name(tmp_path):
+    # Arrange — the save-success body round-trips the caller-supplied name
+    # verbatim alongside the server-issued id. Same reflection class as the
+    # delete-id echo above: the 200 body must not carry untrusted input
+    # back whole. The server-generated id stays (it is the delete handle
+    # existing tests drive); no client reads the name key.
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        # Act
+        resp = views.searches_save(
+            rf.post(
+                "/api/searches/save",
+                data=_json.dumps({"name": "ml-marker", "query": "graph nets"}),
+                content_type="application/json",
+            )
+        )
+        # Assert
+        body = _json.loads(resp.content)
+        assert resp.status_code == 200 and body["saved"] is True and "ml-marker" not in _json.dumps(body) and set(body) == {"saved", "id"}
+
+
 def test_searches_are_user_scoped(tmp_path):
     # Arrange — user A saves; user B lists a different root.
     root_a = tmp_path / "a"
@@ -3658,7 +4742,692 @@ def test_searches_are_user_scoped(tmp_path):
     assert listed_b["searches"] == []
 
 
+@pytest.mark.parametrize(
+    "oversized",
+    (
+        _json.dumps({"name": "n" * 2001, "query": "q"}),
+        _json.dumps({"name": "n", "query": "q" * 2001}),
+        _json.dumps({"name": "n", "query": "q", "params": {"blob": "x" * 9000}}),
+    ),
+)
+def test_searches_save_rejects_oversized_name_query_and_params(tmp_path, oversized):
+    # Arrange — the rows file is read whole per request; unbounded values
+    # let one caller bloat every future list call for that user (and the
+    # stored file). Cap the scalar fields AND the serialized params mapping
+    # at generous-but-finite bounds: 2k chars per name/query, 8k serialized
+    # params (no client sends params at all today -- the UI posts name +
+    # query only -- so anything past that is abuse, not a feature).
+    # Act — an oversized name, query, or params fails closed.
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        resp = views.searches_save(
+            rf.post("/api/searches/save", data=oversized, content_type="application/json")
+        )
+    # Assert
+    assert resp.status_code == 400
+
+
+def test_searches_save_rejected_oversized_stores_nothing(tmp_path):
+    # Arrange — a rejected oversized save must not append a row.
+    # Act
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        views.searches_save(
+            rf.post(
+                "/api/searches/save",
+                data=_json.dumps({"name": "n" * 2001, "query": "q"}),
+                content_type="application/json",
+            )
+        )
+        listed = _json.loads(views.searches_list(rf.get("/api/searches")).content)
+    # Assert
+    assert listed["searches"] == []
+
+
+def test_searches_endpoints_reject_oversized_body(tmp_path):
+    # Arrange — save + delete parse the whole body before any check; a
+    # 300k-padded body sailed through parsing (measured: save 200 +
+    # stored, delete 404). Same 256k-per-body bound as the library save
+    # endpoints: far past any legitimate saved-search payload.
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        padded_save = _json.dumps({"name": "n", "query": "q", "pad": "x" * 300000})
+        padded_delete = _json.dumps({"id": "nope", "pad": "x" * 300000})
+        # Act
+        save_resp = views.searches_save(
+            rf.post("/api/searches/save", data=padded_save, content_type="application/json")
+        )
+        delete_resp = views.searches_delete(
+            rf.post("/api/searches/delete", data=padded_delete, content_type="application/json")
+        )
+        listed = _json.loads(views.searches_list(rf.get("/api/searches")).content)
+        # Assert — refused before parsing, and nothing persisted.
+        assert (save_resp.status_code, delete_resp.status_code) == (413, 413) and listed["searches"] == []
+
+
+def test_searches_save_rejects_overflowing_row_count(tmp_path):
+    # Arrange — per-row values are capped (name/query 2k, params 8k) but the
+    # ROW COUNT is not: one scripted caller can append unlimited rows, and
+    # the rows file is re-read whole per list call, so every future list
+    # call for that user pays for the bloat. Cap stored rows at a
+    # generous-but-finite 500: far past any curated set of saved searches.
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        views._write_saved_searches(
+            tmp_path,
+            [
+                {
+                    "id": f"seed{i:04d}",
+                    "name": f"n{i}",
+                    "query": f"q{i}",
+                    "params": {},
+                    "created_by": "user",
+                    "created_at": "t",
+                }
+                for i in range(views._MAX_SAVED_SEARCHES)
+            ],
+        )
+        # Act
+        resp = views.searches_save(
+            rf.post(
+                "/api/searches/save",
+                data=_json.dumps({"name": "one-more", "query": "q"}),
+                content_type="application/json",
+            )
+        )
+        listed = _json.loads(views.searches_list(rf.get("/api/searches")).content)
+        # Assert — fails closed and stores nothing.
+        assert resp.status_code == 400 and len(listed["searches"]) == views._MAX_SAVED_SEARCHES
+
+
+def test_server_error_bodies_hide_internal_detail():
+    # Arrange — every 5xx site must answer a fixed message: raw exception
+    # strings name internal hosts/paths (measured: search 500 echoed a db
+    # host:port + secret path; enrich 500 echoed /var/scitex/secrets/key),
+    # and the clients render data.error as-is (textContent, but readable).
+    # The full traceback stays in the server log via logger.exception.
+    import inspect
+
+    # Act
+    leaks = [
+        line.strip()
+        for line in inspect.getsource(views).splitlines()
+        if "status=500" in line
+        and ("{e}" in line or "{exc}" in line or "str(e)" in line)
+    ]
+    # Assert
+    assert leaks == [], leaks
+
+
+def test_library_save_bulk_rejects_oversized_batch(tmp_path):
+    # Arrange — save-bulk loops one file write per item with no count bound;
+    # the 256k body cap alone still admits ~1000 tiny papers (measured: 600
+    # minimal rows sail through parsing into 600 writes). One request must
+    # not amplify into hundreds of writes. Cap the batch at a generous-but-
+    # finite 500 items: far past the documented 100+ legitimate bulk use.
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        papers = [
+            {"paper_id": f"B{i:04d}", "doi": f"10.9/b{i}", "title": f"Bulk {i}"}
+            for i in range(600)
+        ]
+        # Act
+        resp = views.library_save_bulk(
+            rf.post(
+                "/api/library/save-bulk",
+                data=_json.dumps({"papers": papers}),
+                content_type="application/json",
+            )
+        )
+        # Assert — fails closed before any write.
+        assert resp.status_code == 400 and not (tmp_path / "MASTER").exists()
+
+
+def test_library_save_rejects_overlong_paper_id(tmp_path):
+    # Arrange — the save path validates the id's SHAPE (no separators) but
+    # never its LENGTH: a 300-char paper_id sails past validation into the
+    # MASTER/<id> write and crashes it (measured: save answers 500, a client
+    # error reported as a server error). A library_id is a single path
+    # component (NAME_MAX 255), so anything longer can never name a record.
+    # Act
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        long_id = "A" * 300
+        save_resp = views.library_save(
+            rf.post(
+                "/api/library/save",
+                data=_json.dumps({"paper_id": long_id, "title": "t"}),
+                content_type="application/json",
+            )
+        )
+    # Assert — fail closed before any write, without echoing the value.
+    assert save_resp.status_code == 400 and "A" * 100 not in save_resp.content.decode() and not (tmp_path / "MASTER").exists()
+
+
+def test_library_save_bulk_rejects_overlong_paper_id(tmp_path):
+    # Arrange — the save-bulk path carries the same unvalidated LENGTH into
+    # its per-item write (measured: 200 carrying the raw OSError -- Errno 36
+    # plus the server filesystem path -- in failed[].error).
+    # Act
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        long_id = "A" * 300
+        bulk_resp = views.library_save_bulk(
+            rf.post(
+                "/api/library/save-bulk",
+                data=_json.dumps({"papers": [{"paper_id": long_id, "title": "t"}]}),
+                content_type="application/json",
+            )
+        )
+        bulk_body = _json.loads(bulk_resp.content)
+    # Assert — fail closed without echoing the value or the server path.
+    assert len(bulk_body["failed"]) == 1 and "Errno" not in bulk_body["failed"][0]["error"] and "A" * 100 not in bulk_body["failed"][0]["error"] and str(tmp_path) not in bulk_resp.content.decode() and not (tmp_path / "MASTER").exists()
+
+
+def test_library_save_bulk_failure_does_not_echo_library_id(tmp_path):
+    # Arrange — a bulk row whose library_id fails shape validation. The
+    # per-item failure object must identify the row by index only: echoing
+    # the raw caller-supplied library_id back whole is the same reflection
+    # class as the enrich 400/404 paper_id echoes (slices 19/21), and the
+    # bulk 200 status means the value would otherwise round-trip verbatim.
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        raw_id = "../OUTSIDE-" + "x" * 200
+        item = {
+            "metadata": {"id": {}, "basic": {"title": "t"}},
+            "container": {"library_id": raw_id},
+        }
+        # Act
+        resp = views.library_save_bulk(
+            rf.post(
+                "/api/library/save-bulk",
+                data=_json.dumps({"papers": [item]}),
+                content_type="application/json",
+            )
+        )
+        body = _json.loads(resp.content)
+        # Assert — RED: fails while the view echoes failed[].library_id.
+        assert resp.status_code == 200 and len(body["failed"]) == 1 and body["failed"][0]["index"] == 0 and raw_id not in resp.content.decode() and not (tmp_path / "MASTER").exists()
+
+
+def test_graph_related_success_does_not_echo_doi():
+    # Arrange — the related-success body round-trips the caller-supplied
+    # doi verbatim under "doi". Same reflection class as the saved-searches
+    # save/delete echoes (slice 25) and the save-bulk failed[].library_id
+    # echo (slice 23): a 200 body must not carry untrusted input back
+    # whole. The only client (citation-graph.js) reads data.related; the
+    # doi key is unconsumed (grep-verified: zero .doi reads on the related
+    # payload in static/ + templates/).
+    class _RelatedStubGraph:
+        def to_dict(self):
+            return {
+                "nodes": [
+                    {"id": "10.9/other", "similarity_score": 0.9},
+                    {"id": "10.9/unrelated", "similarity_score": 0.1},
+                ]
+            }
+
+    class _RelatedStubBuilder:
+        def build(self, **kwargs):
+            return _RelatedStubGraph()
+
+    rf = RequestFactory()
+    marker = "10.9/seed-marker"
+    # Act
+    resp = views.graph_related(
+        rf.get("/api/graph/related", {"doi": marker}),
+        _builder=_RelatedStubBuilder(),
+    )
+    # Assert — RED: fails while the view echoes {"doi": <raw input>}.
+    body = _json.loads(resp.content)
+    assert resp.status_code == 200 and marker not in resp.content.decode() and set(body) == {"related", "count"}
+
+
+def test_library_save_success_does_not_leak_server_path(tmp_path):
+    # Arrange — the save-success body carries str(path), an absolute server
+    # filesystem path under the user root. Same disclosure class as the
+    # library_root list payload (slice 3) and the api_url health/graph lanes
+    # (slice 24): it names the service account + jail layout, and no
+    # JS/template consumer reads the key (grep-verified: zero .path reads
+    # on save responses in static/ + templates/).
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        req = rf.post(
+            "/api/library/save",
+            data=_json.dumps(_save_payload()),
+            content_type="application/json",
+        )
+        # Act
+        resp = views.library_save(req)
+        # Assert — RED: fails while the body carries {"path": <server path>}.
+        body = _json.loads(resp.content)
+        assert resp.status_code == 200 and "path" not in body and str(tmp_path) not in resp.content.decode()
+
+
+def test_library_save_bulk_saved_entries_do_not_leak_server_path(tmp_path):
+    # Arrange — same disclosure class as the single-save lane above: each
+    # saved[] entry carries str(path) under the user root.
+    with _library_env(tmp_path):
+        rf = RequestFactory()
+        body = _json.dumps({"papers": [_save_payload("PID1")]})
+        # Act
+        resp = views.library_save_bulk(
+            rf.post("/api/library/save-bulk", data=body, content_type="application/json")
+        )
+        # Assert — RED: fails while saved[] entries carry "path".
+        data = _json.loads(resp.content)
+        assert resp.status_code == 200 and len(data["saved"]) == 1 and "path" not in data["saved"][0] and str(tmp_path) not in resp.content.decode()
+
+
 # EOF
 
 
 # EOF
+
+
+# New Library command controls; all existing source above is retained exactly.
+from django.contrib.auth import get_user_model
+from tests.scitex_scholar._django.test_views_shell_context import _private_context
+
+
+def _command_library_request(root, user, query="", **query_hints):
+    request = RequestFactory().get("/api/library", {"q": query, **query_hints})
+    request.user = user
+    request.scholar_library_root = root
+    return request
+
+
+@pytest.fixture
+def _command_library(_private_context):
+    from scitex_scholar.core.Paper import Paper
+    from scitex_scholar.storage.PaperIO import PaperIO
+
+    root = _private_context["temp_root"] / "command-library" / "alice"
+    user = get_user_model()(username="alice")
+    specs = [
+        ("ALPHA", "Sharp wave hippocampus", 2020, 0, "Brain Science",
+         ["Alice Jones", "Bob Smith"]),
+        ("BETA", "Slow wave cortex", 2024, 50, "Neuro Reports", ["Bob Smith"]),
+        ("GAMMA", "Hippocampus after seizure", 2019, 100, "Brain Science",
+         ["Carol Ng"]),
+        ("NULLS", None, None, None, None, []),
+        ("MISSING", None, None, None, None, []),
+        ("DELTA", "Sharp cortex", 2022, 25, "Brain Science", ["Ada Lovelace"]),
+    ]
+    files = []
+    for paper_id, title, year, citations, journal, authors in specs:
+        paper = Paper.from_dict({
+            "metadata": {
+                "id": {"doi": f"10.9999/commands-{paper_id.lower()}"},
+                "basic": {"title": title, "year": year, "authors": authors},
+                "publication": {"journal": journal},
+                "citation_count": {"total": citations},
+            },
+            "container": {"library_id": paper_id, "created_by": "alice"},
+        })
+        path = PaperIO(paper, base_dir=root / "MASTER").save_metadata()
+        record = json.loads(path.read_text())
+        if paper_id == "ALPHA":
+            record["metadata"]["basic"]["authors"] = [
+                "Alice Jones", {"name": "Bob Smith"}, {"name": None}, None,
+            ]
+        if paper_id == "NULLS":
+            record["metadata"]["basic"]["authors"] = [None, {"name": None}]
+        if paper_id == "MISSING":
+            for key in ("title", "year", "authors"):
+                record["metadata"]["basic"].pop(key, None)
+            record["metadata"].pop("citation_count", None)
+            record["metadata"].pop("publication", None)
+        path.write_text(json.dumps(record))
+        files.append(path)
+    response = views.library_list(_command_library_request(root, user))
+    return {
+        "root": root, "user": user, "rows": json.loads(response.content)["papers"],
+        "files": files, "before": [path.read_bytes() for path in files],
+        "private": _private_context,
+    }
+
+
+class TestLibraryCommandQuery:
+    @pytest.mark.parametrize("query,selected", [
+        ("-t Sharp", ["ALPHA", "DELTA"]),
+        ("--title Sharp", ["ALPHA", "DELTA"]),
+        ("-t -Sharp", ["BETA", "GAMMA", "NULLS", "MISSING"]),
+        ("--title -Sharp", ["BETA", "GAMMA", "NULLS", "MISSING"]),
+        ("-a Bob", ["ALPHA", "BETA"]),
+        ("--author Bob", ["ALPHA", "BETA"]),
+        ("-a -Bob", ["GAMMA", "NULLS", "MISSING", "DELTA"]),
+        ("--author -Bob", ["GAMMA", "NULLS", "MISSING", "DELTA"]),
+        ("-j Brain", ["ALPHA", "GAMMA", "DELTA"]),
+        ("--journal Brain", ["ALPHA", "GAMMA", "DELTA"]),
+        ("-j -Brain", ["BETA", "NULLS", "MISSING"]),
+        ("--journal -Brain", ["BETA", "NULLS", "MISSING"]),
+    ])
+    def test_short_and_long_text_commands_keep_original_rows(
+        self, _command_library, query, selected,
+    ):
+        # Arrange
+        fixture = _command_library
+        expected = [row for row in fixture["rows"] if row["paper_id"] in selected]
+        # Act
+        response = views.library_list(_command_library_request(
+            fixture["root"], fixture["user"], query,
+        ))
+        result = json.loads(response.content)
+        # Assert
+        # Hardened envelope: no `query` echo (pure reflection surface) and
+        # no `library_root` (server-side path stays server-side).
+        assert (response.status_code, result) == (200, {
+            "papers": expected, "count": len(selected), "total": 6,
+            "filtered": True,
+        })
+
+    @pytest.mark.parametrize("query,selected", [
+        ('-t "Sharp wave"', ["ALPHA"]),
+        ("--title 'Sharp wave'", ["ALPHA"]),
+        ('-a "Alice Jones"', ["ALPHA"]),
+        ("--author 'Alice Jones'", ["ALPHA"]),
+        ('-j "Neuro Reports"', ["BETA"]),
+        ("--journal -'Brain Science'", ["BETA", "NULLS", "MISSING"]),
+    ])
+    def test_quoted_multiword_commands_keep_values_and_original_rows(
+        self, _command_library, query, selected,
+    ):
+        # Arrange
+        fixture = _command_library
+        expected = [row for row in fixture["rows"] if row["paper_id"] in selected]
+        # Act
+        response = views.library_list(_command_library_request(
+            fixture["root"], fixture["user"], query,
+        ))
+        result = json.loads(response.content)
+        # Assert
+        assert (response.status_code, result["papers"], result["count"], result["total"]) == (
+            200, expected, len(selected), 6,
+        )
+
+    @pytest.mark.parametrize("query,selected", [
+        ("-ymin 2020", ["ALPHA", "BETA", "DELTA"]),
+        ("--year-min 2020", ["ALPHA", "BETA", "DELTA"]),
+        ("-ymax 2020", ["ALPHA", "GAMMA"]),
+        ("--year-max 2020", ["ALPHA", "GAMMA"]),
+        ("-ymin 0000", ["ALPHA", "BETA", "GAMMA", "DELTA"]),
+        ("year:2020-2024", ["ALPHA", "BETA", "DELTA"]),
+        ("-cmin 0", ["ALPHA", "BETA", "GAMMA", "DELTA"]),
+        ("--citations-min 50", ["BETA", "GAMMA"]),
+        ("-cmax 0", ["ALPHA"]),
+        ("--citations-max 0", ["ALPHA"]),
+        ("citations:>50", ["BETA", "GAMMA"]),
+        ("-ymin 2020 -ymax 2022 -cmin 0 -cmax 25", ["ALPHA", "DELTA"]),
+    ])
+    def test_year_and_citation_bounds_preserve_zero_and_missing_values(
+        self, _command_library, query, selected,
+    ):
+        # Arrange
+        fixture = _command_library
+        expected = [row for row in fixture["rows"] if row["paper_id"] in selected]
+        # Act
+        response = views.library_list(_command_library_request(
+            fixture["root"], fixture["user"], query,
+        ))
+        result = json.loads(response.content)
+        # Assert
+        assert (response.status_code, result["papers"], result["count"], result["total"]) == (
+            200, expected, len(selected), 6,
+        )
+
+    @pytest.mark.parametrize("query,selected", [
+        ("", ["ALPHA", "BETA", "GAMMA", "NULLS", "MISSING", "DELTA"]),
+        ("   ", ["ALPHA", "BETA", "GAMMA", "NULLS", "MISSING", "DELTA"]),
+        ("sHaRp", ["ALPHA", "DELTA"]),
+        ("sharp cortex", ["DELTA"]),
+        ("cortex sharp", []),
+        ("Bob", ["ALPHA", "BETA"]),
+    ])
+    def test_plain_and_empty_queries_keep_existing_substring_and_envelope(
+        self, _command_library, query, selected,
+    ):
+        # Arrange
+        fixture = _command_library
+        query = query.strip()
+        expected = [row for row in fixture["rows"] if row["paper_id"] in selected]
+        # Act
+        response = views.library_list(_command_library_request(
+            fixture["root"], fixture["user"], query,
+        ))
+        result = json.loads(response.content)
+        # Assert
+        # Hardened envelope: no `query` echo (pure reflection surface) and
+        # no `library_root` (server-side path stays server-side).
+        assert (response.status_code, result) == (200, {
+            "papers": expected, "count": len(selected), "total": 6,
+            "filtered": bool(query),
+        })
+
+    @pytest.mark.parametrize("query", [
+        "-ymin nope", "-cmin -3", "--author", "--foo bar",
+        "-cmin 3.5", "--citations-max 2.1", "-ymin 20202", "--year-max 20202",
+    ])
+    def test_malformed_commands_return_400_without_primary_writes(
+        self, _command_library, query,
+    ):
+        # Arrange
+        fixture = _command_library
+        # Act
+        response = views.library_list(_command_library_request(
+            fixture["root"], fixture["user"], query,
+        ))
+        after = [path.read_bytes() for path in fixture["files"]]
+        # Assert
+        assert (response.status_code, json.loads(response.content), after) == (
+            400, {"error": "Invalid Library command option or value"}, fixture["before"],
+        )
+
+    @pytest.mark.parametrize("query", [
+        "-ifmin 5", "--if-max 10", "if:>5", "impact_factor:>5",
+        "oa:true", "open_access:false", "type:review",
+        "oa:false", "open_access:0", "if:0", "-ifmin 0",
+    ])
+    def test_unavailable_row_filters_return_honest_400(
+        self, _command_library, query,
+    ):
+        # Arrange
+        fixture = _command_library
+        # Act
+        response = views.library_list(_command_library_request(
+            fixture["root"], fixture["user"], query,
+        ))
+        # Assert
+        assert (response.status_code, json.loads(response.content)) == (
+            400, {"error": "Library command filters do not support IF, OA or type"},
+        )
+
+    @pytest.mark.parametrize("query,selected", [
+        ("hippocampus -seizure -ymax 2020", ["ALPHA"]),
+        ("cortex -Slow --year-min 2020", ["DELTA"]),
+        ("unknownword --author Bob", []),
+    ])
+    def test_residual_keywords_and_negatives_are_applied_before_field_filters(
+        self, _command_library, query, selected,
+    ):
+        # Arrange
+        fixture = _command_library
+        expected = [row for row in fixture["rows"] if row["paper_id"] in selected]
+        # Act
+        response = views.library_list(_command_library_request(
+            fixture["root"], fixture["user"], query,
+        ))
+        result = json.loads(response.content)
+        # Assert
+        assert (response.status_code, result["papers"], result["count"], result["total"]) == (
+            200, expected, len(selected), 6,
+        )
+
+    @pytest.mark.parametrize("query", ["oa:false", "-ifmin 0"])
+    def test_unsupported_commands_fail_before_missing_primary_collection(
+        self, _private_context, query,
+    ):
+        # Arrange
+        root = _private_context["temp_root"] / "absent-command-library"
+        user = get_user_model()(username="alice")
+        # Act
+        response = views.library_list(_command_library_request(root, user, query))
+        # Assert
+        assert (response.status_code, json.loads(response.content), root.exists()) == (
+            400, {"error": "Library command filters do not support IF, OA or type"}, False,
+        )
+
+    def _isolation_probe(self, _command_library):
+        fixture = _command_library
+        other_root = fixture["private"]["temp_root"] / "command-library" / "bob"
+        bob = get_user_model()(username="bob")
+        expected = [row for row in fixture["rows"] if row["paper_id"] == "ALPHA"]
+        alice_response = views.library_list(_command_library_request(
+            fixture["root"], fixture["user"], "-t Sharp -cmax 0",
+            project="Foreign", library_root=str(other_root), path=str(other_root),
+        ))
+        bob_response = views.library_list(_command_library_request(other_root, bob, "-t Sharp"))
+        return (
+            alice_response, json.loads(alice_response.content),
+            bob_response, json.loads(bob_response.content),
+            other_root, expected,
+        )
+
+    def test_queries_preserve_bound_root_and_other_user_isolation(self, _command_library):
+        # Arrange
+        # Act
+        alice_response, alice_data, bob_response, bob_data, other_root, expected = (
+            self._isolation_probe(_command_library)
+        )
+        # Assert
+        # Isolation rides on the bound root: alice asked with other_root hints
+        # yet is served the fixture root's ALPHA, bob's absent root stays
+        # uncreated. The hardened envelope carries no server-side path and no
+        # caller-input echo, so the proof reads papers, not keys.
+        assert (alice_response.status_code, alice_data["papers"],
+                bob_response.status_code, bob_data["papers"],
+                other_root.exists()) == (
+            200, expected, 200, [], False,
+        )
+
+    def test_isolation_envelope_hides_library_root_from_alice(self, _command_library):
+        # Arrange
+        # Act
+        _, alice_data, _, _, _, _ = self._isolation_probe(_command_library)
+        # Assert
+        assert "library_root" not in alice_data
+
+    def test_isolation_envelope_hides_library_root_from_bob(self, _command_library):
+        # Arrange
+        # Act
+        _, _, _, bob_data, _, _ = self._isolation_probe(_command_library)
+        # Assert
+        assert "library_root" not in bob_data
+
+    def test_isolation_envelope_hides_query_echo(self, _command_library):
+        # Arrange
+        # Act
+        _, alice_data, _, _, _, _ = self._isolation_probe(_command_library)
+        # Assert
+        assert "query" not in alice_data
+
+    def test_queries_leave_primary_files_and_project_links_untouched(self, _command_library):
+        # Arrange
+        fixture = _command_library
+        project = fixture["private"]["paths"]["SCITEX_SCHOLAR_PROJECTS_DIR"] / "Alpha"
+        link = project / "ALPHA"
+        link.symlink_to(fixture["root"] / "MASTER" / "ALPHA", target_is_directory=True)
+        target = link.readlink()
+        # Act
+        response = views.library_list(_command_library_request(
+            fixture["root"], fixture["user"], "--author Bob", project="Alpha",
+        ))
+        after = [path.read_bytes() for path in fixture["files"]]
+        # Assert
+        assert (response.status_code, after, link.is_symlink(), link.readlink()) == (
+            200, fixture["before"], True, target,
+        )
+
+    @pytest.mark.parametrize("count", [0, 17, None])
+    def test_real_paperio_canonical_citations_are_listed(self, _private_context, count):
+        # Arrange
+        from scitex_scholar.core.Paper import Paper
+        from scitex_scholar.storage.PaperIO import PaperIO
+
+        root = _private_context["temp_root"] / "canonical-citation-library"
+        paper = Paper.from_dict({
+            "metadata": {"basic": {"title": "Real saved paper"},
+                         "citation_count": {"total": count}},
+            "container": {"library_id": "REALCOUNT", "created_by": "alice"},
+        })
+        path = PaperIO(paper, base_dir=root / "MASTER").save_metadata()
+        before = path.read_bytes()
+        user = get_user_model()(username="alice")
+        # Act
+        response = views.library_list(_command_library_request(root, user))
+        data = json.loads(response.content)
+        stored = json.loads(path.read_text())
+        # Assert
+        assert (response.status_code, data["papers"][0]["citation_count"],
+                stored["metadata"]["citation_count"]["total"], path.read_bytes()) == (
+            200, count, count, before,
+        )
+
+    @pytest.mark.parametrize("canonical_metadata,legacy,expected", [
+        ({}, 17, 17),
+        ({"citation_count": {"total": None}}, 17, 17),
+        ({"citation_count": {"total": 0}}, 17, 0),
+        ({"citation_count": {"total": 17}}, 99, 17),
+    ])
+    def test_legacy_citation_fallback_preserves_canonical_zero(
+        self, _private_context, canonical_metadata, legacy, expected,
+    ):
+        # Arrange
+        root = _private_context["temp_root"] / "legacy-citation-library"
+        path = _seed_library(root, paper_id="LEGACY", title="Legacy primary paper")
+        stored = json.loads(path.read_text())
+        stored["metadata"]["citation"] = {"count": legacy}
+        stored["metadata"].update(canonical_metadata)
+        path.write_text(json.dumps(stored))
+        before = path.read_bytes()
+        user = get_user_model()(username="alice")
+        # Act
+        response = views.library_list(_command_library_request(root, user))
+        data = json.loads(response.content)
+        # Assert
+        assert (response.status_code, data["papers"][0]["citation_count"], path.read_bytes()) == (
+            200, expected, before,
+        )
+
+
+class TestLibraryCanonicalCommandParser:
+    @pytest.mark.parametrize("query,field,value", [
+        ('-t "Sharp wave"', "title_includes", "Sharp wave"),
+        ("--title 'Sharp wave'", "title_includes", "Sharp wave"),
+        ('-t -"Sharp wave"', "title_excludes", "Sharp wave"),
+        ('-a "Alice Jones"', "author_includes", "Alice Jones"),
+        ("--author 'Alice Jones'", "author_includes", "Alice Jones"),
+        ('--author -"Alice Jones"', "author_excludes", "Alice Jones"),
+        ('-j "Brain Science"', "journal_includes", "Brain Science"),
+        ("--journal -'Brain Science'", "journal_excludes", "Brain Science"),
+    ])
+    def test_quoted_selector_is_one_value(self, _private_context, query, field, value):
+        # Arrange
+        from scitex_scholar.pipelines.SearchQueryParser import SearchQueryParser
+
+        # Act
+        parsed = SearchQueryParser.from_shell_syntax(query).get_filters()
+        # Assert
+        assert parsed == {field: [value]}
+
+    @pytest.mark.parametrize("query", [
+        "-ymin 20202", "--year-max 20202", "-cmin 3.5", "--citations-max 2.1",
+    ])
+    def test_numeric_suffix_is_not_partially_consumed(self, _private_context, query):
+        # Arrange
+        from scitex_scholar.pipelines.SearchQueryParser import SearchQueryParser
+
+        # Act
+        parsed = SearchQueryParser.from_shell_syntax(query).get_filters()
+        # Assert
+        assert parsed == {"positive_keywords": query.split()}

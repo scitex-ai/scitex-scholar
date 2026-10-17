@@ -36,6 +36,8 @@ Output:
 """Imports"""
 import argparse
 from pprint import pprint
+import scitex_logging as slogging
+_console = slogging.getPlainConsole(__name__)
 
 try:
     import scitex as stx
@@ -74,21 +76,21 @@ def demonstrate_bibtex_parsing(
 
     results = {}
 
-    print(f"📚 Parsing OpenAccess BibTeX file: {openaccess_path}")
+    _console.print(f"📚 Parsing OpenAccess BibTeX file: {openaccess_path}")
     openaccess_parsed = parse_bibtex(openaccess_path)
-    print(f"📊 Found {len(openaccess_parsed)} OpenAccess papers")
+    _console.print(f"📊 Found {len(openaccess_parsed)} OpenAccess papers")
 
-    print(f"\n📋 Sample OpenAccess entries (first {n_samples}):")
-    print("=" * 50)
-    pprint(openaccess_parsed[:n_samples])
+    _console.print(f"\n📋 Sample OpenAccess entries (first {n_samples}):")
+    _console.print("=" * 50)
+    _console.print(openaccess_parsed[:n_samples])
 
-    print(f"\n📚 Parsing Paywalled BibTeX file: {paywalled_path}")
+    _console.print(f"\n📚 Parsing Paywalled BibTeX file: {paywalled_path}")
     paywalled_parsed = parse_bibtex(paywalled_path)
-    print(f"📊 Found {len(paywalled_parsed)} Paywalled papers")
+    _console.print(f"📊 Found {len(paywalled_parsed)} Paywalled papers")
 
-    print(f"\n📋 Sample Paywalled entries (first {n_samples}):")
-    print("=" * 50)
-    pprint(paywalled_parsed[:n_samples])
+    _console.print(f"\n📋 Sample Paywalled entries (first {n_samples}):")
+    _console.print("=" * 50)
+    _console.print(paywalled_parsed[:n_samples])
 
     results = {"openaccess": openaccess_parsed, "paywalled": paywalled_parsed}
 
@@ -108,8 +110,8 @@ def main(args) -> int:
     int
         Exit status code (0 for success, 1 for failure)
     """
-    print("📚 Scholar BibTeX Parser Demonstration")
-    print("=" * 40)
+    _console.print("📚 Scholar BibTeX Parser Demonstration")
+    _console.print("=" * 40)
 
     try:
         results = demonstrate_bibtex_parsing(
@@ -119,11 +121,11 @@ def main(args) -> int:
         )
 
         total_entries = len(results["openaccess"]) + len(results["paywalled"])
-        print(f"\n✅ Successfully parsed {total_entries} total BibTeX entries")
+        _console.print(f"\n✅ Successfully parsed {total_entries} total BibTeX entries")
         return 0
 
     except Exception as e:
-        print(f"❌ Error: {e}")
+        _console.print(f"❌ Error: {e}")
         return 1
 
 
