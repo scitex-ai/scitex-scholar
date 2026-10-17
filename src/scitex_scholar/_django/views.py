@@ -549,6 +549,21 @@ def _js_i18n_dict() -> dict:
         "No papers with a DOI in your library yet.": _i18n(
             "No papers with a DOI in your library yet."
         ),
+        # Library tab slice 3b (old-direct parity): the Zotero /
+        # Connected Papers import controls render these client-side, so
+        # each MUST be a key here for the same catalog-visibility reason.
+        "Importing…": _i18n("Importing…"),
+        "Import failed": _i18n("Import failed"),
+        "Zotero database found": _i18n("Zotero database found"),
+        "Zotero database not found": _i18n("Zotero database not found"),
+        "Connected Papers available": _i18n("Connected Papers available"),
+        "Connected Papers unavailable": _i18n("Connected Papers unavailable"),
+        "Imported %(imported)s of %(total)s papers": _i18n(
+            "Imported %(imported)s of %(total)s papers"
+        ),
+        "Enter a Semantic Scholar paper ID": _i18n(
+            "Enter a Semantic Scholar paper ID"
+        ),
     }
 
 
@@ -970,6 +985,15 @@ _MAX_BULK_ITEMS = 500
 #: value is per-request cache + engine + log pressure; 500 chars is far past
 #: any real DOI (tens of chars).
 _MAX_DOI_CHARS = 500
+
+#: Largest accepted Connected Papers seed id (Semantic Scholar 40-char SHA
+#: or DOI). Same fan-out class as _MAX_DOI_CHARS (cache key + upstream fetch
+#: + logs); 500 chars is far past any real seed.
+_MAX_CP_PAPER_ID_CHARS = 500
+
+#: Import modes the leaf Zotero reflection supports (hub parity: all /
+#: collection / tags on the local-DB reader). Anything else is a 400.
+_ZOTERO_IMPORT_MODES = ("all", "collection", "tags")
 
 #: Largest accepted library paper_id on every endpoint that resolves one
 #: (enrich, save, save-bulk, import, load). The id is a single path
@@ -1566,6 +1590,278 @@ def library_import(request):
     except Exception as e:
         logger.error(f"library import failed: {e}", exc_info=True)
         return JsonResponse({"error": "Import failed. Try again later."}, status=500)
+
+
+def _resolve_zotero_reader(_reader):
+    """The local-DB reader behind the Zotero views, with a test seam.
+
+    ``_reader`` is None in production (construct the real
+    ZoteroLocalReader, which raises FileNotFoundError when no local
+    database exists); a test passes either a prebuilt stand-in instance
+    or a zero-arg factory (e.g. a raising stand-in class). The
+    collaborator is a PARAMETER, not a monkeypatch (PA-306), exactly as
+    ``library_enrich(request, _pipeline=)``.
+    """
+    if _reader is None:
+        from scitex_scholar.integration.zotero import ZoteroLocalReader
+
+        return ZoteroLocalReader()
+    if isinstance(_reader, type):
+        return _reader()
+    return _reader
+
+
+def _persist_imported_papers(papers, root, request) -> tuple:
+    """Persist package Papers into the leaf store; return (imported, skipped).
+
+    Each paper gets a derived, dedup-friendly library_id (same function
+    the BibTeX import uses) and the request user's stamp. A paper whose id
+    OR DOI already exists is SKIPPED, never overwritten: the stored record
+    may carry enrichment the fresh import would clobber. One bad paper
+    cannot fail the batch (same per-row class as library_save_bulk).
+    """
+    from scitex_scholar.storage import _library_index as idx
+
+    try:
+        known_dois = {
+            str(r.get("doi") or "").strip().lower() for r in idx.collect_rows(root)
+        }
+    except (FileNotFoundError, ValueError):
+        # No library yet, or an inconsistent one the list endpoint already
+        # surfaces -- neither may fail an import; id checks still dedupe.
+        known_dois = set()
+    user = getattr(request, "user", None)
+    imported = skipped = 0
+    for paper in papers:
+        try:
+            library_id = _assert_safe_library_id(_derived_library_id(paper))
+            doi = str(paper.metadata.id.doi or "").strip().lower()
+        except Exception:
+            skipped += 1
+            continue
+        if (root / "MASTER" / library_id / "metadata.json").is_file() or (
+            doi and doi in known_dois
+        ):
+            skipped += 1
+            continue
+        try:
+            paper.container.library_id = library_id
+            paper.container.created_by = (
+                _safe_username(user) if user is not None else "user"
+            )
+            _save_library_paper(paper, root)
+        except Exception as e:
+            logger.warning(f"library ext import: skipping one paper ({e})")
+            skipped += 1
+            continue
+        imported += 1
+        if doi:
+            known_dois.add(doi)
+    return imported, skipped
+
+
+@require_GET
+def zotero_status(request, _reader=None):
+    """Whether a local Zotero database is reachable on this host.
+
+    Returns {available: bool} only: the reader's FileNotFoundError text
+    names server-side search paths, so it must never reach the client
+    (same non-echo class as the library-root payload rule).
+    """
+    try:
+        _resolve_zotero_reader(_reader)
+    except FileNotFoundError:
+        return JsonResponse({"available": False})
+    except Exception as e:
+        logger.warning(f"zotero status check failed: {e}")
+        return JsonResponse({"available": False})
+    return JsonResponse({"available": True})
+
+
+@require_GET
+def zotero_collections(request, _reader=None):
+    """List local Zotero collections for the import mode picker."""
+    try:
+        reader = _resolve_zotero_reader(_reader)
+        return JsonResponse({"collections": list(reader.list_collections())})
+    except FileNotFoundError:
+        return JsonResponse(
+            {"error": "Zotero database not available"}, status=404
+        )
+    except Exception as e:
+        logger.warning(f"zotero collections failed: {e}")
+        return JsonResponse({"error": "Zotero database not available"}, status=500)
+
+
+@require_POST
+def zotero_import(request, _reader=None):
+    """Import papers from the local Zotero database into the leaf library.
+
+    Body (JSON): {mode: all|collection|tags, collection?: str,
+    tags?: [str]|"a, b", match_all?: bool}. Reads via ZoteroLocalReader
+    and persists through the same MASTER/<id>/metadata.json path the
+    list/enrich routes read, so imported papers are immediately visible
+    and enrichable. Caps at _MAX_BULK_ITEMS (same class as
+    library_import). Bodies over 256k are refused with 413 before parsing.
+    """
+    try:
+        payload = _json_body(request)
+    except ValueError as e:
+        if "too large" in str(e):
+            return JsonResponse({"error": str(e)}, status=413)
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    except TypeError:
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    if not isinstance(payload, dict):
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    mode = (payload.get("mode") or "all")
+    if not isinstance(mode, str):
+        mode = "all"
+    mode = mode.strip().lower()
+    if mode not in _ZOTERO_IMPORT_MODES:
+        # Fixed message: the raw mode is untrusted input (echo class).
+        return JsonResponse(
+            {"error": "Unsupported import mode", "supported": list(_ZOTERO_IMPORT_MODES)},
+            status=400,
+        )
+    collection = payload.get("collection") or ""
+    tags = payload.get("tags") or []
+    if isinstance(tags, str):
+        tags = [t.strip() for t in tags.split(",") if t.strip()]
+    if not isinstance(collection, str) or not isinstance(tags, list) or any(
+        not isinstance(t, str) for t in tags
+    ):
+        return JsonResponse({"error": "Invalid collection or tags"}, status=400)
+    if len(collection) + sum(len(t) for t in tags) > _MAX_QUERY_CHARS:
+        return JsonResponse(
+            {"error": "collection/tags filter too long"}, status=400
+        )
+    if mode == "collection" and not collection.strip():
+        return JsonResponse(
+            {"error": "collection required for collection mode"}, status=400
+        )
+    if mode == "tags" and not tags:
+        return JsonResponse({"error": "tags required for tags mode"}, status=400)
+    match_all = payload.get("match_all", False)
+    try:
+        reader = _resolve_zotero_reader(_reader)
+        if mode == "collection":
+            papers = list(reader.read_by_collection(collection.strip()))
+        elif mode == "tags":
+            papers = list(reader.read_by_tags(tags, match_all=bool(match_all)))
+        else:
+            papers = list(reader.read_all())
+    except FileNotFoundError:
+        return JsonResponse(
+            {"error": "Zotero database not available"}, status=404
+        )
+    except Exception as e:
+        logger.error(f"zotero import failed: {e}", exc_info=True)
+        return JsonResponse({"error": "Import failed. Try again later."}, status=500)
+    if len(papers) > _MAX_BULK_ITEMS:
+        return JsonResponse(
+            {"error": f"Too many entries: at most {_MAX_BULK_ITEMS} per import"},
+            status=400,
+        )
+    root = _library_root_for(request)
+    imported, skipped = _persist_imported_papers(papers, root, request)
+    return JsonResponse(
+        {"ok": True, "imported": imported, "skipped": skipped, "total": len(papers)}
+    )
+
+
+@require_GET
+def connected_papers_status(request, _probe=None):
+    """Whether the Connected Papers integration is available (hub parity:
+    the ``connectedpapers`` package import check).
+
+    ``_probe`` is a test-injection seam (PA-306): Django routes call with
+    only ``request``; tests pass True/False directly.
+    """
+    if _probe is None:
+        try:
+            import connectedpapers  # noqa: F401
+        except ImportError:
+            return JsonResponse({"available": False})
+        return JsonResponse({"available": True})
+    return JsonResponse({"available": bool(_probe)})
+
+
+@require_POST
+def connected_papers_import(request, _importer=None):
+    """Import a Connected Papers graph into the leaf library by seed paper.
+
+    Body (JSON): {paper_id: str (S2 40-char SHA or DOI), dry_run?: bool,
+    cp_api_key?: str, s2_api_key?: str}. Fetches with output_format
+    "papers" and persists through the leaf store, same as zotero_import.
+    The seed id is untrusted input: blank is a 400, oversized is a 400,
+    both FIXED messages (echo class). Upstream failures are a 500 with a
+    fixed message -- CP/network error text is server-side detail.
+    """
+    try:
+        payload = _json_body(request)
+    except ValueError as e:
+        if "too large" in str(e):
+            return JsonResponse({"error": str(e)}, status=413)
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    except TypeError:
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    if not isinstance(payload, dict):
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    paper_id = payload.get("paper_id") or ""
+    if not isinstance(paper_id, str):
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    paper_id = paper_id.strip()
+    if not paper_id:
+        return JsonResponse({"error": "A seed paper is required"}, status=400)
+    if len(paper_id) > _MAX_CP_PAPER_ID_CHARS:
+        return JsonResponse(
+            {"error": f"Seed id must be at most {_MAX_CP_PAPER_ID_CHARS} characters"},
+            status=400,
+        )
+    dry_run = bool(payload.get("dry_run", False))
+    try:
+        importer = _importer
+        if importer is None:
+            from scitex_scholar.migration import from_connected_papers
+
+            importer = from_connected_papers
+        result = importer(
+            paper_id,
+            cp_api_key=payload.get("cp_api_key") or None,
+            s2_api_key=payload.get("s2_api_key") or None,
+            output_format="papers",
+            dry_run=dry_run,
+        )
+    except Exception as e:
+        logger.error(f"connected papers import failed: {e}", exc_info=True)
+        return JsonResponse({"error": "Import failed. Try again later."}, status=500)
+    if not result.get("success"):
+        return JsonResponse({"error": "Import failed. Try again later."}, status=500)
+    stats = result.get("stats", {})
+    warnings = result.get("warnings", [])
+    if dry_run:
+        return JsonResponse(
+            {"ok": True, "dry_run": True, "stats": stats, "warnings": warnings}
+        )
+    papers = list(result.get("papers") or [])
+    if len(papers) > _MAX_BULK_ITEMS:
+        return JsonResponse(
+            {"error": f"Too many entries: at most {_MAX_BULK_ITEMS} per import"},
+            status=400,
+        )
+    root = _library_root_for(request)
+    imported, skipped = _persist_imported_papers(papers, root, request)
+    return JsonResponse(
+        {
+            "ok": True,
+            "imported": imported,
+            "skipped": skipped,
+            "total": len(papers),
+            "stats": stats,
+            "warnings": warnings,
+        }
+    )
 
 
 def _paper_from_save_payload(payload):

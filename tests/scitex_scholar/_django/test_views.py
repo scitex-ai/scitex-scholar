@@ -3321,6 +3321,7 @@ def test_ja_catalog_translates_every_msgid():
     proper_nouns = {
         "SciTeX Scholar", "DOI", "CrossRef API",
         "BibTeX (.bib)", "RIS (.ris)", "EndNote (.enw)",
+        "Zotero", "Connected Papers",
     }
     # Act
     po = po_path.read_text(encoding="utf-8")
