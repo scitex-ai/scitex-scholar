@@ -373,6 +373,81 @@ def test_graph_health_probe_answers_200_even_when_the_backend_fails():
     assert resp.status_code == 200
 
 
+@override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL=None)
+def test_graph_health_unconfigured_paragraph_is_translated_in_japanese():
+    """The Service Status sidebar paragraph must not stay English on a JA page.
+
+    Operator screenshot 2026-10-16: error/detail/fix were hardcoded EN, so the
+    JA page mixed languages. They now go through gettext.
+    """
+    # Arrange
+    from django.utils import translation
+
+    request = RequestFactory().get("/api/graph/health")
+    # Act
+    with translation.override("ja"):
+        body = json.loads(views.graph_health(request).content)
+    # Assert — the whole paragraph reads JA: error exact, detail/fix keyed
+    # on their JA-only phrases so an EN fallback fails loudly.
+    assert (
+        body["error"],
+        "引用グラフは crossref-local" in body["detail"],
+        "再起動してください" in body["fix"],
+    ) == ("CrossRef API 未設定", True, True)
+
+
+def test_graph_health_configured_paragraph_is_translated_in_japanese():
+    # Arrange
+    from django.utils import translation
+
+    request = RequestFactory().get("/api/graph/health")
+    # Act
+    with translation.override("ja"), override_settings(
+        SCITEX_SCHOLAR_CROSSREF_API_URL="http://127.0.0.1:1"
+    ):
+        body = json.loads(views.graph_health(request).content)
+    # Assert — status envelope plus the JA paragraph in one comparison.
+    assert (
+        (body["status"], body["probed"]),
+        body["error"],
+        "引用グラフタブを開いて確認してください" in body["fix"],
+    ) == (("configured", False), "引用グラフ：未確認", True)
+
+
+def test_graph_health_degraded_paragraph_is_translated_in_japanese():
+    # Arrange
+    from django.utils import translation
+
+    # Act
+    with translation.override("ja"):
+        body = views._degraded_payload()
+    # Assert — error exact, detail/fix keyed on JA-only phrases.
+    assert (
+        body["error"],
+        "確認用の論文" in body["detail"],
+        "想定どおりのコーパス" in body["fix"],
+    ) == ("引用グラフ：制限あり", True, True)
+
+
+@override_settings(SCITEX_SCHOLAR_CROSSREF_API_URL="http://127.0.0.1:1")
+def test_graph_health_unavailable_paragraph_is_translated_in_japanese():
+    """A refused probe on a JA page reports the cause and the fix in JA."""
+    # Arrange
+    from django.utils import translation
+
+    request = RequestFactory().get("/api/graph/health", {"probe": "1"})
+    # Act
+    with translation.override("ja"):
+        body = json.loads(views.graph_health(request).content)
+    # Assert — status envelope plus the JA paragraph in one comparison.
+    assert (
+        (body["status"], body["probed"]),
+        body["error"],
+        "到達できないため" in body["detail"],
+        "再試行してください" in body["fix"],
+    ) == (("unavailable", True), "引用グラフ：利用不可", True, True)
+
+
 def test_initial_load_checks_configuration_without_probing():
     """The initial-load path asks the server for CONFIGURATION only."""
     # Arrange
@@ -397,6 +472,186 @@ def test_live_probe_is_bound_to_opening_the_graph_tab():
     lazy = 'bindLazyHealthProbe' in script and '?probe=1' in script
     # Assert
     assert lazy
+
+
+def test_mobile_swipe_wires_tab_switching():
+    """Phone users can swipe between Search/Library/Graph, like figrecipe panes.
+
+    Operator request 2026-10-16: Scholar tabs are tap-only; figrecipe's phone
+    panes switch by tap AND swipe (SDK Panes, opt-in swipeToSwitch). The tab
+    manager must listen for touchstart/touchend and step the tab order.
+    """
+    # Arrange
+    script = (
+        Path(views.__file__).parent / "static" / "scholar" / "js" / "app.js"
+    ).read_text()
+    # Act
+    wired = (
+        "touchstart" in script,
+        "touchend" in script,
+        "dataset.tab" in script,
+    )
+    # Assert
+    assert wired == (True, True, True)
+
+
+def test_mobile_swipe_ignores_graph_and_form_gestures():
+    """A swipe starting inside interactive content must not switch tabs.
+
+    Mirrors the SDK Panes NO_SWIPE_SELECTOR contract (operator mobile ruling
+    7724-7725): the citation-graph svg/canvas, form fields, and horizontal
+    scrollers own their gestures; only swipes starting on plain panel
+    content may change the active tab.
+    """
+    # Arrange
+    script = (
+        Path(views.__file__).parent / "static" / "scholar" / "js" / "app.js"
+    ).read_text()
+    # Act
+    guarded = (
+        "svg" in script and "canvas" in script,
+        "input" in script and "textarea" in script,
+        "scrollWidth" in script or "overflow" in script,
+    )
+    # Assert
+    assert guarded == (True, True, True)
+
+
+def test_mobile_swipe_needs_minimum_horizontal_travel():
+    """Vertical scrolls and taps must not flip tabs: SDK thresholds apply.
+
+    A minimum horizontal distance (60px) with a horizontal-over-vertical
+    dominance ratio (1.5x), exactly the SDK Panes SWIPE_MIN_PX /
+    SWIPE_AXIS_RATIO contract figrecipe inherits.
+    """
+    # Arrange
+    script = (
+        Path(views.__file__).parent / "static" / "scholar" / "js" / "app.js"
+    ).read_text()
+    # Act
+    gated = ("60" in script, "1.5" in script, "changedTouches" in script)
+    # Assert
+    assert gated == (True, True, True)
+
+
+def test_mobile_swipe_only_on_phone_layout():
+    """Swipe switching applies at phone widths, never on desktop.
+
+    The SDK Panes swipe runs only in single-pane (phone) mode so desktop
+    horizontal gestures (table scroll, graph pan) never flip sections.
+    Scholar gates on its own 768px mobile breakpoint (its stacked layout).
+    """
+    # Arrange
+    script = (
+        Path(views.__file__).parent / "static" / "scholar" / "js" / "app.js"
+    ).read_text()
+    # Act
+    gated = ("matchMedia" in script, "768" in script)
+    # Assert
+    assert gated == (True, True)
+
+
+def test_status_strip_sits_at_right_edge():
+    """Service Status lives at the RIGHT edge, not in the left sidebar.
+
+    Operator mandates 2026-10-16/17 + layout rule: status minutiae ALWAYS in
+    the rightmost column AND collapsible. The left sidebar keeps only the
+    Graph Controls hint; #serviceStatus (the JS health-render target) moves
+    into a right-edge strip placed after <main>.
+    """
+    # Arrange
+    template = (
+        Path(views.__file__).parent
+        / "templates"
+        / "scholar"
+        / "workspace_content.html"
+    ).read_text()
+    # Act
+    placed = (
+        '<aside class="app-status-strip"' in template,
+        template.index("app-status-strip") > template.index("</main>"),
+        "serviceStatus" not in template.split("</aside>")[0],
+    )
+    # Assert
+    assert placed == (True, True, True)
+
+
+def test_status_strip_uses_led_dots_with_expand():
+    """The strip follows the old Sources style: LED dots + expandable detail.
+
+    Hub's old Scholar UI (scholar_base.html) shows per-source LED dots
+    (data-source + data-status) synced with an expandable Sources panel.
+    The strip renders one dot per backend (CrossRef API, citation graph) and
+    the translated detail/fix paragraph inside <details> expanders; the
+    #serviceStatus id stays so checkServiceHealth keeps rendering into it.
+    """
+    # Arrange
+    template = (
+        Path(views.__file__).parent
+        / "templates"
+        / "scholar"
+        / "workspace_content.html"
+    ).read_text()
+    # Act
+    styled = (
+        'data-source="crossref"' in template and 'data-source="graph"' in template,
+        "<details" in template and 'id="serviceStatus"' in template,
+        "data-status" in template,
+    )
+    # Assert
+    assert styled == (True, True, True)
+
+
+def test_status_strip_is_collapsible():
+    """The right strip minimizes to a rail: template toggle + CSS + JS."""
+    # Arrange
+    base = Path(views.__file__).parent
+    template = (base / "templates" / "scholar" / "workspace_content.html").read_text()
+    css = (base / "static" / "scholar" / "css" / "_partials" / "_sidebar.css").read_text()
+    script = (base / "static" / "scholar" / "js" / "app.js").read_text()
+    # Act
+    collapsible = (
+        "status-strip-toggle" in template,
+        "status-strip--collapsed" in css,
+        "status-strip--collapsed" in script,
+    )
+    # Assert
+    assert collapsible == (True, True, True)
+
+
+def test_standalone_boots_light_by_default():
+    """LIGHT mode delivered: standalone boots light unless stored otherwise.
+
+    The SDK shell reads the visitor's stored preference first; the default
+    (no preference) was dark. Scholar now declares light.
+    """
+    # Arrange
+    rf = RequestFactory()
+    request = rf.get("/")
+    # Act
+    html = views.index(request).content.decode()
+    # Assert
+    assert 'data-theme-default="light"' in html
+
+
+def test_graph_marks_have_light_values():
+    """No UNQUALIFIED dark-only literals left in graph marks.
+
+    #fff (selected-node ring) survives only inside a [data-theme="dark"]
+    block, with the light value reading through a theme token; the edge
+    arrowhead's #3a3a3a literal is gone entirely (class + token rule).
+    """
+    # Arrange
+    base = Path(views.__file__).parent / "static" / "scholar"
+    graph_css = (base / "css" / "_partials" / "_graph.css").read_text()
+    renderer = (base / "js" / "graph" / "GraphRenderer.js").read_text()
+    # Act
+    themed = (
+        graph_css.count("#fff") == 1 and '[data-theme="dark"]' in graph_css,
+        '"#3a3a3a"' not in renderer and "graph-arrowhead" in renderer,
+    )
+    # Assert
+    assert themed == (True, True)
 
 
 def test_client_distinguishes_configured_from_ready():

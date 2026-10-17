@@ -17,12 +17,6 @@ msgstr "SciTeX Scholar"
 msgid "Scientific Literature Management"
 msgstr "科学文献管理"
 
-msgid "Service Status"
-msgstr "サービス状態"
-
-msgid "Checking..."
-msgstr "確認中…"
-
 msgid "Graph Controls"
 msgstr "グラフ操作"
 
@@ -158,6 +152,18 @@ msgstr "SVG をダウンロード"
 msgid "Related Papers"
 msgstr "関連論文"
 
+msgid "Collapse status panel"
+msgstr "ステータスパネルを折りたたむ"
+
+msgid "Expand status panel"
+msgstr "ステータスパネルを展開する"
+
+msgid "Service Status"
+msgstr "サービス状態"
+
+msgid "Checking..."
+msgstr "確認中…"
+
 msgid "Search academic databases (OpenAlex, Crossref, PubMed,\n                                    Semantic Scholar, &#8230;) by keyword. This searches\n                                    <strong>external databases</strong>, not your Library\n                                    (a separate tab)."
 msgstr "キーワードで学術データベース（OpenAlex、Crossref、PubMed、Semantic Scholar など）を検索します。これは<strong>外部データベース</strong>を検索するもので、ライブラリ（別のタブ）ではありません。"
 
@@ -166,6 +172,12 @@ msgstr "クエリ構文：<code>-word</code> で用語を除外、<code>year:202
 
 msgid "Your papers, stored locally. Use <strong>Enrich</strong>\n                                    to fill in metadata (abstract, citations, impact\n                                    factor) from the databases, or\n                                    <strong>Import</strong> BibTeX and\n                                    <strong>Export</strong> your library."
 msgstr "ローカルに保存された論文です。<strong>補完</strong> でデータベースからメタデータ（抄録、被引用数、インパクトファクター）を入力するか、<strong>インポート</strong> で BibTeX をインポートしてライブラリを<strong>エクスポート</strong>できます。"
+
+msgid "CrossRef API not configured"
+msgstr "CrossRef API 未設定"
+
+msgid "The citation graph reads its data from a crossref-local HTTP API; scholar never opens the corpus files itself. No endpoint is configured, so there is nothing to query."
+msgstr "引用グラフは crossref-local HTTP API からデータを取得します。scholar がコーパスファイルを直接開くことはありません。エンドポイントが設定されていないため、問い合わせ先がありません。"
 
 msgid "Build citation graph"
 msgstr "引用グラフを構築"
@@ -244,3 +256,33 @@ msgstr "%(file)s から %(n)s 件の論文をインポートしました"
 
 msgid "Imported %(n)s papers from %(file)s"
 msgstr "%(file)s から %(n)s 件の論文をインポートしました"
+
+msgid "Citation Graph: limited"
+msgstr "引用グラフ：制限あり"
+
+msgid "The crossref-local endpoint is configured and reachable, but the probe returned no data for the canary paper. Citation graphs may be incomplete."
+msgstr "crossref-local エンドポイントは設定され到達可能ですが、確認用の論文に対するプローブがデータを返さなかったため、引用グラフが不完全な場合があります。"
+
+msgid "Check that the crossref-local endpoint is serving the corpus you expect; the citation graph depends on it."
+msgstr "crossref-local エンドポイントが想定どおりのコーパスを提供しているか確認してください。引用グラフはこのエンドポイントに依存しています。"
+
+msgid "Set %(setting)s to a running crossref-local endpoint (env var of the same name, or the Django setting when scholar is mounted in a host project), then restart the server. Installing the `crossref-local` package supplies a default endpoint, which scholar falls back to when the variable is unset."
+msgstr "%(setting)s に稼働中の crossref-local エンドポイントを設定し（ホストプロジェクトにマウントしている場合は同名の環境変数または Django 設定）、サーバーを再起動してください。`crossref-local` パッケージをインストールするとデフォルトのエンドポイントが用意され、変数が未設定の場合はそちらにフォールバックします。"
+
+msgid "Citation Graph: not checked"
+msgstr "引用グラフ：未確認"
+
+msgid "A crossref-local endpoint is configured. The graph backend is probed when you open the Citation Graph tab, so a slow or unreachable backend cannot delay the rest of the page."
+msgstr "crossref-local エンドポイントが設定されています。グラフバックエンドの確認は引用グラフタブを開いたときに行われるため、応答の遅いバックエンドや到達不能なバックエンドがページの他の表示を遅らせることはありません。"
+
+msgid "Open the Citation Graph tab to check it."
+msgstr "引用グラフタブを開いて確認してください。"
+
+msgid "Citation Graph: unavailable"
+msgstr "引用グラフ：利用不可"
+
+msgid "The crossref-local endpoint is configured but could not be reached right now, so citation graphs cannot be built."
+msgstr "crossref-local エンドポイントは設定されていますが、現在到達できないため、引用グラフを構築できません。"
+
+msgid "Verify the crossref-local service is running and that the endpoint is reachable, then retry."
+msgstr "crossref-local サービスが稼働していることと、エンドポイントに到達できることを確認してから、再試行してください。"

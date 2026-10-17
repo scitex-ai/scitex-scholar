@@ -89,7 +89,7 @@ class GraphRenderer {
       "path",
     );
     arrow.setAttribute("d", "M0,-5L10,0L0,5");
-    arrow.setAttribute("fill", "#3a3a3a");
+    arrow.setAttribute("class", "graph-arrowhead");
     marker.appendChild(arrow);
     defs.appendChild(marker);
     svg.appendChild(defs);

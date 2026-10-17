@@ -253,21 +253,28 @@ def _api_url() -> Optional[str]:
 # step (measured 2026-09-02 as a standalone first-run blocker). Built once and
 # shared so the routes cannot drift into different explanations.
 def _not_configured_payload() -> dict:
-    """The 'no crossref-local endpoint' body, with the fix in it."""
+    """The 'no crossref-local endpoint' body, with the fix in it.
+
+    All user-facing strings go through gettext so the Service Status
+    sidebar paragraph renders JA under a JA locale instead of staying
+    English (operator screenshot 2026-10-16). The setting name travels
+    as a %(setting)s placeholder so the msgid stays stable.
+    """
     return {
-        "error": "CrossRef API not configured",
-        "detail": (
+        "error": _i18n("CrossRef API not configured"),
+        "detail": _i18n(
             "The citation graph reads its data from a crossref-local HTTP API; "
             "scholar never opens the corpus files itself. No endpoint is "
             "configured, so there is nothing to query."
         ),
-        "fix": (
-            f"Set {CROSSREF_API_URL_SETTING} to a running crossref-local "
-            "endpoint (env var of the same name, or the Django setting when "
-            "scholar is mounted in a host project), then restart the server. "
-            "Installing the `crossref-local` package supplies a default "
-            "endpoint, which scholar falls back to when the variable is unset."
-        ),
+        "fix": _i18n(
+            "Set %(setting)s to a running crossref-local endpoint (env var of "
+            "the same name, or the Django setting when scholar is mounted in "
+            "a host project), then restart the server. Installing the "
+            "`crossref-local` package supplies a default endpoint, which "
+            "scholar falls back to when the variable is unset."
+        )
+        % {"setting": CROSSREF_API_URL_SETTING},
         "setting": CROSSREF_API_URL_SETTING,
         "docs": "src/scitex_scholar/citation_graph/README.md",
     }
@@ -399,7 +406,7 @@ def index_context(request, current_project=None):
         explicit=request.GET.get("project"),
     )
     return {
-        **shell_context("Scholar"),
+        **shell_context("Scholar", theme_default="light"),
         "api_available": resolved_api is not None,
         "api_url": resolved_api or "Not configured",
         "stx_mount": mount_prefix(request),
@@ -737,13 +744,13 @@ def graph_health(request):
             {
                 "status": "configured",
                 "probed": False,
-                "error": "Citation Graph: not checked",
-                "detail": (
+                "error": _i18n("Citation Graph: not checked"),
+                "detail": _i18n(
                     "A crossref-local endpoint is configured. The graph backend "
                     "is probed when you open the Citation Graph tab, so a slow "
                     "or unreachable backend cannot delay the rest of the page."
                 ),
-                "fix": "Open the Citation Graph tab to check it.",
+                "fix": _i18n("Open the Citation Graph tab to check it."),
             }
         )
 
@@ -765,12 +772,12 @@ def graph_health(request):
             {
                 "status": "unavailable",
                 "probed": True,
-                "error": "Citation Graph: unavailable",
-                "detail": (
+                "error": _i18n("Citation Graph: unavailable"),
+                "detail": _i18n(
                     "The crossref-local endpoint is configured but could not "
                     "be reached right now, so citation graphs cannot be built."
                 ),
-                "fix": (
+                "fix": _i18n(
                     "Verify the crossref-local service is running and that "
                     "the endpoint is reachable, then retry."
                 ),
@@ -787,13 +794,13 @@ def _degraded_payload() -> dict:
     """
     return {
         "status": "degraded",
-        "error": "Citation Graph: limited",
-        "detail": (
+        "error": _i18n("Citation Graph: limited"),
+        "detail": _i18n(
             "The crossref-local endpoint is configured and reachable, but the "
             "probe returned no data for the canary paper. Citation graphs may "
             "be incomplete."
         ),
-        "fix": (
+        "fix": _i18n(
             "Check that the crossref-local endpoint is serving the corpus you "
             "expect; the citation graph depends on it."
         ),
