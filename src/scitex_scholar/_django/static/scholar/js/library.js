@@ -27,6 +27,56 @@ document.addEventListener("DOMContentLoaded", () => {
   let loaded = false;
   let filterTimer = null;
 
+  // Project sync (parity slice 3c): the header picker navigates with
+  // ?project=<id> (the SDK picker's default contract), so the selection is
+  // readable here with no extra state. Saves elsewhere (search.js) file
+  // into the same selection; the list filters to it server-side.
+  function currentProject() {
+    try {
+      return new URLSearchParams(window.location.search).get("project") || "";
+    } catch (e) {
+      return "";
+    }
+  }
+
+  // Project chips + sync indicator, from the existing /api/projects
+  // endpoint (the picker's provider contract). Chips navigate with
+  // ?project= so the server resolves and remembers the selection.
+  const projectChipsEl = document.getElementById("libraryProjectChips");
+  const projectCurrentEl = document.getElementById("libraryProjectCurrent");
+  async function loadProjectChips() {
+    if (!projectChipsEl && !projectCurrentEl) return;
+    const current = currentProject();
+    if (projectCurrentEl) {
+      projectCurrentEl.textContent = current
+        ? scholarT("Project: %(project)s", { project: current })
+        : scholarT("All projects");
+    }
+    if (!projectChipsEl || projectChipsEl.dataset.done) return;
+    try {
+      const resp = await fetch(`${STX_MOUNT}/api/projects`);
+      const data = await resp.json();
+      if (!resp.ok) return;
+      projectChipsEl.dataset.done = "1";
+      const all = document.createElement("a");
+      all.className = "library-project__chip" + (current ? "" : " library-project__chip--active");
+      all.href = window.location.pathname;
+      all.textContent = scholarT("All projects");
+      projectChipsEl.appendChild(all);
+      (data.projects || []).forEach((p) => {
+        const chip = document.createElement("a");
+        const id = typeof p === "string" ? p : p.id || "";
+        if (!id) return;
+        chip.className = "library-project__chip" + (id === current ? " library-project__chip--active" : "");
+        chip.href = `${window.location.pathname}?project=${encodeURIComponent(id)}`;
+        chip.textContent = (typeof p === "string" ? p : p.name || p.id) || "";
+        projectChipsEl.appendChild(chip);
+      });
+    } catch (e) {
+      /* chips are progressive enhancement; the list still loads */
+    }
+  }
+
   function formatAuthors(paper) {
     const authors = paper.authors || [];
     if (!authors.length) return "";
@@ -71,6 +121,19 @@ document.addEventListener("DOMContentLoaded", () => {
       link.textContent = paper.doi;
       doi.appendChild(link);
       main.appendChild(doi);
+    }
+
+    // Project sync (parity slice 3c): filed papers show their projects.
+    if (paper.projects && paper.projects.length) {
+      const proj = document.createElement("div");
+      proj.className = "library-item__projects";
+      paper.projects.forEach((name) => {
+        const chip = document.createElement("span");
+        chip.className = "library-project__chip library-project__chip--static";
+        chip.textContent = name;
+        proj.appendChild(chip);
+      });
+      main.appendChild(proj);
     }
 
     // Enrichment status line (filled in after an enrich round-trip).
@@ -189,8 +252,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const query = filterEl ? filterEl.value.trim() : "";
     if (filterClearEl) filterClearEl.classList.toggle("hidden", !query);
     try {
-      const url = query
-        ? `${STX_MOUNT}/api/library?q=${encodeURIComponent(query)}`
+      // Project sync: the list follows the header picker's ?project=
+      // selection server-side (same endpoint, no new backend). The filter
+      // shape stays `/api/library?q=` first so the flag contract holds.
+      const qp = [];
+      if (query) qp.push(`q=${encodeURIComponent(query)}`);
+      const project = currentProject();
+      if (project) qp.push(`project=${encodeURIComponent(project)}`);
+      const url = qp.length
+        ? `${STX_MOUNT}/api/library?${qp.join("&")}`
         : `${STX_MOUNT}/api/library`;
       const resp = await fetch(url);
       const data = await resp.json();
@@ -472,6 +542,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (libTabBtn) {
     libTabBtn.addEventListener("click", () => {
       if (!loaded) loadLibrary();
+      loadProjectChips();
       checkExtStatuses();
     });
   }
@@ -493,6 +564,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // If the page loads with Library already active (it does not by default), load now.
   if (listPanel.classList.contains("active")) {
     loadLibrary();
+    loadProjectChips();
     checkExtStatuses();
   }
 });

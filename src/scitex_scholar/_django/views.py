@@ -420,6 +420,11 @@ def index_context(request, current_project=None):
         provider,
         explicit=request.GET.get("project"),
     )
+    # The SDK picker tag needs the EXPLICIT selection state: a user-scoped
+    # app (app_scope "user") opts into the picker with allow_user_scope, and
+    # current_scope tells it whether a project is selected. An absent
+    # selection is explicit user scope, never an implied project.
+    current_scope = "project" if current_project else "user"
     return {
         **shell_context("Scholar", theme_default="light"),
         **_leaf_identity(),
@@ -429,6 +434,7 @@ def index_context(request, current_project=None):
         "app_label": _app_label("SciTeX Scholar"),
         "app_scope": "user",
         "current_project": current_project,
+        "current_scope": current_scope,
         # i18n (operator directive 2026-09-14): the whole page flips via
         # LocaleMiddleware; this carries the strings that live ONLY in
         # JS, translated server-side for the current request language so
@@ -564,6 +570,12 @@ def _js_i18n_dict() -> dict:
         "Enter a Semantic Scholar paper ID": _i18n(
             "Enter a Semantic Scholar paper ID"
         ),
+        # Library tab slice 3c (old-direct parity): the project sync
+        # indicator/chips render these client-side, so each MUST be a
+        # key here for the same catalog-visibility reason.
+        "Project": _i18n("Project"),
+        "All projects": _i18n("All projects"),
+        "Project: %(project)s": _i18n("Project: %(project)s"),
     }
 
 
@@ -1120,6 +1132,85 @@ def _assert_safe_library_id(library_id: str) -> str:
     return library_id
 
 
+def _assert_safe_project_name(project: str) -> str:
+    """A project filing/filter target is a single path component.
+
+    Same jail class as ``_assert_safe_library_id``: a project name becomes
+    ``<library_root>/<project>/``, so a separator, NUL, or traversal token
+    would escape the library root. The refusal message is FIXED -- it never
+    carries the value (same reflection class as the library_id echoes).
+    Reserved store names (MASTER, downloads, ...) are refused too: they are
+    real directories under the root but never projects, and the picker
+    filter excludes them for the same reason.
+    """
+    from scitex_scholar.storage._project_reconcile import RESERVED_LIBRARY_DIRS
+
+    if not isinstance(project, str):
+        raise ValueError("unsafe project name: not a string")
+    if not project or "/" in project or "\\" in project or "\x00" in project:
+        raise ValueError("unsafe project name: not a single path component")
+    if project in (".", ".."):
+        raise ValueError("unsafe project name: traversal token")
+    if project.upper() in {name.upper() for name in RESERVED_LIBRARY_DIRS}:
+        raise ValueError("unsafe project name: reserved store name")
+    return project
+
+
+def _checked_project_dir(root: Path, project: str) -> Path:
+    """Validate a filing/filter target and return its directory.
+
+    Fail-closed: an unsafe name, a reserved store name, or a missing /
+    non-directory / symlinked path raises ValueError BEFORE anything is
+    written, so callers can validate up front and never leave a half-saved
+    paper behind.
+    """
+    name = _assert_safe_project_name(project)
+    pdir = root / name
+    if pdir.is_symlink() or not pdir.is_dir():
+        raise ValueError("unknown project: no such project in this library")
+    return pdir
+
+
+def _file_paper_into_project(root: Path, library_id: str, project: str) -> None:
+    """File a saved paper under ``<root>/<project>/`` (project sync).
+
+    Creates ``<project>/<library_id> -> ../MASTER/<library_id>`` and stamps
+    ``container.projects`` via the existing reconcile verb. The link name is
+    the validated library_id (safe, unique); membership and reconcile are
+    name-agnostic, so no readable-name machinery is needed here.
+
+    The project directory MUST already exist: callers check it with
+    ``_checked_project_dir`` BEFORE the save. A real file occupying the link
+    path, or a symlink failure, raises OSError (fail loud, fixed message).
+    """
+    from scitex_scholar.storage._project_reconcile import add_project_to_master
+
+    pdir = _checked_project_dir(root, project)
+    master_id = _assert_safe_library_id(library_id)
+    link = pdir / master_id
+    for existing in pdir.iterdir():
+        if not existing.is_symlink() or existing == link:
+            continue
+        try:
+            if existing.resolve().name == master_id:
+                existing.unlink()
+        except (OSError, RuntimeError):
+            continue
+    if link.is_symlink():
+        try:
+            resolved = link.resolve().name == master_id
+        except (OSError, RuntimeError):
+            resolved = False
+        if resolved:
+            add_project_to_master(root, master_id, pdir.name)
+            return
+        link.unlink()
+    elif link.exists():
+        raise OSError("cannot file into project: link path is occupied")
+    link.symlink_to(f"../MASTER/{master_id}")
+    add_project_to_master(root, master_id, pdir.name)
+
+
 def _load_library_paper(root: Path, paper_id: str):
     """Load one primary metadata.json as a Paper, keyed by paper_id.
 
@@ -1184,6 +1275,21 @@ def library_list(request):
             {"error": f"q must be at most {_MAX_QUERY_CHARS} characters"},
             status=400,
         )
+    project = (request.GET.get("project") or "").strip()
+    if project:
+        # A filter that escapes the library root fails closed, like the
+        # filing path. The message is fixed; the value is never echoed.
+        try:
+            _assert_safe_project_name(project)
+        except ValueError as e:
+            return JsonResponse({"error": str(e)}, status=400)
+        # The filter names a FILING location: it narrows only when that
+        # project exists under this request's library root. A selection
+        # that corresponds to nothing here (a hand-typed query, or a
+        # mounted host's project id) leaves the request-bound root alone --
+        # an explicit project selection never redirects the listing.
+        if (root / project).is_symlink() or not (root / project).is_dir():
+            project = ""
     try:
         command = _parse_library_query(query)
     except ValueError as e:
@@ -1193,12 +1299,13 @@ def library_list(request):
         # Success body carries server-computed result only: the client
         # already holds the filter text in its own input box, and no
         # JS/template consumer reads a `query` key -- echoing raw caller
-        # input back whole is pure reflection surface.
+        # input back whole is pure reflection surface. A project filter
+        # counts as filtering too, so the empty state stays reachable.
         return {
             "papers": papers,
             "count": len(papers),
             "total": total,
-            "filtered": bool(query),
+            "filtered": bool(query) or bool(project),
         }
 
     try:
@@ -1211,6 +1318,13 @@ def library_list(request):
         logger.error(f"library list: {e}")
         return JsonResponse({"error": "Library index inconsistent. Rebuild or repair the library."}, status=500)
 
+    try:
+        from scitex_scholar.storage import _project_reconcile as _pr
+
+        membership, _broken = _pr.build_project_membership(root)
+    except OSError:
+        membership = {}
+
     papers = [
         {
             "paper_id": r.get("paper_id"),
@@ -1221,9 +1335,16 @@ def library_list(request):
             "abstract": r.get("abstract"),
             "citation_count": r.get("citation_count"),
             "authors": json.loads(r["authors_json"]) if r.get("authors_json") else [],
+            # Project-sync (parity slice 3c): which projects file this
+            # paper, from the existing symlink-membership verb. Unfiled
+            # papers carry [], never null, so the client can filter
+            # without a second round-trip.
+            "projects": sorted(membership.get(r.get("paper_id") or "", ())),
         }
         for r in rows
     ]
+    if project:
+        papers = [p for p in papers if project in p["projects"]]
     if query:
         papers = _filter_library_papers(papers, query, command)
     return JsonResponse(_payload(papers, len(rows)))
@@ -1930,6 +2051,23 @@ def library_save(request):
     if not paper.container.library_id:
         paper.container.library_id = _derived_library_id(paper)
     root = _library_root_for(request)
+    # Project sync (parity slice 3c): an optional top-level "project" files
+    # the paper under <root>/<project>/ (hub old-direct files saves into the
+    # current project tree). Validated BEFORE the save so a refused project
+    # never leaves a half-saved paper behind. Absent stays user-scoped.
+    project = payload.get("project", None)
+    if project is not None:
+        if not isinstance(project, str):
+            return JsonResponse(
+                {"error": "unsafe project name: not a string"}, status=400
+            )
+        try:
+            _checked_project_dir(root, project)
+            _file_after_save = True
+        except ValueError as e:
+            return JsonResponse({"error": str(e)}, status=400)
+    else:
+        _file_after_save = False
     try:
         _save_library_paper(paper, root)
     except ValueError as e:
@@ -1937,11 +2075,21 @@ def library_save(request):
     except OSError as e:
         logger.error(f"library save failed: {e}", exc_info=True)
         return JsonResponse({"error": "Save failed. Try again later."}, status=500)
+    if _file_after_save:
+        # The paper is saved; the filing was pre-validated above, so only a
+        # filesystem failure can still occur -- fail loud, fixed message.
+        try:
+            _file_paper_into_project(root, paper.container.library_id, project)
+        except OSError as e:
+            logger.error(f"library file-into-project failed: {e}", exc_info=True)
+            return JsonResponse(
+                {"error": "Saved, but filing into the project failed."}, status=500
+            )
     # The body reports STATE + the validated library_id handle only, never
     # the server filesystem path: str(path) names the service account + jail
     # layout (same disclosure class as the library_root list payload).
     return JsonResponse(
-        {"saved": True, "library_id": paper.container.library_id}
+        {"saved": True, "library_id": paper.container.library_id, "project": project}
     )
 
 
@@ -1976,6 +2124,20 @@ def library_save_bulk(request):
     user = getattr(request, "user", None)
     created_by = _safe_username(user) if user is not None else "user"
     root = _library_root_for(request)
+    # Project sync (parity slice 3c): an optional top-level "project" files
+    # every row under <root>/<project>/ (hub old-direct files saves into the
+    # current project tree). Validated BEFORE any write so a refused project
+    # fails the whole batch with nothing saved.
+    project = payload.get("project", None)
+    if project is not None:
+        if not isinstance(project, str):
+            return JsonResponse(
+                {"error": "unsafe project name: not a string"}, status=400
+            )
+        try:
+            _checked_project_dir(root, project)
+        except ValueError as e:
+            return JsonResponse({"error": str(e)}, status=400)
     saved, failed = [], []
     for i, item in enumerate(papers):
         try:
@@ -1997,6 +2159,15 @@ def library_save_bulk(request):
             # fixed validator message (see _assert_safe_library_id).
             failed.append({"index": i, "error": str(e)})
             continue
+        if project is not None:
+            try:
+                _file_paper_into_project(root, paper.container.library_id, project)
+            except OSError as e:
+                logger.error(f"library file-into-project failed: {e}", exc_info=True)
+                failed.append(
+                    {"index": i, "error": "Saved, but filing into the project failed."}
+                )
+                continue
         # Saved entries carry the validated library_id handle only, never
         # the server filesystem path (same disclosure class as above).
         saved.append({"library_id": paper.container.library_id})

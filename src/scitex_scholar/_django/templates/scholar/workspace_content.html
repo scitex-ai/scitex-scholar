@@ -198,6 +198,17 @@
                                     <button type="button" id="libraryImportBtn" class="btn-control-library">{% trans "Import BibTeX" %}</button>
                                 </div>
                                 <div id="libraryIoStatus" class="library-io__status"></div>
+                                <!-- Project sync (parity slice 3c): the header
+                                     picker selects the project (?project=
+                                     navigation); the Library view shows the
+                                     sync target and filters to filed papers.
+                                     Chips are rendered by library.js from
+                                     the existing /api/projects endpoint. -->
+                                <div class="library-project">
+                                    <span id="libraryProjectCurrent" class="library-project__current">{% trans "Project" %}</span>
+                                    <span class="library-io__sep"></span>
+                                    <div id="libraryProjectChips" class="library-project__chips"></div>
+                                </div>
                                 <!-- External imports (parity slice 3b): Zotero
                                      local-DB and Connected Papers reflection
                                      over the existing package backends (same

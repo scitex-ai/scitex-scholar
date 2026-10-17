@@ -99,6 +99,18 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // The flat shape library_save accepts (same rows library_list returns).
+  // Project sync (parity slice 3c): saves file into the header picker's
+  // ?project= selection, mirroring hub old-direct's per-save project
+  // filing. Absent selection stays user-scoped (project: undefined is
+  // dropped by JSON.stringify, so the backend sees no project key).
+  function currentProject() {
+    try {
+      return new URLSearchParams(window.location.search).get("project") || undefined;
+    } catch (e) {
+      return undefined;
+    }
+  }
+
   function savePayload(paper) {
     return {
       title: paper.title || "",
@@ -108,6 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
       abstract: paper.abstract || "",
       venue: paper.venue || paper.journal || "",
       citation_count: paper.citation_count || null,
+      project: currentProject(),
     };
   }
 
@@ -353,7 +366,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const resp = await fetch(`${STX_MOUNT}/api/library/save-bulk`, {
         method: "POST",
         headers: csrfHeaders({ "Content-Type": "application/json" }),
-        body: JSON.stringify({ papers: papers.map(savePayload) }),
+        body: JSON.stringify({ papers: papers.map(savePayload), project: currentProject() }),
       });
       const data = await resp.json();
       if (!resp.ok) throw new Error(data.error || scholarT("Save failed"));
