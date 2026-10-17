@@ -10,19 +10,10 @@
             </div>
         </header>
         <div class="app-container" data-scholar-root>
-            <!-- Sidebar -->
+            <!-- Sidebar (left): interaction hints only. Status minutiae live
+                in the right-edge strip per the operator layout rule
+                (rightmost column, collapsible) -->
             <aside class="app-sidebar">
-                <!-- Service Status -->
-                <div class="sidebar-section">
-                    <div class="sidebar-section__header">
-                        <span class="sidebar-section__title">{% trans "Service Status" %}</span>
-                    </div>
-                    <div class="sidebar-section__content">
-                        <div id="serviceStatus">
-                            <span class="status-indicator status-checking">&#9679; {% trans "Checking..." %}</span>
-                        </div>
-                    </div>
-                </div>
                 <!-- Controls (graph interaction, shown only while the Graph tab is active) -->
                 <div class="sidebar-section graph-controls-hint" data-graph-hint>
                     <div class="sidebar-section__header">
@@ -348,5 +339,47 @@
                     </div>
                 </div>
             </main>
+            <!-- Status strip (right edge): LED dots + expandable detail.
+                Old Sources style (hub scholar_base.html health LEDs synced
+                with an expandable panel): one dot per backend, the translated
+                detail/fix paragraph inside <details>. Collapsible per the
+                operator layout rule (rightmost column, minimizable). -->
+            <aside class="app-status-strip" data-status-strip>
+                <button type="button" class="status-strip-toggle" data-status-strip-toggle
+                        aria-expanded="true"
+                        aria-label="{% trans "Collapse status panel" %}"
+                        data-label-collapse="{% trans "Collapse status panel" %}"
+                        data-label-expand="{% trans "Expand status panel" %}">&raquo;</button>
+                <div class="status-strip__body">
+                    <div class="status-strip__title">{% trans "Service Status" %}</div>
+                    <details class="status-expand" open>
+                        <summary class="status-expand__summary" aria-label="{% trans "Service Status" %}">
+                            <span class="status-leds">
+                                <span class="status-led" data-source="crossref"
+                                      data-status="{% if api_available %}ready{% else %}unavailable{% endif %}"
+                                      title="CrossRef API — {% if api_available %}{% trans "Configured" %}{% else %}{% trans "Not configured" %}{% endif %}"></span>
+                                <span class="status-led" data-source="graph" data-status="checking"
+                                      title="{% trans "Citation Graph" %} — {% trans "Checking..." %}"></span>
+                            </span>
+                        </summary>
+                        <div class="status-expand__body">
+                            <div class="status-row">
+                                <span class="status-row__label">{% trans "CrossRef API" %}</span>
+                                {% if api_available %}
+                                    <span class="status-indicator status-healthy">&#9679; {% trans "Configured" %}</span>
+                                {% else %}
+                                    <span class="status-indicator status-warning">&#9679; {% trans "Not configured" %}</span>
+                                {% endif %}
+                            </div>
+                            <div class="status-row">
+                                <span class="status-row__label">{% trans "Citation Graph" %}</span>
+                                <div id="serviceStatus">
+                                    <span class="status-indicator status-checking">&#9679; {% trans "Checking..." %}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </aside>
         </div>
         <!-- Scripts (order matters: ForceSimulation < GraphRenderer < citation-graph) -->

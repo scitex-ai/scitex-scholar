@@ -63,3 +63,152 @@
   font-size: 11px;
   color: var(--text-secondary);
 }
+
+/* ── Status Strip (right edge) ────────────────────────────────────
+ * Operator mandates 2026-10-16/17 + layout rule: status minutiae live in
+ * the rightmost column AND collapse to a rail. Old Sources style (hub
+ * scholar_base.html health LEDs): one LED dot per backend, the translated
+ * detail/fix paragraph inside a <details> expander. All colours resolve
+ * through theme-aware tokens, so the strip renders in light AND dark.
+ */
+.app-status-strip {
+  width: 208px;
+  flex-shrink: 0;
+  background: var(--bg-secondary);
+  border-left: 1px solid var(--border-default);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+}
+
+.status-strip-toggle {
+  align-self: flex-end;
+  background: none;
+  border: 1px solid var(--border-default);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 4px 8px;
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.status-strip-toggle:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.status-strip__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.status-strip__title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.app-status-strip.status-strip--collapsed {
+  width: auto;
+  padding: 12px 8px;
+  align-items: center;
+}
+
+.app-status-strip.status-strip--collapsed .status-strip__body {
+  display: none;
+}
+
+.app-status-strip.status-strip--collapsed .status-strip-toggle {
+  align-self: center;
+}
+
+/* LED dots: 6px round marks, one per backend. data-status values mirror
+ * the old Sources contract (checking pulses); "limited" is the strip's own
+ * addition for configured-but-degraded backends (amber, steady). */
+.status-leds {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.status-led {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  display: inline-block;
+}
+
+.status-led[data-status="checking"] {
+  animation: status-led-pulse 1s ease-in-out infinite;
+}
+
+.status-led[data-status="ready"] {
+  background: var(--accent);
+}
+
+.status-led[data-status="limited"] {
+  background: #f59e0b;
+}
+
+.status-led[data-status="unavailable"],
+.status-led[data-status="error"] {
+  background: var(--status-error);
+}
+
+@keyframes status-led-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.status-expand {
+  border-top: 1px solid var(--border-default);
+  padding-top: 8px;
+}
+
+.status-expand__summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.status-expand__summary::-webkit-details-marker {
+  display: none;
+}
+
+.status-expand__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.status-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.status-row__label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+  .app-status-strip {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--border-default);
+    order: 3;
+  }
+}
