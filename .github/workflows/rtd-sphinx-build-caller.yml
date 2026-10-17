@@ -92,8 +92,14 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
     # PS-169: self-hosted like the rest of CI, not GitHub-hosted.
     runs-on: ${{ fromJSON(vars.CI_RUNS_ON || '["self-hosted","Linux","X64","scitex-ci"]') }}
+    # Rolling vendor PR (option b): one run's refresh supersedes the
+    # previous, so cancel the stale run instead of racing force-pushes.
+    concurrency:
+      group: docs-vendor-and-commit
+      cancel-in-progress: true
     permissions:
-      contents: write
+      contents: write # push the bot/<branch> head
+      pull-requests: write # open/update the vendor PR (option b)
     steps:
       - uses: actions/checkout@v4
         with:
@@ -168,23 +174,43 @@ jobs:
             exit 1
           fi
 
-      - name: Commit refreshed HTML if it changed
-        # NO continue-on-error here by decision (scholar-docs-vendor-bot-
-        # push-rejected, option c): a rejected push must go RED, not green.
-        # A rejected push and an identical tree both produce "no commit" —
-        # silence is the failure mode. If this step fails on a protected
-        # branch hook, the durable fix is an operator call: allow the bot
-        # as a pusher on develop, or vendor through a PR instead.
+      - name: Open or update the vendor PR if the bundle changed
+        # scholar-docs-vendor-bot-push-rejected, option (b) per operator
+        # ruling (card scholar-docs-caller-pr-flow-fix-20261017): develop
+        # branch protection rejects bot pushes (GH006), so the bundle is
+        # vendored through a rolling PR instead of a direct push. One
+        # fixed bot branch: every run force-pushes it, so at most ONE
+        # vendor PR is ever open and each run refreshes it in place.
+        # Option (c) still holds: NO continue-on-error anywhere here — a
+        # rejected branch push or a failed `gh pr create` goes RED.
+        # NO LOOP: this job runs on push-to-develop only. The bot-branch
+        # push matches no `push.branches` entry, and the PR's open/sync
+        # events are `pull_request`, which skips this job. The PR build
+        # runs `-W` (fail_on_warning on pull_request), so a warning blocks
+        # the vendor PR instead of freezing the bundle with green CI.
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          if [ -n "$(git status --porcelain src/scitex_scholar/_sphinx_html)" ]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add src/scitex_scholar/_sphinx_html
-            git commit -m "docs(sphinx_html): refresh from CI build"
-            git push
-          else
+          if [ -z "$(git status --porcelain src/scitex_scholar/_sphinx_html)" ]; then
             echo "vendored bundle unchanged - nothing to commit"
+            exit 0
+          fi
+          branch="bot/sphinx-html-vendor"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/scitex_scholar/_sphinx_html
+          git commit -m "docs(sphinx_html): refresh from CI build"
+          # Rolling bot branch: --force is scoped to this bot-owned ref
+          # and only ever rewrites the unmerged vendor delta.
+          git push --force origin "HEAD:${branch}"
+          open_pr=$(gh pr list --head "${branch}" --base develop --state open --json number --jq '.[0].number')
+          if [ -n "${open_pr}" ] && [ "${open_pr}" != "null" ]; then
+            echo "vendor PR #${open_pr} already open - the push updated it in place"
+          else
+            gh pr create --base develop --head "${branch}" \
+              --title "docs(sphinx_html): refresh from CI build" \
+              --body "Automated refresh of the vendored in-wheel docs bundle (src/scitex_scholar/_sphinx_html) from the docs-caller CI build. Merging keeps the shipped wheel docs current; the vendor job byte-checks the bundle every run. Safe to merge when CI is green."
           fi
 
 # EOF
