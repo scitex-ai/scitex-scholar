@@ -244,6 +244,10 @@ JA = {
         "%(total)s 件中 %(imported)s 件の論文をインポートしました",
     "Enter a Semantic Scholar paper ID":
         "Semantic Scholar の論文 ID を入力してください",
+    # --- JS dict, slice 3c (project-sync controls) ---
+    "Project": "プロジェクト",
+    "All projects": "すべてのプロジェクト",
+    "Project: %(project)s": "プロジェクト: %(project)s",
     # --- Service Status sidebar paragraph (graph_health / _not_configured_payload /
     # _degraded_payload error+detail+fix; operator screenshot 2026-10-16) ---
     "CrossRef API not configured": "CrossRef API 未設定",

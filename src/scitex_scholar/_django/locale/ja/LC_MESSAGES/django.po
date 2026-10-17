@@ -110,6 +110,9 @@ msgstr "EndNote (.enw)"
 msgid "Import BibTeX"
 msgstr "BibTeX をインポート"
 
+msgid "Project"
+msgstr "プロジェクト"
+
 msgid "Zotero"
 msgstr "Zotero"
 
@@ -406,6 +409,12 @@ msgstr "%(total)s 件中 %(imported)s 件の論文をインポートしました
 
 msgid "Enter a Semantic Scholar paper ID"
 msgstr "Semantic Scholar の論文 ID を入力してください"
+
+msgid "All projects"
+msgstr "すべてのプロジェクト"
+
+msgid "Project: %(project)s"
+msgstr "プロジェクト: %(project)s"
 
 msgid "Citation Graph: limited"
 msgstr "引用グラフ：制限あり"
