@@ -131,6 +131,32 @@
                                         <small id="searchStats" class="card-subtitle"></small>
                                     </span>
                                 </div>
+                                <!-- Slice 2 (old-direct parity): sorter + source filter +
+                                    bulk/pipeline pills over the results. Sort/filter
+                                    re-render locally; pills POST to the existing
+                                    library save/save-bulk/enrich endpoints. -->
+                                <div class="search-results-toolbar">
+                                    <label class="form-label" for="searchSort">{% trans "Sort by" %}</label>
+                                    <select id="searchSort" class="form-select">
+                                        <option value="relevance" selected>{% trans "Relevance" %}</option>
+                                        <option value="year-desc">{% trans "Year (newest)" %}</option>
+                                        <option value="year-asc">{% trans "Year (oldest)" %}</option>
+                                        <option value="title">{% trans "Title (A-Z)" %}</option>
+                                    </select>
+                                    <label class="form-label" for="searchSourceFilter">{% trans "Source" %}</label>
+                                    <select id="searchSourceFilter" class="form-select">
+                                        <option value="" selected>{% trans "All sources" %}</option>
+                                    </select>
+                                </div>
+                                <div class="search-bulk-bar" id="searchBulkBar">
+                                    <label class="search-bulk-bar__select-all">
+                                        <input type="checkbox" id="searchSelectAll">
+                                        {% trans "Select all" %}
+                                    </label>
+                                    <button type="button" id="searchSaveSelected" class="btn-control-library">{% trans "Save selected" %}</button>
+                                    <button type="button" id="searchEnrichSelected" class="btn-control-library">{% trans "Save & enrich" %}</button>
+                                    <span id="searchBulkStatus" class="search-bulk-status" role="status"></span>
+                                </div>
                                 <div class="graph-card__body" id="searchResultsContent"></div>
                             </div>
                         </div>

@@ -529,6 +529,17 @@ def _js_i18n_dict() -> dict:
         "Online fallback": _i18n("Online fallback"),
         "Imported %(n)s paper from %(file)s": _i18n("Imported %(n)s paper from %(file)s"),
         "Imported %(n)s papers from %(file)s": _i18n("Imported %(n)s papers from %(file)s"),
+        # Search tab slice 2 (old-direct parity): per-result Save and the
+        # bulk/pipeline pills render these client-side, so each MUST be a
+        # key here -- an English literal in search.js is invisible to the
+        # catalog and shows EN on a JA page.
+        "Save": _i18n("Save"),
+        "Saving…": _i18n("Saving…"),
+        "Saved": _i18n("Saved"),
+        "Save failed": _i18n("Save failed"),
+        "Select results to save.": _i18n("Select results to save."),
+        "Saved %(saved)s of %(total)s": _i18n("Saved %(saved)s of %(total)s"),
+        "Enriched %(done)s of %(total)s": _i18n("Enriched %(done)s of %(total)s"),
     }
 
 

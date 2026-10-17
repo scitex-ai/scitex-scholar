@@ -14,27 +14,6 @@ msgstr ""
 msgid "SciTeX Scholar"
 msgstr "SciTeX Scholar"
 
-msgid "Graph Controls"
-msgstr "グラフ操作"
-
-msgid "Scroll"
-msgstr "スクロール"
-
-msgid "Zoom"
-msgstr "ズーム"
-
-msgid "Drag"
-msgstr "ドラッグ"
-
-msgid "Pan"
-msgstr "パン"
-
-msgid "Click"
-msgstr "クリック"
-
-msgid "Select node"
-msgstr "ノードを選択"
-
 msgid "Search databases"
 msgstr "データベースを検索"
 
@@ -85,6 +64,36 @@ msgstr "エラーが発生しました"
 
 msgid "Dismiss"
 msgstr "閉じる"
+
+msgid "Sort by"
+msgstr "並び替え"
+
+msgid "Relevance"
+msgstr "関連度順"
+
+msgid "Year (newest)"
+msgstr "発行年（新しい順）"
+
+msgid "Year (oldest)"
+msgstr "発行年（古い順）"
+
+msgid "Title (A-Z)"
+msgstr "タイトル（A-Z順）"
+
+msgid "Source"
+msgstr "ソース"
+
+msgid "All sources"
+msgstr "すべてのソース"
+
+msgid "Select all"
+msgstr "すべて選択"
+
+msgid "Save selected"
+msgstr "選択を保存"
+
+msgid "Save & enrich"
+msgstr "保存して補完"
 
 msgid "Export"
 msgstr "エクスポート"
@@ -154,6 +163,30 @@ msgstr "ステータスパネルを折りたたむ"
 
 msgid "Expand status panel"
 msgstr "ステータスパネルを展開する"
+
+msgid "Details"
+msgstr "詳細"
+
+msgid "Graph Controls"
+msgstr "グラフ操作"
+
+msgid "Scroll"
+msgstr "スクロール"
+
+msgid "Zoom"
+msgstr "ズーム"
+
+msgid "Drag"
+msgstr "ドラッグ"
+
+msgid "Pan"
+msgstr "パン"
+
+msgid "Click"
+msgstr "クリック"
+
+msgid "Select node"
+msgstr "ノードを選択"
 
 msgid "Service Status"
 msgstr "サービス状態"
@@ -253,6 +286,27 @@ msgstr "%(file)s から %(n)s 件の論文をインポートしました"
 
 msgid "Imported %(n)s papers from %(file)s"
 msgstr "%(file)s から %(n)s 件の論文をインポートしました"
+
+msgid "Save"
+msgstr "保存"
+
+msgid "Saving…"
+msgstr "保存中…"
+
+msgid "Saved"
+msgstr "保存済み"
+
+msgid "Save failed"
+msgstr "保存に失敗"
+
+msgid "Select results to save."
+msgstr "保存する結果を選択してください。"
+
+msgid "Saved %(saved)s of %(total)s"
+msgstr "%(total)s 件中 %(saved)s 件を保存"
+
+msgid "Enriched %(done)s of %(total)s"
+msgstr "%(total)s 件中 %(done)s 件を補完"
 
 msgid "Citation Graph: limited"
 msgstr "引用グラフ：制限あり"

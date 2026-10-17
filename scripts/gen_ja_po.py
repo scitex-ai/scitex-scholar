@@ -153,6 +153,18 @@ JA = {
     "Reset zoom": "ズームをリセット",
     "Download SVG": "SVG をダウンロード",
     "Related Papers": "関連論文",
+    # --- Search tab slice 2 (old-direct parity: sorter/filter/bulk) ---
+    "Details": "詳細",
+    "Sort by": "並び替え",
+    "Relevance": "関連度順",
+    "Year (newest)": "発行年（新しい順）",
+    "Year (oldest)": "発行年（古い順）",
+    "Title (A-Z)": "タイトル（A-Z順）",
+    "Source": "ソース",
+    "All sources": "すべてのソース",
+    "Select all": "すべて選択",
+    "Save selected": "選択を保存",
+    "Save & enrich": "保存して補完",
     # --- JS dict (views._js_i18n_dict) ---
     "Build citation graph": "引用グラフを構築",
     "Enrich": "補完",
@@ -180,6 +192,13 @@ JA = {
     "Online fallback": "オンラインへのフォールバック",
     "Imported %(n)s paper from %(file)s": "%(file)s から %(n)s 件の論文をインポートしました",
     "Imported %(n)s papers from %(file)s": "%(file)s から %(n)s 件の論文をインポートしました",
+    "Save": "保存",
+    "Saving…": "保存中…",
+    "Saved": "保存済み",
+    "Save failed": "保存に失敗",
+    "Select results to save.": "保存する結果を選択してください。",
+    "Saved %(saved)s of %(total)s": "%(total)s 件中 %(saved)s 件を保存",
+    "Enriched %(done)s of %(total)s": "%(total)s 件中 %(done)s 件を補完",
     # --- Service Status sidebar paragraph (graph_health / _not_configured_payload /
     # _degraded_payload error+detail+fix; operator screenshot 2026-10-16) ---
     "CrossRef API not configured": "CrossRef API 未設定",
