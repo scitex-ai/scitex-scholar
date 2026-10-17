@@ -23,6 +23,8 @@ _SCRIPT_NAMES = (
 _CONTENT_IDS = {
     "searchForm", "tab-search", "tab-library", "libraryImportFile",
     "libraryImportBtn", "libraryExportBtn", "graphForm", "tab-graph",
+    "searchSort", "searchSourceFilter", "searchBulkBar", "searchSelectAll",
+    "searchSaveSelected", "searchEnrichSelected", "searchBulkStatus",
 }
 
 
