@@ -540,6 +540,15 @@ def _js_i18n_dict() -> dict:
         "Select results to save.": _i18n("Select results to save."),
         "Saved %(saved)s of %(total)s": _i18n("Saved %(saved)s of %(total)s"),
         "Enriched %(done)s of %(total)s": _i18n("Enriched %(done)s of %(total)s"),
+        # Graph tab slice 3a (old-direct parity): the library-seed picker
+        # renders these client-side, so each MUST be a key here -- an
+        # English literal in citation-graph.js is invisible to the catalog
+        # and shows EN on a JA page.
+        "Seed from your Library": _i18n("Seed from your Library"),
+        "Loading your library…": _i18n("Loading your library…"),
+        "No papers with a DOI in your library yet.": _i18n(
+            "No papers with a DOI in your library yet."
+        ),
     }
 
 

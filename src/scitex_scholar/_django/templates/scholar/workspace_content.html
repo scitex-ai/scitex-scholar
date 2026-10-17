@@ -282,6 +282,55 @@
                                 </form>
                             </div>
                         </div>
+                        <!-- Seed from your Library (old-direct parity, slice
+                             3a): the graph builds from a typed DOI above OR
+                             a library paper here. The picker lists library
+                             papers carrying a DOI; clicking one seeds the
+                             build directly (hub _GraphInputHandler).
+                             Populated lazily by citation-graph.js from the
+                             EXISTING /api/library endpoint -- no new
+                             backend. -->
+                        <div class="graph-card">
+                            <div class="graph-card__header">
+                                <span class="graph-card__title">{% trans "Seed from your Library" %}</span>
+                            </div>
+                            <div class="graph-card__body">
+                                <div id="graphLibrarySeed" class="graph-library-seed">
+                                    <p class="empty-message">{% trans "Loading your library…" %}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- How It Works (old-direct parity, slice 3a): the
+                             three relatedness signals the graph renders.
+                             Static explainer, translated like every other
+                             label (JA rule). -->
+                        <div class="graph-card">
+                            <div class="graph-card__header">
+                                <span class="graph-card__title">{% trans "How It Works" %}</span>
+                            </div>
+                            <div class="graph-card__body">
+                                <div class="info-list">
+                                    <div class="info-item">
+                                        <div>
+                                            <strong>{% trans "Bibliographic Coupling" %}</strong>
+                                            <p>{% trans "Papers sharing common references" %}</p>
+                                        </div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div>
+                                            <strong>{% trans "Co-citation" %}</strong>
+                                            <p>{% trans "Papers frequently cited together" %}</p>
+                                        </div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div>
+                                            <strong>{% trans "Direct Citations" %}</strong>
+                                            <p>{% trans "Papers citing or cited by the seed" %}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <!-- Loading -->
                         <div id="graphLoading" class="graph-loading hidden">
                             <div class="loading-spinner">
