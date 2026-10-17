@@ -5,6 +5,14 @@ All notable changes to `scitex-scholar` are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.15.0] - 2026-10-17
+
+### Added
+- SDK SSoT app header (writer shape): shared `app-header.css` owns the
+  40px row, title + live leaf version, subtitle removed (PR #216).
+- Saved graphs file endpoints `api/graphs/save|list|delete` (old-direct
+  parity slice 1, hub SavedGraph shape; PR #216).
+
 ## [1.14.0] - 2026-10-17
 
 ### Added
