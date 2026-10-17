@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scitex_scholar.pipelines.SearchQueryParser &mdash; SciTeX Scholar v1.11.0</title>
+  <title>scitex_scholar.pipelines.SearchQueryParser &mdash; SciTeX Scholar v1.15.1</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=6cf1fb80"></script>
+      <script src="../../../_static/documentation_options.js?v=d4ad50bc"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -73,7 +73,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../cli.html#database-integrity">Database / integrity</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../../cli.html#skills">skills</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cli.html#dev-skills">dev skills</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../cli.html#python-api-introspection">Python API introspection</a></li>
 </ul>
 </li>
@@ -763,9 +763,9 @@
 
         <span class="c1"># Text filters: -t/-a/-j  (value may be prefixed with - for exclude)</span>
         <span class="n">text_patterns</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="p">(</span><span class="sa">r</span><span class="s1">'(?:-t|--title)\s+(-?)([^\s]+|"[^"]+"|</span><span class="se">\'</span><span class="s1">[^</span><span class="se">\'</span><span class="s1">]+</span><span class="se">\'</span><span class="s1">)'</span><span class="p">,</span> <span class="s2">"title"</span><span class="p">),</span>
-            <span class="p">(</span><span class="sa">r</span><span class="s1">'(?:-a|--author)\s+(-?)([^\s]+|"[^"]+"|</span><span class="se">\'</span><span class="s1">[^</span><span class="se">\'</span><span class="s1">]+</span><span class="se">\'</span><span class="s1">)'</span><span class="p">,</span> <span class="s2">"author"</span><span class="p">),</span>
-            <span class="p">(</span><span class="sa">r</span><span class="s1">'(?:-j|--journal)\s+(-?)([^\s]+|"[^"]+"|</span><span class="se">\'</span><span class="s1">[^</span><span class="se">\'</span><span class="s1">]+</span><span class="se">\'</span><span class="s1">)'</span><span class="p">,</span> <span class="s2">"journal"</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s1">'(?:-t|--title)\s+(-?)("[^"]+"|</span><span class="se">\'</span><span class="s1">[^</span><span class="se">\'</span><span class="s1">]+</span><span class="se">\'</span><span class="s1">|[^\s]+)'</span><span class="p">,</span> <span class="s2">"title"</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s1">'(?:-a|--author)\s+(-?)("[^"]+"|</span><span class="se">\'</span><span class="s1">[^</span><span class="se">\'</span><span class="s1">]+</span><span class="se">\'</span><span class="s1">|[^\s]+)'</span><span class="p">,</span> <span class="s2">"author"</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s1">'(?:-j|--journal)\s+(-?)("[^"]+"|</span><span class="se">\'</span><span class="s1">[^</span><span class="se">\'</span><span class="s1">]+</span><span class="se">\'</span><span class="s1">|[^\s]+)'</span><span class="p">,</span> <span class="s2">"journal"</span><span class="p">),</span>
         <span class="p">]</span>
 
         <span class="k">for</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">field_name</span> <span class="ow">in</span> <span class="n">text_patterns</span><span class="p">:</span>
@@ -780,10 +780,10 @@
 
         <span class="c1"># Numeric filters</span>
         <span class="n">numeric_patterns</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="p">(</span><span class="sa">r</span><span class="s2">"(?:-ymin|--year-min)\s+(\d</span><span class="si">{4}</span><span class="s2">)"</span><span class="p">,</span> <span class="s2">"year_min"</span><span class="p">),</span>
-            <span class="p">(</span><span class="sa">r</span><span class="s2">"(?:-ymax|--year-max)\s+(\d</span><span class="si">{4}</span><span class="s2">)"</span><span class="p">,</span> <span class="s2">"year_max"</span><span class="p">),</span>
-            <span class="p">(</span><span class="sa">r</span><span class="s2">"(?:-cmin|--citations-min)\s+(\d+)"</span><span class="p">,</span> <span class="s2">"citations_min"</span><span class="p">),</span>
-            <span class="p">(</span><span class="sa">r</span><span class="s2">"(?:-cmax|--citations-max)\s+(\d+)"</span><span class="p">,</span> <span class="s2">"citations_max"</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">"(?:-ymin|--year-min)\s+(\d</span><span class="si">{4}</span><span class="s2">)(?!\S)"</span><span class="p">,</span> <span class="s2">"year_min"</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">"(?:-ymax|--year-max)\s+(\d</span><span class="si">{4}</span><span class="s2">)(?!\S)"</span><span class="p">,</span> <span class="s2">"year_max"</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">"(?:-cmin|--citations-min)\s+(\d+)(?!\S)"</span><span class="p">,</span> <span class="s2">"citations_min"</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">"(?:-cmax|--citations-max)\s+(\d+)(?!\S)"</span><span class="p">,</span> <span class="s2">"citations_max"</span><span class="p">),</span>
             <span class="p">(</span><span class="sa">r</span><span class="s2">"(?:-ifmin|--if-min)\s+(\d+(?:\.\d+)?)"</span><span class="p">,</span> <span class="s2">"impact_factor_min"</span><span class="p">),</span>
             <span class="p">(</span><span class="sa">r</span><span class="s2">"(?:-ifmax|--if-max)\s+(\d+(?:\.\d+)?)"</span><span class="p">,</span> <span class="s2">"impact_factor_max"</span><span class="p">),</span>
         <span class="p">]</span>

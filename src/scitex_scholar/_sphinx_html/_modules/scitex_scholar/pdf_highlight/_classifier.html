@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scitex_scholar.pdf_highlight._classifier &mdash; SciTeX Scholar v1.11.0</title>
+  <title>scitex_scholar.pdf_highlight._classifier &mdash; SciTeX Scholar v1.15.1</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=6cf1fb80"></script>
+      <script src="../../../_static/documentation_options.js?v=d4ad50bc"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -73,7 +73,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../cli.html#database-integrity">Database / integrity</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../../cli.html#skills">skills</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cli.html#dev-skills">dev skills</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../cli.html#python-api-introspection">Python API introspection</a></li>
 </ul>
 </li>
@@ -720,7 +720,18 @@
     <span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">concurrent.futures</span><span class="w"> </span><span class="kn">import</span> <span class="n">ThreadPoolExecutor</span><span class="p">,</span> <span class="n">as_completed</span>
 
-    <span class="kn">import</span><span class="w"> </span><span class="nn">anthropic</span>
+    <span class="c1"># `anthropic` is optional: the LLM path is one of two classifiers (the</span>
+    <span class="c1"># offline `--stub` pass is the other) and it additionally needs</span>
+    <span class="c1"># SCITEX_SCHOLAR_ANTHROPIC_API_KEY. Guarded so a fresh install that</span>
+    <span class="c1"># never opts into the LLM path does not need the SDK, while anyone who</span>
+    <span class="c1"># does gets the install line instead of a bare ModuleNotFoundError.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">anthropic</span>
+    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># optional dependency</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="s2">"The Anthropic-backed classifier needs the `anthropic` SDK: "</span>
+            <span class="s2">"pip install anthropic"</span>
+        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 
     <span class="n">info</span> <span class="o">=</span> <span class="n">on_info</span> <span class="ow">or</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">_msg</span><span class="p">:</span> <span class="kc">None</span><span class="p">)</span>
     <span class="n">warn</span> <span class="o">=</span> <span class="n">on_warning</span> <span class="ow">or</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">_msg</span><span class="p">:</span> <span class="kc">None</span><span class="p">)</span>

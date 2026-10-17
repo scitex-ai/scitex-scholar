@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scitex_scholar.citation_graph.visualization &mdash; SciTeX Scholar v1.11.0</title>
+  <title>scitex_scholar.citation_graph.visualization &mdash; SciTeX Scholar v1.15.1</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=6cf1fb80"></script>
+      <script src="../../../_static/documentation_options.js?v=d4ad50bc"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -73,7 +73,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../cli.html#database-integrity">Database / integrity</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../../cli.html#skills">skills</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cli.html#dev-skills">dev skills</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../cli.html#python-api-introspection">Python API introspection</a></li>
 </ul>
 </li>
@@ -610,7 +610,16 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_plot_scitex_plt</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Render with scitex.plt (AxisWrapper + CSV auto-export)."""</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">scitex_plt</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">stx_plt</span>
+    <span class="c1"># Optional backend. scitex-plt is not a runtime requirement of the</span>
+    <span class="c1"># package: it is one of four renderers, selected explicitly or by the</span>
+    <span class="c1"># availability order above. Guarded so the import names the install line</span>
+    <span class="c1"># instead of raising a bare ModuleNotFoundError from a plot call.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">scitex_plt</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">stx_plt</span>
+    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># optional dependency</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+            <span class="s2">"The 'scitex.plt' backend needs scitex-plt: pip install scitex-plt"</span>
+        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 
     <span class="n">preset</span> <span class="o">=</span> <span class="n">_fr_get_preset</span><span class="p">(</span><span class="s2">"citation"</span><span class="p">)</span> <span class="k">if</span> <span class="n">_FIGRECIPE_AVAILABLE</span> <span class="k">else</span> <span class="p">{}</span>
     <span class="n">merged</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">preset</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">}</span>
@@ -634,7 +643,16 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_plot_matplotlib</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># noqa: C901</span>
 <span class="w">    </span><span class="sd">"""Render with raw matplotlib + networkx (no external deps)."""</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">networkx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nx</span>
+
+    <span class="c1"># networkx is the optional layout engine of this backend (the other</span>
+    <span class="c1"># backends draw through figrecipe / pyvis). Optional dependency: guarded</span>
+    <span class="c1"># so the failure names the install line.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">networkx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nx</span>
+    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># optional dependency</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+            <span class="s2">"The 'matplotlib' backend needs networkx: pip install networkx"</span>
+        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"figsize"</span><span class="p">,</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">)))</span>
 
