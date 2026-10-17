@@ -552,12 +552,14 @@ def test_mobile_swipe_only_on_phone_layout():
 
 
 def test_status_strip_sits_at_right_edge():
-    """Service Status lives at the RIGHT edge, not in the left sidebar.
+    """Service Status lives at the RIGHT edge; there is no left sidebar.
 
     Operator mandates 2026-10-16/17 + layout rule: status minutiae ALWAYS in
-    the rightmost column AND collapsible. The left sidebar keeps only the
-    Graph Controls hint; #serviceStatus (the JS health-render target) moves
-    into a right-edge strip placed after <main>.
+    the rightmost column AND collapsible. Operator redirect 2026-10-17 removed
+    the left sidebar entirely (even the Graph Controls hint lives in the
+    right-edge Details strip), so no tab ever renders an empty column.
+    #serviceStatus (the JS health-render target) lives inside the right-edge
+    strip placed after <main>.
     """
     # Arrange
     template = (
@@ -570,7 +572,7 @@ def test_status_strip_sits_at_right_edge():
     placed = (
         '<aside class="app-status-strip"' in template,
         template.index("app-status-strip") > template.index("</main>"),
-        "serviceStatus" not in template.split("</aside>")[0],
+        '<aside class="app-sidebar"' not in template,
     )
     # Assert
     assert placed == (True, True, True)

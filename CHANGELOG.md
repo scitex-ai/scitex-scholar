@@ -5,6 +5,14 @@ All notable changes to `scitex-scholar` are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.15.1] - 2026-10-17
+
+### Fixed
+- Removed the empty left sidebar on all Scholar workspace tabs (Search
+  and Library showed a 240px empty column holding only graph hints);
+  graph controls moved into the right status strip (graph-tab-only) and
+  the rightmost column is titled Details (PR #219).
+
 ## [1.15.0] - 2026-10-17
 
 ### Added

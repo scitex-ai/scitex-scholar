@@ -14,44 +14,9 @@
             </div>
         </header>
         <div class="app-container" data-scholar-root>
-            <!-- Sidebar (left): interaction hints only. Status minutiae live
-                in the right-edge strip per the operator layout rule
-                (rightmost column, collapsible) -->
-            <aside class="app-sidebar">
-                <!-- Controls (graph interaction, shown only while the Graph tab is active) -->
-                <div class="sidebar-section graph-controls-hint" data-graph-hint>
-                    <div class="sidebar-section__header">
-                        <span class="sidebar-section__title">{% trans "Graph Controls" %}</span>
-                    </div>
-                    <div class="sidebar-section__content"
-                         style="font-size: 11px;
-                                color: var(--text-muted)">
-                        <div style="margin-bottom: 6px;">
-                            <kbd style="background: var(--bg-tertiary);
-                                        border: 1px solid var(--border-default);
-                                        padding: 1px 4px;
-                                        font-size: 10px">{% trans "Scroll" %}</kbd> {% trans "Zoom" %}
-                        </div>
-                        <div style="margin-bottom: 6px;">
-                            <kbd style="background: var(--bg-tertiary);
-                                        border: 1px solid var(--border-default);
-                                        padding: 1px 4px;
-                                        font-size: 10px">{% trans "Drag" %}</kbd> {% trans "Pan" %}
-                        </div>
-                        <div>
-                            <kbd style="background: var(--bg-tertiary);
-                                        border: 1px solid var(--border-default);
-                                        padding: 1px 4px;
-                                        font-size: 10px">{% trans "Click" %}</kbd> {% trans "Select node" %}
-                        </div>
-                    </div>
-                </div>
-                <!--
-                    The CrossRef API status section was moved into the Search
-                    tab's Advanced section (compass 2026-09-10, L653): backend
-                    API infrastructure is no longer the default researcher view.
-                -->
-            </aside>
+            <!-- No left sidebar: even graph interaction hints live in the
+                right-edge Details strip (operator 2026-10-17), so no tab
+                ever renders an empty column. -->
             <!-- Main Content -->
             <main class="app-main">
                 <!-- Tab Navigation: Search is the primary, default action. -->
@@ -355,7 +320,38 @@
                         data-label-collapse="{% trans "Collapse status panel" %}"
                         data-label-expand="{% trans "Expand status panel" %}">&raquo;</button>
                 <div class="status-strip__body">
-                    <div class="status-strip__title">{% trans "Service Status" %}</div>
+                    <div class="status-strip__title">{% trans "Details" %}</div>
+                    <!-- Graph interaction hints: shown only while the Graph
+                        tab is active (operator 2026-10-17: no left sidebar
+                        on any tab, Details集約). Visibility is driven by
+                        syncGraphHint in app.js via [data-graph-hint]. -->
+                    <div class="sidebar-section graph-controls-hint" data-graph-hint>
+                        <div class="sidebar-section__header">
+                            <span class="sidebar-section__title">{% trans "Graph Controls" %}</span>
+                        </div>
+                        <div class="sidebar-section__content"
+                             style="font-size: 11px;
+                                    color: var(--text-muted)">
+                            <div style="margin-bottom: 6px;">
+                                <kbd style="background: var(--bg-tertiary);
+                                            border: 1px solid var(--border-default);
+                                            padding: 1px 4px;
+                                            font-size: 10px">{% trans "Scroll" %}</kbd> {% trans "Zoom" %}
+                            </div>
+                            <div style="margin-bottom: 6px;">
+                                <kbd style="background: var(--bg-tertiary);
+                                            border: 1px solid var(--border-default);
+                                            padding: 1px 4px;
+                                            font-size: 10px">{% trans "Drag" %}</kbd> {% trans "Pan" %}
+                            </div>
+                            <div>
+                                <kbd style="background: var(--bg-tertiary);
+                                            border: 1px solid var(--border-default);
+                                            padding: 1px 4px;
+                                            font-size: 10px">{% trans "Click" %}</kbd> {% trans "Select node" %}
+                            </div>
+                        </div>
+                    </div>
                     <details class="status-expand" open>
                         <summary class="status-expand__summary" aria-label="{% trans "Service Status" %}">
                             <span class="status-leds">
