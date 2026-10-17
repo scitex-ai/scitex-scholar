@@ -337,3 +337,33 @@ msgstr "crossref-local エンドポイントは設定されていますが、現
 
 msgid "Verify the crossref-local service is running and that the endpoint is reachable, then retry."
 msgstr "crossref-local サービスが稼働していることと、エンドポイントに到達できることを確認してから、再試行してください。"
+
+msgid "Seed from your Library"
+msgstr "ライブラリからシードを選択"
+
+msgid "Loading your library…"
+msgstr "ライブラリを読み込み中…"
+
+msgid "How It Works"
+msgstr "使い方"
+
+msgid "Bibliographic Coupling"
+msgstr "書誌結合"
+
+msgid "Papers sharing common references"
+msgstr "共通の参考文献を持つ論文"
+
+msgid "Co-citation"
+msgstr "共引用"
+
+msgid "Papers frequently cited together"
+msgstr "共に引用されることの多い論文"
+
+msgid "Direct Citations"
+msgstr "直接引用"
+
+msgid "Papers citing or cited by the seed"
+msgstr "シード論文を引用または被引用する論文"
+
+msgid "No papers with a DOI in your library yet."
+msgstr "ライブラリにはDOI付きの論文がまだありません。"

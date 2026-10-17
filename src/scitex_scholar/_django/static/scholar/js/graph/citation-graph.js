@@ -44,6 +44,10 @@ class CitationGraphManager {
       if (this.probed) return;
       this.probed = true;
       this.checkServiceHealth(true);
+      // Slice 3a (old-direct parity): the library-seed picker loads with
+      // the same laziness -- no /api/library request for users who never
+      // open the graph tab.
+      this.loadLibrarySeed();
     });
   }
 
@@ -136,7 +140,69 @@ class CitationGraphManager {
 
     const doi = doiInput.value.trim();
     const topN = parseInt(topNSelect ? topNSelect.value : "20", 10);
+    this.buildGraph(doi, topN);
+  }
 
+  /**
+   * Slice 3a (old-direct parity): seed-from-library picker. Lists library
+   * papers carrying a DOI from the EXISTING /api/library endpoint; clicking
+   * one seeds the build directly (hub _GraphInputHandler: "Build graph
+   * directly from library-selected DOI"). No new backend.
+   */
+  async loadLibrarySeed() {
+    const box = document.getElementById("graphLibrarySeed");
+    if (!box || box.dataset.loaded === "1") return;
+    box.setAttribute("aria-label", scholarT("Seed from your Library"));
+    box.innerHTML =
+      '<p class="empty-message">' + this.esc(scholarT("Loading your library…")) + "</p>";
+    try {
+      const resp = await fetch(STX_MOUNT + "/api/library");
+      if (!resp.ok) throw new Error("Failed");
+      const data = await resp.json();
+      const seeds = (data.papers || []).filter((p) => p && p.doi);
+      if (seeds.length === 0) {
+        box.innerHTML =
+          '<p class="empty-message">' +
+          this.esc(scholarT("No papers with a DOI in your library yet.")) +
+          "</p>";
+        box.dataset.loaded = "1";
+        return;
+      }
+      box.innerHTML = seeds
+        .map(
+          (p) =>
+            '<div class="graph-library-seed__item" data-doi="' +
+            this.esc(p.doi) +
+            '">' +
+            '<div class="graph-library-seed__title">' +
+            this.esc(p.title || scholarT("Untitled")) +
+            "</div>" +
+            '<div class="graph-library-seed__meta">' +
+            this.esc((p.authors || []).slice(0, 2).join(", ")) +
+            (p.year ? " (" + this.esc(p.year) + ")" : "") +
+            "</div>" +
+            "</div>",
+        )
+        .join("");
+      box.querySelectorAll(".graph-library-seed__item").forEach((item) => {
+        item.addEventListener("click", () => {
+          const doi = item.getAttribute("data-doi");
+          if (!doi) return;
+          const doiInput = document.getElementById("doiInput");
+          if (doiInput) doiInput.value = doi;
+          const topNSelect = document.getElementById("topN");
+          const topN = parseInt(topNSelect ? topNSelect.value : "20", 10);
+          this.buildGraph(doi, topN);
+        });
+      });
+      box.dataset.loaded = "1";
+    } catch {
+      box.innerHTML =
+        '<p class="error-message">' + this.esc(scholarT("Service unavailable")) + "</p>";
+    }
+  }
+
+  async buildGraph(doi, topN) {
     this.showLoading(true);
     this.hideError();
 
