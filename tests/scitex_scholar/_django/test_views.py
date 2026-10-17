@@ -722,6 +722,102 @@ def test_header_version_matches_installed_package():
     assert ("v" + importlib.metadata.version("scitex-scholar")) in html
 
 
+def test_saved_graphs_roundtrip_through_list(tmp_path):
+    """Old-direct parity slice 1: a saved graph persists and lists back.
+
+    Hub scholar_app keeps SavedGraph rows (name + rebuild recipe); the leaf
+    keeps the same shape file-based under the user root, mirroring the
+    saved-searches pattern. Reload = GET api/graph/network?doi=<seed_doi>.
+    """
+    # Arrange
+    rf = RequestFactory()
+    # Act
+    with _library_env(tmp_path):
+        saved = views.graphs_save(
+            rf.post(
+                "/api/graphs/save",
+                data=_json.dumps({"name": "g", "seed_doi": "10.1038/s41586-020-2008-3"}),
+                content_type="application/json",
+            )
+        )
+        listed = _json.loads(views.graphs_list(rf.get("/api/graphs/list")).content)
+    # Assert
+    assert (saved.status_code, [g["name"] for g in listed["graphs"]]) == (200, ["g"])
+
+
+def test_saved_graphs_delete_removes_the_row(tmp_path):
+    # Arrange
+    rf = RequestFactory()
+    # Act
+    with _library_env(tmp_path):
+        row_id = _json.loads(
+            views.graphs_save(
+                rf.post(
+                    "/api/graphs/save",
+                    data=_json.dumps({"name": "g", "seed_doi": "10.1/a"}),
+                    content_type="application/json",
+                )
+            ).content
+        )["id"]
+        deleted = views.graphs_delete(
+            rf.post(
+                "/api/graphs/delete",
+                data=_json.dumps({"id": row_id}),
+                content_type="application/json",
+            )
+        )
+        listed = _json.loads(views.graphs_list(rf.get("/api/graphs/list")).content)
+    # Assert
+    assert (deleted.status_code, listed["graphs"]) == (200, [])
+
+
+def test_saved_graphs_reject_overlong_name_and_doi(tmp_path):
+    # Arrange — hub caps names at 200; DOIs reuse the leaf 500 bound.
+    rf = RequestFactory()
+    # Act
+    with _library_env(tmp_path):
+        long_name = views.graphs_save(
+            rf.post(
+                "/api/graphs/save",
+                data=_json.dumps({"name": "n" * 201, "seed_doi": "10.1/a"}),
+                content_type="application/json",
+            )
+        )
+        long_doi = views.graphs_save(
+            rf.post(
+                "/api/graphs/save",
+                data=_json.dumps({"name": "g", "seed_doi": "x" * 501}),
+                content_type="application/json",
+            )
+        )
+        listed = _json.loads(views.graphs_list(rf.get("/api/graphs/list")).content)
+    # Assert
+    assert (long_name.status_code, long_doi.status_code, listed["graphs"]) == (400, 400, [])
+
+
+def test_saved_graphs_reject_missing_recipe(tmp_path):
+    # Arrange — a nameless or seedless row cannot rebuild, so it is refused.
+    rf = RequestFactory()
+    # Act
+    with _library_env(tmp_path):
+        no_name = views.graphs_save(
+            rf.post(
+                "/api/graphs/save",
+                data=_json.dumps({"seed_doi": "10.1/a"}),
+                content_type="application/json",
+            )
+        )
+        no_seed = views.graphs_save(
+            rf.post(
+                "/api/graphs/save",
+                data=_json.dumps({"name": "g"}),
+                content_type="application/json",
+            )
+        )
+    # Assert
+    assert (no_name.status_code, no_seed.status_code) == (400, 400)
+
+
 def test_client_distinguishes_configured_from_ready():
     """`configured` must render as its own state, never as available."""
     # Arrange
