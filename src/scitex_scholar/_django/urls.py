@@ -39,6 +39,9 @@ urlpatterns = [
     path("api/searches/save", views.searches_save, name="searches_save"),
     path("api/searches/list", views.searches_list, name="searches_list"),
     path("api/searches/delete", views.searches_delete, name="searches_delete"),
+    path("api/graphs/save", views.graphs_save, name="graphs_save"),
+    path("api/graphs/list", views.graphs_list, name="graphs_list"),
+    path("api/graphs/delete", views.graphs_delete, name="graphs_delete"),
 ]
 
 # EOF

@@ -14,9 +14,6 @@ msgstr ""
 msgid "SciTeX Scholar"
 msgstr "SciTeX Scholar"
 
-msgid "Scientific Literature Management"
-msgstr "科学文献管理"
-
 msgid "Graph Controls"
 msgstr "グラフ操作"
 

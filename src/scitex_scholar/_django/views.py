@@ -396,6 +396,21 @@ def _project_provider(request):
 project_scope = project_listing_view(_project_provider)
 
 
+def _leaf_identity() -> dict:
+    """Title + version for the leaf header, read from the leaf's own dist.
+
+    Mirrors writer's `_leaf_identity` in SHAPE (operator header mandate
+    2026-10-17: `<title> + v<version>`) while reading the version from the
+    package's own `__version__` (importlib.metadata, stdlib-only) instead of
+    the app registry: the same installed-version source the SDK's
+    `app_version` resolves, with no new imports and no registry dependency.
+    Never a hand-written string and never the host's version.
+    """
+    from scitex_scholar import __version__
+
+    return {"scholar_version": __version__}
+
+
 def index_context(request, current_project=None):
     """Return the existing Scholar page context for this request."""
     resolved_api = _api_url()
@@ -407,6 +422,7 @@ def index_context(request, current_project=None):
     )
     return {
         **shell_context("Scholar", theme_default="light"),
+        **_leaf_identity(),
         "api_available": resolved_api is not None,
         "api_url": resolved_api or "Not configured",
         "stx_mount": mount_prefix(request),
@@ -1801,6 +1817,132 @@ def searches_delete(request):
         _write_saved_searches(root, kept)
     except OSError as e:
         logger.error(f"searches delete failed: {e}", exc_info=True)
+        return JsonResponse({"error": "Delete failed. Try again later."}, status=500)
+    return JsonResponse({"deleted": True})
+
+
+# Old-direct parity slice 1 (operator mandate 2026-10-17): hub scholar_app
+# keeps SavedGraph rows (name + rebuild recipe); the leaf keeps the same
+# shape file-based under the user-scoped root, mirroring saved searches.
+# Reload needs no endpoint: GET api/graph/network?doi=<seed_doi> rebuilds.
+_MAX_SAVED_GRAPHS = 500
+_MAX_GRAPH_NAME_CHARS = 200
+
+
+def _saved_graphs_path(root: Path) -> Path:
+    """Single JSON file holding this user's saved graphs."""
+    return root / "SAVED_GRAPHS" / "saved_graphs.json"
+
+
+def _load_saved_graphs(root: Path) -> list:
+    path = _saved_graphs_path(root)
+    if not path.is_file():
+        return []
+    try:
+        data = json.loads(path.read_text())
+    except ValueError:
+        return []
+    return data if isinstance(data, list) else []
+
+
+def _write_saved_graphs(root: Path, rows: list) -> None:
+    path = _saved_graphs_path(root)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(rows))
+
+
+@require_POST
+def graphs_save(request):
+    """Save a named graph rebuild recipe for this user (explicit action).
+
+    Body: {"name": ..., "seed_doi": ...}. Stored file-based under the
+    request's user-scoped root — no shared store, no database. Bodies over
+    256k are refused with 413 before parsing. At most 500 rows per user.
+    Names cap at 200 (hub SavedGraph.name); seed DOIs reuse the 500-char
+    leaf DOI bound. A nameless or seedless row cannot rebuild: 400.
+    """
+    try:
+        payload = _json_body(request)
+    except ValueError as e:
+        if "too large" in str(e):
+            return JsonResponse({"error": str(e)}, status=413)
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    except TypeError:
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    name = (payload.get("name") or "").strip()
+    seed_doi = (payload.get("seed_doi") or "").strip()
+    if not name or not seed_doi:
+        return JsonResponse({"error": "name and seed_doi are required"}, status=400)
+    if len(name) > _MAX_GRAPH_NAME_CHARS:
+        return JsonResponse(
+            {"error": f"name must be at most {_MAX_GRAPH_NAME_CHARS} characters"},
+            status=400,
+        )
+    if len(seed_doi) > _MAX_DOI_CHARS:
+        return JsonResponse(
+            {"error": f"seed_doi must be at most {_MAX_DOI_CHARS} characters"},
+            status=400,
+        )
+    user = getattr(request, "user", None)
+    root = _library_root_for(request)
+    rows = _load_saved_graphs(root)
+    if len(rows) >= _MAX_SAVED_GRAPHS:
+        return JsonResponse(
+            {"error": f"at most {_MAX_SAVED_GRAPHS} saved graphs per user"},
+            status=400,
+        )
+    import datetime as _dt
+    import uuid as _uuid
+
+    row = {
+        "id": _uuid.uuid4().hex,
+        "name": name,
+        "seed_doi": seed_doi,
+        "created_by": _safe_username(user) if user is not None else "user",
+        "created_at": _dt.datetime.now(_dt.timezone.utc).isoformat(),
+    }
+    rows.append(row)
+    try:
+        _write_saved_graphs(root, rows)
+    except OSError as e:
+        logger.error(f"graphs save failed: {e}", exc_info=True)
+        return JsonResponse({"error": "Save failed. Try again later."}, status=500)
+    # Success body carries the server-issued id only (the delete handle);
+    # caller input is never reflected (same reflection class as searches).
+    return JsonResponse({"saved": True, "id": row["id"]})
+
+
+@require_GET
+def graphs_list(request):
+    """List this user's saved graphs (user-scoped root only)."""
+    root = _library_root_for(request)
+    return JsonResponse({"graphs": _load_saved_graphs(root)})
+
+
+@require_POST
+def graphs_delete(request):
+    """Delete one saved graph by id; 404 when unknown. Bodies over 256k are
+    refused with 413 before parsing. The success body carries state only."""
+    try:
+        payload = _json_body(request)
+    except ValueError as e:
+        if "too large" in str(e):
+            return JsonResponse({"error": str(e)}, status=413)
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    except TypeError:
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    graph_id = payload.get("id")
+    if not graph_id:
+        return JsonResponse({"error": "id is required"}, status=400)
+    root = _library_root_for(request)
+    rows = _load_saved_graphs(root)
+    kept = [r for r in rows if r.get("id") != graph_id]
+    if len(kept) == len(rows):
+        return JsonResponse({"error": "Unknown id"}, status=404)
+    try:
+        _write_saved_graphs(root, kept)
+    except OSError as e:
+        logger.error(f"graphs delete failed: {e}", exc_info=True)
         return JsonResponse({"error": "Delete failed. Try again later."}, status=500)
     return JsonResponse({"deleted": True})
 
