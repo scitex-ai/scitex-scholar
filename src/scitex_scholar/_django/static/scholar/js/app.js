@@ -65,10 +65,6 @@ function initScholarTabs(root) {
   function syncGraphHint(activeTab) {
     if (!graphHint) return;
     graphHint.classList.toggle("hidden", activeTab !== "graph");
-    // Operator 2026-10-17 (photo tour): the 240px left sidebar holds only
-    // graph hints, so off-graph it renders as a mystery empty column.
-    // Collapse it unless the Graph tab is active.
-    root.classList.toggle("scholar-graph-active", activeTab === "graph");
   }
 
   function activateTab(tab) {

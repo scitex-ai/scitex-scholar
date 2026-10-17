@@ -23,13 +23,6 @@
   flex-shrink: 0;
 }
 
-/* Operator 2026-10-17 (photo tour): the sidebar holds only graph hints, so
- * on Search/Library tabs it is an empty 240px column. app.js toggles
- * .scholar-graph-active on the root; without it the sidebar collapses. */
-[data-scholar-root]:not(.scholar-graph-active) .app-sidebar {
-  display: none;
-}
-
 .app-main {
   flex: 1;
   overflow-y: auto;
