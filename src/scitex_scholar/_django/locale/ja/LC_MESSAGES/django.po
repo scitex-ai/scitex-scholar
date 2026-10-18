@@ -14,27 +14,6 @@ msgstr ""
 msgid "SciTeX Scholar"
 msgstr "SciTeX Scholar"
 
-msgid "Graph Controls"
-msgstr "グラフ操作"
-
-msgid "Scroll"
-msgstr "スクロール"
-
-msgid "Zoom"
-msgstr "ズーム"
-
-msgid "Drag"
-msgstr "ドラッグ"
-
-msgid "Pan"
-msgstr "パン"
-
-msgid "Click"
-msgstr "クリック"
-
-msgid "Select node"
-msgstr "ノードを選択"
-
 msgid "Search databases"
 msgstr "データベースを検索"
 
@@ -86,6 +65,36 @@ msgstr "エラーが発生しました"
 msgid "Dismiss"
 msgstr "閉じる"
 
+msgid "Sort by"
+msgstr "並び替え"
+
+msgid "Relevance"
+msgstr "関連度順"
+
+msgid "Year (newest)"
+msgstr "発行年（新しい順）"
+
+msgid "Year (oldest)"
+msgstr "発行年（古い順）"
+
+msgid "Title (A-Z)"
+msgstr "タイトル（A-Z順）"
+
+msgid "Source"
+msgstr "ソース"
+
+msgid "All sources"
+msgstr "すべてのソース"
+
+msgid "Select all"
+msgstr "すべて選択"
+
+msgid "Save selected"
+msgstr "選択を保存"
+
+msgid "Save & enrich"
+msgstr "保存して補完"
+
 msgid "Export"
 msgstr "エクスポート"
 
@@ -100,6 +109,57 @@ msgstr "EndNote (.enw)"
 
 msgid "Import BibTeX"
 msgstr "BibTeX をインポート"
+
+msgid "Project"
+msgstr "プロジェクト"
+
+msgid "Zotero"
+msgstr "Zotero"
+
+msgid "Import from your local Zotero database, or download the library as BibTeX for Zotero."
+msgstr "ローカルの Zotero データベースからインポートするか、ライブラリを Zotero 用の BibTeX としてダウンロードできます。"
+
+msgid "Checking..."
+msgstr "確認中…"
+
+msgid "Import source"
+msgstr "インポート元"
+
+msgid "All papers"
+msgstr "すべての論文"
+
+msgid "By collection"
+msgstr "コレクション別"
+
+msgid "By tags"
+msgstr "タグ別"
+
+msgid "Tags, comma-separated"
+msgstr "タグ（カンマ区切り）"
+
+msgid "Import from Zotero"
+msgstr "Zotero からインポート"
+
+msgid "Download BibTeX for Zotero"
+msgstr "Zotero 用に BibTeX をダウンロード"
+
+msgid "Connected Papers"
+msgstr "Connected Papers"
+
+msgid "Import a Connected Papers graph by seed paper."
+msgstr "起点論文から Connected Papers のグラフをインポートします。"
+
+msgid "Find paper IDs at semanticscholar.org"
+msgstr "論文 ID は semanticscholar.org で確認できます"
+
+msgid "Semantic Scholar paper ID"
+msgstr "Semantic Scholar 論文 ID"
+
+msgid "40-char SHA or DOI"
+msgstr "40文字の SHA または DOI"
+
+msgid "Import Graph"
+msgstr "グラフをインポート"
 
 msgid "Filter your library"
 msgstr "ライブラリを絞り込む"
@@ -131,6 +191,33 @@ msgstr "起点となる論文の DOI を貼り付けてください。タイト�
 msgid "Max papers in graph"
 msgstr "グラフ内の最大論文数"
 
+msgid "Seed from your Library"
+msgstr "ライブラリからシードを選択"
+
+msgid "Loading your library…"
+msgstr "ライブラリを読み込み中…"
+
+msgid "How It Works"
+msgstr "使い方"
+
+msgid "Bibliographic Coupling"
+msgstr "書誌結合"
+
+msgid "Papers sharing common references"
+msgstr "共通の参考文献を持つ論文"
+
+msgid "Co-citation"
+msgstr "共引用"
+
+msgid "Papers frequently cited together"
+msgstr "共に引用されることの多い論文"
+
+msgid "Direct Citations"
+msgstr "直接引用"
+
+msgid "Papers citing or cited by the seed"
+msgstr "シード論文を引用または被引用する論文"
+
 msgid "Building citation network... This may take a moment."
 msgstr "引用ネットワークを構築中。少し時間がかかる場合があります。"
 
@@ -155,11 +242,32 @@ msgstr "ステータスパネルを折りたたむ"
 msgid "Expand status panel"
 msgstr "ステータスパネルを展開する"
 
+msgid "Details"
+msgstr "詳細"
+
+msgid "Graph Controls"
+msgstr "グラフ操作"
+
+msgid "Scroll"
+msgstr "スクロール"
+
+msgid "Zoom"
+msgstr "ズーム"
+
+msgid "Drag"
+msgstr "ドラッグ"
+
+msgid "Pan"
+msgstr "パン"
+
+msgid "Click"
+msgstr "クリック"
+
+msgid "Select node"
+msgstr "ノードを選択"
+
 msgid "Service Status"
 msgstr "サービス状態"
-
-msgid "Checking..."
-msgstr "確認中…"
 
 msgid "Search academic databases (OpenAlex, Crossref, PubMed,\n                                    Semantic Scholar, &#8230;) by keyword. This searches\n                                    <strong>external databases</strong>, not your Library\n                                    (a separate tab)."
 msgstr "キーワードで学術データベース（OpenAlex、Crossref、PubMed、Semantic Scholar など）を検索します。これは<strong>外部データベース</strong>を検索するもので、ライブラリ（別のタブ）ではありません。"
@@ -253,6 +361,60 @@ msgstr "%(file)s から %(n)s 件の論文をインポートしました"
 
 msgid "Imported %(n)s papers from %(file)s"
 msgstr "%(file)s から %(n)s 件の論文をインポートしました"
+
+msgid "Save"
+msgstr "保存"
+
+msgid "Saving…"
+msgstr "保存中…"
+
+msgid "Saved"
+msgstr "保存済み"
+
+msgid "Save failed"
+msgstr "保存に失敗"
+
+msgid "Select results to save."
+msgstr "保存する結果を選択してください。"
+
+msgid "Saved %(saved)s of %(total)s"
+msgstr "%(total)s 件中 %(saved)s 件を保存"
+
+msgid "Enriched %(done)s of %(total)s"
+msgstr "%(total)s 件中 %(done)s 件を補完"
+
+msgid "No papers with a DOI in your library yet."
+msgstr "ライブラリにはDOI付きの論文がまだありません。"
+
+msgid "Importing…"
+msgstr "インポート中…"
+
+msgid "Import failed"
+msgstr "インポートに失敗"
+
+msgid "Zotero database found"
+msgstr "Zotero データベースが見つかりました"
+
+msgid "Zotero database not found"
+msgstr "Zotero データベースが見つかりません"
+
+msgid "Connected Papers available"
+msgstr "Connected Papers 利用可能"
+
+msgid "Connected Papers unavailable"
+msgstr "Connected Papers 利用不可"
+
+msgid "Imported %(imported)s of %(total)s papers"
+msgstr "%(total)s 件中 %(imported)s 件の論文をインポートしました"
+
+msgid "Enter a Semantic Scholar paper ID"
+msgstr "Semantic Scholar の論文 ID を入力してください"
+
+msgid "All projects"
+msgstr "すべてのプロジェクト"
+
+msgid "Project: %(project)s"
+msgstr "プロジェクト: %(project)s"
 
 msgid "Citation Graph: limited"
 msgstr "引用グラフ：制限あり"

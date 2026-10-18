@@ -133,6 +133,40 @@ JA = {
     "Title, author, or DOI": "タイトル、著者、DOI",
     "Clear filters": "絞り込みを解除",
     "Loading your library...": "ライブラリを読み込み中…",
+    # --- Graph tab slice 3a strings: these shipped in the committed .po
+    # with translations but were never entered in this table, so a regen
+    # silently reset them to English (caught by
+    # test_ja_catalog_translates_every_msgid). Entering them here makes
+    # the script the source of truth again.
+    "Seed from your Library": "ライブラリからシードを選択",
+    "Loading your library…": "ライブラリを読み込み中…",
+    "How It Works": "使い方",
+    "Bibliographic Coupling": "書誌結合",
+    "Papers sharing common references": "共通の参考文献を持つ論文",
+    "Co-citation": "共引用",
+    "Papers frequently cited together": "共に引用されることの多い論文",
+    "Direct Citations": "直接引用",
+    "Papers citing or cited by the seed": "シード論文を引用または被引用する論文",
+    "No papers with a DOI in your library yet.": "ライブラリにはDOI付きの論文がまだありません。",
+    # --- Library tab slice 3b (old-direct parity: Zotero/CP reflection) ---
+    "Zotero": "Zotero",
+    "Import from your local Zotero database, or download the library as BibTeX for Zotero.":
+        "ローカルの Zotero データベースからインポートするか、ライブラリを Zotero 用の BibTeX としてダウンロードできます。",
+    "Import source": "インポート元",
+    "All papers": "すべての論文",
+    "By collection": "コレクション別",
+    "By tags": "タグ別",
+    "Tags, comma-separated": "タグ（カンマ区切り）",
+    "Import from Zotero": "Zotero からインポート",
+    "Download BibTeX for Zotero": "Zotero 用に BibTeX をダウンロード",
+    "Connected Papers": "Connected Papers",
+    "Import a Connected Papers graph by seed paper.":
+        "起点論文から Connected Papers のグラフをインポートします。",
+    "Find paper IDs at semanticscholar.org":
+        "論文 ID は semanticscholar.org で確認できます",
+    "Semantic Scholar paper ID": "Semantic Scholar 論文 ID",
+    "40-char SHA or DOI": "40文字の SHA または DOI",
+    "Import Graph": "グラフをインポート",
     # --- Graph tab ---
     "Build Citation Network": "引用ネットワークを構築",
     # Graph seed/limit copy added with the graph demotion; these were missing
@@ -153,6 +187,18 @@ JA = {
     "Reset zoom": "ズームをリセット",
     "Download SVG": "SVG をダウンロード",
     "Related Papers": "関連論文",
+    # --- Search tab slice 2 (old-direct parity: sorter/filter/bulk) ---
+    "Details": "詳細",
+    "Sort by": "並び替え",
+    "Relevance": "関連度順",
+    "Year (newest)": "発行年（新しい順）",
+    "Year (oldest)": "発行年（古い順）",
+    "Title (A-Z)": "タイトル（A-Z順）",
+    "Source": "ソース",
+    "All sources": "すべてのソース",
+    "Select all": "すべて選択",
+    "Save selected": "選択を保存",
+    "Save & enrich": "保存して補完",
     # --- JS dict (views._js_i18n_dict) ---
     "Build citation graph": "引用グラフを構築",
     "Enrich": "補完",
@@ -180,6 +226,28 @@ JA = {
     "Online fallback": "オンラインへのフォールバック",
     "Imported %(n)s paper from %(file)s": "%(file)s から %(n)s 件の論文をインポートしました",
     "Imported %(n)s papers from %(file)s": "%(file)s から %(n)s 件の論文をインポートしました",
+    "Save": "保存",
+    "Saving…": "保存中…",
+    "Saved": "保存済み",
+    "Save failed": "保存に失敗",
+    "Select results to save.": "保存する結果を選択してください。",
+    "Saved %(saved)s of %(total)s": "%(total)s 件中 %(saved)s 件を保存",
+    "Enriched %(done)s of %(total)s": "%(total)s 件中 %(done)s 件を補完",
+    # --- JS dict, slice 3b (Zotero / Connected Papers import controls) ---
+    "Importing…": "インポート中…",
+    "Import failed": "インポートに失敗",
+    "Zotero database found": "Zotero データベースが見つかりました",
+    "Zotero database not found": "Zotero データベースが見つかりません",
+    "Connected Papers available": "Connected Papers 利用可能",
+    "Connected Papers unavailable": "Connected Papers 利用不可",
+    "Imported %(imported)s of %(total)s papers":
+        "%(total)s 件中 %(imported)s 件の論文をインポートしました",
+    "Enter a Semantic Scholar paper ID":
+        "Semantic Scholar の論文 ID を入力してください",
+    # --- JS dict, slice 3c (project-sync controls) ---
+    "Project": "プロジェクト",
+    "All projects": "すべてのプロジェクト",
+    "Project: %(project)s": "プロジェクト: %(project)s",
     # --- Service Status sidebar paragraph (graph_health / _not_configured_payload /
     # _degraded_payload error+detail+fix; operator screenshot 2026-10-16) ---
     "CrossRef API not configured": "CrossRef API 未設定",

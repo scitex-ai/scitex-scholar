@@ -228,3 +228,55 @@
   font-size: 12px;
   color: var(--accent);
 }
+
+/* ── Slice 3a: library-seed picker + How-It-Works (old-direct parity) ── */
+.graph-library-seed {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.graph-library-seed__item {
+  padding: 8px 10px;
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.graph-library-seed__item:hover {
+  border-color: var(--accent);
+}
+
+.graph-library-seed__title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.graph-library-seed__meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.info-item strong {
+  display: block;
+  font-size: 13px;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.info-item p {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+}

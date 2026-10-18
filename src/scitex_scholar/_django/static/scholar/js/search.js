@@ -11,6 +11,12 @@
  * here (mode + no_cache are existing /api/search params). Each result with a
  * DOI offers "Build citation graph", which prefills the Graph tab's DOI and
  * jumps there -- graph creation from a search result, the demotion path.
+ *
+ * SLICE 2 (old-direct parity, CCT4130 slice-1): sorter + source filter +
+ * bulk/pipeline pills over the results. Sort/filter re-render the cached
+ * result set locally (no refetch); the pills POST to the EXISTING library
+ * save/save-bulk/enrich endpoints -- search adds no backend of its own.
+ * Selection is keyed by DOI-or-title so it survives re-sorts.
  */
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("searchForm");
@@ -26,6 +32,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const results = document.getElementById("searchResults");
   const resultsContent = document.getElementById("searchResultsContent");
   const stats = document.getElementById("searchStats");
+  const sortSelect = document.getElementById("searchSort");
+  const sourceFilter = document.getElementById("searchSourceFilter");
+  const selectAll = document.getElementById("searchSelectAll");
+  const saveSelectedBtn = document.getElementById("searchSaveSelected");
+  const enrichSelectedBtn = document.getElementById("searchEnrichSelected");
+  const bulkStatus = document.getElementById("searchBulkStatus");
+
+  // The last fetched result set (engine order = relevance) plus the user's
+  // selection, keyed by DOI-or-title so re-sorts keep the checked rows.
+  let lastPapers = [];
+  const selected = new Set();
+
+  // Enrichment fans one request per paper; cap the pipeline pill so one
+  // click cannot queue hundreds of sequential enrichment runs.
+  const ENRICH_LIMIT = 20;
 
   const show = (el) => el && el.classList.remove("hidden");
   const hide = (el) => el && el.classList.add("hidden");
@@ -33,6 +54,22 @@ document.addEventListener("DOMContentLoaded", () => {
   function showError(message) {
     errorMessage.textContent = message;
     show(errorBox);
+  }
+
+  // CSRF: same pattern as library.js -- the mounted hub enables
+  // CsrfViewMiddleware; standalone has no token and needs no header.
+  function csrfHeaders(extra) {
+    const headers = Object.assign({}, extra);
+    const csrfInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
+    const csrf = csrfInput ? csrfInput.value : "";
+    if (csrf) headers["X-CSRFToken"] = csrf;
+    return headers;
+  }
+
+  function paperKey(paper, index) {
+    if (paper.doi) return `doi:${paper.doi}`;
+    if (paper.title) return `title:${paper.title}`;
+    return `index:${index}`;
   }
 
   function formatAuthors(paper) {
@@ -61,15 +98,71 @@ document.addEventListener("DOMContentLoaded", () => {
     if (doiInput) doiInput.focus();
   }
 
-  function renderPaper(paper) {
+  // The flat shape library_save accepts (same rows library_list returns).
+  // Project sync (parity slice 3c): saves file into the header picker's
+  // ?project= selection, mirroring hub old-direct's per-save project
+  // filing. Absent selection stays user-scoped (project: undefined is
+  // dropped by JSON.stringify, so the backend sees no project key).
+  function currentProject() {
+    try {
+      return new URLSearchParams(window.location.search).get("project") || undefined;
+    } catch (e) {
+      return undefined;
+    }
+  }
+
+  function savePayload(paper) {
+    return {
+      title: paper.title || "",
+      authors: paper.authors || [],
+      year: paper.year || null,
+      doi: paper.doi || "",
+      abstract: paper.abstract || "",
+      venue: paper.venue || paper.journal || "",
+      citation_count: paper.citation_count || null,
+      project: currentProject(),
+    };
+  }
+
+  async function saveOne(paper) {
+    const resp = await fetch(`${STX_MOUNT}/api/library/save`, {
+      method: "POST",
+      headers: csrfHeaders({ "Content-Type": "application/json" }),
+      body: JSON.stringify(savePayload(paper)),
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || scholarT("Save failed"));
+    return data.library_id;
+  }
+
+  function renderPaper(paper, index) {
     const item = document.createElement("div");
     item.className = "search-result";
+
+    const row = document.createElement("div");
+    row.className = "search-result__row";
+
+    const check = document.createElement("input");
+    check.type = "checkbox";
+    check.className = "search-result__select";
+    check.checked = selected.has(paperKey(paper, index));
+    check.setAttribute("aria-label", scholarT("Save"));
+    check.addEventListener("change", () => {
+      const key = paperKey(paper, index);
+      if (check.checked) selected.add(key);
+      else selected.delete(key);
+      syncSelectAll();
+    });
+    row.appendChild(check);
+
+    const body = document.createElement("div");
+    body.className = "search-result__body";
 
     const title = document.createElement("div");
     title.className = "search-result__title";
     // textContent, not innerHTML: titles and abstracts are third-party data.
     title.textContent = paper.title || scholarT("Untitled");
-    item.appendChild(title);
+    body.appendChild(title);
 
     const meta = document.createElement("div");
     meta.className = "search-result__meta";
@@ -82,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
       span.textContent = text;
       meta.appendChild(span);
     });
-    item.appendChild(meta);
+    body.appendChild(meta);
 
     // DOI line: the DOI link plus a "Build citation graph" action.
     if (paper.doi) {
@@ -103,7 +196,7 @@ document.addEventListener("DOMContentLoaded", () => {
       graphBtn.addEventListener("click", () => buildGraphFromDoi(paper.doi));
       doiLine.appendChild(graphBtn);
 
-      item.appendChild(doiLine);
+      body.appendChild(doiLine);
     }
 
     if (paper.abstract) {
@@ -112,24 +205,116 @@ document.addEventListener("DOMContentLoaded", () => {
       const text = paper.abstract;
       abstract.textContent =
         text.length > 300 ? `${text.slice(0, 300)}...` : text;
-      item.appendChild(abstract);
+      body.appendChild(abstract);
     }
 
+    // Per-result actions: Save to the library (slice-4 backend on the
+    // search surface) beside the graph demotion path.
+    const actions = document.createElement("div");
+    actions.className = "search-result__actions";
+    const saveBtn = document.createElement("button");
+    saveBtn.type = "button";
+    saveBtn.className = "search-result__save-btn";
+    saveBtn.textContent = scholarT("Save");
+    saveBtn.addEventListener("click", async () => {
+      saveBtn.disabled = true;
+      saveBtn.textContent = scholarT("Saving…");
+      try {
+        await saveOne(paper);
+        saveBtn.textContent = scholarT("Saved");
+      } catch (err) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = scholarT("Save");
+        showError(`${scholarT("Save failed")}: ${err.message}`);
+      }
+    });
+    actions.appendChild(saveBtn);
+    body.appendChild(actions);
+
+    row.appendChild(body);
+    item.appendChild(row);
     return item;
+  }
+
+  function viewPapers() {
+    const source = sourceFilter ? sourceFilter.value : "";
+    const order = sortSelect ? sortSelect.value : "relevance";
+    let papers = lastPapers.map((paper, index) => ({ paper, index }));
+    if (source) {
+      papers = papers.filter(({ paper }) => (paper.source || "") === source);
+    }
+    if (order === "year-desc" || order === "year-asc") {
+      const dir = order === "year-desc" ? -1 : 1;
+      papers = papers
+        .slice()
+        .sort((a, b) => ((a.paper.year || 0) - (b.paper.year || 0)) * dir);
+    } else if (order === "title") {
+      papers = papers
+        .slice()
+        .sort((a, b) =>
+          String(a.paper.title || "").localeCompare(String(b.paper.title || "")),
+        );
+    }
+    return papers;
+  }
+
+  function refreshSourceOptions() {
+    if (!sourceFilter) return;
+    const current = sourceFilter.value;
+    // Capture the server-translated "All sources" label BEFORE replacing
+    // the options -- after replaceChildren the static option is gone.
+    const staticAll = sourceFilter.querySelector('option[value=""]');
+    const allLabel =
+      staticAll && staticAll.textContent ? staticAll.textContent : "All sources";
+    const sources = [];
+    lastPapers.forEach((paper) => {
+      const source = paper.source || "";
+      if (source && !sources.includes(source)) sources.push(source);
+    });
+    sourceFilter.replaceChildren();
+    const all = document.createElement("option");
+    all.value = "";
+    // The static "All sources" option is translated server-side; the
+    // per-source options are corpus proper nouns and stay as-is.
+    all.textContent = allLabel;
+    sourceFilter.appendChild(all);
+    sources.forEach((source) => {
+      const option = document.createElement("option");
+      option.value = source;
+      option.textContent = source;
+      sourceFilter.appendChild(option);
+    });
+    sourceFilter.value = sources.includes(current) ? current : "";
+  }
+
+  function syncSelectAll() {
+    if (!selectAll) return;
+    const visible = viewPapers().map(({ paper, index }) =>
+      paperKey(paper, index),
+    );
+    selectAll.checked =
+      visible.length > 0 && visible.every((key) => selected.has(key));
   }
 
   function renderResults(data) {
     const papers = data.results || [];
+    lastPapers = papers;
+    selected.clear();
+    refreshSourceOptions();
     resultsContent.replaceChildren();
 
-    if (!papers.length) {
+    const visible = viewPapers();
+    if (!visible.length) {
       const empty = document.createElement("div");
       empty.className = "empty-message";
       empty.textContent = scholarT("No papers matched this query.");
       resultsContent.appendChild(empty);
     } else {
-      papers.forEach((paper) => resultsContent.appendChild(renderPaper(paper)));
+      visible.forEach(({ paper, index }) =>
+        resultsContent.appendChild(renderPaper(paper, index)),
+      );
     }
+    syncSelectAll();
 
     const metadata = data.metadata || {};
     const parts = [`${papers.length} paper${papers.length === 1 ? "" : "s"}`];
@@ -148,6 +333,131 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     stats.textContent = parts.join(" · ");
     show(results);
+  }
+
+  function selectedPapers() {
+    return lastPapers.filter((paper, index) =>
+      selected.has(paperKey(paper, index)),
+    );
+  }
+
+  function setBulkBusy(btn, busy) {
+    [saveSelectedBtn, enrichSelectedBtn].forEach((b) => {
+      if (b) b.disabled = busy;
+    });
+    if (btn && busy && !btn.dataset.label) {
+      btn.dataset.label = btn.textContent;
+      btn.textContent = scholarT("Saving…");
+    } else if (btn && !busy && btn.dataset.label) {
+      btn.textContent = btn.dataset.label;
+      delete btn.dataset.label;
+    }
+  }
+
+  async function saveSelected() {
+    const papers = selectedPapers();
+    if (!papers.length) {
+      if (bulkStatus) bulkStatus.textContent = scholarT("Select results to save.");
+      return;
+    }
+    setBulkBusy(saveSelectedBtn, true);
+    if (bulkStatus) bulkStatus.textContent = "";
+    try {
+      const resp = await fetch(`${STX_MOUNT}/api/library/save-bulk`, {
+        method: "POST",
+        headers: csrfHeaders({ "Content-Type": "application/json" }),
+        body: JSON.stringify({ papers: papers.map(savePayload), project: currentProject() }),
+      });
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.error || scholarT("Save failed"));
+      const saved = (data.saved || []).length;
+      const failed = (data.failed || []).length;
+      if (bulkStatus) {
+        bulkStatus.textContent = scholarT("Saved %(saved)s of %(total)s", {
+          saved,
+          total: saved + failed,
+        });
+      }
+    } catch (err) {
+      showError(`${scholarT("Save failed")}: ${err.message}`);
+    } finally {
+      setBulkBusy(saveSelectedBtn, false);
+    }
+  }
+
+  async function enrichSelected() {
+    const papers = selectedPapers().slice(0, ENRICH_LIMIT);
+    if (!selectedPapers().length) {
+      if (bulkStatus) bulkStatus.textContent = scholarT("Select results to save.");
+      return;
+    }
+    setBulkBusy(enrichSelectedBtn, true);
+    if (bulkStatus) bulkStatus.textContent = "";
+    try {
+      let enriched = 0;
+      for (const paper of papers) {
+        const libraryId = await saveOne(paper);
+        const params = new URLSearchParams({ paper_id: libraryId });
+        const resp = await fetch(`${STX_MOUNT}/api/library/enrich`, {
+          method: "POST",
+          headers: csrfHeaders({
+            "Content-Type": "application/x-www-form-urlencoded",
+          }),
+          body: params.toString(),
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || scholarT("Save failed"));
+        enriched += 1;
+      }
+      if (bulkStatus) {
+        bulkStatus.textContent = scholarT("Enriched %(done)s of %(total)s", {
+          done: enriched,
+          total: selectedPapers().length,
+        });
+      }
+    } catch (err) {
+      showError(`${scholarT("Save failed")}: ${err.message}`);
+    } finally {
+      setBulkBusy(enrichSelectedBtn, false);
+    }
+  }
+
+  if (sortSelect) {
+    sortSelect.addEventListener("change", () => {
+      resultsContent.replaceChildren();
+      const visible = viewPapers();
+      visible.forEach(({ paper, index }) =>
+        resultsContent.appendChild(renderPaper(paper, index)),
+      );
+      syncSelectAll();
+    });
+  }
+  if (sourceFilter) {
+    sourceFilter.addEventListener("change", () => {
+      resultsContent.replaceChildren();
+      const visible = viewPapers();
+      visible.forEach(({ paper, index }) =>
+        resultsContent.appendChild(renderPaper(paper, index)),
+      );
+      syncSelectAll();
+    });
+  }
+  if (selectAll) {
+    selectAll.addEventListener("change", () => {
+      const visible = viewPapers().map(({ paper, index }) =>
+        paperKey(paper, index),
+      );
+      if (selectAll.checked) visible.forEach((key) => selected.add(key));
+      else visible.forEach((key) => selected.delete(key));
+      resultsContent.replaceChildren();
+      viewPapers().forEach(({ paper, index }) =>
+        resultsContent.appendChild(renderPaper(paper, index)),
+      );
+    });
+  }
+  if (saveSelectedBtn) saveSelectedBtn.addEventListener("click", saveSelected);
+  if (enrichSelectedBtn) {
+    enrichSelectedBtn.addEventListener("click", enrichSelected);
   }
 
   form.addEventListener("submit", async (event) => {

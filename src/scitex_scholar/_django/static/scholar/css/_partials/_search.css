@@ -144,3 +144,87 @@
   border-color: var(--accent);
   background: var(--bg-primary);
 }
+
+/*
+ * Slice 2 (old-direct parity, CCT4130 slice-1): sorter + source filter +
+ * bulk/pipeline pills over the search results. Toolbar and bulk bar reuse
+ * the shared form/btn tokens; per-result selection + Save reuse the quiet
+ * secondary-button shape of .search-result__graph-btn.
+ */
+.search-results-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px 16px 0;
+}
+
+.search-bulk-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px 16px 0;
+}
+
+.search-bulk-bar__select-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.search-bulk-status {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.search-result__row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.search-result__select {
+  margin-top: 2px;
+  flex: none;
+}
+
+.search-result__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.search-result__actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-result__save-btn {
+  margin-left: 12px;
+  padding: 4px 10px;
+  background: none;
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  cursor: pointer;
+  min-height: 24px;
+  transition:
+    color 0.15s,
+    border-color 0.15s,
+    background 0.15s;
+}
+.search-result__save-btn:hover:not(:disabled) {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--bg-primary);
+}
+.search-result__save-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

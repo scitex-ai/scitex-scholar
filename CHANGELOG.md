@@ -5,6 +5,21 @@ All notable changes to `scitex-scholar` are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.16.0] - 2026-10-18
+
+### Added
+- Search sorter/filter controls with bulk save and save-enrich pills
+  (parity slice 2, PR #224).
+- Graph seed-from-library picker plus How-It-Works surface (parity
+  slice 3a, PR #225).
+- Zotero and Connected Papers import reflection (parity slice 3b,
+  PR #226).
+- Project-sync UI reflection (parity slice 3c, PR #227).
+
+### Fixed
+- Vendor the docs bundle through a rolling PR instead of a bot push (#222).
+- Single-assert test pins (STX-TQ007, PA-306 audit).
+
 ## [1.15.1] - 2026-10-17
 
 ### Fixed
