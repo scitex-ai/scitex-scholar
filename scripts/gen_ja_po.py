@@ -118,6 +118,7 @@ JA = {
     "Searching databases... This may take a moment.": "データベースを検索中。少し時間がかかる場合があります。",
     "An error occurred": "エラーが発生しました",
     "Dismiss": "閉じる",
+    "Retry": "再試行",
     # --- Library tab ---
     BLOCKTRANS_MSGIDS[2]: (
         "ローカルに保存された論文です。<strong>補完</strong> でデータベースからメタデータ"

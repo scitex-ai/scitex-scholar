@@ -121,6 +121,9 @@
                                     onclick="document.getElementById('searchError').classList.add('hidden')">
                                 {% trans "Dismiss" %}
                             </button>
+                            <button id="searchRetryBtn" class="btn-build">
+                                {% trans "Retry" %}
+                            </button>
                         </div>
                         <!-- Results -->
                         <div id="searchResults" class="hidden related-papers-section">
@@ -292,6 +295,9 @@
                                             onclick="document.getElementById('libraryError').classList.add('hidden')">
                                         {% trans "Dismiss" %}
                                     </button>
+                                    <button id="libraryRetryBtn" class="btn-build">
+                                        {% trans "Retry" %}
+                                    </button>
                                 </div>
                                 <div id="libraryList" class="library-list"></div>
                             </div>
@@ -402,6 +408,9 @@
                             <button class="btn-build"
                                     onclick="document.getElementById('graphError').classList.add('hidden')">
                                 {% trans "Dismiss" %}
+                            </button>
+                            <button id="graphRetryBtn" class="btn-build">
+                                {% trans "Retry" %}
                             </button>
                         </div>
                         <!-- Visualization -->
