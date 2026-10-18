@@ -159,12 +159,25 @@
   padding: 10px 16px 0;
 }
 
+/*
+ * Declutter (CCT4429): the bulk pills live INSIDE the toolbar row, so this
+ * is an inline group, not a second padded strip. The selector stays (the
+ * slice-2 style pin references it) but carries no strip padding of its own.
+ */
 .search-bulk-bar {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
-  padding: 10px 16px 0;
+  padding: 0;
+}
+
+/* Hairline divider between the sort/filter selects and the bulk pills. */
+.search-results-toolbar__sep {
+  width: 1px;
+  align-self: stretch;
+  background: var(--border-default);
+  margin: 2px 4px;
 }
 
 .search-bulk-bar__select-all {

@@ -317,9 +317,11 @@ document.addEventListener("DOMContentLoaded", () => {
     syncSelectAll();
 
     const metadata = data.metadata || {};
+    // Declutter (CCT4429): header meta is count + corpus tier only. The
+    // cached flag and the search mode already have visible owners (the
+    // request path and the Advanced block's source control); repeating them
+    // here is the clutter the operator flagged.
     const parts = [`${papers.length} paper${papers.length === 1 ? "" : "s"}`];
-    if (metadata.cached) parts.push("cached");
-    if (metadata.search_mode) parts.push(metadata.search_mode);
     // READINESS: which corpus answered. The configured policy is local-first,
     // and the user (and a bug report) must be able to see when the network was
     // actually needed -- a silent fallback is indistinguishable from a local
