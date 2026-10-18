@@ -12,6 +12,8 @@ class CitationGraphManager {
     this.transform = { x: 0, y: 0, k: 1 };
     this.isDragging = false;
     this.selectedNode = null;
+    // Error fallback (UX standard): the build the error box retries.
+    this.lastBuild = null;
     // Set once the Citation Graph tab has asked the backend (see
     // bindLazyHealthProbe) so the live probe runs at most once per page.
     this.probed = false;
@@ -64,6 +66,15 @@ class CitationGraphManager {
 
     const fitBtn = document.getElementById("fitViewBtn");
     if (fitBtn) fitBtn.addEventListener("click", () => this.fitToView());
+
+    // Error fallback (UX standard): retry re-runs the failed build with the
+    // same seed -- the error box retries, not just dismisses.
+    const retryBtn = document.getElementById("graphRetryBtn");
+    if (retryBtn) {
+      retryBtn.addEventListener("click", () => {
+        if (this.lastBuild) this.buildGraph(this.lastBuild.doi, this.lastBuild.topN);
+      });
+    }
   }
 
   async checkServiceHealth(probe) {
@@ -197,12 +208,24 @@ class CitationGraphManager {
       });
       box.dataset.loaded = "1";
     } catch {
+      // Error fallback (UX standard): the seed list is auxiliary, but its
+      // failure still retries in place instead of sitting dead.
       box.innerHTML =
-        '<p class="error-message">' + this.esc(scholarT("Service unavailable")) + "</p>";
+        '<p class="error-message">' +
+        this.esc(scholarT("Service unavailable")) +
+        "</p>" +
+        '<button type="button" class="btn-control-library" data-seed-retry="1">' +
+        this.esc(scholarT("Retry")) +
+        "</button>";
+      const seedRetry = box.querySelector("[data-seed-retry]");
+      if (seedRetry) {
+        seedRetry.addEventListener("click", () => this.loadLibrarySeed());
+      }
     }
   }
 
   async buildGraph(doi, topN) {
+    this.lastBuild = { doi, topN };
     this.showLoading(true);
     this.hideError();
 
@@ -219,7 +242,7 @@ class CitationGraphManager {
       this.renderGraph(data);
       this.fetchRelatedPapers(doi, topN);
     } catch (err) {
-      this.showError(err.message || "An error occurred");
+      this.showError(err.message || "An error occurred", true);
     } finally {
       this.showLoading(false);
     }
@@ -457,11 +480,15 @@ class CitationGraphManager {
     }
   }
 
-  showError(msg) {
+  showError(msg, canRetry) {
     const el = document.getElementById("graphError");
     const msgEl = document.getElementById("graphErrorMessage");
+    const retryBtn = document.getElementById("graphRetryBtn");
     if (el && msgEl) {
       msgEl.textContent = msg;
+      // Validation mistakes (empty DOI) carry no retry: the user must fix
+      // the input by hand. Build failures do -- the seed is remembered.
+      if (retryBtn) retryBtn.classList.toggle("hidden", !canRetry);
       el.classList.remove("hidden");
     }
   }

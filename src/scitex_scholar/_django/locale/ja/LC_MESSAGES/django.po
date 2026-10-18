@@ -65,6 +65,9 @@ msgstr "エラーが発生しました"
 msgid "Dismiss"
 msgstr "閉じる"
 
+msgid "Retry"
+msgstr "再試行"
+
 msgid "Sort by"
 msgstr "並び替え"
 

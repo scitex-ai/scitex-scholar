@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const loading = document.getElementById("searchLoading");
   const errorBox = document.getElementById("searchError");
   const errorMessage = document.getElementById("searchErrorMessage");
+  const retryBtn = document.getElementById("searchRetryBtn");
   const results = document.getElementById("searchResults");
   const resultsContent = document.getElementById("searchResultsContent");
   const stats = document.getElementById("searchStats");
@@ -51,9 +52,25 @@ document.addEventListener("DOMContentLoaded", () => {
   const show = (el) => el && el.classList.remove("hidden");
   const hide = (el) => el && el.classList.add("hidden");
 
-  function showError(message) {
+  // Error fallback (UX standard): the error box retries the operation that
+  // failed, not just dismisses it. Each failure site passes its own retry;
+  // validation messages pass none, so the retry button stays hidden for
+  // mistakes the user must fix by hand (empty query).
+  let retryAction = null;
+
+  function showError(message, retry) {
     errorMessage.textContent = message;
+    retryAction = typeof retry === "function" ? retry : null;
+    if (retryBtn) retryBtn.classList.toggle("hidden", !retryAction);
     show(errorBox);
+  }
+
+  if (retryBtn) {
+    retryBtn.addEventListener("click", () => {
+      if (!retryAction) return;
+      hide(errorBox);
+      retryAction();
+    });
   }
 
   // CSRF: same pattern as library.js -- the mounted hub enables
@@ -225,7 +242,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (err) {
         saveBtn.disabled = false;
         saveBtn.textContent = scholarT("Save");
-        showError(`${scholarT("Save failed")}: ${err.message}`);
+        showError(`${scholarT("Save failed")}: ${err.message}`, () => saveBtn.click());
       }
     });
     actions.appendChild(saveBtn);
@@ -381,7 +398,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     } catch (err) {
-      showError(`${scholarT("Save failed")}: ${err.message}`);
+      showError(`${scholarT("Save failed")}: ${err.message}`, saveSelected);
     } finally {
       setBulkBusy(saveSelectedBtn, false);
     }
@@ -418,7 +435,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     } catch (err) {
-      showError(`${scholarT("Save failed")}: ${err.message}`);
+      showError(`${scholarT("Save failed")}: ${err.message}`, enrichSelected);
     } finally {
       setBulkBusy(enrichSelectedBtn, false);
     }
@@ -485,12 +502,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await response.json();
 
       if (!response.ok) {
-        showError(data.error || `Search failed (${response.status})`);
+        showError(
+          data.error || `Search failed (${response.status})`,
+          () => form.requestSubmit(),
+        );
         return;
       }
       renderResults(data);
     } catch (err) {
-      showError(`Search failed: ${err.message}`);
+      showError(`Search failed: ${err.message}`, () => form.requestSubmit());
     } finally {
       hide(loading);
     }
