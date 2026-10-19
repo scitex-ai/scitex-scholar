@@ -70,8 +70,10 @@ def test_remove_deletes_the_paper_tree(tmp_path):
         _post("/api/library/remove", tmp_path, {"library_id": "RM000001"})
     )
     # Assert
-    assert resp.status_code == 200
-    assert not (tmp_path / "MASTER" / "RM000001").exists()
+    assert (resp.status_code, (tmp_path / "MASTER" / "RM000001").exists()) == (
+        200,
+        False,
+    )
 
 
 def test_remove_drops_project_filing_symlinks(tmp_path):
@@ -85,8 +87,7 @@ def test_remove_drops_project_filing_symlinks(tmp_path):
         _post("/api/library/remove", tmp_path, {"library_id": "RM000001"})
     )
     # Assert
-    assert resp.status_code == 200
-    assert not (project_dir / "RM000001").is_symlink()
+    assert (resp.status_code, (project_dir / "RM000001").is_symlink()) == (200, False)
 
 
 def test_remove_unknown_paper_is_404(tmp_path):
@@ -143,9 +144,11 @@ def test_rename_updates_the_recipe_name(tmp_path):
         )
     )
     # Assert
-    assert resp.status_code == 200
     listed = json.loads(views.graphs_list(_get("/api/graphs/list", tmp_path)).content)
-    assert [g["name"] for g in listed["graphs"]] == ["New name"]
+    assert (resp.status_code, [g["name"] for g in listed["graphs"]]) == (
+        200,
+        ["New name"],
+    )
 
 
 def test_rename_rejects_empty_name(tmp_path):
