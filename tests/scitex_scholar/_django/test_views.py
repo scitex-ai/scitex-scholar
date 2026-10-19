@@ -489,7 +489,7 @@ def test_mobile_swipe_wires_tab_switching():
     wired = (
         "touchstart" in script,
         "touchend" in script,
-        "dataset.tab" in script,
+        "stepTab" in script and "aria-controls" in script,
     )
     # Assert
     assert wired == (True, True, True)
@@ -2031,22 +2031,24 @@ def _compass_index_body() -> str:
     return views.index(RequestFactory().get("/")).content.decode()
 
 
-def test_search_is_the_default_active_tab():
+def test_search_is_the_default_selected_tab():
     # Arrange
     body = _compass_index_body()
     # Act
-    search_default = 'class="tab-btn active" data-tab="search"' in body
+    search_selected = (
+        'aria-selected="true" aria-controls="tab-search"' in body
+    )
     search_panel_active = 'id="tab-search" class="tab-panel active"' in body
     # Assert
-    assert search_default and search_panel_active
+    assert search_selected and search_panel_active
 
 
 def test_graph_tab_is_not_default_but_still_present():
     # Arrange
     body = _compass_index_body()
     # Act
-    graph_present = 'data-tab="graph"' in body
-    graph_not_default = 'class="tab-btn active" data-tab="graph"' not in body
+    graph_present = 'aria-controls="tab-graph"' in body
+    graph_not_default = 'aria-selected="true" aria-controls="tab-graph"' not in body
     graph_panel_not_active = 'id="tab-graph" class="tab-panel active"' not in body
     # Assert
     assert graph_present and graph_not_default and graph_panel_not_active
@@ -2182,7 +2184,7 @@ def test_search_tab_and_button_are_labelled_databases():
     # Arrange
     body = _compass_index_body()
     # Act
-    tab_label = 'class="tab-btn active" data-tab="search">Search databases<' in body
+    tab_label = 'aria-controls="tab-search" tabindex="0">Search databases<' in body
     # #95: the search submit is the PRIMARY action, so it carries btn-primary
     # (NOT btn-build, which is the secondary Build Graph / per-row class).
     button_label = 'class="btn-primary">Search databases<' in body
@@ -2255,7 +2257,7 @@ def test_enrichment_is_not_a_top_level_tab():
     # Arrange
     body = _compass_index_body()
     # Act
-    no_button = 'data-tab="enrichment"' not in body
+    no_button = 'aria-controls="tab-enrichment"' not in body
     no_panel = 'id="tab-enrichment"' not in body
     no_placeholder_heading = "Metadata Enrichment" not in body
     # Assert
@@ -2266,9 +2268,129 @@ def test_scholar_tab_bar_has_exactly_three_tabs():
     # Arrange
     body = _compass_index_body()
     # Act
-    tab_count = body.count('class="tab-btn')
+    tab_count = body.count('stx-content-tabs__tab" role="tab"')
     # Assert
     assert tab_count == 3
+
+
+def test_tabs_link_sdk_ssot_stylesheet():
+    """The tab bar is styled by the SDK SSoT sheet, as the header is.
+
+    Operator UI standard (card scholar-ui-standard-tabs-colors-20261016):
+    scholar tabs must use stx-content-tabs from
+    scitex_sdk/ui/css/app/content-tabs.css — the leaf links the sheet exactly
+    like it already does for app-header.css (test_header_links_sdk_ssot_stylesheet).
+    """
+    # Arrange
+    assets = (
+        Path(views.__file__).parent
+        / "templates"
+        / "scholar"
+        / "workspace_assets.html"
+    ).read_text()
+    # Act
+    linked = "scitex_sdk/ui/css/app/content-tabs.css" in assets
+    # Assert
+    assert linked
+
+
+def test_tabs_sdk_stylesheet_exists_in_installed_package():
+    """The linked SDK sheet resolves to a real installed file with selected-state.
+
+    Regression guard for the 0.3.6 hold: the template linked
+    scitex_sdk/ui/css/app/content-tabs.css while no PyPI release carried it,
+    so the URL 404'd and tabs shipped unstyled. Linking the path is not
+    enough — the file must exist in the installed scitex-sdk (floor >=0.3.7)
+    and carry the selected-state rule the contract depends on.
+    """
+    # Arrange
+    import scitex_sdk.ui
+
+    sheet = (
+        Path(scitex_sdk.ui.__file__).parent
+        / "static"
+        / "scitex_sdk"
+        / "ui"
+        / "css"
+        / "app"
+        / "content-tabs.css"
+    )
+    # Act
+    text = sheet.read_text()
+    # Assert
+    assert '.stx-content-tabs__tab[aria-selected="true"]' in text
+
+
+def test_tabs_do_not_redefine_the_bar():
+    """Scholar carries no .tab-nav/.tab-btn rules: the shared sheet owns the bar."""
+    # Arrange
+    layout = (
+        Path(views.__file__).parent
+        / "static"
+        / "scholar"
+        / "css"
+        / "_partials"
+        / "_layout.css"
+    ).read_text()
+    # Act — a RULE (selector + block), not a prose mention in a comment.
+    redefined = re.search(r"\.tab-(nav|btn)[\w-]*\s*\{", layout)
+    # Assert
+    assert redefined is None
+
+
+def test_tablist_matches_the_sdk_markup_contract():
+    """The tablist emits the content-tabs MARKUP CONTRACT: role=tablist/tab,
+    one aria-selected=true, tab→panel wiring via aria-controls, and roving
+    tabindex (Search 0, the rest -1). The shared sheet reads aria-selected
+    only, so this markup is what keeps the selected look unforked."""
+    # Arrange
+    body = _compass_index_body()
+    # Act
+    contracted = (
+        'class="stx-content-tabs" role="tablist"' in body,
+        body.count('aria-selected="true"') == 1,
+        all(
+            f'aria-controls="tab-{t}"' in body
+            for t in ("search", "library", "graph")
+        ),
+        'aria-controls="tab-search" tabindex="0"' in body,
+        'aria-controls="tab-library" tabindex="-1"' in body,
+        'aria-controls="tab-graph" tabindex="-1"' in body,
+    )
+    # Assert
+    assert contracted == (True, True, True, True, True, True)
+
+
+def test_panels_reference_their_tabs():
+    """Each panel points back at its tab (aria-labelledby): the
+    aria-controls wiring is bidirectional, so assistive tech can travel
+    tab→panel→tab without leaf-owned keys."""
+    # Arrange
+    body = _compass_index_body()
+    # Act
+    labelled = all(
+        f'aria-labelledby="scholar-tab-{t}"' in body
+        for t in ("search", "library", "graph")
+    )
+    # Assert
+    assert labelled
+
+
+def test_tab_producer_drives_selection_through_aria():
+    """app.js is the contract's producer: it queries the shared tab class,
+    writes aria-selected + roving tabindex, and handles ArrowLeft/Right.
+    No .tab-btn/.active class logic may remain — the selected look lives in
+    the shared sheet, never in leaf classes."""
+    # Arrange
+    app_js = (COMPASS_SEARCH_JS.parent / "app.js").read_text()
+    # Act
+    produces = (
+        ".stx-content-tabs__tab" in app_js and 'aria-selected' in app_js,
+        "ArrowRight" in app_js and "ArrowLeft" in app_js,
+    )
+    forked = ".tab-btn" in app_js or "dataset.tab" in app_js
+    # Assert
+    assert produces == (True, True) and not forked
 
 
 # --- responsive fix (MONITOR-1731): shell side panes + mobile collapse -------
@@ -2660,7 +2782,7 @@ def test_enrichment_is_a_contextual_library_action_not_a_tab():
     tpl = _scholar_template_source(COMPASS_TEMPLATE)
     js = (COMPASS_SEARCH_JS.parent / "library.js").read_text()
     # Act
-    no_enrich_tab = 'data-tab="enrichment"' not in body
+    no_enrich_tab = 'aria-controls="tab-enrichment"' not in body
     library_has_list = 'id="libraryList"' in tpl and 'class="library-list"' in tpl
     js_wires_enrich = "api/library/enrich" in js and 'method: "POST"' in js
     # Assert

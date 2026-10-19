@@ -1,5 +1,5 @@
 /**
- * Scholar GUI - App shell layout and tab navigation.
+ * Scholar GUI - App shell layout (tab bar: SDK content-tabs SSoT sheet).
  */
 
 /* ── Layout ────────────────────────────────────────────────── */
@@ -31,42 +31,14 @@
 }
 
 /* ── Tabs ──────────────────────────────────────────────────── */
-.tab-nav {
-  display: flex;
-  border-bottom: 1px solid var(--border-default);
-  background: var(--bg-secondary);
-  padding: 0 16px;
-}
-
-.tab-btn {
-  /*
-   * Touch-target minimum on the tab bar (compass L303 / WCAG 2.5.5).
-   * Same token as the search input so the whole UI grows together when
-   * scitex-ui merges --input-height.
-   */
-  min-height: var(--input-height, 44px);
-  padding: 12px 20px;
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  color: var(--text-muted);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  transition:
-    color 0.15s,
-    border-color 0.15s;
-}
-
-.tab-btn:hover {
-  color: var(--text-primary);
-}
-.tab-btn.active {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
-}
+/*
+ * The tab BAR is the SDK SSoT sheet (scitex_sdk/ui/css/app/content-tabs.css,
+ * linked in the workspace_assets head): no .stx-content-tabs selectors live
+ * here at all — the shared sheet owns the layout, the 13px labels, the 44px
+ * touch targets, and the selected state (aria-selected). Scholar keeps only
+ * its panel show/hide below; panels are not part of the shared primitive.
+ * See test_tabs_use_sdk_ssot_stylesheet / test_tabs_do_not_redefine_the_bar.
+ */
 
 .tab-panel {
   display: none;

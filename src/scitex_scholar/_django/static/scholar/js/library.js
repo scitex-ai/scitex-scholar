@@ -544,7 +544,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Lazy-load the list the first time the Library tab is activated.
-  const libTabBtn = document.querySelector('.tab-btn[data-tab="library"]');
+  const libTabBtn = document.querySelector(
+    '.stx-content-tabs__tab[aria-controls="tab-library"]',
+  );
   if (libTabBtn) {
     libTabBtn.addEventListener("click", () => {
       if (!loaded) loadLibrary();

@@ -88,7 +88,7 @@ def test_workspace_renderer_conserves_index_at_trusted_root(
                 "outer_shell": len(fragment.select("html,head,body")),
                 "mount": [node["content"] for node in fragment.select('meta[name="stx-mount"]')],
                 "language": fragment_response.headers["Content-Language"],
-                "library_text": fragment.select_one('[data-tab="library"]').get_text(),
+                "library_text": fragment.select_one('[aria-controls="tab-library"]').get_text(),
                 "csrf": (full_csrf, fragment_csrf),
                 "cookie": fragment_response.cookies[settings.CSRF_COOKIE_NAME].value,
                 "roots": (before, tuple(views._library_root_for(req) for req in (request, fragment_request))),

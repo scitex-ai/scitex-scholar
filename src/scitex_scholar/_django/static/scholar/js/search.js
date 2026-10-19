@@ -110,7 +110,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (doiInput && doi) {
       doiInput.value = doi;
     }
-    const graphTab = document.querySelector('.tab-btn[data-tab="graph"]');
+    const graphTab = document.querySelector(
+      '.stx-content-tabs__tab[aria-controls="tab-graph"]',
+    );
     if (graphTab) graphTab.click();
     if (doiInput) doiInput.focus();
   }

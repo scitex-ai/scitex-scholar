@@ -40,7 +40,9 @@ class CitationGraphManager {
 
   /** Probe once, the first time the Citation Graph tab is opened. */
   bindLazyHealthProbe() {
-    const graphTab = document.querySelector('.tab-btn[data-tab="graph"]');
+    const graphTab = document.querySelector(
+      '.stx-content-tabs__tab[aria-controls="tab-graph"]',
+    );
     if (!graphTab) return;
     graphTab.addEventListener("click", () => {
       if (this.probed) return;
