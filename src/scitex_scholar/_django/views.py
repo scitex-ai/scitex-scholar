@@ -587,6 +587,16 @@ def _js_i18n_dict() -> dict:
         ),
         "Importing %(file)s…": _i18n("Importing %(file)s…"),
         "Already in library": _i18n("Already in library"),
+        # Graph tab slice 9 (old-direct unification): the saved-graphs
+        # card renders these client-side -- same rule.
+        "No saved graphs yet.": _i18n("No saved graphs yet."),
+        "Load": _i18n("Load"),
+        "Delete": _i18n("Delete"),
+        "Name the graph and build it first.": _i18n("Name the graph and build it first."),
+        "Graph saved": _i18n("Graph saved"),
+        "Graph not found": _i18n("Graph not found"),
+        "Graph deleted": _i18n("Graph deleted"),
+        "Delete failed": _i18n("Delete failed"),
         # Graph tab slice 3a (old-direct parity): the library-seed picker
         # renders these client-side, so each MUST be a key here -- an
         # English literal in citation-graph.js is invisible to the catalog

@@ -296,6 +296,15 @@ msgstr "ライブラリからシードを選択"
 msgid "Loading your library…"
 msgstr "ライブラリを読み込み中…"
 
+msgid "Saved graphs"
+msgstr "保存したグラフ"
+
+msgid "Graph name"
+msgstr "グラフ名"
+
+msgid "Save current graph"
+msgstr "現在のグラフを保存"
+
 msgid "How It Works"
 msgstr "使い方"
 
@@ -553,6 +562,30 @@ msgstr "%(file)s をインポート中…"
 
 msgid "Already in library"
 msgstr "登録済み"
+
+msgid "No saved graphs yet."
+msgstr "保存したグラフはまだありません。"
+
+msgid "Load"
+msgstr "読み込む"
+
+msgid "Delete"
+msgstr "削除"
+
+msgid "Name the graph and build it first."
+msgstr "グラフに名前を付けて、先に構築してください。"
+
+msgid "Graph saved"
+msgstr "グラフを保存しました"
+
+msgid "Graph not found"
+msgstr "グラフが見つかりません"
+
+msgid "Graph deleted"
+msgstr "グラフを削除しました"
+
+msgid "Delete failed"
+msgstr "削除に失敗しました"
 
 msgid "No papers with a DOI in your library yet."
 msgstr "ライブラリにはDOI付きの論文がまだありません。"

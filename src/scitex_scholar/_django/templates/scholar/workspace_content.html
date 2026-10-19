@@ -494,6 +494,29 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- Saved graphs (old-direct unification, slice 9):
+                             hub's graph page saves/loads/deletes graphs; the
+                             leaf backend ships the same endpoints (parity
+                             slice 1) with no UI. Recipes rebuild from the
+                             seed DOI through the existing network endpoint --
+                             no new backend. -->
+                        <div class="graph-card">
+                            <div class="graph-card__header">
+                                <span class="graph-card__title">{% trans "Saved graphs" %}</span>
+                            </div>
+                            <div class="graph-card__body">
+                                <div id="graphSavedBar" class="graph-saved-bar">
+                                    <input type="text"
+                                           id="graphSaveName"
+                                           class="form-input graph-saved-bar__input"
+                                           placeholder="{% trans "Graph name" %}"
+                                           maxlength="200">
+                                    <button type="button" id="graphSaveBtn" class="btn-control-library">{% trans "Save current graph" %}</button>
+                                </div>
+                                <div id="graphSavedStatus" class="library-io__status" role="status"></div>
+                                <div id="graphSavedList" class="graph-saved-list"></div>
+                            </div>
+                        </div>
                         <!-- How It Works (old-direct parity, slice 3a): the
                              three relatedness signals the graph renders.
                              Static explainer, translated like every other
