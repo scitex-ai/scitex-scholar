@@ -137,6 +137,24 @@ msgstr "ソース"
 msgid "All sources"
 msgstr "すべてのソース"
 
+msgid "Toggle abstract display"
+msgstr "抄録の表示を切り替え"
+
+msgid "Abstract: truncated"
+msgstr "抄録：省略表示"
+
+msgid "Open selected papers in new tabs"
+msgstr "選択した論文を新しいタブで開く"
+
+msgid "Open URLs"
+msgstr "URLを開く"
+
+msgid "Download BibTeX for the selected results"
+msgstr "選択した結果のBibTeXをダウンロード"
+
+msgid "Export BibTeX"
+msgstr "BibTeXをエクスポート"
+
 msgid "Select all"
 msgstr "すべて選択"
 
@@ -436,6 +454,24 @@ msgstr "%(total)s 件中 %(saved)s 件を保存"
 
 msgid "Enriched %(done)s of %(total)s"
 msgstr "%(total)s 件中 %(done)s 件を補完"
+
+msgid "Abstract: full"
+msgstr "抄録：全文表示"
+
+msgid "Select results first."
+msgstr "先に結果を選択してください。"
+
+msgid "No DOI links in selection."
+msgstr "選択範囲にDOIリンクがありません。"
+
+msgid "Copied %(n)s BibTeX entry"
+msgstr "%(n)s 件のBibTeXエントリをコピーしました"
+
+msgid "Copied %(n)s BibTeX entries"
+msgstr "%(n)s 件のBibTeXエントリをコピーしました"
+
+msgid "Copy failed"
+msgstr "コピーに失敗しました"
 
 msgid "No papers with a DOI in your library yet."
 msgstr "ライブラリにはDOI付きの論文がまだありません。"

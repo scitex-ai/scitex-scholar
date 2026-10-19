@@ -241,6 +241,17 @@
                                         <option value="" selected>{% trans "All sources" %}</option>
                                     </select>
                                     <span class="search-results-toolbar__sep" aria-hidden="true"></span>
+                                    <!--
+                                        Slice 3 (old-direct unification): the
+                                        results-header tools. Old-direct offers
+                                        an abstract truncated/full toggle, an
+                                        open-selected-URLs button, and an
+                                        export-selected-BibTeX button -- all
+                                        client-side over the checked rows.
+                                    -->
+                                    <button type="button" id="searchAbstractToggle" class="btn-control-library" data-mode="truncated" title="{% trans "Toggle abstract display" %}">{% trans "Abstract: truncated" %}</button>
+                                    <button type="button" id="searchOpenUrls" class="btn-control-library" title="{% trans "Open selected papers in new tabs" %}">{% trans "Open URLs" %}</button>
+                                    <button type="button" id="searchExportBibtex" class="btn-control-library" title="{% trans "Download BibTeX for the selected results" %}">{% trans "Export BibTeX" %}</button>
                                     <div class="search-bulk-bar" id="searchBulkBar">
                                         <label class="search-bulk-bar__select-all">
                                             <input type="checkbox" id="searchSelectAll">

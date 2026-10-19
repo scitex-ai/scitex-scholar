@@ -550,6 +550,15 @@ def _js_i18n_dict() -> dict:
         "Select results to save.": _i18n("Select results to save."),
         "Saved %(saved)s of %(total)s": _i18n("Saved %(saved)s of %(total)s"),
         "Enriched %(done)s of %(total)s": _i18n("Enriched %(done)s of %(total)s"),
+        # Search tab slice 3 (old-direct unification): the results-header
+        # tools render these client-side -- same catalog-visibility rule.
+        "Abstract: truncated": _i18n("Abstract: truncated"),
+        "Abstract: full": _i18n("Abstract: full"),
+        "Select results first.": _i18n("Select results first."),
+        "No DOI links in selection.": _i18n("No DOI links in selection."),
+        "Copied %(n)s BibTeX entry": _i18n("Copied %(n)s BibTeX entry"),
+        "Copied %(n)s BibTeX entries": _i18n("Copied %(n)s BibTeX entries"),
+        "Copy failed": _i18n("Copy failed"),
         # Graph tab slice 3a (old-direct parity): the library-seed picker
         # renders these client-side, so each MUST be a key here -- an
         # English literal in citation-graph.js is invisible to the catalog
