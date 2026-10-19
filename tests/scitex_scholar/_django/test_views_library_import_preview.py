@@ -53,12 +53,16 @@ def test_preview_returns_entries_without_saving(tmp_path):
     )
     # Assert
     body = json.loads(resp.content)
-    assert resp.status_code == 200
-    assert body["preview"] is True and len(body["entries"]) == 1
     entry = body["entries"][0]
-    assert entry["title"] == "Preview Paper" and entry["doi"] == "10.1/preview"
-    assert entry["exists"] is False
-    assert not (tmp_path / "MASTER").exists()
+    assert (
+        resp.status_code,
+        body["preview"],
+        len(body["entries"]),
+        entry["title"],
+        entry["doi"],
+        entry["exists"],
+        (tmp_path / "MASTER").exists(),
+    ) == (200, True, 1, "Preview Paper", "10.1/preview", False, False)
 
 
 def test_preview_flags_entries_already_in_library(tmp_path):
@@ -81,8 +85,7 @@ def test_preview_rejects_empty_bibtex_without_saving(tmp_path):
         _req(tmp_path, {"format": "bibtex", "bibtex": "  ", "preview": "1"})
     )
     # Assert
-    assert resp.status_code == 400
-    assert not (tmp_path / "MASTER").exists()
+    assert (resp.status_code, (tmp_path / "MASTER").exists()) == (400, False)
 
 
 def test_confirm_path_still_imports(tmp_path):

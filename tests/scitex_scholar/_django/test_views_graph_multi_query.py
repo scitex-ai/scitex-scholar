@@ -54,19 +54,21 @@ def test_graph_network_multi_builds_from_each_doi():
     # Act
     resp = views.graph_network_multi(request, _builder=builder)
     # Assert
-    assert resp.status_code == 200
-    assert builder.calls == [
-        (
-            "dois",
-            ["10.1/a", "10.1/b"],
-            {
-                "num_related_per_doi": 5,
-                "weight_coupling": 2.0,
-                "weight_cocitation": 2.0,
-                "weight_direct": 1.0,
-            },
-        )
-    ]
+    assert (resp.status_code, builder.calls) == (
+        200,
+        [
+            (
+                "dois",
+                ["10.1/a", "10.1/b"],
+                {
+                    "num_related_per_doi": 5,
+                    "weight_coupling": 2.0,
+                    "weight_cocitation": 2.0,
+                    "weight_direct": 1.0,
+                },
+            )
+        ],
+    )
 
 
 def test_graph_network_multi_caps_seed_count():
@@ -77,8 +79,7 @@ def test_graph_network_multi_caps_seed_count():
     # Act
     resp = views.graph_network_multi(request, _builder=builder)
     # Assert
-    assert resp.status_code == 400
-    assert builder.calls == []
+    assert (resp.status_code, builder.calls) == (400, [])
 
 
 def test_graph_network_multi_rejects_overlong_doi():
@@ -90,8 +91,7 @@ def test_graph_network_multi_rejects_overlong_doi():
     # Act
     resp = views.graph_network_multi(request, _builder=builder)
     # Assert
-    assert resp.status_code == 400
-    assert builder.calls == []
+    assert (resp.status_code, builder.calls) == (400, [])
 
 
 def test_graph_network_query_requires_q_param():
@@ -111,19 +111,21 @@ def test_graph_network_query_builds_from_query_text():
     # Act
     resp = views.graph_network_query(request, _builder=builder)
     # Assert
-    assert resp.status_code == 200
-    assert builder.calls == [
-        (
-            "query",
-            "hippocampus",
-            {
-                "num_related_per_doi": 5,
-                "weight_coupling": 2.0,
-                "weight_cocitation": 2.0,
-                "weight_direct": 1.0,
-            },
-        )
-    ]
+    assert (resp.status_code, builder.calls) == (
+        200,
+        [
+            (
+                "query",
+                "hippocampus",
+                {
+                    "num_related_per_doi": 5,
+                    "weight_coupling": 2.0,
+                    "weight_cocitation": 2.0,
+                    "weight_direct": 1.0,
+                },
+            )
+        ],
+    )
 
 
 def test_graph_network_query_marks_uncached_results():
