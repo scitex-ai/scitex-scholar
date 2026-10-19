@@ -139,6 +139,45 @@
                                             </div>
                                             <p class="search-sources-hint">{% trans "Uncheck sources to narrow the search. All checked searches the default set." %}</p>
                                         </div>
+                                        <!--
+                                            Slice 2 (old-direct unification): the
+                                            Filters rows. Old-direct renders
+                                            year/citations/impact-factor range
+                                            sliders feeding hidden inputs; the
+                                            leaf uses native number inputs (no
+                                            slider dependency) with the same
+                                            hub param names. Empty means
+                                            unbounded on that side.
+                                        -->
+                                        <div class="search-advanced__row search-advanced__row--stack">
+                                            <span class="form-label" id="searchFiltersLabel">{% trans "Filters" %}</span>
+                                            <div class="search-filters-grid" role="group" aria-labelledby="searchFiltersLabel">
+                                                <label class="search-filters-grid__item">
+                                                    <span class="search-filters-grid__name">{% trans "Year from" %}</span>
+                                                    <input type="number" id="searchYearFrom" class="form-input" min="1000" max="2100" step="1" inputmode="numeric">
+                                                </label>
+                                                <label class="search-filters-grid__item">
+                                                    <span class="search-filters-grid__name">{% trans "Year to" %}</span>
+                                                    <input type="number" id="searchYearTo" class="form-input" min="1000" max="2100" step="1" inputmode="numeric">
+                                                </label>
+                                                <label class="search-filters-grid__item">
+                                                    <span class="search-filters-grid__name">{% trans "Min citations" %}</span>
+                                                    <input type="number" id="searchMinCitations" class="form-input" min="0" step="1" inputmode="numeric">
+                                                </label>
+                                                <label class="search-filters-grid__item">
+                                                    <span class="search-filters-grid__name">{% trans "Max citations" %}</span>
+                                                    <input type="number" id="searchMaxCitations" class="form-input" min="0" step="1" inputmode="numeric">
+                                                </label>
+                                                <label class="search-filters-grid__item">
+                                                    <span class="search-filters-grid__name">{% trans "Min impact factor" %}</span>
+                                                    <input type="number" id="searchMinImpact" class="form-input" min="0" step="0.1" inputmode="decimal">
+                                                </label>
+                                                <label class="search-filters-grid__item">
+                                                    <span class="search-filters-grid__name">{% trans "Max impact factor" %}</span>
+                                                    <input type="number" id="searchMaxImpact" class="form-input" min="0" step="0.1" inputmode="decimal">
+                                                </label>
+                                            </div>
+                                        </div>
                                         <div class="search-advanced__row">
                                             <label class="search-advanced__check">
                                                 <input type="checkbox" id="searchNoCache">

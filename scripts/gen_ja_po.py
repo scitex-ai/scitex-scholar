@@ -241,6 +241,14 @@ JA = {
     "Uncheck sources to narrow the search. All checked searches the default set.":
         "ソースのチェックを外すと検索範囲が狭まります。すべて選択時はデフォルト設定で検索します。",
     "Selected sources": "選択したソース",
+    # Slice 2 (old-direct unification): the Filters grid labels.
+    "Filters": "絞り込み",
+    "Year from": "開始年",
+    "Year to": "終了年",
+    "Min citations": "最小被引用数",
+    "Max citations": "最大被引用数",
+    "Min impact factor": "最小インパクトファクター",
+    "Max impact factor": "最大インパクトファクター",
     "Imported %(n)s paper from %(file)s": "%(file)s から %(n)s 件の論文をインポートしました",
     "Imported %(n)s papers from %(file)s": "%(file)s から %(n)s 件の論文をインポートしました",
     "Save": "保存",
