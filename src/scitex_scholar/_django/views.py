@@ -947,6 +947,13 @@ def search(request, _engine=None):
         )
     sources = normalize_sources(sources_raw) if sources_raw else None
 
+    # Explicit range filters (old-direct Filters sliders, hub hidden-input
+    # names). Malformed numbers and inverted ranges fail closed (400), the
+    # same convention as max_results/mode above.
+    range_filters, range_error = _parse_range_filters(request.GET)
+    if range_error:
+        return JsonResponse({"error": range_error}, status=400)
+
     use_cache = request.GET.get("no_cache", "false").lower() != "true"
     cache_key = _make_cache_key(
         "search",
@@ -955,6 +962,7 @@ def search(request, _engine=None):
         mode=mode,
         max_results=max_results,
         sources=",".join(sources) if sources else "",
+        filters=json.dumps(range_filters, sort_keys=True) if range_filters else "",
     )
     if use_cache:
         cached = _cache_get(cache_key)
@@ -966,7 +974,11 @@ def search(request, _engine=None):
         engine = _engine or _get_search_engine()
         result = asyncio.run(
             engine.search(
-                query=query, mode=mode, max_results=max_results, sources=sources
+                query=query,
+                mode=mode,
+                max_results=max_results,
+                sources=sources,
+                filters=range_filters,
             )
         )
         _strip_markup_from_search_abstracts(result)
@@ -1032,6 +1044,67 @@ _MAX_DOI_CHARS = 500
 #: `?sources=a,b,c`). Same fan-out class as _MAX_DOI_CHARS (cache key +
 #: engine fan-out); 500 chars is far past the seven known names (~80 chars).
 _MAX_SOURCES_CHARS = 500
+
+#: Bounds for the explicit range filters (old-direct Filters section, hub
+#: hidden-input names). A bound outside these is a client bug, not a search.
+_MIN_FILTER_YEAR = 1000
+_MAX_FILTER_YEAR = 2100
+_MAX_FILTER_CITATIONS = 100_000_000
+_MAX_FILTER_IMPACT_FACTOR = 1000.0
+
+
+def _parse_range_filters(params) -> tuple:
+    """Map hub range params to pipeline threshold keys.
+
+    Returns (filters_or_None, error_or_None). Empty strings count as
+    absent; malformed numbers, out-of-range values, and inverted ranges
+    return an error message for the view to fail closed with (400).
+    """
+    int_bounds = {
+        "year_from": ("min_year", _MIN_FILTER_YEAR, _MAX_FILTER_YEAR),
+        "year_to": ("max_year", _MIN_FILTER_YEAR, _MAX_FILTER_YEAR),
+        "min_citations": ("min_citations", 0, _MAX_FILTER_CITATIONS),
+        "max_citations": ("max_citations", 0, _MAX_FILTER_CITATIONS),
+    }
+    float_bounds = {
+        "min_impact_factor": ("min_impact_factor", 0.0, _MAX_FILTER_IMPACT_FACTOR),
+        "max_impact_factor": ("max_impact_factor", 0.0, _MAX_FILTER_IMPACT_FACTOR),
+    }
+    filters: dict = {}
+    for name, (key, lo, hi) in int_bounds.items():
+        raw = (params.get(name, "") or "").strip()
+        if not raw:
+            continue
+        try:
+            value = int(raw)
+        except ValueError:
+            return None, f"{name} must be an integer"
+        if not lo <= value <= hi:
+            return None, f"{name} must be between {lo} and {hi}"
+        filters[key] = value
+    for name, (key, lo, hi) in float_bounds.items():
+        raw = (params.get(name, "") or "").strip()
+        if not raw:
+            continue
+        try:
+            value = float(raw)
+        except ValueError:
+            return None, f"{name} must be a number"
+        if not lo <= value <= hi:
+            return None, f"{name} must be between {lo} and {hi}"
+        filters[key] = value
+    for low_key, high_key in (
+        ("min_year", "max_year"),
+        ("min_citations", "max_citations"),
+        ("min_impact_factor", "max_impact_factor"),
+    ):
+        if (
+            low_key in filters
+            and high_key in filters
+            and filters[low_key] > filters[high_key]
+        ):
+            return None, f"{low_key} must not exceed {high_key}"
+    return (filters or None), None
 
 #: Largest accepted Connected Papers seed id (Semantic Scholar 40-char SHA
 #: or DOI). Same fan-out class as _MAX_DOI_CHARS (cache key + upstream fetch

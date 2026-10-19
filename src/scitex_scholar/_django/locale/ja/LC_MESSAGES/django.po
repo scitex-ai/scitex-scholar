@@ -71,6 +71,27 @@ msgstr "OpenAlex — 学術成果物のオープンカタログ"
 msgid "Uncheck sources to narrow the search. All checked searches the default set."
 msgstr "ソースのチェックを外すと検索範囲が狭まります。すべて選択時はデフォルト設定で検索します。"
 
+msgid "Filters"
+msgstr "絞り込み"
+
+msgid "Year from"
+msgstr "開始年"
+
+msgid "Year to"
+msgstr "終了年"
+
+msgid "Min citations"
+msgstr "最小被引用数"
+
+msgid "Max citations"
+msgstr "最大被引用数"
+
+msgid "Min impact factor"
+msgstr "最小インパクトファクター"
+
+msgid "Max impact factor"
+msgstr "最大インパクトファクター"
+
 msgid "Ignore cache"
 msgstr "キャッシュを無視"
 

@@ -26,6 +26,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const maxResults = document.getElementById("searchMaxResults");
   const modeSelect = document.getElementById("searchMode");
   const sourcesGrid = document.getElementById("searchSourcesGrid");
+  // Slice 2 (old-direct unification): the Filters number inputs. Empty
+  // means unbounded; non-empty values travel under the hub param names.
+  const filterInputs = {
+    year_from: document.getElementById("searchYearFrom"),
+    year_to: document.getElementById("searchYearTo"),
+    min_citations: document.getElementById("searchMinCitations"),
+    max_citations: document.getElementById("searchMaxCitations"),
+    min_impact_factor: document.getElementById("searchMinImpact"),
+    max_impact_factor: document.getElementById("searchMaxImpact"),
+  };
   const noCache = document.getElementById("searchNoCache");
   const loading = document.getElementById("searchLoading");
   const errorBox = document.getElementById("searchError");
@@ -524,6 +534,12 @@ document.addEventListener("DOMContentLoaded", () => {
           params.set("sources", checked.join(","));
         }
       }
+      // Slice 2: range filters travel only when set; the backend fails
+      // closed (400) on malformed values and surfaces the message.
+      Object.keys(filterInputs).forEach((name) => {
+        const el = filterInputs[name];
+        if (el && el.value.trim() !== "") params.set(name, el.value.trim());
+      });
       if (noCache && noCache.checked) params.set("no_cache", "true");
       const response = await fetch(`${STX_MOUNT}/api/search?${params}`);
       const data = await response.json();

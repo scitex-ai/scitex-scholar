@@ -33,6 +33,7 @@ from typing import Any, Dict, List
 import scitex_logging as logging
 
 from scitex_scholar.core import Paper
+from scitex_scholar.pipelines._search_thresholds import apply_threshold_filters
 from scitex_scholar.search_engines._source_tiers import (
     build_tiered_engines,
     declared_source_tiers,
@@ -203,6 +204,10 @@ class ScholarPipelineSearchSingle:
 
         # Enrich papers with impact factors
         unique_papers = self._enrich_impact_factors(unique_papers)
+
+        # Apply threshold filters (same bounds as the parallel pipeline --
+        # old-direct's Filters section applies whatever the mode).
+        unique_papers = apply_threshold_filters(unique_papers, filters)
 
         # Sort if requested
         sort_by = filters.get("sort_by", "relevance")

@@ -30,7 +30,7 @@ class _RecordingEngine:
     def __init__(self):
         self.calls = []
 
-    async def search(self, query, mode=None, max_results=20, sources=None):
+    async def search(self, query, mode=None, max_results=20, sources=None, filters=None):
         self.calls.append(sources)
         return {"results": [], "metadata": {"engine_counts": {}}}
 
