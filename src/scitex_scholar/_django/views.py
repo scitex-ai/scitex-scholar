@@ -559,6 +559,23 @@ def _js_i18n_dict() -> dict:
         "Copied %(n)s BibTeX entry": _i18n("Copied %(n)s BibTeX entry"),
         "Copied %(n)s BibTeX entries": _i18n("Copied %(n)s BibTeX entries"),
         "Copy failed": _i18n("Copy failed"),
+        # Library tab slice 4b (old-direct unification): the per-row
+        # details panel renders these client-side -- same rule.
+        "To read": _i18n("To read"),
+        "Reading": _i18n("Reading"),
+        "Read": _i18n("Read"),
+        "Referenced": _i18n("Referenced"),
+        "Favorite": _i18n("Favorite"),
+        "Reading status": _i18n("Reading status"),
+        "Importance": _i18n("Importance"),
+        "Tags": _i18n("Tags"),
+        "Add tag...": _i18n("Add tag..."),
+        "Personal notes": _i18n("Personal notes"),
+        "Add your notes about this paper...": _i18n(
+            "Add your notes about this paper..."
+        ),
+        "Save changes": _i18n("Save changes"),
+        "Details": _i18n("Details"),
         # Graph tab slice 3a (old-direct parity): the library-seed picker
         # renders these client-side, so each MUST be a key here -- an
         # English literal in citation-graph.js is invisible to the catalog

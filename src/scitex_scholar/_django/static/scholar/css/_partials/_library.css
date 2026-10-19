@@ -288,6 +288,94 @@
   margin-top: 4px;
 }
 
+/*
+ * Slice 4b (old-direct unification): annotation badges + per-row details
+ * panel (reading status, stars, tags, notes, save). Shapes reuse the
+ * project-chip and secondary-button tokens.
+ */
+.library-item__annotations {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+.library-item__annotations:empty {
+  display: none;
+}
+.library-annotation__chip {
+  font-size: 11px;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: 10px;
+  padding: 1px 8px;
+}
+.library-annotation__stars {
+  font-size: 12px;
+  color: var(--accent);
+  letter-spacing: 1px;
+}
+.library-item__details {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.library-details__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.library-details__status-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+.library-details__status-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-primary);
+  cursor: pointer;
+  min-height: var(--input-height, 44px);
+}
+.library-details__status-option input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+.library-details__stars {
+  display: flex;
+  gap: 2px;
+}
+.library-details__star {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+.library-details__notes {
+  min-height: 88px;
+  resize: vertical;
+}
+.library-details__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.library-details__status {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
 .library-ext {
   padding: 10px 12px;
   margin-bottom: 12px;

@@ -239,6 +239,21 @@ msgstr "タイトル、著者、DOI"
 msgid "Clear filters"
 msgstr "絞り込みを解除"
 
+msgid "Sort"
+msgstr "並べ替え"
+
+msgid "Sort library"
+msgstr "ライブラリを並べ替え"
+
+msgid "Title (Z-A)"
+msgstr "タイトル（Z-A）"
+
+msgid "Importance (highest)"
+msgstr "重要度（高）"
+
+msgid "Importance (lowest)"
+msgstr "重要度（低）"
+
 msgid "Loading your library..."
 msgstr "ライブラリを読み込み中…"
 
@@ -472,6 +487,42 @@ msgstr "%(n)s 件のBibTeXエントリをコピーしました"
 
 msgid "Copy failed"
 msgstr "コピーに失敗しました"
+
+msgid "To read"
+msgstr "未読"
+
+msgid "Reading"
+msgstr "読書中"
+
+msgid "Read"
+msgstr "既読"
+
+msgid "Referenced"
+msgstr "引用済み"
+
+msgid "Favorite"
+msgstr "お気に入り"
+
+msgid "Reading status"
+msgstr "読書状態"
+
+msgid "Importance"
+msgstr "重要度"
+
+msgid "Tags"
+msgstr "タグ"
+
+msgid "Add tag..."
+msgstr "タグを追加…"
+
+msgid "Personal notes"
+msgstr "個人メモ"
+
+msgid "Add your notes about this paper..."
+msgstr "この論文についてのメモを追加…"
+
+msgid "Save changes"
+msgstr "変更を保存"
 
 msgid "No papers with a DOI in your library yet."
 msgstr "ライブラリにはDOI付きの論文がまだありません。"
