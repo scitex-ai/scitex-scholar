@@ -6,11 +6,14 @@ its library cards offer PDF actions, while no leaf endpoint or UI
 downloads anything -- search rows carry ``pdf_url``/``is_open_access``
 but they are display-only. This slice adds ``POST
 /api/library/download-pdfs`` ({library_ids: [...], at most 10}: OA-only
-fetch via ScholarPDFDownloader into the paper dir through PaperIO, with
-per-item results) plus the two UI surfaces: a Download-PDF button in the
-Library details panel and a PDFs bulk pill on Search (saves selected via
-save-bulk, then downloads). The downloader is an injected fake (PA-306).
-Library roots bind via ``request.scholar_library_root``.
+fetch via the package's plain-HTTP OA strategy into the paper dir through
+PaperIO, with per-item results) plus the two UI surfaces: a Download-PDF
+button in the Library details panel and a PDFs bulk pill on Search (saves
+selected via save-bulk, then downloads). The fetch is an injected fake
+(PA-306). Library roots bind via ``request.scholar_library_root``.
+
+House rule STX-TQ007: one assertion per pin -- multi-part outcomes ride
+a single tuple comparison.
 """
 
 import json
@@ -82,10 +85,12 @@ def test_download_pdfs_fetches_oa_papers(tmp_path):
     )
     # Assert
     body = json.loads(resp.content)
-    assert resp.status_code == 200
-    assert body["downloaded"] == [{"library_id": "PDF00001"}]
-    assert body["failed"] == []
-    assert list((tmp_path / "MASTER" / "PDF00001").glob("*.pdf")) != []
+    assert (
+        resp.status_code,
+        body["downloaded"],
+        body["failed"],
+        list((tmp_path / "MASTER" / "PDF00001").glob("*.pdf")) != [],
+    ) == (200, [{"library_id": "PDF00001"}], [], True)
 
 
 def test_download_pdfs_skips_papers_without_oa_url(tmp_path):
@@ -98,10 +103,10 @@ def test_download_pdfs_skips_papers_without_oa_url(tmp_path):
     )
     # Assert
     body = json.loads(resp.content)
-    assert [(f["index"], f["error"]) for f in body["failed"]] == [
-        (0, "No open-access PDF available")
-    ]
-    assert body["downloaded"] == []
+    assert (
+        [(f["index"], f["error"]) for f in body["failed"]],
+        body["downloaded"],
+    ) == ([(0, "No open-access PDF available")], [])
 
 
 def test_download_pdfs_caps_batch_size(tmp_path):
@@ -126,8 +131,10 @@ def test_download_pdfs_unknown_paper_is_reported_not_raised(tmp_path):
     )
     # Assert
     body = json.loads(resp.content)
-    assert resp.status_code == 200
-    assert [(f["index"], f["error"]) for f in body["failed"]] == [(0, "Paper not found")]
+    assert (
+        resp.status_code,
+        [(f["index"], f["error"]) for f in body["failed"]],
+    ) == (200, [(0, "Paper not found")])
 
 
 def test_download_pdfs_refuses_path_traversal_ids(tmp_path):

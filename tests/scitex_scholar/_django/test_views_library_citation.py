@@ -7,6 +7,9 @@ rows). This slice adds ``GET /api/library/citation`` (?library_id=,
 ?format= over the library export formats incl. csv): the formatted
 citation string for copy-paste, 404 for unknown papers. Library roots bind
 via ``request.scholar_library_root``.
+
+House rule STX-TQ007: one assertion per pin -- multi-part outcomes ride
+a single tuple comparison.
 """
 
 import csv
@@ -55,9 +58,12 @@ def test_citation_bibtex_carries_title_and_doi(tmp_path):
     )
     # Assert
     body = json.loads(resp.content)
-    assert resp.status_code == 200
-    assert "Cited Paper" in body["citation"] and "10.1/cite" in body["citation"]
-    assert body["format"] == "bibtex"
+    assert (
+        resp.status_code,
+        "Cited Paper" in body["citation"],
+        "10.1/cite" in body["citation"],
+        body["format"],
+    ) == (200, True, True, "bibtex")
 
 
 def test_citation_csv_returns_header_and_row(tmp_path):
