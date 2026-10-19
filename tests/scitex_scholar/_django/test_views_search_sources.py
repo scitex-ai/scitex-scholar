@@ -6,6 +6,9 @@ took no ``sources`` parameter. These pins cover the thin HTTP adapter:
 hub spellings map to canonical engine names, unknown names degrade to the
 tiered default (never a 400), the selection rides the cache key, and the
 echo lands in response metadata. Engines are injected fakes (PA-306).
+
+House rule STX-TQ007: one assertion per pin -- multi-part outcomes ride
+a single tuple comparison.
 """
 
 import json
@@ -50,8 +53,7 @@ def test_search_passes_hub_source_spellings_as_canonical_names():
     # Act
     resp = views.search(request, _engine=engine)
     # Assert
-    assert resp.status_code == 200
-    assert engine.calls == [["arXiv", "PubMed"]]
+    assert (resp.status_code, engine.calls) == (200, [["arXiv", "PubMed"]])
 
 
 def test_search_drops_unknown_sources_without_failing():
@@ -61,8 +63,7 @@ def test_search_drops_unknown_sources_without_failing():
     # Act
     resp = views.search(request, _engine=engine)
     # Assert
-    assert resp.status_code == 200
-    assert engine.calls == [["arXiv"]]
+    assert (resp.status_code, engine.calls) == (200, [["arXiv"]])
 
 
 def test_search_all_unknown_sources_keeps_tiered_default():
@@ -72,8 +73,7 @@ def test_search_all_unknown_sources_keeps_tiered_default():
     # Act
     resp = views.search(request, _engine=engine)
     # Assert
-    assert resp.status_code == 200
-    assert engine.calls == [None]
+    assert (resp.status_code, engine.calls) == (200, [None])
 
 
 def test_search_without_sources_keeps_tiered_default():
@@ -83,8 +83,7 @@ def test_search_without_sources_keeps_tiered_default():
     # Act
     resp = views.search(request, _engine=engine)
     # Assert
-    assert resp.status_code == 200
-    assert engine.calls == [None]
+    assert (resp.status_code, engine.calls) == (200, [None])
 
 
 def test_search_echoes_the_selection_in_response_metadata():
@@ -94,8 +93,9 @@ def test_search_echoes_the_selection_in_response_metadata():
     # Act
     resp = views.search(request, _engine=engine)
     # Assert
-    body = json.loads(resp.content)
-    assert body["metadata"]["sources_selected"] == ["Semantic_Scholar"]
+    assert json.loads(resp.content)["metadata"]["sources_selected"] == [
+        "Semantic_Scholar"
+    ]
 
 
 def test_search_cache_varies_by_source_selection():
@@ -117,8 +117,7 @@ def test_search_rejects_overlong_sources_param():
     # Act
     resp = views.search(request, _engine=engine)
     # Assert
-    assert resp.status_code == 400
-    assert engine.calls == []
+    assert (resp.status_code, engine.calls) == (400, [])
 
 
 def test_advanced_block_carries_sources_grid():

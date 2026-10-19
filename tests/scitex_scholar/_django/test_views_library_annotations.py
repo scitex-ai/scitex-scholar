@@ -59,8 +59,11 @@ def test_validate_annotations_accepts_a_full_doc():
         }
     )
     # Assert
-    assert error is None
-    assert clean["reading_status"] == "reading" and clean["importance"] == 4
+    assert (error, clean["reading_status"], clean["importance"]) == (
+        None,
+        "reading",
+        4,
+    )
 
 
 def test_validate_annotations_rejects_unknown_status():
@@ -99,9 +102,12 @@ def test_annotate_stores_reading_status_in_the_sidecar(tmp_path):
         )
     )
     # Assert
-    assert resp.status_code == 200
-    sidecar = tmp_path / "MASTER" / "ABC12345" / "annotations.json"
-    assert json.loads(sidecar.read_text())["reading_status"] == "read"
+    assert (
+        resp.status_code,
+        json.loads((tmp_path / "MASTER" / "ABC12345" / "annotations.json").read_text())[
+            "reading_status"
+        ],
+    ) == (200, "read")
 
 
 def test_annotate_merges_partial_updates(tmp_path):
