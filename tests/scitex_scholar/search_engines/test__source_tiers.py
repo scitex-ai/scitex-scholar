@@ -420,3 +420,116 @@ def test_search_metadata_reports_the_tier_membership_for_readiness():
         ["CrossRefLocal"],
         ["CrossRef"],
     )
+
+
+# --- explicit source selection (old-direct unification slice 1) ---------------
+#
+# Hub's unified search takes ``?sources=a,b,c`` from the Sources checkbox
+# grid; a selection runs exactly those engines with no tier short-circuit,
+# while the absent/empty case keeps the tiered behaviour above untouched.
+# Single-assert pins (STX-TQ007); offline fakes through ``engines=`` (PA-306).
+
+
+def test_normalize_sources_maps_hub_names_to_canonical_engines():
+    # Arrange
+    raw = "crossref_local,openalex_local,pubmed,arxiv,semantic,crossref,openalex"
+    # Act
+    out = tiers.normalize_sources(raw)
+    # Assert
+    assert out == [
+        "CrossRefLocal",
+        "OpenAlexLocal",
+        "PubMed",
+        "arXiv",
+        "Semantic_Scholar",
+        "CrossRef",
+        "OpenAlex",
+    ]
+
+
+def test_normalize_sources_drops_unknown_names():
+    # Arrange
+    # Act
+    out = tiers.normalize_sources("arxiv,nope,pubmed")
+    # Assert
+    assert out == ["arXiv", "PubMed"]
+
+
+def test_normalize_sources_empty_means_tiered_default():
+    # Arrange
+    # Act
+    out = tiers.normalize_sources("")
+    # Assert
+    assert out is None
+
+
+def test_normalize_sources_all_unknown_means_tiered_default():
+    # Arrange -- degrade to the default path, never fail the search.
+    # Act
+    out = tiers.normalize_sources("nope,nada")
+    # Assert
+    assert out is None
+
+
+@pytest.mark.parametrize(
+    "pipeline_cls",
+    [ScholarPipelineSearchParallel, ScholarPipelineSearchSingle],
+    ids=["parallel", "single"],
+)
+def test_explicit_selection_runs_only_the_selected_engines(pipeline_cls):
+    # Arrange
+    local = _StubEngine("CrossRefLocal", results=[_result("10.1/x", "Hit")])
+    online = _StubEngine("CrossRef", results=[_result("10.1/y", "Other")])
+    pipeline = _pipeline(pipeline_cls, {"CrossRefLocal": local, "CrossRef": online})
+    # Act
+    _run(pipeline.search_async(query="hippocampus", sources=["CrossRef"]))
+    # Assert
+    assert (bool(local.calls), bool(online.calls)) == (False, True)
+
+
+@pytest.mark.parametrize(
+    "pipeline_cls",
+    [ScholarPipelineSearchParallel, ScholarPipelineSearchSingle],
+    ids=["parallel", "single"],
+)
+def test_explicit_selection_skips_the_tier_short_circuit(pipeline_cls):
+    # Arrange -- the local corpus HAS an answer, yet the user asked for the
+    # online source alone: the explicit selection wins over the tier policy.
+    local = _StubEngine("CrossRefLocal", results=[_result("10.1/x", "Hit")])
+    online = _StubEngine("CrossRef", results=[_result("10.1/y", "Other")])
+    pipeline = _pipeline(pipeline_cls, {"CrossRefLocal": local, "CrossRef": online})
+    # Act
+    out = _run(pipeline.search_async(query="hippocampus", sources=["CrossRef"]))
+    # Assert
+    assert out["metadata"]["source_tier"] == "selected"
+
+
+@pytest.mark.parametrize(
+    "pipeline_cls",
+    [ScholarPipelineSearchParallel, ScholarPipelineSearchSingle],
+    ids=["parallel", "single"],
+)
+def test_explicit_selection_reports_per_engine_counts(pipeline_cls):
+    # Arrange
+    online = _StubEngine("CrossRef", results=[_result("10.1/y", "Other")])
+    pipeline = _pipeline(pipeline_cls, {"CrossRef": online})
+    # Act
+    out = _run(pipeline.search_async(query="hippocampus", sources=["CrossRef"]))
+    # Assert
+    assert out["metadata"]["engine_counts"] == {"CrossRef": 1}
+
+
+@pytest.mark.parametrize(
+    "pipeline_cls",
+    [ScholarPipelineSearchParallel, ScholarPipelineSearchSingle],
+    ids=["parallel", "single"],
+)
+def test_absent_selection_keeps_tiered_behaviour(pipeline_cls):
+    # Arrange
+    local = _StubEngine("CrossRefLocal", results=[_result("10.1/x", "Hit")])
+    online = _StubEngine("CrossRef", results=[_result("10.1/y", "Other")])
+    pipeline = _pipeline(pipeline_cls, {"CrossRefLocal": local, "CrossRef": online})
+    # Act
+    out = _run(pipeline.search_async(query="hippocampus"))
+    # Assert
+    assert out["metadata"]["source_tier"] == "primary"

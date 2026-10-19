@@ -54,17 +54,19 @@ def test_search_maps_hub_range_params_to_threshold_keys():
     # Act
     resp = views.search(request, _engine=engine)
     # Assert
-    assert resp.status_code == 200
-    assert engine.calls == [
-        {
-            "min_year": 2020,
-            "max_year": 2024,
-            "min_citations": 5,
-            "max_citations": 100,
-            "min_impact_factor": 1.5,
-            "max_impact_factor": 20.0,
-        }
-    ]
+    assert (resp.status_code, engine.calls) == (
+        200,
+        [
+            {
+                "min_year": 2020,
+                "max_year": 2024,
+                "min_citations": 5,
+                "max_citations": 100,
+                "min_impact_factor": 1.5,
+                "max_impact_factor": 20.0,
+            }
+        ],
+    )
 
 
 def test_search_without_range_params_passes_no_filters():
@@ -74,8 +76,7 @@ def test_search_without_range_params_passes_no_filters():
     # Act
     resp = views.search(request, _engine=engine)
     # Assert
-    assert resp.status_code == 200
-    assert engine.calls == [None]
+    assert (resp.status_code, engine.calls) == (200, [None])
 
 
 def test_search_rejects_non_integer_year():
@@ -85,8 +86,7 @@ def test_search_rejects_non_integer_year():
     # Act
     resp = views.search(request, _engine=engine)
     # Assert
-    assert resp.status_code == 400
-    assert engine.calls == []
+    assert (resp.status_code, engine.calls) == (400, [])
 
 
 def test_search_rejects_inverted_year_range():
@@ -98,8 +98,7 @@ def test_search_rejects_inverted_year_range():
     # Act
     resp = views.search(request, _engine=engine)
     # Assert
-    assert resp.status_code == 400
-    assert engine.calls == []
+    assert (resp.status_code, engine.calls) == (400, [])
 
 
 def test_search_rejects_out_of_range_year():
@@ -109,8 +108,7 @@ def test_search_rejects_out_of_range_year():
     # Act
     resp = views.search(request, _engine=engine)
     # Assert
-    assert resp.status_code == 400
-    assert engine.calls == []
+    assert (resp.status_code, engine.calls) == (400, [])
 
 
 def test_search_cache_varies_by_range_filters():
