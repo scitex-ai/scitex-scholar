@@ -1,14 +1,13 @@
 /**
- * Scholar GUI - Tab Manager
+ * Scholar GUI - Producer for the SDK content-tabs primitive.
  *
- * Manages tab switching for the Scholar SPA.
- *
- * COMPASS 2026-09-10 (L316): when the active tab changes, also show or hide
- * the sidebar "Graph Controls" hint (it only applies to the Citation Graph
- * tab) so the sidebar does not present controls for a surface that is not
- * visible. The tab bar itself is unchanged: every tab keeps the same
- * min-height and the panels share the same container, so nothing jumps
- * horizontally on switch.
+ * The tab BAR is styled by scitex_sdk/ui/css/app/content-tabs.css (the SSoT
+ * sheet, linked in the workspace_assets head). This module is the producer
+ * that contract names: it owns the tablist's live state — aria-selected +
+ * roving tabindex + ArrowLeft/ArrowRight — and the CSS reads aria-selected
+ * only, so the selected look can never fork from the shared primitive.
+ * Scholar keeps just its panel show/hide (.tab-panel/.active in _layout.css);
+ * panels are not part of the shared primitive.
  *
  * Mobile swipe (operator request 2026-10-16, figrecipe parity): on phone
  * layouts the tabs also switch by horizontal swipe, following the SDK Panes
@@ -58,36 +57,61 @@ function initScholarTabs(root) {
   if (initializedRoots.has(root)) return;
   initializedRoots.add(root);
 
-  const tabs = Array.from(root.querySelectorAll(".tab-btn"));
+  // Producer state for the SDK content-tabs primitive: the shared sheet reads
+  // aria-selected only, so selection lives in attributes, never in
+  // leaf-owned classes.
+  const tabs = Array.from(root.querySelectorAll(".stx-content-tabs__tab"));
   const panels = root.querySelectorAll(".tab-panel");
   const graphHint = root.querySelector("[data-graph-hint]");
 
-  function syncGraphHint(activeTab) {
-    if (!graphHint) return;
-    graphHint.classList.toggle("hidden", activeTab !== "graph");
+  function tabKey(tab) {
+    return (tab.getAttribute("aria-controls") || "").replace(/^tab-/, "");
   }
 
-  function activateTab(tab) {
-    const target = tab.dataset.tab;
+  function syncGraphHint(key) {
+    if (!graphHint) return;
+    graphHint.classList.toggle("hidden", key !== "graph");
+  }
 
-    tabs.forEach((t) => t.classList.remove("active"));
+  function activateTab(tab, focus) {
+    tabs.forEach((t) => {
+      const selected = t === tab;
+      t.setAttribute("aria-selected", String(selected));
+      t.tabIndex = selected ? 0 : -1;
+    });
     panels.forEach((p) => p.classList.remove("active"));
 
-    tab.classList.add("active");
-    const panel = root.querySelector("#tab-" + target);
+    const controls = tab.getAttribute("aria-controls");
+    const panel = controls
+      ? root.querySelector("#" + CSS.escape(controls))
+      : null;
     if (panel) panel.classList.add("active");
 
-    syncGraphHint(target);
+    if (focus) tab.focus();
+    syncGraphHint(tabKey(tab));
   }
 
-  function stepTab(delta) {
-    const index = tabs.findIndex((t) => t.classList.contains("active"));
+  function stepTab(delta, focus) {
+    const index = tabs.findIndex(
+      (t) => t.getAttribute("aria-selected") === "true",
+    );
     const next = tabs[index + delta];
-    if (next) activateTab(next);
+    if (next) activateTab(next, focus);
   }
 
   tabs.forEach((tab) => {
-    tab.addEventListener("click", () => activateTab(tab));
+    tab.addEventListener("click", () => activateTab(tab, false));
+    // Roving tabindex: ArrowLeft/ArrowRight move selection AND focus, per
+    // the content-tabs producer contract (arrows only — no Home/End).
+    tab.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        stepTab(1, true);
+      } else if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        stepTab(-1, true);
+      }
+    });
   });
 
   // Horizontal swipe-to-switch-tab, phone layouts only.
@@ -145,10 +169,12 @@ function initScholarTabs(root) {
     });
   }
 
-  // Initial state: the default active tab is Search (see scholar.html), so the
-  // graph hint is hidden on load.
-  const initial = root.querySelector(".tab-btn.active");
-  if (initial) syncGraphHint(initial.dataset.tab);
+  // Initial state: the default selected tab is Search (see
+  // workspace_content.html), so the graph hint is hidden on load.
+  const initial = root.querySelector(
+    '.stx-content-tabs__tab[aria-selected="true"]',
+  );
+  if (initial) syncGraphHint(tabKey(initial));
 }
 
 function initScholarRoots() {

@@ -19,14 +19,20 @@
                 ever renders an empty column. -->
             <!-- Main Content -->
             <main class="app-main">
-                <!-- Tab Navigation: Search is the primary, default action. -->
-                <nav class="tab-nav">
-                    <button class="tab-btn active" data-tab="search">{% trans "Search databases" %}</button>
-                    <button class="tab-btn" data-tab="library">{% trans "Library" %}</button>
-                    <button class="tab-btn" data-tab="graph">{% trans "Citation Graph" %}</button>
-                </nav>
+                <!-- Tab Navigation: Search is the primary, default action.
+                    SDK SSoT content-tabs primitive
+                    (scitex_sdk/ui/css/app/content-tabs.css, linked in the
+                    workspace_assets head): the shared sheet owns the tab
+                    layout and the selected state, read from aria-selected.
+                    Roving tabindex + ArrowLeft/ArrowRight live in app.js,
+                    the producer. Search stays the default selected tab. -->
+                <div class="stx-content-tabs" role="tablist" aria-label="{% trans "SciTeX Scholar" %}">
+                    <button type="button" class="stx-content-tabs__tab" role="tab" id="scholar-tab-search" aria-selected="true" aria-controls="tab-search" tabindex="0">{% trans "Search databases" %}</button>
+                    <button type="button" class="stx-content-tabs__tab" role="tab" id="scholar-tab-library" aria-selected="false" aria-controls="tab-library" tabindex="-1">{% trans "Library" %}</button>
+                    <button type="button" class="stx-content-tabs__tab" role="tab" id="scholar-tab-graph" aria-selected="false" aria-controls="tab-graph" tabindex="-1">{% trans "Citation Graph" %}</button>
+                </div>
                 <!-- Search Tab (default) -->
-                <div id="tab-search" class="tab-panel active">
+                <div id="tab-search" class="tab-panel active" role="tabpanel" aria-labelledby="scholar-tab-search" tabindex="0">
                     <div class="citation-graph-container">
                         <!-- Input Form -->
                         <div class="graph-card">
@@ -169,7 +175,7 @@
                      contextual (per-paper) Enrichment action. Enrichment is an
                      operation ON a library item (#106), not a top-level tab
                      (#105 kept it off the nav). -->
-                <div id="tab-library" class="tab-panel">
+                <div id="tab-library" class="tab-panel" role="tabpanel" aria-labelledby="scholar-tab-library" tabindex="0">
                     <div class="citation-graph-container">
                         <div class="graph-card">
                             <div class="graph-card__header">
@@ -305,7 +311,7 @@
                     </div>
                 </div>
                 <!-- Citation Graph Tab (demoted: no longer the default) -->
-                <div id="tab-graph" class="tab-panel">
+                <div id="tab-graph" class="tab-panel" role="tabpanel" aria-labelledby="scholar-tab-graph" tabindex="0">
                     <div class="citation-graph-container">
                         <!-- Input Form -->
                         <div class="graph-card">
