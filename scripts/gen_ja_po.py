@@ -291,6 +291,8 @@ JA = {
     "Previewing %(n)s papers from %(file)s": "%(file)s から %(n)s 件の論文をプレビュー中",
     "Importing %(file)s…": "%(file)s をインポート中…",
     "Already in library": "登録済み",
+    # Slice 7 (old-direct unification): the CSV export option.
+    "CSV (.csv)": "CSV (.csv)",
     "Imported %(n)s paper from %(file)s": "%(file)s から %(n)s 件の論文をインポートしました",
     "Imported %(n)s papers from %(file)s": "%(file)s から %(n)s 件の論文をインポートしました",
     "Save": "保存",

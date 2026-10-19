@@ -3454,7 +3454,7 @@ def test_ja_catalog_translates_every_msgid():
     # them would be wrong, not a missed translation).
     proper_nouns = {
         "SciTeX Scholar", "DOI", "CrossRef API",
-        "BibTeX (.bib)", "RIS (.ris)", "EndNote (.enw)",
+        "BibTeX (.bib)", "RIS (.ris)", "EndNote (.enw)", "CSV (.csv)",
         "Zotero", "Connected Papers",
     }
     # Act
