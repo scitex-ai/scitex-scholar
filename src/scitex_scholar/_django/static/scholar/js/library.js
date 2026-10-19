@@ -310,8 +310,9 @@ document.addEventListener("DOMContentLoaded", () => {
     let importance = typeof ann.importance === "number" ? ann.importance : 0;
     const starBtns = [];
     const paintStars = () => {
-      starBtns.forEach((btn, i) => {
-        btn.textContent = i < importance ? "★" : "☆";
+      // forEach index idx is 0-based: the first `importance` buttons fill.
+      starBtns.forEach((btn, idx) => {
+        btn.textContent = idx < importance ? "★" : "☆";
       });
     };
     for (let i = 1; i <= 5; i += 1) {
