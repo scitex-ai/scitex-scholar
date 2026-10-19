@@ -169,15 +169,39 @@ def test_library_list_project_filter_narrows_to_filed(tmp_path):
         assert [p["paper_id"] for p in data["papers"]] == ["PID1"]
 
 
-def test_library_list_rejects_traversal_project(tmp_path):
-    """?project= is a path component; traversal fails closed."""
+def test_library_list_ignores_traversal_project(tmp_path):
+    """?project= never fails the listing: traversal drops to unfiltered.
+
+    The LIST filter only narrows (string compare); it never touches the
+    filesystem with the value, so an unsafe name loses no jail property by
+    degrading to unfiltered. WRITES stay fail-closed (see the save test
+    below). Measured live: a hub `owner/repo` selection broke the Library
+    view; the passive listing must never break on a selection.
+    """
     # Arrange
     with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="PIDT", doi="10.3c/t", title="T")
         rf = RequestFactory()
         # Act
         resp = views.library_list(rf.get("/api/library?project=../MASTER"))
+        data = _json.loads(resp.content)
         # Assert
-        assert resp.status_code == 400
+        assert resp.status_code == 200
+        assert [p["paper_id"] for p in data["papers"]] == ["PIDT"]
+
+
+def test_library_list_ignores_hub_style_project_id(tmp_path):
+    """?project=owner/repo (mounted host id) lists unfiltered, never 4xx."""
+    # Arrange
+    with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="PIDH", doi="10.3c/h", title="H")
+        rf = RequestFactory()
+        # Act
+        resp = views.library_list(rf.get("/api/library?project=ywatanabe/dotfiles"))
+        data = _json.loads(resp.content)
+        # Assert
+        assert resp.status_code == 200
+        assert [p["paper_id"] for p in data["papers"]] == ["PIDH"]
 
 
 def test_library_save_files_into_project(tmp_path):

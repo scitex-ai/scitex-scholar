@@ -1280,18 +1280,28 @@ def library_list(request):
         )
     project = (request.GET.get("project") or "").strip()
     if project:
-        # A filter that escapes the library root fails closed, like the
-        # filing path. The message is fixed; the value is never echoed.
+        # A filter that names no filing location under this request's root
+        # never fails the listing: it simply corresponds to nothing filed
+        # here, so the filter is dropped and the request-bound root lists
+        # unfiltered. That covers unsafe names (a mounted host's
+        # `owner/repo` project id carries a separator -- measured live as a
+        # broken Library view on every hub project selection), reserved
+        # store names, and missing/non-directory targets alike. The value
+        # never reaches the filesystem on this path (string compare only),
+        # so dropping it loses no jail property; WRITES (library_save and
+        # save-bulk) stay fail-closed via _checked_project_dir. The message
+        # stays fixed and the value is never echoed.
         try:
             _assert_safe_project_name(project)
-        except ValueError as e:
-            return JsonResponse({"error": str(e)}, status=400)
-        # The filter names a FILING location: it narrows only when that
-        # project exists under this request's library root. A selection
-        # that corresponds to nothing here (a hand-typed query, or a
-        # mounted host's project id) leaves the request-bound root alone --
-        # an explicit project selection never redirects the listing.
-        if (root / project).is_symlink() or not (root / project).is_dir():
+            _safe_project = True
+        except ValueError:
+            _safe_project = False
+        if not _safe_project or (root / project).is_symlink() or not (root / project).is_dir():
+            # The filter names a FILING location: it narrows only when that
+            # project exists under this request's library root. A selection
+            # that corresponds to nothing here (a hand-typed query, or a
+            # mounted host's project id) leaves the request-bound root alone --
+            # an explicit project selection never redirects the listing.
             project = ""
     try:
         command = _parse_library_query(query)
