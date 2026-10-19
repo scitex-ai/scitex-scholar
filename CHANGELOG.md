@@ -5,6 +5,14 @@ All notable changes to `scitex-scholar` are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [1.17.0] - 2026-10-19
+
+### Added
+- Retry on Scholar error fallback states (UX standard, PR #232).
+- Decluttered Scholar results header (CCT4429, PR #231).
+
 ## [1.16.0] - 2026-10-18
 
 ### Added
