@@ -7,6 +7,27 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.18.0] - 2026-10-19
+
+Old-direct unification, 11 slices (PR #237-#247), plus Scholar tabs
+convergence onto the SDK content-tabs SSoT primitive (PR #236):
+
+### Added
+- Search Sources grid end to end (?sources=) (slice 1, PR #237).
+- Search range filters: year, cites, IF (slice 2, PR #238).
+- Results-header tools: abstract toggle, open URLs, BibTeX (slice 3,
+  PR #239).
+- Library annotations: sidecar backend + details UI (slice 4, PR #240).
+- BibTeX import preview-before-save (slice 5, PR #241).
+- Graph multi-seed + query builds API parity (slice 6, PR #242).
+- CSV library export (slice 7, PR #243).
+- Single-paper citation endpoint (slice 8, PR #244).
+- Saved-graphs UI: save/load/delete (slice 9, PR #245).
+- Library remove + graph rename close-out writes (slice 10, PR #246).
+- Open-access PDF download (slice 11, PR #247).
+- Scholar tabs converged onto the SDK content-tabs SSoT primitive
+  (PR #236).
+
 ## [1.17.0] - 2026-10-19
 
 ### Added
