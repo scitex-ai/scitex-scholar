@@ -564,46 +564,137 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const importBtn = document.getElementById("libraryImportBtn");
   const importFile = document.getElementById("libraryImportFile");
+  // Slice 5 (old-direct unification): preview-before-save. The chosen file's
+  // text is held here between the preview POST and the confirm POST.
+  const importPreview = document.getElementById("libraryImportPreview");
+  const importEntries = document.getElementById("libraryImportEntries");
+  const importConfirmBtn = document.getElementById("libraryImportConfirm");
+  const importCancelBtn = document.getElementById("libraryImportCancel");
+  let pendingImportText = "";
+  let pendingImportName = "";
+
+  function importHeaders() {
+    // CSRF: the mounted hub enables CsrfViewMiddleware, so the Import POST
+    // must carry the token. Read it from the hidden input rendered by the
+    // {% csrf_token %} tag (populated by the middleware when enabled;
+    // empty/inert standalone).
+    const csrfInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
+    const csrf = csrfInput ? csrfInput.value : "";
+    const headers = { "Content-Type": "application/x-www-form-urlencoded" };
+    if (csrf) headers["X-CSRFToken"] = csrf;
+    return headers;
+  }
+
+  function renderImportPreview(entries) {
+    importEntries.replaceChildren();
+    entries.forEach((entry) => {
+      const row = document.createElement("div");
+      row.className = "library-import-preview__entry";
+      const title = document.createElement("div");
+      title.className = "library-import-preview__title";
+      title.textContent = entry.title || scholarT("Untitled");
+      row.appendChild(title);
+      const meta = document.createElement("div");
+      meta.className = "library-import-preview__meta";
+      const bits = [];
+      if ((entry.authors || []).length) bits.push(entry.authors.join(", "));
+      if (entry.year) bits.push(String(entry.year));
+      if (entry.doi) bits.push(entry.doi);
+      meta.textContent = bits.join(" · ");
+      row.appendChild(meta);
+      if (entry.exists) {
+        const flag = document.createElement("span");
+        flag.className = "library-import-preview__exists";
+        flag.textContent = scholarT("Already in library");
+        row.appendChild(flag);
+      }
+      importEntries.appendChild(row);
+    });
+    show(importPreview);
+  }
+
+  function hideImportPreview() {
+    hide(importPreview);
+    if (importEntries) importEntries.replaceChildren();
+    pendingImportText = "";
+    pendingImportName = "";
+    if (importFile) importFile.value = "";
+  }
+
+  async function confirmImport() {
+    if (!pendingImportText) return;
+    importConfirmBtn.disabled = true;
+    setIoStatus(scholarT("Importing %(file)s…", { file: pendingImportName }));
+    try {
+      const params = new URLSearchParams({ format: "bibtex", bibtex: pendingImportText });
+      const resp = await fetch(`${STX_MOUNT}/api/library/import`, {
+        method: "POST",
+        headers: importHeaders(),
+        body: params.toString(),
+      });
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.error || `Import failed (${resp.status})`);
+      // A dict keyed call, not a template literal: scholarT looks the string
+      // up verbatim, so an interpolated literal could never match the
+      // catalog and the JA page showed English here (review blocker 2).
+      setIoStatus(
+        scholarT(
+          data.imported === 1
+            ? "Imported %(n)s paper from %(file)s"
+            : "Imported %(n)s papers from %(file)s",
+          { n: data.imported, file: pendingImportName },
+        ),
+      );
+      hideImportPreview();
+      loadLibrary(true); // refresh the list to show the imported papers
+    } catch (err) {
+      setIoStatus(String(err.message || err), true);
+    } finally {
+      importConfirmBtn.disabled = false;
+    }
+  }
+
+  if (importConfirmBtn) {
+    importConfirmBtn.addEventListener("click", confirmImport);
+  }
+  if (importCancelBtn) {
+    importCancelBtn.addEventListener("click", () => {
+      hideImportPreview();
+      setIoStatus("");
+    });
+  }
   if (importBtn && importFile) {
     importBtn.addEventListener("click", () => importFile.click());
     importFile.addEventListener("change", async () => {
       const file = importFile.files && importFile.files[0];
       if (!file) return;
       importBtn.disabled = true;
-      setIoStatus(`Importing ${file.name}…`);
+      hideImportPreview();
+      setIoStatus(scholarT("Previewing %(file)s…", { file: file.name }));
       try {
         const text = await file.text();
-        const params = new URLSearchParams({ format: "bibtex", bibtex: text });
-        // CSRF: the mounted hub enables CsrfViewMiddleware, so the Import POST
-        // must carry the token. Read it from the hidden input rendered by the
-        // {% csrf_token %} tag (populated by the middleware when enabled;
-        // empty/inert standalone).
-        const csrfInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
-        const csrf = csrfInput ? csrfInput.value : "";
-        const headers = { "Content-Type": "application/x-www-form-urlencoded" };
-        if (csrf) headers["X-CSRFToken"] = csrf;
+        const params = new URLSearchParams({ format: "bibtex", bibtex: text, preview: "1" });
         const resp = await fetch(`${STX_MOUNT}/api/library/import`, {
           method: "POST",
-          headers,
+          headers: importHeaders(),
           body: params.toString(),
         });
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || `Import failed (${resp.status})`);
-        // A dict keyed call, not a template literal: scholarT looks the string
-        // up verbatim, so an interpolated literal could never match the
-        // catalog and the JA page showed English here (review blocker 2).
+        pendingImportText = text;
+        pendingImportName = file.name;
+        renderImportPreview(data.entries || []);
         setIoStatus(
           scholarT(
-            data.imported === 1
-              ? "Imported %(n)s paper from %(file)s"
-              : "Imported %(n)s papers from %(file)s",
-            { n: data.imported, file: file.name },
+            (data.entries || []).length === 1
+              ? "Previewing %(n)s paper from %(file)s"
+              : "Previewing %(n)s papers from %(file)s",
+            { n: (data.entries || []).length, file: file.name },
           ),
         );
-        importFile.value = "";
-        loadLibrary(true); // refresh the list to show the imported papers
       } catch (err) {
         setIoStatus(String(err.message || err), true);
+        importFile.value = "";
       } finally {
         importBtn.disabled = false;
       }

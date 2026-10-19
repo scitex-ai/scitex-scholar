@@ -280,6 +280,17 @@ JA = {
     "Personal notes": "個人メモ",
     "Add your notes about this paper...": "この論文についてのメモを追加…",
     "Save changes": "変更を保存",
+    # Slice 5 (old-direct unification): the import preview panel.
+    "Import preview": "インポートのプレビュー",
+    "These entries will be added to your library. Entries already present are marked.":
+        "これらのエントリがライブラリに追加されます。既存のエントリには印が付きます。",
+    "Confirm import": "インポートを実行",
+    "Cancel": "キャンセル",
+    "Previewing %(file)s…": "%(file)s をプレビュー中…",
+    "Previewing %(n)s paper from %(file)s": "%(file)s から %(n)s 件の論文をプレビュー中",
+    "Previewing %(n)s papers from %(file)s": "%(file)s から %(n)s 件の論文をプレビュー中",
+    "Importing %(file)s…": "%(file)s をインポート中…",
+    "Already in library": "登録済み",
     "Imported %(n)s paper from %(file)s": "%(file)s から %(n)s 件の論文をインポートしました",
     "Imported %(n)s papers from %(file)s": "%(file)s から %(n)s 件の論文をインポートしました",
     "Save": "保存",

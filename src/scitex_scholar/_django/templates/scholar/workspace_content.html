@@ -303,6 +303,21 @@
                                     <button type="button" id="libraryImportBtn" class="btn-control-library">{% trans "Import BibTeX" %}</button>
                                 </div>
                                 <div id="libraryIoStatus" class="library-io__status"></div>
+                                <!-- Slice 5 (old-direct unification): import
+                                     preview-before-save. Hub previews parsed
+                                     BibTeX (diff vs the library) before the
+                                     save; the leaf renders the parsed entries
+                                     with exists flags and confirms through
+                                     the unchanged import flow. -->
+                                <div id="libraryImportPreview" class="library-import-preview hidden">
+                                    <h4 class="library-ext__title">{% trans "Import preview" %}</h4>
+                                    <p class="library-ext__hint">{% trans "These entries will be added to your library. Entries already present are marked." %}</p>
+                                    <div id="libraryImportEntries" class="library-import-preview__entries"></div>
+                                    <div class="library-import-preview__actions">
+                                        <button type="button" id="libraryImportConfirm" class="btn-control-library">{% trans "Confirm import" %}</button>
+                                        <button type="button" id="libraryImportCancel" class="btn-control-library">{% trans "Cancel" %}</button>
+                                    </div>
+                                </div>
                                 <!-- Project sync (parity slice 3c): the header
                                      picker selects the project (?project=
                                      navigation); the Library view shows the

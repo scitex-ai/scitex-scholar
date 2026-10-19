@@ -376,6 +376,47 @@
   color: var(--text-muted);
 }
 
+/*
+ * Slice 5 (old-direct unification): import preview-before-save panel.
+ * Entry rows reuse the library-item title/meta shapes.
+ */
+.library-import-preview {
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+}
+.library-import-preview__entries {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 8px 0;
+  max-height: 320px;
+  overflow-y: auto;
+}
+.library-import-preview__title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.library-import-preview__meta {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.library-import-preview__exists {
+  font-size: 11px;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  padding: 1px 8px;
+  margin-left: 8px;
+}
+.library-import-preview__actions {
+  display: flex;
+  gap: 10px;
+}
+
 .library-ext {
   padding: 10px 12px;
   margin-bottom: 12px;
