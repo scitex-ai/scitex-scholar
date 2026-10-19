@@ -179,6 +179,18 @@ msgstr "EndNote (.enw)"
 msgid "Import BibTeX"
 msgstr "BibTeX をインポート"
 
+msgid "Import preview"
+msgstr "インポートのプレビュー"
+
+msgid "These entries will be added to your library. Entries already present are marked."
+msgstr "これらのエントリがライブラリに追加されます。既存のエントリには印が付きます。"
+
+msgid "Confirm import"
+msgstr "インポートを実行"
+
+msgid "Cancel"
+msgstr "キャンセル"
+
 msgid "Project"
 msgstr "プロジェクト"
 
@@ -523,6 +535,21 @@ msgstr "この論文についてのメモを追加…"
 
 msgid "Save changes"
 msgstr "変更を保存"
+
+msgid "Previewing %(file)s…"
+msgstr "%(file)s をプレビュー中…"
+
+msgid "Previewing %(n)s paper from %(file)s"
+msgstr "%(file)s から %(n)s 件の論文をプレビュー中"
+
+msgid "Previewing %(n)s papers from %(file)s"
+msgstr "%(file)s から %(n)s 件の論文をプレビュー中"
+
+msgid "Importing %(file)s…"
+msgstr "%(file)s をインポート中…"
+
+msgid "Already in library"
+msgstr "登録済み"
 
 msgid "No papers with a DOI in your library yet."
 msgstr "ライブラリにはDOI付きの論文がまだありません。"

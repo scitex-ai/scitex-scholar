@@ -576,6 +576,17 @@ def _js_i18n_dict() -> dict:
         ),
         "Save changes": _i18n("Save changes"),
         "Details": _i18n("Details"),
+        # Library tab slice 5 (old-direct unification): the import
+        # preview panel renders these client-side -- same rule.
+        "Previewing %(file)s…": _i18n("Previewing %(file)s…"),
+        "Previewing %(n)s paper from %(file)s": _i18n(
+            "Previewing %(n)s paper from %(file)s"
+        ),
+        "Previewing %(n)s papers from %(file)s": _i18n(
+            "Previewing %(n)s papers from %(file)s"
+        ),
+        "Importing %(file)s…": _i18n("Importing %(file)s…"),
+        "Already in library": _i18n("Already in library"),
         # Graph tab slice 3a (old-direct parity): the library-seed picker
         # renders these client-side, so each MUST be a key here -- an
         # English literal in citation-graph.js is invisible to the catalog
@@ -1787,6 +1798,27 @@ def _derived_library_id(paper) -> str:
     return hashlib.sha1(key.encode("utf-8")).hexdigest()[:8].upper()
 
 
+def _preview_import_entry(paper, root: Path) -> dict:
+    """One parsed BibTeX entry for the import preview (no writes).
+
+    The derived library_id is computed exactly as the save path computes
+    it, so the ``exists`` flag answers whether confirming would upsert an
+    entry that is already in the library. The id itself is NOT echoed
+    (same reflection rule as the save-bulk row handles); only display
+    fields travel.
+    """
+    library_id = _assert_safe_library_id(_derived_library_id(paper))
+    authors = paper.metadata.basic.authors or []
+    return {
+        "title": paper.metadata.basic.title or "",
+        "authors": [a for a in authors if isinstance(a, str)],
+        "year": paper.metadata.basic.year,
+        "venue": getattr(paper.metadata.publication, "journal", None),
+        "doi": paper.metadata.id.doi or "",
+        "exists": (root / "MASTER" / library_id / "metadata.json").is_file(),
+    }
+
+
 @require_POST
 def library_import(request):
     """Import BibTeX into the user's local library.
@@ -1795,6 +1827,11 @@ def library_import(request):
     parsed by the package's BibTeX handler and persisted to the same
     MASTER/<paper_id>/metadata.json path the list/enrich routes read, so imported
     papers are immediately visible and enrichable.
+
+    With preview=1 the entries are parsed and REPORTED (title/authors/year/
+    doi + whether each already exists) without writing anything -- hub's
+    preview-before-save step, minus the async job machinery. The confirm
+    path below is byte-for-byte the pre-slice save flow.
     """
     fmt = (request.POST.get("format") or "bibtex").strip().lower()
     if fmt not in LIBRARY_IMPORT_FORMATS:
@@ -1840,6 +1877,21 @@ def library_import(request):
             return JsonResponse(
                 {"error": f"Too many entries: at most {_MAX_BULK_ITEMS} per import"},
                 status=400,
+            )
+
+        if (request.POST.get("preview") or "").strip().lower() in (
+            "1",
+            "true",
+            "yes",
+            "on",
+        ):
+            # Preview-before-save (old-direct unification slice 5): report
+            # the parsed entries with exists flags, write nothing.
+            return JsonResponse(
+                {
+                    "preview": True,
+                    "entries": [_preview_import_entry(p, root) for p in papers],
+                }
             )
 
         imported = []
