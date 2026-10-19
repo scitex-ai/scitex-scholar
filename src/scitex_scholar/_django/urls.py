@@ -41,6 +41,7 @@ urlpatterns = [
     path("api/library/connected-papers/import", views.connected_papers_import, name="connected_papers_import"),
     path("api/library/save", views.library_save, name="library_save"),
     path("api/library/save-bulk", views.library_save_bulk, name="library_save_bulk"),
+    path("api/library/annotate", views.library_annotate, name="library_annotate"),
     path("api/searches/save", views.searches_save, name="searches_save"),
     path("api/searches/list", views.searches_list, name="searches_list"),
     path("api/searches/delete", views.searches_delete, name="searches_delete"),
