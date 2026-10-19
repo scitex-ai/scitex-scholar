@@ -739,6 +739,174 @@ def graph_network(request, _builder=None):
         return JsonResponse({"error": "Failed to build network. Try again later."}, status=500)
 
 
+#: Largest accepted seed count on the multi-seed graph build (hub parity:
+#: hub allows 20 DOIs; each fans out to related-paper discovery, so an
+#: unbounded list is per-request graph + cache pressure).
+_MAX_GRAPH_SEEDS = 20
+
+
+@require_GET
+def graph_network_multi(request, _builder=None):
+    """Build a citation network from multiple seed DOIs (hub parity).
+
+    ?dois=a,b,c (required, at most 20) + num_related_per_doi (default 20,
+    capped at 50, hub parity) + the shared weights/no_cache. Hub wires no
+    UI to its multi endpoint either; this is API parity over the existing
+    builder, same validation/cache/error class as graph_network.
+
+    `_builder` is a test-injection seam (PA-306).
+    """
+    dois_raw = (request.GET.get("dois") or "").strip()
+    if not dois_raw:
+        return JsonResponse(
+            {"error": "dois parameter required (comma-separated DOIs)"}, status=400
+        )
+    dois = [d.strip() for d in dois_raw.split(",") if d.strip()]
+    if not dois:
+        return JsonResponse({"error": "At least one DOI required"}, status=400)
+    if len(dois) > _MAX_GRAPH_SEEDS:
+        return JsonResponse(
+            {"error": f"At most {_MAX_GRAPH_SEEDS} DOIs allowed"}, status=400
+        )
+    if any(len(d) > _MAX_DOI_CHARS for d in dois):
+        return _overlong_doi_response()
+
+    try:
+        num_related = int(request.GET.get("num_related_per_doi", 20))
+        num_related = max(1, min(num_related, 50))
+        weight_coupling = float(request.GET.get("weight_coupling", 2.0))
+        weight_cocitation = float(request.GET.get("weight_cocitation", 2.0))
+        weight_direct = float(request.GET.get("weight_direct", 1.0))
+    except ValueError:
+        return JsonResponse(
+            {
+                "error": (
+                    "num_related_per_doi, weight_coupling, weight_cocitation, and "
+                    "weight_direct must be numbers"
+                )
+            },
+            status=400,
+        )
+
+    use_cache = request.GET.get("no_cache", "false").lower() != "true"
+
+    cache_key = _make_cache_key(
+        "net-multi",
+        ",".join(sorted(d.lower() for d in dois)),
+        _cache_scope(request),
+        num_related=num_related,
+        wc=weight_coupling,
+        wco=weight_cocitation,
+        wd=weight_direct,
+    )
+    if use_cache:
+        cached = _cache_get(cache_key)
+        if cached:
+            cached["metadata"]["cached"] = True
+            return JsonResponse(cached)
+
+    builder = _builder or _get_builder()
+    if not builder:
+        return JsonResponse(_not_configured_payload(), status=503)
+
+    try:
+        graph = builder.build_from_dois(
+            dois=dois,
+            num_related_per_doi=num_related,
+            weight_coupling=weight_coupling,
+            weight_cocitation=weight_cocitation,
+            weight_direct=weight_direct,
+        )
+        result = graph.to_dict()
+        result["metadata"]["cached"] = False
+
+        seeds = {d.lower() for d in dois}
+        for node in result["nodes"]:
+            node["is_seed"] = node["id"].lower() in seeds
+
+        _cache_set(cache_key, result)
+        return JsonResponse(result)
+
+    except Exception as e:
+        logger.error(f"Error building multi-seed network: {e}", exc_info=True)
+        return JsonResponse({"error": "Failed to build network. Try again later."}, status=500)
+
+
+@require_GET
+def graph_network_query(request, _builder=None):
+    """Build a citation network from a text query (hub parity).
+
+    ?q= (required, capped like the search query) + num_related_per_doi +
+    the shared weights/no_cache. Same class as graph_network_multi above.
+
+    `_builder` is a test-injection seam (PA-306).
+    """
+    query = (request.GET.get("q") or "").strip()
+    if not query:
+        return JsonResponse({"error": "q parameter required"}, status=400)
+    if len(query) > _MAX_QUERY_CHARS:
+        return JsonResponse(
+            {"error": f"q must be at most {_MAX_QUERY_CHARS} characters"},
+            status=400,
+        )
+
+    try:
+        num_related = int(request.GET.get("num_related_per_doi", 20))
+        num_related = max(1, min(num_related, 50))
+        weight_coupling = float(request.GET.get("weight_coupling", 2.0))
+        weight_cocitation = float(request.GET.get("weight_cocitation", 2.0))
+        weight_direct = float(request.GET.get("weight_direct", 1.0))
+    except ValueError:
+        return JsonResponse(
+            {
+                "error": (
+                    "num_related_per_doi, weight_coupling, weight_cocitation, and "
+                    "weight_direct must be numbers"
+                )
+            },
+            status=400,
+        )
+
+    use_cache = request.GET.get("no_cache", "false").lower() != "true"
+
+    cache_key = _make_cache_key(
+        "net-query",
+        query,
+        _cache_scope(request),
+        num_related=num_related,
+        wc=weight_coupling,
+        wco=weight_cocitation,
+        wd=weight_direct,
+    )
+    if use_cache:
+        cached = _cache_get(cache_key)
+        if cached:
+            cached["metadata"]["cached"] = True
+            return JsonResponse(cached)
+
+    builder = _builder or _get_builder()
+    if not builder:
+        return JsonResponse(_not_configured_payload(), status=503)
+
+    try:
+        graph = builder.build_from_query(
+            query=query,
+            num_related_per_doi=num_related,
+            weight_coupling=weight_coupling,
+            weight_cocitation=weight_cocitation,
+            weight_direct=weight_direct,
+        )
+        result = graph.to_dict()
+        result["metadata"]["cached"] = False
+
+        _cache_set(cache_key, result)
+        return JsonResponse(result)
+
+    except Exception as e:
+        logger.error(f"Error building query network for {query!r}: {e}", exc_info=True)
+        return JsonResponse({"error": "Failed to build network. Try again later."}, status=500)
+
+
 @require_GET
 def graph_related(request, _builder=None):
     """Get related papers for a DOI.
