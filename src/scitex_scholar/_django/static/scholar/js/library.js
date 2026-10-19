@@ -310,8 +310,9 @@ document.addEventListener("DOMContentLoaded", () => {
     let importance = typeof ann.importance === "number" ? ann.importance : 0;
     const starBtns = [];
     const paintStars = () => {
-      starBtns.forEach((btn, i) => {
-        btn.textContent = i < importance ? "★" : "☆";
+      // forEach index idx is 0-based: the first `importance` buttons fill.
+      starBtns.forEach((btn, idx) => {
+        btn.textContent = idx < importance ? "★" : "☆";
       });
     };
     for (let i = 1; i <= 5; i += 1) {
@@ -395,6 +396,37 @@ document.addEventListener("DOMContentLoaded", () => {
     saveRow.appendChild(saveBtn);
     saveRow.appendChild(saveMsg);
     panel.appendChild(saveRow);
+
+    // Slice 10: remove-from-library (hub details parity). Guarded by a
+    // confirm -- hub deletes directly, but an undeleteable file tree
+    // deserves one explicit gate.
+    const dangerRow = document.createElement("div");
+    dangerRow.className = "library-details__actions";
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.className = "btn-control-library library-details__remove";
+    removeBtn.textContent = scholarT("Remove from library");
+    removeBtn.addEventListener("click", async () => {
+      if (!window.confirm(scholarT("Remove this paper from the library?"))) return;
+      removeBtn.disabled = true;
+      try {
+        const resp = await fetch(`${STX_MOUNT}/api/library/remove`, {
+          method: "POST",
+          headers: csrfJsonHeaders(),
+          body: JSON.stringify({ library_id: paper.paper_id }),
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || scholarT("Remove failed"));
+        lastRows = lastRows.filter((p) => p.paper_id !== paper.paper_id);
+        renderRows();
+      } catch (err) {
+        saveMsg.textContent = `${scholarT("Remove failed")}: ${err.message}`;
+      } finally {
+        removeBtn.disabled = false;
+      }
+    });
+    dangerRow.appendChild(removeBtn);
+    panel.appendChild(dangerRow);
     return panel;
   }
 

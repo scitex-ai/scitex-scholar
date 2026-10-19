@@ -587,6 +587,24 @@ msgstr "グラフを削除しました"
 msgid "Delete failed"
 msgstr "削除に失敗しました"
 
+msgid "Remove from library"
+msgstr "ライブラリから削除"
+
+msgid "Remove this paper from the library?"
+msgstr "この論文をライブラリから削除しますか？"
+
+msgid "Remove failed"
+msgstr "削除に失敗しました"
+
+msgid "Rename"
+msgstr "名前を変更"
+
+msgid "Graph renamed"
+msgstr "グラフ名を変更しました"
+
+msgid "Rename failed"
+msgstr "名前の変更に失敗しました"
+
 msgid "No papers with a DOI in your library yet."
 msgstr "ライブラリにはDOI付きの論文がまだありません。"
 

@@ -303,6 +303,9 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.graph-saved-list__rename {
+  flex: 1 1 auto;
+}
 
 .info-list {
   display: flex;

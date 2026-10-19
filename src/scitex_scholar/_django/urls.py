@@ -44,6 +44,7 @@ urlpatterns = [
     path("api/library/save", views.library_save, name="library_save"),
     path("api/library/save-bulk", views.library_save_bulk, name="library_save_bulk"),
     path("api/library/annotate", views.library_annotate, name="library_annotate"),
+    path("api/library/remove", views.library_remove, name="library_remove"),
     path("api/library/citation", views.library_citation, name="library_citation"),
     path("api/searches/save", views.searches_save, name="searches_save"),
     path("api/searches/list", views.searches_list, name="searches_list"),
@@ -51,6 +52,7 @@ urlpatterns = [
     path("api/graphs/save", views.graphs_save, name="graphs_save"),
     path("api/graphs/list", views.graphs_list, name="graphs_list"),
     path("api/graphs/delete", views.graphs_delete, name="graphs_delete"),
+    path("api/graphs/rename", views.graphs_rename, name="graphs_rename"),
 ]
 
 # EOF

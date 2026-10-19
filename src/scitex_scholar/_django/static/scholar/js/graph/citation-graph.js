@@ -609,6 +609,9 @@ class CitationGraphManager {
           '<button type="button" class="btn-control-library" data-load="1">' +
           this.esc(scholarT("Load")) +
           "</button>" +
+          '<button type="button" class="btn-control-library" data-rename="1">' +
+          this.esc(scholarT("Rename")) +
+          "</button>" +
           '<button type="button" class="btn-control-library" data-delete="1">' +
           this.esc(scholarT("Delete")) +
           "</button>" +
@@ -621,11 +624,65 @@ class CitationGraphManager {
       if (loadBtn) {
         loadBtn.addEventListener("click", () => this.loadSavedGraph(id));
       }
+      const renameBtn = item.querySelector('[data-rename="1"]');
+      if (renameBtn) {
+        renameBtn.addEventListener("click", () => this.renameSavedGraph(item, id));
+      }
       const deleteBtn = item.querySelector('[data-delete="1"]');
       if (deleteBtn) {
         deleteBtn.addEventListener("click", () => this.deleteSavedGraph(id));
       }
     });
+  }
+
+  async renameSavedGraph(item, id) {
+    if (!id) return;
+    const nameEl = item.querySelector(".graph-saved-list__name");
+    if (!nameEl || item.querySelector(".graph-saved-list__rename")) return;
+    const current = nameEl.textContent;
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "form-input graph-saved-list__rename";
+    input.value = current;
+    input.maxLength = 200;
+    // Enter and blur both commit; the flag keeps the second event from
+    // posting twice.
+    let done = false;
+    const commit = async (save) => {
+      if (done) return;
+      done = true;
+      const next = input.value.trim();
+      if (!save || !next || next === current) {
+        this.loadSavedGraphs();
+        return;
+      }
+      try {
+        const resp = await fetch(STX_MOUNT + "/api/graphs/rename", {
+          method: "POST",
+          headers: this.csrfJsonHeaders(),
+          body: JSON.stringify({ id, name: next }),
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || scholarT("Rename failed"));
+        this.savedStatus(scholarT("Graph renamed"));
+      } catch (err) {
+        this.savedStatus(scholarT("Rename failed") + ": " + err.message);
+      } finally {
+        this.loadSavedGraphs();
+      }
+    };
+    // Swap the name span for an inline editor; Enter commits, Esc cancels.
+    const holder = document.createElement("span");
+    holder.className = "graph-saved-list__name";
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") commit(true);
+      else if (e.key === "Escape") commit(false);
+    });
+    input.addEventListener("blur", () => commit(true));
+    nameEl.replaceWith(holder);
+    holder.appendChild(input);
+    input.focus();
+    input.select();
   }
 
   async saveCurrentGraph() {

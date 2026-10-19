@@ -305,6 +305,13 @@ JA = {
     "Graph not found": "グラフが見つかりません",
     "Graph deleted": "グラフを削除しました",
     "Delete failed": "削除に失敗しました",
+    # Slice 10 (old-direct unification): remove + rename actions.
+    "Remove from library": "ライブラリから削除",
+    "Remove this paper from the library?": "この論文をライブラリから削除しますか？",
+    "Remove failed": "削除に失敗しました",
+    "Rename": "名前を変更",
+    "Graph renamed": "グラフ名を変更しました",
+    "Rename failed": "名前の変更に失敗しました",
     "Imported %(n)s paper from %(file)s": "%(file)s から %(n)s 件の論文をインポートしました",
     "Imported %(n)s papers from %(file)s": "%(file)s から %(n)s 件の論文をインポートしました",
     "Save": "保存",
