@@ -59,11 +59,14 @@ def test_export_csv_returns_header_and_rows(tmp_path):
     # Act
     resp = views.library_export(_req(tmp_path, {"format": "csv"}))
     # Assert
-    assert resp.status_code == 200
-    assert resp["Content-Type"] == "text/csv"
     rows = list(csv.DictReader(io.StringIO(resp.content.decode())))
-    assert [r["Title"] for r in rows] == ["CSV Paper"]
-    assert rows[0]["DOI"] == "10.1/csv" and rows[0]["Year"] == "2023"
+    assert (
+        resp.status_code,
+        resp["Content-Type"],
+        [r["Title"] for r in rows],
+        rows[0]["DOI"],
+        rows[0]["Year"],
+    ) == (200, "text/csv", ["CSV Paper"], "10.1/csv", "2023")
 
 
 def test_export_csv_downloads_as_attachment(tmp_path):
