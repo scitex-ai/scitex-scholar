@@ -93,6 +93,52 @@
                                                 <option value="single">{% trans "Single source" %}</option>
                                             </select>
                                         </div>
+                                        <!--
+                                            Slice 1 (old-direct unification): the
+                                            Sources grid. Old-direct renders one
+                                            checkbox per source (local corpora
+                                            first, then external APIs) plus an
+                                            ignore-cache toggle; the checked set
+                                            travels as ?sources=a,b,c. All
+                                            checked (or none) keeps the tiered
+                                            default -- the request omits the
+                                            param and behaves exactly as
+                                            before this slice.
+                                        -->
+                                        <div class="search-advanced__row search-advanced__row--stack">
+                                            <span class="form-label" id="searchSourcesLabel">{% trans "Sources" %}</span>
+                                            <div class="search-sources-grid" id="searchSourcesGrid" role="group" aria-labelledby="searchSourcesLabel">
+                                                <label class="search-advanced__check" title="{% trans "Crossref database on the SciTeX server — fast, unlimited" %}">
+                                                    <input type="checkbox" class="source-toggle" value="crossref_local" checked>
+                                                    Crossref (SciTeX)
+                                                </label>
+                                                <label class="search-advanced__check" title="{% trans "OpenAlex database on the SciTeX server — fast, unlimited" %}">
+                                                    <input type="checkbox" class="source-toggle" value="openalex_local" checked>
+                                                    OpenAlex (SciTeX)
+                                                </label>
+                                                <label class="search-advanced__check" title="{% trans "NCBI PubMed — biomedical literature" %}">
+                                                    <input type="checkbox" class="source-toggle" value="pubmed" checked>
+                                                    PubMed
+                                                </label>
+                                                <label class="search-advanced__check" title="{% trans "arXiv — physics, mathematics, and computer science preprints" %}">
+                                                    <input type="checkbox" class="source-toggle" value="arxiv" checked>
+                                                    arXiv
+                                                </label>
+                                                <label class="search-advanced__check" title="{% trans "Semantic Scholar — AI-powered academic search" %}">
+                                                    <input type="checkbox" class="source-toggle" value="semantic" checked>
+                                                    Semantic Scholar
+                                                </label>
+                                                <label class="search-advanced__check" title="{% trans "Crossref — DOI metadata registry" %}">
+                                                    <input type="checkbox" class="source-toggle" value="crossref" checked>
+                                                    Crossref
+                                                </label>
+                                                <label class="search-advanced__check" title="{% trans "OpenAlex — open catalog of scholarly works" %}">
+                                                    <input type="checkbox" class="source-toggle" value="openalex" checked>
+                                                    OpenAlex
+                                                </label>
+                                            </div>
+                                            <p class="search-sources-hint">{% trans "Uncheck sources to narrow the search. All checked searches the default set." %}</p>
+                                        </div>
                                         <div class="search-advanced__row">
                                             <label class="search-advanced__check">
                                                 <input type="checkbox" id="searchNoCache">

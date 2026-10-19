@@ -35,7 +35,9 @@ from scitex_scholar.core import Paper, normalize_journal_name
 from scitex_scholar.search_engines._source_tiers import (
     build_tiered_engines,
     declared_source_tiers,
+    normalize_sources,
     resolve_tier,
+    select_engines,
 )
 
 logger = logging.getLogger(__name__)
@@ -125,6 +127,7 @@ class ScholarPipelineSearchParallel:
         filters: Dict = None,
         max_results: int = 100,
         on_progress: Optional[Callable[[str, str, int], None]] = None,
+        sources: Any = None,
     ) -> Dict[str, Any]:
         """Search for papers across multiple engines in parallel.
 
@@ -139,6 +142,9 @@ class ScholarPipelineSearchParallel:
                 - engine_name: Name of the search engine (str)
                 - status: 'loading', 'completed', or 'error' (str)
                 - count: Number of results found (int)
+            sources: Optional explicit source selection (hub ``?sources=a,b,c``
+                or canonical engine names). Runs exactly those engines with
+                no tier short-circuit. None/empty keeps the tiered default.
 
         Returns:
             Dict with:
@@ -162,32 +168,37 @@ class ScholarPipelineSearchParallel:
         filters = filters or {}
         search_fields = search_fields or ["title", "abstract"]
 
-        # --- Tier 1: the NAS-local corpora (primary) --------------------------
-        # The configured policy names CrossRefLocal/OpenAlexLocal primary, so
-        # they run FIRST and alone. The online engines below are reached only
-        # when this tier cannot answer (see resolve_tier for the reason).
+        # --- Explicit source selection (old-direct Sources grid) ------------
+        # A user selection runs exactly those engines in parallel with no
+        # tier short-circuit -- hub parity runs every checked source. None
+        # or empty keeps the tiered default path below untouched.
         engine_counts = {}
-        all_papers, engines_used = await self._search_tier(
-            engines=self.primary_engines,
-            query=search_query,
-            search_fields=search_fields,
-            filters=filters,
-            max_results=max_results,
-            on_progress=on_progress,
-            engine_counts=engine_counts,
-        )
-
-        source_tier, fallback_reason = resolve_tier(
-            len(all_papers), self.primary_engines, self.min_primary_results
-        )
-
-        if source_tier == "online_fallback":
-            logger.warning(
-                f"{self.name}: online fallback ({fallback_reason}); "
-                f"querying {len(self.fallback_engines)} public API engines"
-            )
+        wanted = normalize_sources(sources)
+        selected: Dict[str, Any] = {}
+        if wanted:
+            selected = select_engines(self.engines, wanted)
             all_papers, engines_used = await self._search_tier(
-                engines=self.fallback_engines,
+                engines=selected,
+                query=search_query,
+                search_fields=search_fields,
+                filters=filters,
+                max_results=max_results,
+                on_progress=on_progress,
+                engine_counts=engine_counts,
+            )
+            source_tier = "selected"
+            fallback_reason = (
+                f"explicit selection: {', '.join(selected)}"
+                if selected
+                else f"explicit selection {', '.join(wanted)} not available here"
+            )
+        else:
+            # --- Tier 1: the NAS-local corpora (primary) --------------------------
+            # The configured policy names CrossRefLocal/OpenAlexLocal primary, so
+            # they run FIRST and alone. The online engines below are reached only
+            # when this tier cannot answer (see resolve_tier for the reason).
+            all_papers, engines_used = await self._search_tier(
+                engines=self.primary_engines,
                 query=search_query,
                 search_fields=search_fields,
                 filters=filters,
@@ -196,14 +207,37 @@ class ScholarPipelineSearchParallel:
                 engine_counts=engine_counts,
             )
 
+            source_tier, fallback_reason = resolve_tier(
+                len(all_papers), self.primary_engines, self.min_primary_results
+            )
+
+            if source_tier == "online_fallback":
+                logger.warning(
+                    f"{self.name}: online fallback ({fallback_reason}); "
+                    f"querying {len(self.fallback_engines)} public API engines"
+                )
+                all_papers, engines_used = await self._search_tier(
+                    engines=self.fallback_engines,
+                    query=search_query,
+                    search_fields=search_fields,
+                    filters=filters,
+                    max_results=max_results,
+                    on_progress=on_progress,
+                    engine_counts=engine_counts,
+                )
+
         # Deduplicate by DOI and title
         unique_papers = self._deduplicate_papers(all_papers)
 
         # Enrich papers with missing citation counts (e.g., from PubMed). This
         # is a NETWORK call through OpenAlex, so it is part of the fallback, not
         # of a local-corpus answer -- running it after a primary hit would put
-        # the network back on the local path.
-        if source_tier == "online_fallback":
+        # the network back on the local path. An explicit selection containing
+        # online engines gets the same enrichment as a fallback answer.
+        selected_online = any(name in self.fallback_engines for name in selected)
+        if source_tier == "online_fallback" or (
+            source_tier == "selected" and selected_online
+        ):
             unique_papers = await self._enrich_citations(unique_papers)
 
         # Enrich papers with impact factors
@@ -232,9 +266,13 @@ class ScholarPipelineSearchParallel:
         self.stats["successful_searches"] += 1
 
         tier_size = (
-            len(self.primary_engines)
-            if source_tier == "primary"
-            else len(self.fallback_engines)
+            len(selected)
+            if source_tier == "selected"
+            else (
+                len(self.primary_engines)
+                if source_tier == "primary"
+                else len(self.fallback_engines)
+            )
         )
 
         logger.success(

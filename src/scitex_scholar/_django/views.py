@@ -533,6 +533,10 @@ def _js_i18n_dict() -> dict:
         # Search tab: which tier answered (local NAS corpora vs online fallback).
         "Local corpus (NAS)": _i18n("Local corpus (NAS)"),
         "Online fallback": _i18n("Online fallback"),
+        # Search tab slice 1 (old-direct unification): an explicit Sources
+        # selection reports itself in the results header -- same catalog
+        # visibility rule as the tier strings above.
+        "Selected sources": _i18n("Selected sources"),
         "Imported %(n)s paper from %(file)s": _i18n("Imported %(n)s paper from %(file)s"),
         "Imported %(n)s papers from %(file)s": _i18n("Imported %(n)s papers from %(file)s"),
         # Search tab slice 2 (old-direct parity): per-result Save and the
@@ -929,9 +933,28 @@ def search(request, _engine=None):
             {"error": "mode must be 'parallel' or 'single'"}, status=400
         )
 
+    # Explicit source selection (old-direct Sources grid, hub `?sources=a,b,c`).
+    # Unknown names are dropped, never a 400; an empty/all-unknown selection
+    # keeps the tiered default. The raw string rides the cache key so two
+    # different selections never share a cached result set.
+    from scitex_scholar.search_engines._source_tiers import normalize_sources
+
+    sources_raw = (request.GET.get("sources", "") or "").strip()
+    if len(sources_raw) > _MAX_SOURCES_CHARS:
+        return JsonResponse(
+            {"error": f"sources must be at most {_MAX_SOURCES_CHARS} characters"},
+            status=400,
+        )
+    sources = normalize_sources(sources_raw) if sources_raw else None
+
     use_cache = request.GET.get("no_cache", "false").lower() != "true"
     cache_key = _make_cache_key(
-        "search", query, _cache_scope(request), mode=mode, max_results=max_results
+        "search",
+        query,
+        _cache_scope(request),
+        mode=mode,
+        max_results=max_results,
+        sources=",".join(sources) if sources else "",
     )
     if use_cache:
         cached = _cache_get(cache_key)
@@ -942,10 +965,14 @@ def search(request, _engine=None):
     try:
         engine = _engine or _get_search_engine()
         result = asyncio.run(
-            engine.search(query=query, mode=mode, max_results=max_results)
+            engine.search(
+                query=query, mode=mode, max_results=max_results, sources=sources
+            )
         )
         _strip_markup_from_search_abstracts(result)
         result.setdefault("metadata", {})["cached"] = False
+        if sources:
+            result["metadata"]["sources_selected"] = sources
         _cache_set(cache_key, result)
         return JsonResponse(result)
 
@@ -1000,6 +1027,11 @@ _MAX_BULK_ITEMS = 500
 #: value is per-request cache + engine + log pressure; 500 chars is far past
 #: any real DOI (tens of chars).
 _MAX_DOI_CHARS = 500
+
+#: Largest accepted `sources` selection on the live search endpoint (hub
+#: `?sources=a,b,c`). Same fan-out class as _MAX_DOI_CHARS (cache key +
+#: engine fan-out); 500 chars is far past the seven known names (~80 chars).
+_MAX_SOURCES_CHARS = 500
 
 #: Largest accepted Connected Papers seed id (Semantic Scholar 40-char SHA
 #: or DOI). Same fan-out class as _MAX_DOI_CHARS (cache key + upstream fetch

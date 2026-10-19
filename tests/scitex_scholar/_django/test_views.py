@@ -935,7 +935,7 @@ def test_search_rejects_overlong_q_param():
     # into the engines and the cache key. The stub engine proves the
     # request reaches execution (200) instead of failing closed (400).
     class _StubEngine:
-        async def search(self, query, mode=None, max_results=20):
+        async def search(self, query, mode=None, max_results=20, sources=None):
             return {"results": [], "metadata": {}}
 
     rf = RequestFactory()
@@ -950,7 +950,7 @@ def test_search_strips_jats_markup_from_abstracts():
     # Arrange — EuropePMC/PMC abstracts arrive with raw JATS XML tags
     # (e.g. <jats:p>); the leaf must serve plain text (CCT 2759/2760).
     class _StubEngine:
-        async def search(self, query, mode=None, max_results=20):
+        async def search(self, query, mode=None, max_results=20, sources=None):
             return {
                 "results": [
                     {
@@ -972,7 +972,12 @@ def test_search_serves_cached_result_without_calling_engine():
     # Arrange -- prime the cache so the engine is never constructed
     request = RequestFactory().get("/api/search?q=hippocampus")
     key = views._make_cache_key(
-        "search", "hippocampus", views._cache_scope(request), mode="parallel", max_results=20
+        "search",
+        "hippocampus",
+        views._cache_scope(request),
+        mode="parallel",
+        max_results=20,
+        sources="",
     )
     views._cache_set(key, {"results": [{"title": "Cached paper"}], "metadata": {}})
     # Act
@@ -985,7 +990,12 @@ def test_search_marks_cached_results_as_cached():
     # Arrange
     request = RequestFactory().get("/api/search?q=sharp%20wave")
     key = views._make_cache_key(
-        "search", "sharp wave", views._cache_scope(request), mode="parallel", max_results=20
+        "search",
+        "sharp wave",
+        views._cache_scope(request),
+        mode="parallel",
+        max_results=20,
+        sources="",
     )
     views._cache_set(key, {"results": [], "metadata": {}})
     # Act
@@ -1006,7 +1016,7 @@ def _prime_search_cache_as_alice():
     req_alice.user = SimpleNamespace(username="alice", is_authenticated=True)
 
     class _UserEngine:
-        async def search(self, query, mode=None, max_results=20):
+        async def search(self, query, mode=None, max_results=20, sources=None):
             return {"results": [], "metadata": {"served_user": "alice"}}
 
     body_alice = json.loads(views.search(req_alice, _engine=_UserEngine()).content)
@@ -1120,7 +1130,7 @@ def test_gui_search_response_carries_the_serving_tier():
     # Arrange -- a hand-rolled engine so the assertion is about the view's
     # pass-through, not about a live query (injected, not patched: PA-306).
     class _TieredEngine:
-        async def search(self, query, mode=None, max_results=20):
+        async def search(self, query, mode=None, max_results=20, sources=None):
             return {
                 "results": [],
                 "metadata": {"source_tier": "primary", "source_tier_reason": ""},
