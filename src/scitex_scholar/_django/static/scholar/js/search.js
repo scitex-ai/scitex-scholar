@@ -50,6 +50,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const saveSelectedBtn = document.getElementById("searchSaveSelected");
   const enrichSelectedBtn = document.getElementById("searchEnrichSelected");
   const bulkStatus = document.getElementById("searchBulkStatus");
+  // Slice 3 (old-direct unification): the results-header tools -- abstract
+  // truncated/full toggle, open-selected-URLs, export-selected-BibTeX.
+  const abstractToggle = document.getElementById("searchAbstractToggle");
+  const openUrlsBtn = document.getElementById("searchOpenUrls");
+  const exportBibtexBtn = document.getElementById("searchExportBibtex");
+  let abstractFull = false;
+  const ABSTRACT_TRUNCATE_AT = 300;
 
   // The last fetched result set (engine order = relevance) plus the user's
   // selection, keyed by DOI-or-title so re-sorts keep the checked rows.
@@ -232,9 +239,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (paper.abstract) {
       const abstract = document.createElement("div");
       abstract.className = "search-result__abstract";
-      const text = paper.abstract;
-      abstract.textContent =
-        text.length > 300 ? `${text.slice(0, 300)}...` : text;
+      // The full text rides the DOM so the header toggle flips length
+      // without a refetch; textContent keeps third-party data inert.
+      abstract.dataset.full = paper.abstract;
+      abstract.textContent = abstractText(paper.abstract);
       body.appendChild(abstract);
     }
 
@@ -324,6 +332,103 @@ document.addEventListener("DOMContentLoaded", () => {
     );
     selectAll.checked =
       visible.length > 0 && visible.every((key) => selected.has(key));
+  }
+
+  // Slice 3: abstract length follows the header toggle (default truncated,
+  // the pre-slice rendering, so nothing changes until the user flips it).
+  function abstractText(full) {
+    if (abstractFull || full.length <= ABSTRACT_TRUNCATE_AT) return full;
+    return `${full.slice(0, ABSTRACT_TRUNCATE_AT)}...`;
+  }
+
+  function applyAbstractMode() {
+    document.querySelectorAll(".search-result__abstract").forEach((el) => {
+      el.textContent = abstractText(el.dataset.full || "");
+    });
+    if (abstractToggle) {
+      abstractToggle.textContent = abstractFull
+        ? scholarT("Abstract: full")
+        : scholarT("Abstract: truncated");
+      abstractToggle.dataset.mode = abstractFull ? "full" : "truncated";
+    }
+  }
+
+  // Slice 3: client-side BibTeX for the checked rows (hub parity: generated
+  // in-browser, Blob download, no backend round-trip).
+  function bibtexEscape(value) {
+    return String(value || "")
+      .replace(/\\/g, "\\\\")
+      .replace(/([{}])/g, "\\$1");
+  }
+
+  function bibtexAuthors(paper) {
+    const authors = paper.authors || [];
+    return authors
+      .map((a) => (typeof a === "string" ? a : a.name || ""))
+      .filter((name) => name)
+      .join(" and ");
+  }
+
+  function bibtexKey(paper) {
+    const first = (paper.authors || [])
+      .map((a) => (typeof a === "string" ? a : a.name || ""))
+      .find((name) => name);
+    const last = first ? first.trim().split(/\s+/).pop() : "unknown";
+    const year = paper.year || "nodate";
+    const word = (paper.title || "untitled").trim().split(/\s+/)[0] || "untitled";
+    return `${last}${year}${word}`.replace(/[^A-Za-z0-9]/g, "");
+  }
+
+  function bibtexEntry(paper) {
+    const fields = [
+      `  title = {${bibtexEscape(paper.title || "Untitled")}}`,
+      `  author = {${bibtexEscape(bibtexAuthors(paper))}}`,
+    ];
+    if (paper.year) fields.push(`  year = {${bibtexEscape(paper.year)}}`);
+    if (paper.journal) fields.push(`  journal = {${bibtexEscape(paper.journal)}}`);
+    if (paper.doi) fields.push(`  doi = {${bibtexEscape(paper.doi)}}`);
+    if (paper.abstract) fields.push(`  abstract = {${bibtexEscape(paper.abstract)}}`);
+    return `@article{${bibtexKey(paper)},\n${fields.join(",\n")}\n}`;
+  }
+
+  function selectedBibtex() {
+    return selectedPapers().map(bibtexEntry).join("\n\n");
+  }
+
+  function openSelectedUrls() {
+    const papers = selectedPapers();
+    if (!papers.length) {
+      if (bulkStatus) bulkStatus.textContent = scholarT("Select results first.");
+      return;
+    }
+    const urls = papers
+      .filter((paper) => paper.doi)
+      .map((paper) => `https://doi.org/${paper.doi}`);
+    if (!urls.length) {
+      if (bulkStatus) bulkStatus.textContent = scholarT("No DOI links in selection.");
+      return;
+    }
+    // Direct click handler: one window.open per URL keeps the popup
+    // blocker satisfied the same way hub's toolbar button does.
+    urls.forEach((url) => window.open(url, "_blank", "noopener"));
+    if (bulkStatus) bulkStatus.textContent = "";
+  }
+
+  function downloadSelectedBibtex() {
+    const papers = selectedPapers();
+    if (!papers.length) {
+      if (bulkStatus) bulkStatus.textContent = scholarT("Select results first.");
+      return;
+    }
+    const blob = new Blob([selectedBibtex()], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scholar-selected-${new Date().toISOString().slice(0, 10)}.bib`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   }
 
   function renderResults(data) {
@@ -501,6 +606,56 @@ document.addEventListener("DOMContentLoaded", () => {
   if (enrichSelectedBtn) {
     enrichSelectedBtn.addEventListener("click", enrichSelected);
   }
+  // Slice 3: header tools over the checked rows (hub results-header parity).
+  if (abstractToggle) {
+    abstractToggle.addEventListener("click", () => {
+      abstractFull = !abstractFull;
+      applyAbstractMode();
+    });
+  }
+  if (openUrlsBtn) openUrlsBtn.addEventListener("click", openSelectedUrls);
+  if (exportBibtexBtn) {
+    exportBibtexBtn.addEventListener("click", downloadSelectedBibtex);
+  }
+  document.addEventListener("keydown", (event) => {
+    // Hub parity: Ctrl/Cmd+C copies selected BibTeX when no text is
+    // selected. Unlike hub, keystrokes inside inputs are never hijacked --
+    // copying from the query box must keep working.
+    const target = event.target;
+    if (
+      (event.ctrlKey || event.metaKey) &&
+      !event.shiftKey &&
+      !event.altKey &&
+      (event.key === "c" || event.key === "C")
+    ) {
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+      const selection = window.getSelection();
+      if (selection && selection.toString().trim().length > 0) return;
+      const papers = selectedPapers();
+      if (!papers.length) return;
+      event.preventDefault();
+      navigator.clipboard
+        .writeText(selectedBibtex())
+        .then(() => {
+          if (bulkStatus) {
+            bulkStatus.textContent =
+              papers.length === 1
+                ? scholarT("Copied %(n)s BibTeX entry", { n: papers.length })
+                : scholarT("Copied %(n)s BibTeX entries", { n: papers.length });
+          }
+        })
+        .catch(() => {
+          if (bulkStatus) bulkStatus.textContent = scholarT("Copy failed");
+        });
+    }
+  });
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
