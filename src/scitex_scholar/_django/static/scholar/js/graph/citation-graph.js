@@ -52,6 +52,9 @@ class CitationGraphManager {
       // the same laziness -- no /api/library request for users who never
       // open the graph tab.
       this.loadLibrarySeed();
+      // Slice 9 (old-direct unification): saved graphs list loads lazily
+      // with the same rule.
+      this.loadSavedGraphs();
     });
   }
 
@@ -68,6 +71,11 @@ class CitationGraphManager {
 
     const fitBtn = document.getElementById("fitViewBtn");
     if (fitBtn) fitBtn.addEventListener("click", () => this.fitToView());
+
+    // Slice 9: saved-graphs bar -- save-current posts the last build's
+    // seed as a recipe; the list lazy-loads on first tab open above.
+    const saveBtn = document.getElementById("graphSaveBtn");
+    if (saveBtn) saveBtn.addEventListener("click", () => this.saveCurrentGraph());
 
     // Error fallback (UX standard): retry re-runs the failed build with the
     // same seed -- the error box retries, not just dismisses.
@@ -546,6 +554,138 @@ class CitationGraphManager {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  }
+
+  /**
+   * Slice 9 (old-direct unification): saved graphs. Hub's graph page
+   * saves/loads/deletes graphs; the leaf backend ships the same endpoints
+   * (parity slice 1) with no UI. Recipes rebuild from the seed DOI through
+   * the existing network build -- no new backend.
+   */
+  csrfJsonHeaders() {
+    const csrfInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
+    const headers = { "Content-Type": "application/json" };
+    if (csrfInput && csrfInput.value) headers["X-CSRFToken"] = csrfInput.value;
+    return headers;
+  }
+
+  savedStatus(msg) {
+    const el = document.getElementById("graphSavedStatus");
+    if (el) el.textContent = msg || "";
+  }
+
+  async loadSavedGraphs() {
+    const box = document.getElementById("graphSavedList");
+    if (!box) return;
+    try {
+      const resp = await fetch(STX_MOUNT + "/api/graphs/list");
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.error || "Failed");
+      this.renderSavedGraphs(box, data.graphs || []);
+    } catch {
+      box.innerHTML =
+        '<p class="empty-message">' + this.esc(scholarT("Service unavailable")) + "</p>";
+    }
+  }
+
+  renderSavedGraphs(box, graphs) {
+    if (!graphs.length) {
+      box.innerHTML =
+        '<p class="empty-message">' + this.esc(scholarT("No saved graphs yet.")) + "</p>";
+      return;
+    }
+    box.innerHTML = graphs
+      .map(
+        (g) =>
+          '<div class="graph-saved-list__item" data-id="' +
+          this.esc(g.id) +
+          '">' +
+          '<span class="graph-saved-list__name">' +
+          this.esc(g.name || g.seed_doi || scholarT("Untitled")) +
+          "</span>" +
+          '<span class="graph-saved-list__seed">' +
+          this.esc(g.seed_doi || "") +
+          "</span>" +
+          '<button type="button" class="btn-control-library" data-load="1">' +
+          this.esc(scholarT("Load")) +
+          "</button>" +
+          '<button type="button" class="btn-control-library" data-delete="1">' +
+          this.esc(scholarT("Delete")) +
+          "</button>" +
+          "</div>",
+      )
+      .join("");
+    box.querySelectorAll(".graph-saved-list__item").forEach((item) => {
+      const id = item.getAttribute("data-id");
+      const loadBtn = item.querySelector('[data-load="1"]');
+      if (loadBtn) {
+        loadBtn.addEventListener("click", () => this.loadSavedGraph(id));
+      }
+      const deleteBtn = item.querySelector('[data-delete="1"]');
+      if (deleteBtn) {
+        deleteBtn.addEventListener("click", () => this.deleteSavedGraph(id));
+      }
+    });
+  }
+
+  async saveCurrentGraph() {
+    const nameInput = document.getElementById("graphSaveName");
+    const name = nameInput ? nameInput.value.trim() : "";
+    const seed = this.lastBuild ? this.lastBuild.doi : "";
+    if (!name || !seed) {
+      this.savedStatus(scholarT("Name the graph and build it first."));
+      return;
+    }
+    this.savedStatus("");
+    try {
+      const resp = await fetch(STX_MOUNT + "/api/graphs/save", {
+        method: "POST",
+        headers: this.csrfJsonHeaders(),
+        body: JSON.stringify({ name, seed_doi: seed }),
+      });
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.error || scholarT("Save failed"));
+      if (nameInput) nameInput.value = "";
+      this.savedStatus(scholarT("Graph saved"));
+      this.loadSavedGraphs();
+    } catch (err) {
+      this.savedStatus(scholarT("Save failed") + ": " + err.message);
+    }
+  }
+
+  async loadSavedGraph(id) {
+    if (!id) return;
+    try {
+      const resp = await fetch(STX_MOUNT + "/api/graphs/list");
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.error || "Failed");
+      const recipe = (data.graphs || []).find((g) => g.id === id);
+      if (!recipe || !recipe.seed_doi) throw new Error(scholarT("Graph not found"));
+      const doiInput = document.getElementById("doiInput");
+      if (doiInput) doiInput.value = recipe.seed_doi;
+      const topNSelect = document.getElementById("topN");
+      const topN = parseInt(topNSelect ? topNSelect.value : "20", 10);
+      this.buildGraph(recipe.seed_doi, topN);
+    } catch (err) {
+      this.showError(err.message || "An error occurred", true);
+    }
+  }
+
+  async deleteSavedGraph(id) {
+    if (!id) return;
+    try {
+      const resp = await fetch(STX_MOUNT + "/api/graphs/delete", {
+        method: "POST",
+        headers: this.csrfJsonHeaders(),
+        body: JSON.stringify({ id }),
+      });
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.error || scholarT("Delete failed"));
+      this.savedStatus(scholarT("Graph deleted"));
+      this.loadSavedGraphs();
+    } catch (err) {
+      this.savedStatus(scholarT("Delete failed") + ": " + err.message);
+    }
   }
 
   esc(text) {

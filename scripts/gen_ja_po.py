@@ -293,6 +293,18 @@ JA = {
     "Already in library": "登録済み",
     # Slice 7 (old-direct unification): the CSV export option.
     "CSV (.csv)": "CSV (.csv)",
+    # Slice 9 (old-direct unification): the saved-graphs card.
+    "Saved graphs": "保存したグラフ",
+    "Graph name": "グラフ名",
+    "Save current graph": "現在のグラフを保存",
+    "No saved graphs yet.": "保存したグラフはまだありません。",
+    "Load": "読み込む",
+    "Delete": "削除",
+    "Name the graph and build it first.": "グラフに名前を付けて、先に構築してください。",
+    "Graph saved": "グラフを保存しました",
+    "Graph not found": "グラフが見つかりません",
+    "Graph deleted": "グラフを削除しました",
+    "Delete failed": "削除に失敗しました",
     "Imported %(n)s paper from %(file)s": "%(file)s から %(n)s 件の論文をインポートしました",
     "Imported %(n)s papers from %(file)s": "%(file)s から %(n)s 件の論文をインポートしました",
     "Save": "保存",
