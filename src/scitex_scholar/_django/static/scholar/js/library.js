@@ -21,6 +21,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const statsEl = document.getElementById("libraryStats");
   const filterEl = document.getElementById("libraryFilter");
   const filterClearEl = document.getElementById("libraryFilterClear");
+  const retryBtn = document.getElementById("libraryRetryBtn");
+  if (retryBtn) {
+    // Error fallback (UX standard): the load-failure state retries the same
+    // force-reload the filter box already uses -- the list, not a blank.
+    retryBtn.addEventListener("click", () => loadLibrary(true));
+  }
 
   const show = (el) => el && el.classList.remove("hidden");
   const hide = (el) => el && el.classList.add("hidden");

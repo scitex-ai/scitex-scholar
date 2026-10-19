@@ -576,6 +576,9 @@ def _js_i18n_dict() -> dict:
         "Project": _i18n("Project"),
         "All projects": _i18n("All projects"),
         "Project: %(project)s": _i18n("Project: %(project)s"),
+        # Error fallback (UX standard): the retry buttons on all three
+        # surfaces and the graph seed picker render client-side.
+        "Retry": _i18n("Retry"),
     }
 
 
