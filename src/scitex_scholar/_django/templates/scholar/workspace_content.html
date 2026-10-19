@@ -375,6 +375,20 @@
                                     <button type="button"
                                             id="libraryFilterClear"
                                             class="btn-control-library hidden">{% trans "Clear filters" %}</button>
+                                    <!-- Slice 4b (old-direct unification): hub
+                                         sorts the library list from the
+                                         toolbar; the leaf re-renders the
+                                         loaded rows client-side. -->
+                                    <label class="form-label" for="librarySort">{% trans "Sort" %}</label>
+                                    <select id="librarySort" class="form-select" aria-label="{% trans "Sort library" %}">
+                                        <option value="relevance" selected>{% trans "Relevance" %}</option>
+                                        <option value="title-asc">{% trans "Title (A-Z)" %}</option>
+                                        <option value="title-desc">{% trans "Title (Z-A)" %}</option>
+                                        <option value="year-desc">{% trans "Year (newest)" %}</option>
+                                        <option value="year-asc">{% trans "Year (oldest)" %}</option>
+                                        <option value="importance-desc">{% trans "Importance (highest)" %}</option>
+                                        <option value="importance-asc">{% trans "Importance (lowest)" %}</option>
+                                    </select>
                                 </div>
                                 <!-- CSRF: emitted by the standard {% csrf_token %}
                                      tag. Inert standalone (no CsrfViewMiddleware,

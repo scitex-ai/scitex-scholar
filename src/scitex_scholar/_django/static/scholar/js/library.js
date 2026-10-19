@@ -32,6 +32,50 @@ document.addEventListener("DOMContentLoaded", () => {
   const hide = (el) => el && el.classList.add("hidden");
   let loaded = false;
   let filterTimer = null;
+  // Slice 4b (old-direct unification): the loaded rows stay cached so the
+  // sort select re-renders client-side (hub sorts the list from its toolbar).
+  let lastRows = [];
+  const sortEl = document.getElementById("librarySort");
+
+  function annotationOf(paper) {
+    return (paper && paper.annotations) || {};
+  }
+
+  function importanceOf(paper) {
+    const value = annotationOf(paper).importance;
+    return typeof value === "number" ? value : 0;
+  }
+
+  function sortedRows() {
+    const mode = sortEl ? sortEl.value : "relevance";
+    const rows = lastRows.slice();
+    const byTitle = (a, b) =>
+      String(a.title || a.paper_id || "").localeCompare(
+        String(b.title || b.paper_id || ""),
+      );
+    const byYear = (a, b) => (a.year || 0) - (b.year || 0);
+    const byImportance = (a, b) => importanceOf(a) - importanceOf(b);
+    if (mode === "title-asc") rows.sort(byTitle);
+    else if (mode === "title-desc") rows.sort((a, b) => byTitle(b, a));
+    else if (mode === "year-desc") rows.sort((a, b) => byYear(b, a));
+    else if (mode === "year-asc") rows.sort(byYear);
+    else if (mode === "importance-desc")
+      rows.sort((a, b) => byImportance(b, a));
+    else if (mode === "importance-asc") rows.sort(byImportance);
+    return rows;
+  }
+
+  function renderRows() {
+    if (!listEl) return;
+    listEl.replaceChildren();
+    sortedRows().forEach((p) => listEl.appendChild(makeRow(p)));
+  }
+
+  if (sortEl) {
+    sortEl.addEventListener("change", () => {
+      if (loaded) renderRows();
+    });
+  }
 
   // Project sync (parity slice 3c): the header picker navigates with
   // ?project=<id> (the SDK picker's default contract), so the selection is
@@ -142,6 +186,13 @@ document.addEventListener("DOMContentLoaded", () => {
       main.appendChild(proj);
     }
 
+    // Slice 4b: annotation badges (reading status, stars, tags) render from
+    // the row's annotations merge -- no extra round-trip.
+    const badges = document.createElement("div");
+    badges.className = "library-item__annotations";
+    renderBadges(badges, paper);
+    main.appendChild(badges);
+
     // Enrichment status line (filled in after an enrich round-trip).
     const status = document.createElement("div");
     status.className = "library-item__enrich-status";
@@ -164,9 +215,187 @@ document.addEventListener("DOMContentLoaded", () => {
     );
     actions.appendChild(enrichBtn);
 
+    // Slice 4b: per-row Details toggle -- hub expands a details panel from
+    // each library row (status, stars, tags, notes, save).
+    const detailsToggle = document.createElement("button");
+    detailsToggle.type = "button";
+    detailsToggle.className = "library-details-toggle library-enrich-btn";
+    detailsToggle.textContent = scholarT("Details");
+    actions.appendChild(detailsToggle);
+
     item.appendChild(main);
     item.appendChild(actions);
+
+    const details = makeDetails(paper, badges);
+    details.hidden = true;
+    detailsToggle.addEventListener("click", () => {
+      details.hidden = !details.hidden;
+    });
+    item.appendChild(details);
     return item;
+  }
+
+  // Slice 4b: status radios + star rating + tags + notes, saved through the
+  // slice-4a /api/library/annotate endpoint (partial merge, same doc the
+  // list rows already carry).
+  const READING_STATUSES = [
+    ["to_read", "To read"],
+    ["reading", "Reading"],
+    ["read", "Read"],
+    ["referenced", "Referenced"],
+    ["favorite", "Favorite"],
+  ];
+
+  function renderBadges(badgesEl, paper) {
+    badgesEl.replaceChildren();
+    const ann = annotationOf(paper);
+    if (ann.reading_status) {
+      const chip = document.createElement("span");
+      chip.className = "library-annotation__chip";
+      const label = (READING_STATUSES.find(([v]) => v === ann.reading_status) || [])[1];
+      chip.textContent = scholarT(label || ann.reading_status);
+      badgesEl.appendChild(chip);
+    }
+    if (typeof ann.importance === "number" && ann.importance > 0) {
+      const stars = document.createElement("span");
+      stars.className = "library-annotation__stars";
+      stars.textContent = "★".repeat(ann.importance) + "☆".repeat(5 - ann.importance);
+      stars.title = scholarT("Importance");
+      badgesEl.appendChild(stars);
+    }
+    (ann.tags || []).forEach((tag) => {
+      const chip = document.createElement("span");
+      chip.className = "library-annotation__chip library-annotation__chip--tag";
+      chip.textContent = tag;
+      badgesEl.appendChild(chip);
+    });
+  }
+
+  function makeDetails(paper, badgesEl) {
+    const ann = annotationOf(paper);
+    const panel = document.createElement("div");
+    panel.className = "library-item__details";
+
+    const statusLabel = document.createElement("div");
+    statusLabel.className = "library-details__label";
+    statusLabel.textContent = scholarT("Reading status");
+    panel.appendChild(statusLabel);
+
+    const statusGroup = document.createElement("div");
+    statusGroup.className = "library-details__status-group";
+    const groupName = `reading-status-${paper.paper_id || Math.random().toString(36).slice(2)}`;
+    READING_STATUSES.forEach(([value, label]) => {
+      const option = document.createElement("label");
+      option.className = "library-details__status-option";
+      const radio = document.createElement("input");
+      radio.type = "radio";
+      radio.name = groupName;
+      radio.value = value;
+      if (ann.reading_status === value) radio.checked = true;
+      option.appendChild(radio);
+      const text = document.createElement("span");
+      text.textContent = scholarT(label);
+      option.appendChild(text);
+      statusGroup.appendChild(option);
+    });
+    panel.appendChild(statusGroup);
+
+    const starsLabel = document.createElement("div");
+    starsLabel.className = "library-details__label";
+    starsLabel.textContent = scholarT("Importance");
+    panel.appendChild(starsLabel);
+
+    const starsRow = document.createElement("div");
+    starsRow.className = "library-details__stars";
+    let importance = typeof ann.importance === "number" ? ann.importance : 0;
+    const starBtns = [];
+    const paintStars = () => {
+      starBtns.forEach((btn, i) => {
+        btn.textContent = i < importance ? "★" : "☆";
+      });
+    };
+    for (let i = 1; i <= 5; i += 1) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "library-details__star";
+      btn.setAttribute("aria-label", scholarT("Importance") + ` ${i}`);
+      btn.addEventListener("click", () => {
+        // Clicking the current rating clears it (0 = unrated).
+        importance = importance === i ? 0 : i;
+        paintStars();
+      });
+      starBtns.push(btn);
+      starsRow.appendChild(btn);
+    }
+    paintStars();
+    panel.appendChild(starsRow);
+
+    const tagsLabel = document.createElement("div");
+    tagsLabel.className = "library-details__label";
+    tagsLabel.textContent = scholarT("Tags");
+    panel.appendChild(tagsLabel);
+    const tagsInput = document.createElement("input");
+    tagsInput.type = "text";
+    tagsInput.className = "form-input library-details__tags";
+    tagsInput.id = "details-tags";
+    tagsInput.placeholder = scholarT("Add tag...");
+    tagsInput.value = (ann.tags || []).join(", ");
+    panel.appendChild(tagsInput);
+
+    const notesLabel = document.createElement("div");
+    notesLabel.className = "library-details__label";
+    notesLabel.textContent = scholarT("Personal notes");
+    panel.appendChild(notesLabel);
+    const notesInput = document.createElement("textarea");
+    notesInput.className = "form-input library-details__notes";
+    notesInput.id = "details-notes";
+    notesInput.rows = 4;
+    notesInput.placeholder = scholarT("Add your notes about this paper...");
+    notesInput.value = ann.notes || "";
+    panel.appendChild(notesInput);
+
+    const saveRow = document.createElement("div");
+    saveRow.className = "library-details__actions";
+    const saveBtn = document.createElement("button");
+    saveBtn.type = "button";
+    saveBtn.className = "btn-control-library";
+    saveBtn.textContent = scholarT("Save changes");
+    const saveMsg = document.createElement("span");
+    saveMsg.className = "library-details__status";
+    saveMsg.setAttribute("role", "status");
+    saveBtn.addEventListener("click", async () => {
+      saveMsg.textContent = "";
+      const picked = statusGroup.querySelector("input:checked");
+      const payload = { library_id: paper.paper_id };
+      if (picked) payload.reading_status = picked.value;
+      payload.importance = importance;
+      payload.tags = tagsInput.value
+        .split(",")
+        .map((t) => t.trim())
+        .filter((t) => t);
+      payload.notes = notesInput.value;
+      saveBtn.disabled = true;
+      try {
+        const resp = await fetch(`${STX_MOUNT}/api/library/annotate`, {
+          method: "POST",
+          headers: csrfJsonHeaders(),
+          body: JSON.stringify(payload),
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || scholarT("Save failed"));
+        paper.annotations = data.annotations || {};
+        renderBadges(badgesEl, paper);
+        saveMsg.textContent = scholarT("Saved");
+      } catch (err) {
+        saveMsg.textContent = `${scholarT("Save failed")}: ${err.message}`;
+      } finally {
+        saveBtn.disabled = false;
+      }
+    });
+    saveRow.appendChild(saveBtn);
+    saveRow.appendChild(saveMsg);
+    panel.appendChild(saveRow);
+    return panel;
   }
 
   async function enrich(paper, btn, statusEl) {
@@ -283,7 +512,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!papers.length) {
         listEl.appendChild(emptyState(data));
       } else {
-        papers.forEach((p) => listEl.appendChild(makeRow(p)));
+        lastRows = papers;
+        renderRows();
       }
       loaded = true;
     } catch (err) {

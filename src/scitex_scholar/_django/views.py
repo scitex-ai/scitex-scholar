@@ -559,6 +559,23 @@ def _js_i18n_dict() -> dict:
         "Copied %(n)s BibTeX entry": _i18n("Copied %(n)s BibTeX entry"),
         "Copied %(n)s BibTeX entries": _i18n("Copied %(n)s BibTeX entries"),
         "Copy failed": _i18n("Copy failed"),
+        # Library tab slice 4b (old-direct unification): the per-row
+        # details panel renders these client-side -- same rule.
+        "To read": _i18n("To read"),
+        "Reading": _i18n("Reading"),
+        "Read": _i18n("Read"),
+        "Referenced": _i18n("Referenced"),
+        "Favorite": _i18n("Favorite"),
+        "Reading status": _i18n("Reading status"),
+        "Importance": _i18n("Importance"),
+        "Tags": _i18n("Tags"),
+        "Add tag...": _i18n("Add tag..."),
+        "Personal notes": _i18n("Personal notes"),
+        "Add your notes about this paper...": _i18n(
+            "Add your notes about this paper..."
+        ),
+        "Save changes": _i18n("Save changes"),
+        "Details": _i18n("Details"),
         # Graph tab slice 3a (old-direct parity): the library-seed picker
         # renders these client-side, so each MUST be a key here -- an
         # English literal in citation-graph.js is invisible to the catalog
@@ -1442,6 +1459,20 @@ def library_list(request):
     except OSError:
         membership = {}
 
+    from scitex_scholar.storage import _library_annotations as _ann
+
+    def _row_annotations(paper_id: str) -> dict:
+        # Slice 4a: merge the annotations sidecar into each row. A missing
+        # or corrupt sidecar degrades to {} (read_annotations never raises),
+        # so an un-annotated library lists exactly as before this slice.
+        if not paper_id:
+            return {}
+        try:
+            safe_id = _assert_safe_library_id(paper_id)
+        except ValueError:
+            return {}
+        return _ann.read_annotations(root / "MASTER" / safe_id)
+
     papers = [
         {
             "paper_id": r.get("paper_id"),
@@ -1457,6 +1488,7 @@ def library_list(request):
             # papers carry [], never null, so the client can filter
             # without a second round-trip.
             "projects": sorted(membership.get(r.get("paper_id") or "", ())),
+            "annotations": _row_annotations(r.get("paper_id") or ""),
         }
         for r in rows
     ]
@@ -2289,6 +2321,54 @@ def library_save_bulk(request):
         # the server filesystem path (same disclosure class as above).
         saved.append({"library_id": paper.container.library_id})
     return JsonResponse({"saved": saved, "failed": failed})
+
+
+@require_POST
+def library_annotate(request):
+    """Update one paper's user annotations (reading status, importance, tags, notes).
+
+    Body: {"library_id": ..., "reading_status"?, "importance"?, "tags"?, "notes"?}.
+    Partial updates merge into the annotations sidecar
+    (``MASTER/<library_id>/annotations.json``) -- never into metadata.json,
+    so enrichment rewrites can never clobber user data. Unknown fields are
+    refused (400); an unknown paper is 404; a traversal library_id is 400
+    via the shared id validator. Bodies over 256k are refused with 413
+    before parsing, same as the other library writes.
+    """
+    try:
+        payload = _json_body(request)
+    except ValueError as e:
+        if "too large" in str(e):
+            return JsonResponse({"error": str(e)}, status=413)
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    except TypeError:
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    if not isinstance(payload, dict):
+        return JsonResponse({"error": "Body must be an object"}, status=400)
+    try:
+        safe_id = _assert_safe_library_id(payload.get("library_id", ""))
+    except ValueError as e:
+        return JsonResponse({"error": str(e)}, status=400)
+    root = _library_root_for(request)
+    paper_dir = root / "MASTER" / safe_id
+    if not (paper_dir / "metadata.json").is_file():
+        return JsonResponse({"error": "Paper not found"}, status=404)
+    from scitex_scholar.storage import _library_annotations as _ann
+
+    fields = {
+        key: value for key, value in payload.items() if key != "library_id"
+    }
+    clean, error = _ann.validate_annotations(fields)
+    if error is not None or clean is None:
+        return JsonResponse({"error": error or "Invalid annotations"}, status=400)
+    try:
+        stored = _ann.write_annotations(paper_dir, clean)
+    except OSError as e:
+        logger.error(f"library annotate failed: {e}", exc_info=True)
+        return JsonResponse({"error": "Annotate failed. Try again later."}, status=500)
+    return JsonResponse(
+        {"annotated": True, "library_id": safe_id, "annotations": stored}
+    )
 
 
 def _saved_searches_path(root: Path) -> Path:
