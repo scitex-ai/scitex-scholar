@@ -375,6 +375,10 @@
   font-size: 12px;
   color: var(--text-muted);
 }
+.library-details__remove {
+  color: var(--status-error);
+  border-color: var(--status-error);
+}
 
 /*
  * Slice 5 (old-direct unification): import preview-before-save panel.

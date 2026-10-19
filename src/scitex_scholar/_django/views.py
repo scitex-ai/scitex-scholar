@@ -597,6 +597,17 @@ def _js_i18n_dict() -> dict:
         "Graph not found": _i18n("Graph not found"),
         "Graph deleted": _i18n("Graph deleted"),
         "Delete failed": _i18n("Delete failed"),
+        # Library tab slice 10 (old-direct unification): the details
+        # remove action renders client-side -- same rule.
+        "Remove from library": _i18n("Remove from library"),
+        "Remove this paper from the library?": _i18n(
+            "Remove this paper from the library?"
+        ),
+        "Remove failed": _i18n("Remove failed"),
+        # Graph tab slice 10: the saved-list rename action -- same rule.
+        "Rename": _i18n("Rename"),
+        "Graph renamed": _i18n("Graph renamed"),
+        "Rename failed": _i18n("Rename failed"),
         # Graph tab slice 3a (old-direct parity): the library-seed picker
         # renders these client-side, so each MUST be a key here -- an
         # English literal in citation-graph.js is invisible to the catalog
@@ -2708,6 +2719,64 @@ def library_annotate(request):
     )
 
 
+@require_POST
+def library_remove(request):
+    """Remove ONE paper from the user's local library (explicit action).
+
+    Deletes the ``MASTER/<library_id>/`` tree (metadata, sidecars, and any
+    downloaded PDFs/texts) plus every project filing symlink that points
+    at it. Unknown papers are 404; traversal ids are 400 via the shared
+    validator. Bodies over 256k are refused with 413 before parsing, same
+    as the other library writes. The success body carries state only.
+    """
+    try:
+        payload = _json_body(request)
+    except ValueError as e:
+        if "too large" in str(e):
+            return JsonResponse({"error": str(e)}, status=413)
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    except TypeError:
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    if not isinstance(payload, dict):
+        return JsonResponse({"error": "Body must be an object"}, status=400)
+    try:
+        safe_id = _assert_safe_library_id(payload.get("library_id", ""))
+    except ValueError as e:
+        return JsonResponse({"error": str(e)}, status=400)
+    root = _library_root_for(request)
+    paper_dir = root / "MASTER" / safe_id
+    if not (paper_dir / "metadata.json").is_file():
+        return JsonResponse({"error": "Paper not found"}, status=404)
+    try:
+        from scitex_scholar.storage import _project_reconcile as _pr
+
+        try:
+            membership, _broken = _pr.build_project_membership(root)
+        except OSError:
+            membership = {}
+        for project in membership.get(safe_id, ()):
+            try:
+                safe_project = _assert_safe_project_name(project)
+            except ValueError:
+                continue
+            link = root / safe_project / safe_id
+            try:
+                if link.is_symlink():
+                    link.unlink()
+            except OSError as e:
+                logger.error(f"library remove unlink failed: {e}", exc_info=True)
+                return JsonResponse(
+                    {"error": "Remove failed. Try again later."}, status=500
+                )
+        import shutil as _shutil
+
+        _shutil.rmtree(paper_dir)
+    except OSError as e:
+        logger.error(f"library remove failed: {e}", exc_info=True)
+        return JsonResponse({"error": "Remove failed. Try again later."}, status=500)
+    return JsonResponse({"removed": True})
+
+
 def _saved_searches_path(root: Path) -> Path:
     """Single JSON file holding this user's saved searches."""
     return root / "SAVED_SEARCHES" / "saved_searches.json"
@@ -2966,6 +3035,55 @@ def graphs_delete(request):
         logger.error(f"graphs delete failed: {e}", exc_info=True)
         return JsonResponse({"error": "Delete failed. Try again later."}, status=500)
     return JsonResponse({"deleted": True})
+
+
+@require_POST
+def graphs_rename(request):
+    """Rename one saved graph; 404 when unknown (hub api_rename_graph parity).
+
+    Body: {"id": ..., "name": ...}. Names cap at 200 chars like graphs_save.
+    Unlike hub (409 on a name clash), duplicate names are allowed -- the
+    leaf save path never enforced uniqueness either, so rename stays
+    consistent with save rather than stricter than it. Bodies over 256k
+    are refused with 413 before parsing. The success body carries the
+    stored id + name (server-issued state, not caller input verbatim --
+    the name passed validation first).
+    """
+    try:
+        payload = _json_body(request)
+    except ValueError as e:
+        if "too large" in str(e):
+            return JsonResponse({"error": str(e)}, status=413)
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    except TypeError:
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    if not isinstance(payload, dict):
+        return JsonResponse({"error": "Body must be an object"}, status=400)
+    graph_id = payload.get("id")
+    if not graph_id:
+        return JsonResponse({"error": "id is required"}, status=400)
+    name = (payload.get("name") or "").strip()
+    if not name:
+        return JsonResponse({"error": "name is required"}, status=400)
+    if len(name) > _MAX_GRAPH_NAME_CHARS:
+        return JsonResponse(
+            {"error": f"name must be at most {_MAX_GRAPH_NAME_CHARS} characters"},
+            status=400,
+        )
+    root = _library_root_for(request)
+    rows = _load_saved_graphs(root)
+    for row in rows:
+        if row.get("id") == graph_id:
+            row["name"] = name
+            break
+    else:
+        return JsonResponse({"error": "Unknown id"}, status=404)
+    try:
+        _write_saved_graphs(root, rows)
+    except OSError as e:
+        logger.error(f"graphs rename failed: {e}", exc_info=True)
+        return JsonResponse({"error": "Rename failed. Try again later."}, status=500)
+    return JsonResponse({"renamed": True, "id": graph_id, "name": name})
 
 
 # EOF
