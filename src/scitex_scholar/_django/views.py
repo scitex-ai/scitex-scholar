@@ -1904,6 +1904,88 @@ def _row_to_formatting_dict(row: dict) -> dict:
     }
 
 
+def _paper_obj_to_formatting_dict(paper) -> dict:
+    """Map a loaded Paper object to the dict shape papers_to_format expects.
+
+    Same keys as _row_to_formatting_dict (which maps index rows); the two
+    stay in sync so single-paper and whole-library exports render
+    identically.
+    """
+    authors = paper.metadata.basic.authors or []
+    names = [
+        a if isinstance(a, str) else (a.get("name") if isinstance(a, dict) else str(a))
+        for a in authors
+        if a
+    ]
+    return {
+        "title": paper.metadata.basic.title or "",
+        "authors": names,
+        "authors_str": " and ".join(names),
+        "year": paper.metadata.basic.year,
+        "journal": getattr(paper.metadata.publication, "journal", None),
+        "doi": paper.metadata.id.doi or "",
+        "pmid": getattr(paper.metadata.id, "pmid", None),
+        "abstract": paper.metadata.basic.abstract,
+    }
+
+
+@require_GET
+def library_citation(request):
+    """Format ONE library paper's citation (hub export get_citation parity).
+
+    ?library_id= (required) + ?format= over LIBRARY_EXPORT_FORMATS
+    (default bibtex). Returns {"citation": <string>, "format": fmt} for
+    copy-paste. Unknown papers are 404; traversal ids are 400 via the
+    shared validator. ?format= travels by GET, so no body cap applies.
+    """
+    fmt = (request.GET.get("format") or "bibtex").strip().lower()
+    if fmt not in LIBRARY_EXPORT_FORMATS:
+        return JsonResponse(
+            {
+                "error": "Unsupported export format",
+                "supported": list(LIBRARY_EXPORT_FORMATS),
+            },
+            status=400,
+        )
+    try:
+        safe_id = _assert_safe_library_id(request.GET.get("library_id", ""))
+    except ValueError as e:
+        return JsonResponse({"error": str(e)}, status=400)
+    root = _library_root_for(request)
+    if not (root / "MASTER" / safe_id / "metadata.json").is_file():
+        return JsonResponse({"error": "Paper not found"}, status=404)
+    from scitex_scholar.formatting import papers_to_format, to_csv_row
+
+    try:
+        paper = _load_library_paper(root, safe_id)
+        formatted = _paper_obj_to_formatting_dict(paper)
+        if fmt == "csv":
+            import csv as _csv
+            import io as _io
+
+            buffer = _io.StringIO()
+            fieldnames = [
+                "Title",
+                "Authors",
+                "Journal",
+                "Year",
+                "DOI",
+                "PMID",
+                "URL",
+                "Abstract",
+            ]
+            writer = _csv.DictWriter(buffer, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerow(to_csv_row(formatted))
+            citation = buffer.getvalue()
+        else:
+            citation = papers_to_format([formatted], fmt)
+    except Exception as e:
+        logger.error(f"library citation ({fmt}) failed: {e}", exc_info=True)
+        return JsonResponse({"error": "Citation failed. Try again later."}, status=500)
+    return JsonResponse({"citation": citation, "format": fmt})
+
+
 @require_GET
 def library_export(request):
     """Export the user's local library to bibtex / ris / endnote / csv.
