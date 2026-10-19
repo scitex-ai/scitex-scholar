@@ -98,6 +98,7 @@ class ScholarSearchEngine:
         filters: Optional[Dict[str, Any]] = None,
         max_results: int = 100,
         parse_query: bool = True,
+        sources: Any = None,
     ) -> Dict[str, Any]:
         """Search for academic papers across multiple databases.
 
@@ -107,6 +108,8 @@ class ScholarSearchEngine:
             filters: Additional filters (merged with parsed query filters)
             max_results: Maximum number of results to return
             parse_query: Whether to parse query for advanced syntax
+            sources: Optional explicit source selection (old-direct Sources
+                grid). Runs exactly those engines; None/empty keeps tiers.
 
         Returns:
             Dict with:
@@ -173,6 +176,7 @@ class ScholarSearchEngine:
                 query=clean_query,
                 filters=combined_filters,
                 max_results=max_results,
+                sources=sources,
             )
 
             # Update statistics

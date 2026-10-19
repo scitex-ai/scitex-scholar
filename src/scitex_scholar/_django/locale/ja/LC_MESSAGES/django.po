@@ -44,6 +44,33 @@ msgstr "すべてのソース（並列）"
 msgid "Single source"
 msgstr "単一ソース"
 
+msgid "Sources"
+msgstr "ソース"
+
+msgid "Crossref database on the SciTeX server — fast, unlimited"
+msgstr "SciTeXサーバー上のCrossrefデータベース — 高速、無制限"
+
+msgid "OpenAlex database on the SciTeX server — fast, unlimited"
+msgstr "SciTeXサーバー上のOpenAlexデータベース — 高速、無制限"
+
+msgid "NCBI PubMed — biomedical literature"
+msgstr "NCBI PubMed — 生物医学文献"
+
+msgid "arXiv — physics, mathematics, and computer science preprints"
+msgstr "arXiv — 物理学・数学・計算機科学のプレプリント"
+
+msgid "Semantic Scholar — AI-powered academic search"
+msgstr "Semantic Scholar — AI駆動の学術検索"
+
+msgid "Crossref — DOI metadata registry"
+msgstr "Crossref — DOIメタデータレジストリ"
+
+msgid "OpenAlex — open catalog of scholarly works"
+msgstr "OpenAlex — 学術成果物のオープンカタログ"
+
+msgid "Uncheck sources to narrow the search. All checked searches the default set."
+msgstr "ソースのチェックを外すと検索範囲が狭まります。すべて選択時はデフォルト設定で検索します。"
+
 msgid "Ignore cache"
 msgstr "キャッシュを無視"
 
@@ -358,6 +385,9 @@ msgstr "ローカルコーパス（NAS）"
 
 msgid "Online fallback"
 msgstr "オンラインへのフォールバック"
+
+msgid "Selected sources"
+msgstr "選択したソース"
 
 msgid "Imported %(n)s paper from %(file)s"
 msgstr "%(file)s から %(n)s 件の論文をインポートしました"

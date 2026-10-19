@@ -322,4 +322,73 @@ def resolve_tier(
     return "online_fallback", "local corpora returned no results"
 
 
+#: Hub/UI spelling -> canonical engine name. The old-direct Sources grid
+#: posts lowercase ``crossref_local``-style values (see hub
+#: ``api_unified._get_sources_to_search``); the leaf engine registry keys
+#: are the ``LOCAL_CORPUS_SOURCES`` / ``ONLINE_ENGINES`` names. Canonical
+#: names map to themselves so already-canonical callers pass through, and
+#: matching is case-insensitive (``normalize_sources`` casefolds first).
+SOURCE_ALIASES: Dict[str, str] = {
+    "crossreflocal": "CrossRefLocal",
+    "crossref_local": "CrossRefLocal",
+    "openalexlocal": "OpenAlexLocal",
+    "openalex_local": "OpenAlexLocal",
+    "pubmed": "PubMed",
+    "arxiv": "arXiv",
+    "semantic": "Semantic_Scholar",
+    "semanticscholar": "Semantic_Scholar",
+    "semantic_scholar": "Semantic_Scholar",
+    "crossref": "CrossRef",
+    "openalex": "OpenAlex",
+    "crossreflocal_corpus": "CrossRefLocal",
+    "openalexlocal_corpus": "OpenAlexLocal",
+}
+
+
+def normalize_sources(raw: Any) -> Optional[List[str]]:
+    """Map a user source selection to canonical engine names.
+
+    Accepts the hub ``?sources=a,b,c`` comma string or a list. Unknown
+    names are dropped with a warning (hub parity: never fail the search
+    for a bad source value); an empty selection or an all-unknown one
+    returns None, meaning the tiered default path stays in charge.
+    Duplicates collapse, order is preserved.
+    """
+    if raw is None:
+        return None
+    parts = raw.split(",") if isinstance(raw, str) else list(raw)
+    known_fold = {k.lower(): k for k in list(LOCAL_CORPUS_SOURCES) + list(ONLINE_ENGINES)}
+    out: List[str] = []
+    for part in parts:
+        key = str(part).strip().lower().replace(" ", "")
+        if not key:
+            continue
+        canonical = SOURCE_ALIASES.get(key, known_fold.get(key))
+        if canonical is None:
+            logger.warning(f"source selection: unknown source {str(part).strip()!r} dropped")
+            continue
+        if canonical not in out:
+            out.append(canonical)
+    return out or None
+
+
+def select_engines(engines: Dict[str, Any], sources: Any) -> Dict[str, Any]:
+    """Restrict an engine mapping to an explicit selection.
+
+    ``sources`` is anything ``normalize_sources`` accepts. Unresolvable
+    names are already dropped there; names absent from THIS mapping (e.g.
+    not installed here) are skipped with a warning rather than retried.
+    """
+    wanted = normalize_sources(sources)
+    if not wanted:
+        return dict(engines)
+    selected = {}
+    for name in wanted:
+        if name in engines:
+            selected[name] = engines[name]
+        else:
+            logger.warning(f"source selection: {name!r} not available here; skipped")
+    return selected
+
+
 # EOF

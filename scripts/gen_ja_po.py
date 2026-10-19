@@ -225,6 +225,22 @@ JA = {
     "No papers matched this query.": "このクエリに一致する論文はありませんでした。",
     "Local corpus (NAS)": "ローカルコーパス（NAS）",
     "Online fallback": "オンラインへのフォールバック",
+    # Slice 1 (old-direct unification): the Sources grid titles, hint, and
+    # the selected-sources header label.
+    "Sources": "ソース",
+    "Crossref database on the SciTeX server — fast, unlimited":
+        "SciTeXサーバー上のCrossrefデータベース — 高速、無制限",
+    "OpenAlex database on the SciTeX server — fast, unlimited":
+        "SciTeXサーバー上のOpenAlexデータベース — 高速、無制限",
+    "NCBI PubMed — biomedical literature": "NCBI PubMed — 生物医学文献",
+    "arXiv — physics, mathematics, and computer science preprints":
+        "arXiv — 物理学・数学・計算機科学のプレプリント",
+    "Semantic Scholar — AI-powered academic search": "Semantic Scholar — AI駆動の学術検索",
+    "Crossref — DOI metadata registry": "Crossref — DOIメタデータレジストリ",
+    "OpenAlex — open catalog of scholarly works": "OpenAlex — 学術成果物のオープンカタログ",
+    "Uncheck sources to narrow the search. All checked searches the default set.":
+        "ソースのチェックを外すと検索範囲が狭まります。すべて選択時はデフォルト設定で検索します。",
+    "Selected sources": "選択したソース",
     "Imported %(n)s paper from %(file)s": "%(file)s から %(n)s 件の論文をインポートしました",
     "Imported %(n)s papers from %(file)s": "%(file)s から %(n)s 件の論文をインポートしました",
     "Save": "保存",

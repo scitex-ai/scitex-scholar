@@ -25,6 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("searchInput");
   const maxResults = document.getElementById("searchMaxResults");
   const modeSelect = document.getElementById("searchMode");
+  const sourcesGrid = document.getElementById("searchSourcesGrid");
   const noCache = document.getElementById("searchNoCache");
   const loading = document.getElementById("searchLoading");
   const errorBox = document.getElementById("searchError");
@@ -344,13 +345,23 @@ document.addEventListener("DOMContentLoaded", () => {
     // READINESS: which corpus answered. The configured policy is local-first,
     // and the user (and a bug report) must be able to see when the network was
     // actually needed -- a silent fallback is indistinguishable from a local
-    // hit that happened to work.
-    if (metadata.source_tier) {
+    // hit that happened to work. An explicit Sources selection reports
+    // itself plus the per-engine counts (old-direct's inline source status).
+    if (metadata.source_tier === "selected") {
+      parts.push(scholarT("Selected sources"));
+    } else if (metadata.source_tier) {
       parts.push(
         metadata.source_tier === "primary"
           ? scholarT("Local corpus (NAS)")
           : scholarT("Online fallback"),
       );
+    }
+    const counts = metadata.engine_counts || {};
+    const counted = Object.keys(counts);
+    if (counted.length) {
+      // Per-source options are corpus proper nouns and stay as-is (same
+      // convention as the source filter's dynamically built options).
+      parts.push(counted.map((name) => `${name} ${counts[name]}`).join(", "));
     }
     stats.textContent = parts.join(" · ");
     show(results);
@@ -499,6 +510,20 @@ document.addEventListener("DOMContentLoaded", () => {
         max_results: maxResults.value,
       });
       if (modeSelect) params.set("mode", modeSelect.value);
+      if (sourcesGrid) {
+        // Old-direct Sources semantics: the checked set travels as
+        // ?sources=a,b,c. All (or none) checked is the tiered default --
+        // omit the param so the request behaves exactly as before.
+        const boxes = Array.from(
+          sourcesGrid.querySelectorAll("input.source-toggle"),
+        );
+        const checked = boxes
+          .filter((box) => box.checked)
+          .map((box) => box.value);
+        if (checked.length && checked.length < boxes.length) {
+          params.set("sources", checked.join(","));
+        }
+      }
       if (noCache && noCache.checked) params.set("no_cache", "true");
       const response = await fetch(`${STX_MOUNT}/api/search?${params}`);
       const data = await response.json();
