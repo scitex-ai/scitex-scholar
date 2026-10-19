@@ -164,6 +164,12 @@ msgstr "選択を保存"
 msgid "Save & enrich"
 msgstr "保存して補完"
 
+msgid "Download open-access PDFs for the selected results"
+msgstr "選択した結果のオープンアクセスPDFをダウンロード"
+
+msgid "PDFs"
+msgstr "PDF"
+
 msgid "Export"
 msgstr "エクスポート"
 
@@ -604,6 +610,30 @@ msgstr "グラフ名を変更しました"
 
 msgid "Rename failed"
 msgstr "名前の変更に失敗しました"
+
+msgid "Download PDF"
+msgstr "PDFをダウンロード"
+
+msgid "PDF downloaded"
+msgstr "PDFをダウンロードしました"
+
+msgid "Download failed"
+msgstr "ダウンロードに失敗しました"
+
+msgid "Downloaded %(done)s of %(total)s PDFs"
+msgstr "%(total)s 件中 %(done)s 件のPDFをダウンロードしました"
+
+msgid "No open-access PDF available"
+msgstr "オープンアクセスのPDFがありません"
+
+msgid "Paper not found"
+msgstr "論文が見つかりません"
+
+msgid "Load failed. Try again later."
+msgstr "読み込みに失敗しました。後でもう一度お試しください。"
+
+msgid "Download failed. Try again later."
+msgstr "ダウンロードに失敗しました。後でもう一度お試しください。"
 
 msgid "No papers with a DOI in your library yet."
 msgstr "ライブラリにはDOI付きの論文がまだありません。"

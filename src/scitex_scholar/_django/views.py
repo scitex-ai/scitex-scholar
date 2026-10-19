@@ -608,6 +608,19 @@ def _js_i18n_dict() -> dict:
         "Rename": _i18n("Rename"),
         "Graph renamed": _i18n("Graph renamed"),
         "Rename failed": _i18n("Rename failed"),
+        # Search tab slice 11 (old-direct unification): the PDFs bulk
+        # pill + Library details download button -- same rule. Server
+        # per-item errors render through scholarT too, so they are keys.
+        "Download PDF": _i18n("Download PDF"),
+        "PDF downloaded": _i18n("PDF downloaded"),
+        "Download failed": _i18n("Download failed"),
+        "Downloaded %(done)s of %(total)s PDFs": _i18n(
+            "Downloaded %(done)s of %(total)s PDFs"
+        ),
+        "No open-access PDF available": _i18n("No open-access PDF available"),
+        "Paper not found": _i18n("Paper not found"),
+        "Load failed. Try again later.": _i18n("Load failed. Try again later."),
+        "Download failed. Try again later.": _i18n("Download failed. Try again later."),
         # Graph tab slice 3a (old-direct parity): the library-seed picker
         # renders these client-side, so each MUST be a key here -- an
         # English literal in citation-graph.js is invisible to the catalog
@@ -2775,6 +2788,98 @@ def library_remove(request):
         logger.error(f"library remove failed: {e}", exc_info=True)
         return JsonResponse({"error": "Remove failed. Try again later."}, status=500)
     return JsonResponse({"removed": True})
+
+
+#: Largest accepted download batch (hub parity: one network fetch per item
+#: through the OA strategy's own 60s timeout; an unbounded list parks the
+#: worker on network IO per request).
+_MAX_DOWNLOAD_IDS = 10
+
+
+@require_POST
+def library_download_pdfs(request, _fetch=None):
+    """Download open-access PDFs for library papers (explicit action).
+
+    Body: {"library_ids": [...], at most 10}. Each id resolves under the
+    request's user-scoped MASTER/ (a traversal id fails the whole batch
+    with 400 via the shared validator); papers without an OA URL and
+    unknown papers land in per-index ``failed`` rows, never raised.
+    Bodies over 256k are refused with 413 before parsing.
+
+    ``_fetch`` is a test-injection seam (PA-306): an async callable
+    ``(oa_url, output_path, metadata=None) -> Path | None``. Production
+    uses the package's plain-HTTP OA strategy (NOT the browser-bound
+    downloader class, which needs a Playwright context no view owns).
+    """
+    try:
+        payload = _json_body(request)
+    except ValueError as e:
+        if "too large" in str(e):
+            return JsonResponse({"error": str(e)}, status=413)
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    except TypeError:
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    if not isinstance(payload, dict):
+        return JsonResponse({"error": "Body must be an object"}, status=400)
+    library_ids = payload.get("library_ids")
+    if not isinstance(library_ids, list) or not library_ids:
+        return JsonResponse({"error": "library_ids must be a non-empty list"}, status=400)
+    if len(library_ids) > _MAX_DOWNLOAD_IDS:
+        return JsonResponse(
+            {"error": f"library_ids must contain at most {_MAX_DOWNLOAD_IDS} items"},
+            status=400,
+        )
+    safe_ids = []
+    for raw_id in library_ids:
+        try:
+            safe_ids.append(_assert_safe_library_id(raw_id))
+        except ValueError as e:
+            # Fixed validator message only; the caller-supplied id is never
+            # echoed (same reflection class as the save-bulk row handles).
+            return JsonResponse({"error": str(e)}, status=400)
+    root = _library_root_for(request)
+    if _fetch is None:
+        from scitex_scholar.pdf_download.strategies.open_access_download import (
+            try_download_open_access_async as _fetch,
+        )
+    from scitex_scholar.storage.PaperIO import PaperIO
+
+    downloaded, failed = [], []
+    for i, safe_id in enumerate(safe_ids):
+        paper_dir = root / "MASTER" / safe_id
+        if not (paper_dir / "metadata.json").is_file():
+            failed.append({"index": i, "error": "Paper not found"})
+            continue
+        try:
+            paper = _load_library_paper(root, safe_id)
+        except Exception as e:
+            logger.error(f"library download-pdfs load failed: {e}", exc_info=True)
+            failed.append({"index": i, "error": "Load failed. Try again later."})
+            continue
+        oa_url = (paper.metadata.access.oa_url or "").strip()
+        if not oa_url:
+            failed.append({"index": i, "error": "No open-access PDF available"})
+            continue
+        try:
+            fetched = asyncio.run(
+                _fetch(oa_url, paper_dir / "download-tmp.pdf", metadata=None)
+            )
+            if not fetched:
+                failed.append({"index": i, "error": "Download failed. Try again later."})
+                continue
+            io = PaperIO(paper, base_dir=root / "MASTER")
+            io.save_pdf(Path(fetched))
+            _save_library_paper(paper, root)
+            downloaded.append({"library_id": safe_id})
+        except Exception as e:
+            logger.error(f"library download-pdfs failed: {e}", exc_info=True)
+            failed.append({"index": i, "error": "Download failed. Try again later."})
+        finally:
+            try:
+                (paper_dir / "download-tmp.pdf").unlink(missing_ok=True)
+            except OSError:
+                pass
+    return JsonResponse({"downloaded": downloaded, "failed": failed})
 
 
 def _saved_searches_path(root: Path) -> Path:

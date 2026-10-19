@@ -259,6 +259,10 @@
                                         </label>
                                         <button type="button" id="searchSaveSelected" class="btn-control-library">{% trans "Save selected" %}</button>
                                         <button type="button" id="searchEnrichSelected" class="btn-control-library">{% trans "Save & enrich" %}</button>
+                                        <!-- Slice 11 (old-direct unification):
+                                             hub's header downloads PDFs for
+                                             the checked rows (OA only). -->
+                                        <button type="button" id="searchDownloadPdfs" class="btn-control-library" title="{% trans "Download open-access PDFs for the selected results" %}">{% trans "PDFs" %}</button>
                                         <span id="searchBulkStatus" class="search-bulk-status" role="status"></span>
                                     </div>
                                 </div>

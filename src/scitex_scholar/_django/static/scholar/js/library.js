@@ -397,6 +397,43 @@ document.addEventListener("DOMContentLoaded", () => {
     saveRow.appendChild(saveMsg);
     panel.appendChild(saveRow);
 
+    // Slice 11: per-paper OA PDF download (hub library PDF actions).
+    const pdfRow = document.createElement("div");
+    pdfRow.className = "library-details__actions";
+    const pdfBtn = document.createElement("button");
+    pdfBtn.type = "button";
+    pdfBtn.className = "btn-control-library";
+    pdfBtn.textContent = scholarT("Download PDF");
+    const pdfMsg = document.createElement("span");
+    pdfMsg.className = "library-details__status";
+    pdfMsg.setAttribute("role", "status");
+    pdfBtn.addEventListener("click", async () => {
+      pdfMsg.textContent = "";
+      pdfBtn.disabled = true;
+      try {
+        const resp = await fetch(`${STX_MOUNT}/api/library/download-pdfs`, {
+          method: "POST",
+          headers: csrfJsonHeaders(),
+          body: JSON.stringify({ library_ids: [paper.paper_id] }),
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || scholarT("Download failed"));
+        if ((data.downloaded || []).length) {
+          pdfMsg.textContent = scholarT("PDF downloaded");
+        } else {
+          const first = (data.failed || [])[0] || {};
+          pdfMsg.textContent = first.error || scholarT("Download failed");
+        }
+      } catch (err) {
+        pdfMsg.textContent = `${scholarT("Download failed")}: ${err.message}`;
+      } finally {
+        pdfBtn.disabled = false;
+      }
+    });
+    pdfRow.appendChild(pdfBtn);
+    pdfRow.appendChild(pdfMsg);
+    panel.appendChild(pdfRow);
+
     // Slice 10: remove-from-library (hub details parity). Guarded by a
     // confirm -- hub deletes directly, but an undeleteable file tree
     // deserves one explicit gate.

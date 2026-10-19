@@ -50,6 +50,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const saveSelectedBtn = document.getElementById("searchSaveSelected");
   const enrichSelectedBtn = document.getElementById("searchEnrichSelected");
   const bulkStatus = document.getElementById("searchBulkStatus");
+  // Slice 11 (old-direct unification): PDFs bulk pill -- hub downloads
+  // OA PDFs for the checked rows.
+  const downloadPdfsBtn = document.getElementById("searchDownloadPdfs");
   // Slice 3 (old-direct unification): the results-header tools -- abstract
   // truncated/full toggle, open-selected-URLs, export-selected-BibTeX.
   const abstractToggle = document.getElementById("searchAbstractToggle");
@@ -605,6 +608,51 @@ document.addEventListener("DOMContentLoaded", () => {
   if (saveSelectedBtn) saveSelectedBtn.addEventListener("click", saveSelected);
   if (enrichSelectedBtn) {
     enrichSelectedBtn.addEventListener("click", enrichSelected);
+  }
+  // Slice 11: save-then-download. Search rows are not library papers, so
+  // the pill files the selection first (existing save-bulk), then fetches
+  // OA PDFs for the filed ids (max 10 per the endpoint cap).
+  async function downloadSelectedPdfs() {
+    const papers = selectedPapers();
+    if (!papers.length) {
+      if (bulkStatus) bulkStatus.textContent = scholarT("Select results to save.");
+      return;
+    }
+    if (downloadPdfsBtn) downloadPdfsBtn.disabled = true;
+    if (bulkStatus) bulkStatus.textContent = "";
+    try {
+      const saveResp = await fetch(`${STX_MOUNT}/api/library/save-bulk`, {
+        method: "POST",
+        headers: csrfHeaders({ "Content-Type": "application/json" }),
+        body: JSON.stringify({ papers: papers.map(savePayload), project: currentProject() }),
+      });
+      const saved = await saveResp.json();
+      if (!saveResp.ok) throw new Error(saved.error || scholarT("Save failed"));
+      const ids = (saved.saved || []).map((row) => row.library_id).filter((id) => id);
+      if (!ids.length) throw new Error(scholarT("Save failed"));
+      const dlResp = await fetch(`${STX_MOUNT}/api/library/download-pdfs`, {
+        method: "POST",
+        headers: csrfHeaders({ "Content-Type": "application/json" }),
+        body: JSON.stringify({ library_ids: ids.slice(0, 10) }),
+      });
+      const data = await dlResp.json();
+      if (!dlResp.ok) throw new Error(data.error || scholarT("Download failed"));
+      const done = (data.downloaded || []).length;
+      const failed = (data.failed || []).length;
+      if (bulkStatus) {
+        bulkStatus.textContent = scholarT("Downloaded %(done)s of %(total)s PDFs", {
+          done,
+          total: done + failed,
+        });
+      }
+    } catch (err) {
+      showError(`${scholarT("Download failed")}: ${err.message}`, downloadSelectedPdfs);
+    } finally {
+      if (downloadPdfsBtn) downloadPdfsBtn.disabled = false;
+    }
+  }
+  if (downloadPdfsBtn) {
+    downloadPdfsBtn.addEventListener("click", downloadSelectedPdfs);
   }
   // Slice 3: header tools over the checked rows (hub results-header parity).
   if (abstractToggle) {
