@@ -2,7 +2,13 @@
         <!-- Scholar leaf header: SDK SSoT row (writer shape). The ROW is the
             shared `.stx-app-header` sheet (linked in workspace_assets head);
             the leaf owns only identity (title + live leaf version, never a
-            subtitle) and the project-selector slot. -->
+            subtitle), the project-selector slot, and the (empty) actions
+            slot. Scholar is user-scoped, so the shared picker is opted in
+            with allow_user_scope + current_scope (operator CCT4595): without
+            the opt-in the tag renders nothing and the slot stands empty.
+            The header picker is the ONE project selector (operator CCT4597);
+            the Library tab carries only a read-only reflection of the same
+            ?project= state, never a second selection control. -->
         <header class="stx-app-header scholar-app-header">
             <div class="stx-app-header__identity">
                 <span class="stx-app-header__title">{% trans "SciTeX Scholar" %}</span>
@@ -10,8 +16,9 @@
                       title="scitex-scholar package serving this page">v{{ scholar_version }}</span>
             </div>
             <div class="stx-app-header__slot--project-selector">
-                {% scitex_project_picker scope=app_scope current=current_project %}
+                {% scitex_project_picker scope=app_scope current=current_project allow_user_scope=True current_scope=current_scope %}
             </div>
+            <div class="stx-app-header__actions"></div>
         </header>
         <div class="app-container" data-scholar-root>
             <!-- No left sidebar: even graph interaction hints live in the
@@ -201,16 +208,14 @@
                                     <button type="button" id="libraryImportBtn" class="btn-control-library">{% trans "Import BibTeX" %}</button>
                                 </div>
                                 <div id="libraryIoStatus" class="library-io__status"></div>
-                                <!-- Project sync (parity slice 3c): the header
-                                     picker selects the project (?project=
-                                     navigation); the Library view shows the
-                                     sync target and filters to filed papers.
-                                     Chips are rendered by library.js from
-                                     the existing /api/projects endpoint. -->
+                                <!-- Project sync: the HEADER picker is the one project
+                                     selector (?project= navigation); the Library
+                                     view only reflects the same state as
+                                     read-only text and filters to filed papers.
+                                     No second selection control lives here
+                                     (operator CCT4597). -->
                                 <div class="library-project">
                                     <span id="libraryProjectCurrent" class="library-project__current">{% trans "Project" %}</span>
-                                    <span class="library-io__sep"></span>
-                                    <div id="libraryProjectChips" class="library-project__chips"></div>
                                 </div>
                                 <!-- External imports (parity slice 3b): Zotero
                                      local-DB and Connected Papers reflection

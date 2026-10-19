@@ -47,7 +47,19 @@ def _rendered_dom(html, secret):
 
 
 def _body_elements(dom):
-    """Compare the two genuine content roots, retaining their inner DOM/text."""
+    """Compare the two genuine content roots, retaining their inner DOM/text.
+
+    The SDK picker's i18n catalog script is document-level dedup state, not
+    leaf content: the full page (shell emitted it first) suppresses the
+    nested copy while the standalone fragment emits it. Strip it on both
+    sides -- script node and its trailing newline -- so the comparison stays
+    about Scholar's own markup.
+    """
+    for catalog in dom.select('script[id^="scitex-i18n-catalog-"]'):
+        trailing = catalog.next_sibling
+        catalog.decompose()
+        if isinstance(trailing, str) and not trailing.strip():
+            trailing.extract()
     return tuple(
         str(dom.select_one(selector))
         for selector in (".stx-app-header", ".app-container")
@@ -96,10 +108,15 @@ def test_index_workspace_content_preserves_native_rendering(
         fragment, fragment_csrf = _rendered_dom(fragment_html, secret)
         result = {
             "status": response.status_code,
-            "content_roots": _body_elements(fragment),
+            # Counted BEFORE _body_elements below: the shared picker is
+            # self-contained (stylesheet link + i18n catalog script + module
+            # script, operator CCT4595), and _body_elements strips the catalog
+            # as document-level dedup state. The fragment carries exactly that
+            # triple, nothing else.
             "fragment_outer_or_assets": len(
                 fragment.select("html,head,body,script,link,meta")
             ),
+            "content_roots": _body_elements(fragment),
             "content_ids": {
                 node["id"] for node in fragment.select("[id]")
             } & _CONTENT_IDS,
@@ -128,7 +145,7 @@ def test_index_workspace_content_preserves_native_rendering(
         expected = {
             "status": 200,
             "content_roots": _body_elements(full),
-            "fragment_outer_or_assets": 0,
+            "fragment_outer_or_assets": 3,
             "content_ids": _CONTENT_IDS,
             "csrf": ([True], [True]),
             "cookies": (secret, secret),

@@ -3495,8 +3495,9 @@ def test_reserved_picker_filter_uses_the_storage_contract_set():
 
 @pytest.fixture(params=["", "?project=Alpha"], ids=["default", "explicit-project"])
 def _rendered_user_scope_header(request, tmp_path):
-    # Arrange -- Scholar is user-scoped. The genuine shared picker still renders
-    # once when the same header is explicitly rendered for project scope.
+    # Arrange -- Scholar is user-scoped but opts into the ONE shared picker
+    # (allow_user_scope + current_scope, operator CCT4595). The project-scope
+    # render below stays as the explicit-scope control.
     (tmp_path / "Alpha").mkdir()
     manifest = json.loads(
         (Path(views.__file__).parent / "manifest.json").read_text()
@@ -3511,7 +3512,11 @@ def _rendered_user_scope_header(request, tmp_path):
         html = response.content.decode()
         project_html = render_to_string(
             "scholar/scholar.html",
-            {"app_scope": "project", "current_project": "Alpha"},
+            {
+                "app_scope": "project",
+                "current_project": "Alpha",
+                "current_scope": "project",
+            },
             request=http_request,
         )
     return {
@@ -3556,13 +3561,14 @@ def test_index_user_scope_keeps_canonical_picker_slot(_rendered_user_scope_heade
     assert html.count('class="stx-app-header__slot--project-selector"') == 1
 
 
-def test_index_user_scope_suppresses_picker(_rendered_user_scope_header):
+def test_index_user_scope_renders_one_shared_picker(_rendered_user_scope_header):
     # Arrange
-    # A project query cannot turn the user-level index into a project-scoped page.
+    # The user-level index carries the ONE shared picker (operator CCT4595);
+    # a project query only moves it to project scope, never a second picker.
     # Act
     # Read the actual index markup supplied by the fixture.
     # Assert
-    assert _rendered_user_scope_header["html"].count("data-stx-project-picker") == 0
+    assert _rendered_user_scope_header["html"].count("data-stx-project-picker") == 1
 
 
 def test_project_header_renders_one_picker(_rendered_user_scope_header):
@@ -3576,8 +3582,9 @@ def test_project_header_renders_one_picker(_rendered_user_scope_header):
 
 @pytest.fixture
 def _rendered_project_query_header(tmp_path):
-    # Arrange -- preserve the shared primitive's navigation assertion as a
-    # project-scope control, rather than requiring a picker on Scholar's index.
+    # Arrange -- the shared primitive's navigation assertion now runs against
+    # Scholar's own index (the header picker renders there), with the
+    # project-scope render kept as the explicit-scope control.
     (tmp_path / "Alpha").mkdir()
     request = RequestFactory().get("/?project=Alpha")
     settings_override = override_settings(
@@ -3588,18 +3595,22 @@ def _rendered_project_query_header(tmp_path):
         html = views.index(request).content.decode()
         project_html = render_to_string(
             "scholar/scholar.html",
-            {"app_scope": "project", "current_project": "Alpha"},
+            {
+                "app_scope": "project",
+                "current_project": "Alpha",
+                "current_scope": "project",
+            },
             request=request,
         )
     return {"html": html, "project_html": project_html}
 
 
-def test_user_index_has_no_project_navigation(_rendered_project_query_header):
+def test_user_index_carries_project_navigation(_rendered_project_query_header):
     # Arrange
     # Act
     html = _rendered_project_query_header["html"]
     # Assert
-    assert 'data-current="Alpha" data-navigate="?project={id}"' not in html
+    assert 'data-current="Alpha" data-navigate="?project={id}"' in html
 
 
 def test_project_header_keeps_project_navigation(_rendered_project_query_header):
@@ -3612,8 +3623,9 @@ def test_project_header_keeps_project_navigation(_rendered_project_query_header)
 
 @pytest.fixture
 def _rendered_host_scope_header(tmp_path):
-    # Arrange -- the host URL remains authoritative whenever the shared
-    # project-scoped header is rendered; user scope does not render that picker.
+    # Arrange -- the host URL stays authoritative for the shared picker, which
+    # now renders on Scholar's user-scope index too (operator CCT4595); the
+    # project-scope render stays as the explicit-scope control.
     request = RequestFactory().get("/")
     settings_override = override_settings(
         SCITEX_PROJECT_PROVIDER="",
@@ -3623,17 +3635,19 @@ def _rendered_host_scope_header(tmp_path):
     with _project_root_env(tmp_path), settings_override:
         html = views.index(request).content.decode()
         project_html = render_to_string(
-            "scholar/scholar.html", {"app_scope": "project"}, request=request
+            "scholar/scholar.html",
+            {"app_scope": "project", "current_scope": "user"},
+            request=request,
         )
     return {"html": html, "project_html": project_html}
 
 
-def test_user_index_has_no_host_project_picker(_rendered_host_scope_header):
+def test_user_index_carries_host_project_picker(_rendered_host_scope_header):
     # Arrange
     # Act
     html = _rendered_host_scope_header["html"]
     # Assert
-    assert 'data-provider-url="/host/api/project-scope/"' not in html
+    assert 'data-provider-url="/host/api/project-scope/"' in html
 
 
 def test_project_header_keeps_host_provider_url(_rendered_host_scope_header):
@@ -3796,12 +3810,12 @@ def test_user_index_returns_200_for_each_bound_user(_user_scope_library_outcomes
     assert all(result["status"] == 200 for result in results)
 
 
-def test_user_index_suppresses_picker_for_each_bound_user(_user_scope_library_outcomes):
+def test_user_index_renders_one_shared_picker_for_each_bound_user(_user_scope_library_outcomes):
     # Arrange
     # Act
     results = _user_scope_library_outcomes["results"]
     # Assert
-    assert all("data-stx-project-picker" not in result["html"] for result in results)
+    assert all(result["html"].count("data-stx-project-picker") == 1 for result in results)
 
 
 def test_user_index_lists_one_paper_for_each_bound_user(_user_scope_library_outcomes):

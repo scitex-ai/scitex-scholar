@@ -45,42 +45,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Project chips + sync indicator, from the existing /api/projects
-  // endpoint (the picker's provider contract). Chips navigate with
-  // ?project= so the server resolves and remembers the selection.
-  const projectChipsEl = document.getElementById("libraryProjectChips");
+  // Read-only sync indicator (operator CCT4597): the HEADER picker is the
+  // one project selector and navigates with ?project=<id> (the SDK picker's
+  // default contract), so the selection is readable here with no extra
+  // state. This span only reflects it as text; it never selects. Saves
+  // elsewhere (search.js) file into the same selection; the list filters
+  // to it server-side.
   const projectCurrentEl = document.getElementById("libraryProjectCurrent");
-  async function loadProjectChips() {
-    if (!projectChipsEl && !projectCurrentEl) return;
+  function reflectProjectIndicator() {
+    if (!projectCurrentEl) return;
     const current = currentProject();
-    if (projectCurrentEl) {
-      projectCurrentEl.textContent = current
-        ? scholarT("Project: %(project)s", { project: current })
-        : scholarT("All projects");
-    }
-    if (!projectChipsEl || projectChipsEl.dataset.done) return;
-    try {
-      const resp = await fetch(`${STX_MOUNT}/api/projects`);
-      const data = await resp.json();
-      if (!resp.ok) return;
-      projectChipsEl.dataset.done = "1";
-      const all = document.createElement("a");
-      all.className = "library-project__chip" + (current ? "" : " library-project__chip--active");
-      all.href = window.location.pathname;
-      all.textContent = scholarT("All projects");
-      projectChipsEl.appendChild(all);
-      (data.projects || []).forEach((p) => {
-        const chip = document.createElement("a");
-        const id = typeof p === "string" ? p : p.id || "";
-        if (!id) return;
-        chip.className = "library-project__chip" + (id === current ? " library-project__chip--active" : "");
-        chip.href = `${window.location.pathname}?project=${encodeURIComponent(id)}`;
-        chip.textContent = (typeof p === "string" ? p : p.name || p.id) || "";
-        projectChipsEl.appendChild(chip);
-      });
-    } catch (e) {
-      /* chips are progressive enhancement; the list still loads */
-    }
+    projectCurrentEl.textContent = current
+      ? scholarT("Project: %(project)s", { project: current })
+      : scholarT("All projects");
   }
 
   function formatAuthors(paper) {
@@ -548,7 +525,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (libTabBtn) {
     libTabBtn.addEventListener("click", () => {
       if (!loaded) loadLibrary();
-      loadProjectChips();
+      reflectProjectIndicator();
       checkExtStatuses();
     });
   }
@@ -570,7 +547,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // If the page loads with Library already active (it does not by default), load now.
   if (listPanel.classList.contains("active")) {
     loadLibrary();
-    loadProjectChips();
+    reflectProjectIndicator();
     checkExtStatuses();
   }
 });

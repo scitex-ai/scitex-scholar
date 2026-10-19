@@ -236,9 +236,10 @@
  * Same surface as the Import/Export row and filter bar so the three read
  * as one toolbar family; title/hint/status are quiet secondary text and
  * the controls reuse .library-io__* and .btn-control-library. Tokens only.
- * Parity slice 3c: project-sync row (sync target + filter chips) and
- * per-row filed-project chips. Chips are links (navigation), so they read
- * as controls, not badges; the --active chip names the current sync target.
+ * Project sync: the Library shows the sync target as read-only text only
+ * (operator CCT4597 -- the header picker is the one selector, so the
+ * interactive filter chips are gone); per-row filed-project badges reuse
+ * the quiet chip shape below with --static.
  */
 .library-project {
   display: flex;
@@ -254,12 +255,6 @@
   color: var(--text-secondary);
 }
 
-.library-project__chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
 .library-project__chip {
   display: inline-block;
   padding: 2px 10px;
@@ -269,12 +264,6 @@
   border: 1px solid var(--border-default);
   background: var(--bg-tertiary);
   border-radius: 999px;
-}
-
-.library-project__chip--active {
-  color: var(--text-on-accent, #fff);
-  background: var(--accent, #1f6feb);
-  border-color: var(--accent, #1f6feb);
 }
 
 .library-project__chip--static {

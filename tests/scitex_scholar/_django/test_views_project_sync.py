@@ -1,17 +1,17 @@
-"""Slice 3c (CCT4130 slice-3 project-sync UI reflection).
+"""Project-sync header unification (operators CCT4595 + CCT4597).
 
-Old-direct parity gap, measured 2026-10-17: hub's Scholar pairs a visible
-project picker with project-scoped library behavior -- saves file into the
-current project tree (ensure_project_link) and the Library view is
-project-aware. The leaf has the slot (SDK app-header project-selector) and
-the backend (api/projects over ScholarLocalProjectProvider), but the slot
-renders NOTHING (scope=user without allow_user_scope), library_list rows
-carry no project membership, and saves ignore any selected project.
-
-This slice reflects project sync into the leaf over EXISTING verbs
+Slice 3c (CCT4130) reflected project sync into the leaf over EXISTING verbs
 (build_project_membership, add_project_to_master, link shape
-library/<project>/ -> ../MASTER/<id>): visible header picker, per-row
-projects + ?project= filter, save-to-project filing. No new stores.
+library/<project>/ -> ../MASTER/<id>) -- but kept the shared header picker
+SUPPRESSED (scope=user without the opt-in) and put a second, hand-rolled
+project selector (filter chips) inside the Library tab.
+
+The operators overruled that shape: the header adopts the SDK primitive
+(allow_user_scope + current_scope, so the ONE shared selector renders), and
+the Library keeps only a read-only reflection of the same ?project= state
+plus the server-side filter -- never a second selection control. The pins
+below record the unified contract; the backend behavior (per-row projects +
+?project= filter, save-to-project filing) is unchanged.
 """
 
 import json as _json
@@ -36,36 +36,37 @@ SEARCH_JS = (
 ).read_text()
 
 
-def test_user_header_keeps_picker_suppressed():
-    """User scope never opts into the picker (tested page contract).
+def test_user_header_opts_into_shared_picker():
+    """User scope opts into the ONE shared picker (tested page contract).
 
-    Scholar is user-scoped; the SDK picker renders for project scope only.
-    Standalone project selection travels through the Library chips'
-    ?project= navigation, which the server resolves and remembers.
+    Scholar is user-scoped; the SDK picker renders for project scope only
+    UNLESS the app opts in with allow_user_scope + current_scope (operator
+    CCT4595). The header picker is the single project selector; the Library
+    tab carries no second one (operator CCT4597).
     """
     # Arrange
     # Act
-    opted = "allow_user_scope" in TEMPLATE
+    opted = ("allow_user_scope" in TEMPLATE, "current_scope" in TEMPLATE)
     # Assert
-    assert not opted
+    assert opted == (True, True)
 
 
-def test_library_chips_navigate_with_project_query():
-    """Chips select via the picker's ?project= contract, no new backend."""
+def test_library_lists_no_second_picker():
+    """Selection lives in the header picker; library.js never lists projects."""
     # Arrange
     # Act
     wired = ("?project=" in LIBRARY_JS, "/api/projects" in LIBRARY_JS)
     # Assert
-    assert wired == (True, True)
+    assert wired == (True, False)
 
 
-def test_library_tab_carries_project_chips():
-    """The Library tab filters by project; old-direct scopes the view."""
+def test_library_tab_carries_no_project_chips():
+    """The Library tab filters by project without a second selector."""
     # Arrange
     # Act
     present = 'id="libraryProjectChips"' in TEMPLATE
     # Assert
-    assert present
+    assert not present
 
 
 def test_library_tab_carries_current_project_indicator():
