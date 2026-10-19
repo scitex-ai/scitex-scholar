@@ -546,7 +546,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const blob = await resp.blob();
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
-        const ext = { bibtex: "bib", ris: "ris", endnote: "enw" }[fmt] || "txt";
+        const ext = { bibtex: "bib", ris: "ris", endnote: "enw", csv: "csv" }[fmt] || "txt";
         a.href = url;
         a.download = `scholar-library.${ext}`;
         document.body.appendChild(a);

@@ -1865,7 +1865,7 @@ def library_enrich(request, _pipeline=None):
 # importer exists in the package, so those are not claimed).
 # ---------------------------------------------------------------------------
 
-LIBRARY_EXPORT_FORMATS = ("bibtex", "ris", "endnote")
+LIBRARY_EXPORT_FORMATS = ("bibtex", "ris", "endnote", "csv")
 LIBRARY_IMPORT_FORMATS = ("bibtex",)
 
 
@@ -1899,16 +1899,19 @@ def _row_to_formatting_dict(row: dict) -> dict:
         "year": row.get("year"),
         "journal": row.get("venue"),
         "doi": row.get("doi"),
+        "pmid": row.get("pmid"),
         "abstract": row.get("abstract"),
     }
 
 
 @require_GET
 def library_export(request):
-    """Export the user's local library to bibtex / ris / endnote.
+    """Export the user's local library to bibtex / ris / endnote / csv.
 
-    ?format=bibtex|ris|endnote (default bibtex). Streams the serialized
-    library as the response body with the right content type.
+    ?format=bibtex|ris|endnote|csv (default bibtex). Streams the serialized
+    library as the response body with the right content type. CSV uses the
+    hub column set (Title/Authors/Journal/Year/DOI/PMID/URL/Abstract) via
+    the package's to_csv_row (old-direct unification slice 7).
     """
     fmt = (request.GET.get("format") or "bibtex").strip().lower()
     if fmt not in LIBRARY_EXPORT_FORMATS:
@@ -1924,7 +1927,7 @@ def library_export(request):
         )
 
     root = _library_root_for(request)
-    from scitex_scholar.formatting import papers_to_format
+    from scitex_scholar.formatting import papers_to_format, to_csv_row
     from scitex_scholar.storage import _library_index as idx
 
     try:
@@ -1932,10 +1935,31 @@ def library_export(request):
     except FileNotFoundError:
         rows = []
     except ValueError as e:
-        return JsonResponse({"error": "Library inconsistent. Rebuild or repair the library."}, status=500)
+        return JsonResponse({"error": "Library index inconsistent. Rebuild or repair the library."}, status=500)
 
     try:
-        content = papers_to_format([_row_to_formatting_dict(r) for r in rows], fmt)
+        if fmt == "csv":
+            import csv as _csv
+            import io as _io
+
+            buffer = _io.StringIO()
+            fieldnames = [
+                "Title",
+                "Authors",
+                "Journal",
+                "Year",
+                "DOI",
+                "PMID",
+                "URL",
+                "Abstract",
+            ]
+            writer = _csv.DictWriter(buffer, fieldnames=fieldnames)
+            writer.writeheader()
+            for row in rows:
+                writer.writerow(to_csv_row(_row_to_formatting_dict(row)))
+            content = buffer.getvalue()
+        else:
+            content = papers_to_format([_row_to_formatting_dict(r) for r in rows], fmt)
     except Exception as e:
         logger.error(f"library export ({fmt}) failed: {e}", exc_info=True)
         return JsonResponse({"error": "Export failed. Try again later."}, status=500)
@@ -1944,8 +1968,9 @@ def library_export(request):
         "bibtex": "application/x-bibtex",
         "ris": "application/x-research-info-systems",
         "endnote": "application/x-endnote-references",
+        "csv": "text/csv",
     }[fmt]
-    ext = {"bibtex": "bib", "ris": "ris", "endnote": "enw"}[fmt]
+    ext = {"bibtex": "bib", "ris": "ris", "endnote": "enw", "csv": "csv"}[fmt]
     resp = HttpResponse(content, content_type=content_type)
     resp["Content-Disposition"] = f'attachment; filename="scholar-library.{ext}"'
     return resp

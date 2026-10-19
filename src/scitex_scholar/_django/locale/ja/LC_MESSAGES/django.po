@@ -176,6 +176,9 @@ msgstr "RIS (.ris)"
 msgid "EndNote (.enw)"
 msgstr "EndNote (.enw)"
 
+msgid "CSV (.csv)"
+msgstr "CSV (.csv)"
+
 msgid "Import BibTeX"
 msgstr "BibTeX をインポート"
 
