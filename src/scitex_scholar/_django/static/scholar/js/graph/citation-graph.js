@@ -88,6 +88,14 @@ class CitationGraphManager {
     const saveBtn = document.getElementById("graphSaveBtn");
     if (saveBtn) saveBtn.addEventListener("click", () => this.saveCurrentGraph());
 
+    // Old-direct U7: Esc closes the node sheet from anywhere and
+    // returns focus to the invoking node (same path as the × button).
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      const panel = document.getElementById("nodeDetailsPanel");
+      if (panel && !panel.classList.contains("hidden")) this.hideNodeDetails();
+    });
+
     // Error fallback (UX standard): retry re-runs the failed build with the
     // same seed -- the error box retries, not just dismisses.
     const retryBtn = document.getElementById("graphRetryBtn");
@@ -410,27 +418,52 @@ class CitationGraphManager {
       .querySelectorAll(".graph-node")
       .forEach((el) => el.classList.remove("selected"));
     const el = document.querySelector(`[data-id="${CSS.escape(node.id)}"]`);
-    if (el) el.classList.add("selected");
+    // Old-direct U7: the invoking node is the focus-return target when
+    // the sheet closes, so it must be focusable.
+    if (el) {
+      el.classList.add("selected");
+      el.setAttribute("tabindex", "-1");
+      this.lastSelectedEl = el;
+    }
     this.showNodeDetails(node);
+  }
+
+  // Old-direct U7: hide the sheet and return focus to the invoking node
+  // (or the graph canvas when the node is gone). Esc calls this too.
+  hideNodeDetails() {
+    const panel = document.getElementById("nodeDetailsPanel");
+    if (panel) panel.classList.add("hidden");
+    const target =
+      this.lastSelectedEl && document.contains(this.lastSelectedEl)
+        ? this.lastSelectedEl
+        : document.getElementById("graphCanvas");
+    if (target && typeof target.focus === "function") target.focus({ preventScroll: true });
   }
 
   showNodeDetails(node) {
     const panel = document.getElementById("nodeDetailsPanel");
     if (!panel) return;
     panel.classList.remove("hidden");
+    // Already-loaded graph_data only: journal + citation count join the
+    // existing title/meta/DOI (hub sheet shape). Values render through
+    // this.esc -- node metadata is third-party data.
+    const meta = [node.year || "?", node.journal || ""].filter(Boolean).join(" · ");
     panel.innerHTML = `
       <div class="node-details-header">
         <h6>${node.is_seed ? "&#9733; Seed Paper" : "Related Paper"}</h6>
-        <button class="btn-close-panel" onclick="document.getElementById('nodeDetailsPanel').classList.add('hidden')">&times;</button>
+        <button type="button" class="btn-close-panel" data-act="close" aria-label="${this.esc(scholarT("Close"))}">&times;</button>
       </div>
       <div class="node-details-content">
         <div class="detail-title">${this.esc(node.title)}</div>
         <div class="detail-authors">${this.esc((node.authors || []).join(", "))}</div>
-        <div class="detail-year">Published: ${this.esc(node.year || "?")}</div>
+        <div class="detail-year">${this.esc(meta)}</div>
+        ${node.citation_count != null ? `<div class="detail-cites">${this.esc(Number(node.citation_count).toLocaleString())} ${this.esc(scholarT("citations"))}</div>` : ""}
         ${node.similarity_score ? '<div class="detail-score">Similarity: <strong>' + node.similarity_score.toFixed(2) + "</strong></div>" : ""}
         <div class="detail-doi"><a href="https://doi.org/${encodeURIComponent(node.id)}" target="_blank" rel="noopener">View on DOI.org &#8599;</a></div>
       </div>
     `;
+    const closeBtn = panel.querySelector('[data-act="close"]');
+    if (closeBtn) closeBtn.addEventListener("click", () => this.hideNodeDetails());
   }
 
   async fetchRelatedPapers(doi, limit) {

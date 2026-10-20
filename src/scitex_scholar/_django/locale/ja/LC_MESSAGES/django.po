@@ -653,6 +653,9 @@ msgstr "読み込みに失敗しました。後でもう一度お試しくださ
 msgid "Download failed. Try again later."
 msgstr "ダウンロードに失敗しました。後でもう一度お試しください。"
 
+msgid "Close"
+msgstr "閉じる"
+
 msgid "No papers with a DOI in your library yet."
 msgstr "ライブラリにはDOI付きの論文がまだありません。"
 
