@@ -71,6 +71,12 @@ msgstr "Crossref — DOIメタデータレジストリ"
 msgid "OpenAlex — open catalog of scholarly works"
 msgstr "OpenAlex — 学術成果物のオープンカタログ"
 
+msgid "bioRxiv — biology preprint server"
+msgstr "bioRxiv — 生物学プレプリントサーバー"
+
+msgid "DOAJ — open-access journals"
+msgstr "DOAJ — オープンアクセスジャーナル"
+
 msgid "Uncheck sources to narrow the search. All checked searches the default set."
 msgstr "ソースのチェックを外すと検索範囲が狭まります。すべて選択時はデフォルト設定で検索します。"
 
