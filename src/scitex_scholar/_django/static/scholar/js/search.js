@@ -558,6 +558,64 @@ document.addEventListener("DOMContentLoaded", () => {
     return selectedPapers().map(bibtexEntry).join("\n\n");
   }
 
+  // Old-direct U4: RIS + EndNote join the selected-papers Blob path.
+  // Shapes mirror hub citation_formats (to_ris / to_endnote): envelope
+  // tags, one AU/%A line per author, optional fields only when present,
+  // abstract capped at 1000 chars. Client rows carry authors[]/title/
+  // journal/year/doi/url/abstract; anything absent is skipped, never
+  // rendered as "undefined".
+  function citeAuthors(paper) {
+    return (paper.authors || [])
+      .map((a) => (typeof a === "string" ? a : a.name || ""))
+      .map((name) => name.trim())
+      .filter((name) => name);
+  }
+
+  function citeAbstract(paper) {
+    const text = String(paper.abstract || "").replace(/\s+/g, " ").trim();
+    return text.length > 1000 ? `${text.slice(0, 1000)}...` : text;
+  }
+
+  function risEntry(paper) {
+    const lines = ["TY  - JOUR"];
+    if (paper.title) lines.push(`TI  - ${paper.title}`);
+    citeAuthors(paper).forEach((author) => lines.push(`AU  - ${author}`));
+    if (paper.journal) lines.push(`JO  - ${paper.journal}`);
+    if (paper.year) lines.push(`PY  - ${paper.year}`);
+    if (paper.doi) lines.push(`DO  - ${paper.doi}`);
+    if (paper.url) lines.push(`UR  - ${paper.url}`);
+    const abstract = citeAbstract(paper);
+    if (abstract) lines.push(`AB  - ${abstract}`);
+    lines.push("ER  - ");
+    return lines.join("\n");
+  }
+
+  function endnoteEntry(paper) {
+    const lines = ["%0 Journal Article"];
+    if (paper.title) lines.push(`%T ${paper.title}`);
+    citeAuthors(paper).forEach((author) => lines.push(`%A ${author}`));
+    if (paper.journal) lines.push(`%J ${paper.journal}`);
+    if (paper.year) lines.push(`%D ${paper.year}`);
+    if (paper.doi) lines.push(`%R ${paper.doi}`);
+    if (paper.url) lines.push(`%U ${paper.url}`);
+    const abstract = citeAbstract(paper);
+    if (abstract) lines.push(`%X ${abstract}`);
+    return lines.join("\n");
+  }
+
+  function selectedCitation(format) {
+    const entries = {
+      bibtex: bibtexEntry,
+      ris: risEntry,
+      endnote: endnoteEntry,
+    }[format] || bibtexEntry;
+    return selectedPapers().map(entries).join("\n\n");
+  }
+
+  function selectedCitationExt(format) {
+    return { bibtex: "bib", ris: "ris", endnote: "enw" }[format] || "bib";
+  }
+
   function openSelectedUrls() {
     const papers = selectedPapers();
     if (!papers.length) {
@@ -583,11 +641,17 @@ document.addEventListener("DOMContentLoaded", () => {
       if (bulkStatus) bulkStatus.textContent = scholarT("Select results first.");
       return;
     }
-    const blob = new Blob([selectedBibtex()], { type: "text/plain" });
+    // Old-direct U4: the format choice rides the same Blob path (hub
+    // export_bulk_citations {format, paper_ids} shape, client-side over
+    // the checked rows). Unknown values fall back to BibTeX, never fail.
+    const formatSelect = document.getElementById("searchExportFormat");
+    const format = (formatSelect && formatSelect.value) || "bibtex";
+    const ext = selectedCitationExt(format);
+    const blob = new Blob([selectedCitation(format)], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `scholar-selected-${new Date().toISOString().slice(0, 10)}.bib`;
+    link.download = `scholar-selected-${new Date().toISOString().slice(0, 10)}.${ext}`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

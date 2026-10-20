@@ -158,11 +158,23 @@ msgstr "選択した論文を新しいタブで開く"
 msgid "Open URLs"
 msgstr "URLを開く"
 
-msgid "Download BibTeX for the selected results"
-msgstr "選択した結果のBibTeXをダウンロード"
+msgid "Citation format"
+msgstr "引用形式"
 
-msgid "Export BibTeX"
-msgstr "BibTeXをエクスポート"
+msgid "BibTeX (.bib)"
+msgstr "BibTeX (.bib)"
+
+msgid "RIS (.ris)"
+msgstr "RIS (.ris)"
+
+msgid "EndNote (.enw)"
+msgstr "EndNote (.enw)"
+
+msgid "Download citations for the selected results"
+msgstr "選択した結果の引用をダウンロード"
+
+msgid "Export"
+msgstr "エクスポート"
 
 msgid "Select all"
 msgstr "すべて選択"
@@ -178,18 +190,6 @@ msgstr "選択した結果のオープンアクセスPDFをダウンロード"
 
 msgid "PDFs"
 msgstr "PDF"
-
-msgid "Export"
-msgstr "エクスポート"
-
-msgid "BibTeX (.bib)"
-msgstr "BibTeX (.bib)"
-
-msgid "RIS (.ris)"
-msgstr "RIS (.ris)"
-
-msgid "EndNote (.enw)"
-msgstr "EndNote (.enw)"
 
 msgid "CSV (.csv)"
 msgstr "CSV (.csv)"
