@@ -347,6 +347,12 @@ msgstr "引用ネットワークを構築中。少し時間がかかる場合が
 msgid "Citation Network"
 msgstr "引用ネットワーク"
 
+msgid "Zoom out"
+msgstr "ズームアウト"
+
+msgid "Zoom in"
+msgstr "ズームイン"
+
 msgid "Fit to view"
 msgstr "画面に合わせる"
 

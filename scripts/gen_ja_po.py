@@ -100,6 +100,8 @@ JA = {
     "Search syntax help": "検索構文ヘルプ",
     "Search Engine Queue Status": "検索エンジンのキューステータス",
     "Active searches": "アクティブな検索",
+    "Zoom in": "ズームイン",
+    "Zoom out": "ズームアウト",
     "Citation format": "引用形式",
     "Download citations for the selected results": "選択した結果の引用をダウンロード",
     BLOCKTRANS_MSGIDS[0]: (
