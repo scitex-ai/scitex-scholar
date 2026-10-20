@@ -269,7 +269,7 @@ class CitationGraphManager {
       const data = await resp.json();
       this.currentData = data;
       this.renderGraph(data);
-      this.fetchRelatedPapers(doi, topN);
+      this.renderRelatedFromGraph(topN);
     } catch (err) {
       this.showError(err.message || "An error occurred", true);
     } finally {
@@ -510,25 +510,30 @@ class CitationGraphManager {
     this.buildGraph(node.id, topN);
   }
 
-  async fetchRelatedPapers(doi, limit) {
+  // Catch-up: the related list derives from the DRAWN graph data (hub
+  // parity: same NetworkData nodes, no second fetch, never disagrees
+  // with the viz). Seeds first, then citation count -- hub order.
+  // Empty graph gets guidance, not a bare canvas.
+  renderRelatedFromGraph(limit) {
     const container = document.getElementById("relatedPapersList");
     const content = document.getElementById("relatedPapersContent");
     if (!container || !content) return;
-
-    try {
-      const url = `${STX_MOUNT}/api/graph/related?doi=${encodeURIComponent(doi)}&limit=${limit}`;
-      const resp = await fetch(url);
-      if (!resp.ok) throw new Error("Failed");
-
-      const data = await resp.json();
-      const papers = data.related || [];
-
+    const nodes = (this.currentData && this.currentData.nodes) || [];
+    if (!nodes.length) {
       content.innerHTML =
-        papers.length === 0
-          ? '<p class="empty-message">No related papers found</p>'
-          : papers
-              .map(
-                (p, i) => `
+        '<p class="empty-message" id="graphEmptyHint">No papers in this graph yet. Enter a DOI above and choose Build Graph to start.</p>';
+      container.classList.remove("hidden");
+      return;
+    }
+    const ranked = [...nodes].sort(
+      (a, b) =>
+        Number(b.is_seed || false) - Number(a.is_seed || false) ||
+        (b.citation_count || 0) - (a.citation_count || 0),
+    ).slice(0, Math.max(1, limit || nodes.length));
+
+      content.innerHTML = ranked
+      .map(
+        (p, i) => `
             <div class="related-paper-item" data-doi="${this.esc(p.id)}">
               <div class="paper-rank">${i + 1}</div>
               <div class="paper-info">
@@ -539,30 +544,23 @@ class CitationGraphManager {
                 </div>
               </div>
               <div class="paper-score">
-                <div class="score-bar"><div class="score-fill" style="width: ${Math.min(100, (p.similarity_score || 0) * 2)}%"></div></div>
-                <span class="score-value">${(p.similarity_score || 0).toFixed(1)}</span>
+                <div class="score-bar"><div class="score-fill" style="width: ${Math.min(100, (p.citation_count || 0))}%"></div></div>
+                <span class="score-value">${this.esc(Number(p.citation_count || 0).toLocaleString())}</span>
               </div>
             </div>
           `,
-              )
-              .join("");
+      )
+      .join("");
 
-      content.querySelectorAll(".related-paper-item").forEach((item) => {
-        item.addEventListener("click", () => {
-          const d = item.getAttribute("data-doi");
-          if (d && this.currentData) {
-            const n = this.currentData.nodes.find((nd) => nd.id === d);
-            if (n) this.selectNode(n);
-          }
-        });
+    content.querySelectorAll(".related-paper-item").forEach((item) => {
+      item.addEventListener("click", () => {
+        const d = item.getAttribute("data-doi");
+        const n = (this.currentData.nodes || []).find((nd) => nd.id === d);
+        if (n) this.selectNode(n);
       });
+    });
 
-      container.classList.remove("hidden");
-    } catch {
-      content.innerHTML =
-        '<p class="error-message">Failed to load related papers</p>';
-      container.classList.remove("hidden");
-    }
+    container.classList.remove("hidden");
   }
 
   showLoading(show) {
