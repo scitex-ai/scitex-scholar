@@ -362,6 +362,9 @@ msgstr "ズームをリセット"
 msgid "Download SVG"
 msgstr "SVG をダウンロード"
 
+msgid "Download PNG"
+msgstr "PNGをダウンロード"
+
 msgid "Related Papers"
 msgstr "関連論文"
 
