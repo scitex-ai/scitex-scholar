@@ -196,6 +196,64 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Old-direct U3: source-selection persistence. The visitor path is
+  // localStorage (their browser owns it); the file-user path is the
+  // server endpoint (user-root JSON, no UserPreference model). On change
+  // both are written; on load localStorage wins when present, otherwise
+  // the server value restores, otherwise the checked-by-default grid
+  // stays untouched. Failures are silent (console.warn) -- persistence
+  // must never break search.
+  const SOURCE_PREFS_KEY = "scitex-scholar:sources";
+  function readGridSources() {
+    if (!sourcesGrid) return null;
+    return Array.from(sourcesGrid.querySelectorAll("input.source-toggle"))
+      .filter((box) => box.checked)
+      .map((box) => box.value);
+  }
+  function applyGridSources(names) {
+    if (!sourcesGrid || !Array.isArray(names)) return false;
+    const wanted = new Set(names);
+    let applied = false;
+    sourcesGrid.querySelectorAll("input.source-toggle").forEach((box) => {
+      if (wanted.has(box.value)) {
+        if (!box.checked) { box.checked = true; applied = true; }
+      } else if (box.checked) { box.checked = false; applied = true; }
+    });
+    return applied;
+  }
+  async function persistSources() {
+    const names = readGridSources();
+    if (!names) return;
+    try {
+      localStorage.setItem(SOURCE_PREFS_KEY, JSON.stringify(names));
+    } catch (err) { console.warn("source prefs localStorage unavailable:", err); }
+    try {
+      await fetch(`${STX_MOUNT}/api/preferences/sources`, {
+        method: "POST",
+        headers: csrfHeaders({ "Content-Type": "application/json" }),
+        body: JSON.stringify({ sources: names }),
+      });
+    } catch (err) { console.warn("source prefs server save unavailable:", err); }
+  }
+  async function restoreSources() {
+    try {
+      const raw = localStorage.getItem(SOURCE_PREFS_KEY);
+      if (raw && applyGridSources(JSON.parse(raw))) return;
+    } catch (err) { console.warn("source prefs localStorage unreadable:", err); }
+    try {
+      const resp = await fetch(`${STX_MOUNT}/api/preferences/sources`);
+      if (!resp.ok) return;
+      const doc = await resp.json();
+      if (doc.sources && Object.keys(doc.sources).length) {
+        applyGridSources(Array.isArray(doc.sources) ? doc.sources : Object.keys(doc.sources));
+      }
+    } catch (err) { console.warn("source prefs server restore unavailable:", err); }
+  }
+  if (sourcesGrid) {
+    sourcesGrid.addEventListener("change", () => { persistSources(); });
+    restoreSources();
+  }
+
   // CSRF: same pattern as library.js -- the mounted hub enables
   // CsrfViewMiddleware; standalone has no token and needs no header.
   function csrfHeaders(extra) {
