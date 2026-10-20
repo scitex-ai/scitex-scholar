@@ -65,6 +65,13 @@ class CitationGraphManager {
     const resetBtn = document.getElementById("resetZoomBtn");
     if (resetBtn) resetBtn.addEventListener("click", () => this.resetView());
 
+    // Old-direct U5: step zoom in/out (hub zoomInBtn/zoomOutBtn, factor
+    // 1.4 about the view center). Same clamp as the wheel path.
+    const zoomInBtn = document.getElementById("zoomInBtn");
+    if (zoomInBtn) zoomInBtn.addEventListener("click", () => this.zoomStep(1.4));
+    const zoomOutBtn = document.getElementById("zoomOutBtn");
+    if (zoomOutBtn) zoomOutBtn.addEventListener("click", () => this.zoomStep(1 / 1.4));
+
     const downloadBtn = document.getElementById("downloadSvgBtn");
     if (downloadBtn)
       downloadBtn.addEventListener("click", () => this.downloadSvg());
@@ -510,6 +517,23 @@ class CitationGraphManager {
 
   resetView() {
     this.transform = { x: 0, y: 0, k: 1 };
+    this.renderer.applyTransform(this.transform);
+  }
+
+  // Old-direct U5: step zoom about the SVG center (hub zoomBy(1.4)).
+  // Same 0.1-5 clamp as the wheel path; fit/reset are untouched.
+  zoomStep(factor) {
+    const svg = this.renderer.getSvg();
+    if (!svg) return;
+    const rect = svg.getBoundingClientRect();
+    const mx = rect.width / 2;
+    const my = rect.height / 2;
+    const newK = Math.max(0.1, Math.min(5, this.transform.k * factor));
+    this.transform.x =
+      mx - (mx - this.transform.x) * (newK / this.transform.k);
+    this.transform.y =
+      my - (my - this.transform.y) * (newK / this.transform.k);
+    this.transform.k = newK;
     this.renderer.applyTransform(this.transform);
   }
 
