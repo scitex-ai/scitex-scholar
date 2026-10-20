@@ -625,6 +625,9 @@ def _js_i18n_dict() -> dict:
         "Paper not found": _i18n("Paper not found"),
         "Load failed. Try again later.": _i18n("Load failed. Try again later."),
         "Download failed. Try again later.": _i18n("Download failed. Try again later."),
+        # Old-direct U7: the node sheet close button renders client-side,
+        # so it MUST be a key here (same catalog-visibility rule).
+        "Close": _i18n("Close"),
         # Graph tab slice 3a (old-direct parity): the library-seed picker
         # renders these client-side, so each MUST be a key here -- an
         # English literal in citation-graph.js is invisible to the catalog
