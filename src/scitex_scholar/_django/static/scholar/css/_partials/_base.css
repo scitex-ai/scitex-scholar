@@ -43,7 +43,7 @@
   --bg-tertiary: #e8e7e5;
   --bg-monaco: #fdfcfa;
   /* Operator hue decision 2026-10-20: navy CTA (base #1a2a40), hover
-   * darkened one step. The old green (#059669) is gone. */
+   * darkened one step. The old green is gone. */
   --accent-hover: #0f1e33;
   --edge-color: #c0bfbd;
   /*
@@ -72,7 +72,7 @@
   --bg-tertiary: #1a1a1a;
   --bg-monaco: #1e1e1e;
   /* Operator hue decision 2026-10-20: gold CTA (base #d4a87a), hover
-   * darkened one step. The old green (#047857) is gone. */
+   * darkened one step. The old green is gone. */
   --accent-hover: #b98d5f;
   --edge-color: #3a3a3a;
 }
