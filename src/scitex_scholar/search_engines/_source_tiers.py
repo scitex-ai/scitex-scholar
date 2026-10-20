@@ -44,6 +44,9 @@ from scitex_scholar.search_engines.individual.BioRxivSearchEngine import (
 from scitex_scholar.search_engines.individual.DOAJSearchEngine import (
     DOAJSearchEngine,
 )
+from scitex_scholar.search_engines.individual.PLOSSearchEngine import (
+    PLOSSearchEngine,
+)
 from scitex_scholar.search_engines.individual.PubMedSearchEngine import (
     PubMedSearchEngine,
 )
@@ -69,6 +72,7 @@ ONLINE_ENGINES: Dict[str, type] = {
     "OpenAlex": OpenAlexSearchEngine,
     "BioRxiv": BioRxivSearchEngine,
     "DOAJ": DOAJSearchEngine,
+    "PLOS": PLOSSearchEngine,
 }
 
 #: Used when config carries no ``source_tiers`` block at all. Keeps a
@@ -350,6 +354,7 @@ SOURCE_ALIASES: Dict[str, str] = {
     "openalex": "OpenAlex",
     "biorxiv": "BioRxiv",
     "doaj": "DOAJ",
+    "plos": "PLOS",
     "crossreflocal_corpus": "CrossRefLocal",
     "openalexlocal_corpus": "OpenAlexLocal",
 }
