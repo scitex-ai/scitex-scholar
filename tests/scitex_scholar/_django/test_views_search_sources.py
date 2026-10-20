@@ -151,3 +151,12 @@ def test_sources_grid_offers_biorxiv_checkbox():
     present = 'value="biorxiv"' in TEMPLATE
     # Assert
     assert present
+
+
+def test_sources_grid_offers_doaj_checkbox():
+    # Arrange -- engine parity: the registered DOAJ engine must be
+    # selectable in the grid (hub old-direct source now in leaf).
+    # Act
+    present = 'value="doaj"' in TEMPLATE
+    # Assert
+    assert present
