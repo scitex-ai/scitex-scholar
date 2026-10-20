@@ -111,6 +111,18 @@
   }
 }
 
+/* TEMPORARY bridge (operator 2026-10-20, sunset when the SDK sheet
+ * ships it): the SDK selected state recolors the text and rounds the
+ * tab, so the underline renders as a rounded colored pill. Old-direct
+ * parity + operator taste: underline ONLY -- siblings' text color,
+ * sharp corners, transparent box. */
+.stx-content-tabs .stx-content-tabs__tab[aria-selected="true"] {
+  border-radius: 0;
+  color: var(--text-secondary, #4a4a4a);
+  border-color: transparent;
+  background: transparent;
+}
+
 /* Old-direct scroll model (operator parity 2026-10-21): the SDK shell
  * makes `.ws-module-pane` the page scroller, so its own scrollbar gutter
  * shrinks the header + content 15px off the module edge (measured 1265
