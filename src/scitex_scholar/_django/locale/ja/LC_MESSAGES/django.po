@@ -26,6 +26,9 @@ msgstr "引用グラフ"
 msgid "Search Papers"
 msgstr "論文を検索"
 
+msgid "Search syntax help"
+msgstr "検索構文ヘルプ"
+
 msgid "Query"
 msgstr "クエリ"
 

@@ -97,6 +97,7 @@ JA = {
     "Citation Graph": "引用グラフ",
     # --- Search tab ---
     "Search Papers": "論文を検索",
+    "Search syntax help": "検索構文ヘルプ",
     BLOCKTRANS_MSGIDS[0]: (
         "キーワードで学術データベース（OpenAlex、Crossref、PubMed、Semantic Scholar など）を検索します。"
         "これは<strong>外部データベース</strong>を検索するもので、ライブラリ（別のタブ）ではありません。"

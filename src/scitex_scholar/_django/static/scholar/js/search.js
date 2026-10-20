@@ -58,6 +58,65 @@ document.addEventListener("DOMContentLoaded", () => {
   const abstractToggle = document.getElementById("searchAbstractToggle");
   const openUrlsBtn = document.getElementById("searchOpenUrls");
   const exportBibtexBtn = document.getElementById("searchExportBibtex");
+  // Old-direct U1: the `?` syntax-help toggle. The panel heading is
+  // server-rendered (translated); only the operator lists come from the
+  // endpoint (hub serves them EN-only -- KEEP). Fetched once; a failed
+  // fetch leaves the panel hidden so help can never break search.
+  const syntaxToggle = document.getElementById("searchSyntaxToggle");
+  const syntaxPanel = document.getElementById("searchSyntaxPanel");
+  const syntaxList = document.getElementById("searchSyntaxList");
+  const syntaxExamples = document.getElementById("searchSyntaxExamples");
+  let syntaxLoaded = false;
+  function renderSyntaxHelp(doc) {
+    const frag = document.createDocumentFragment();
+    Object.values(doc.syntax || {}).forEach((op) => {
+      const dt = document.createElement("dt");
+      dt.textContent = [op.short, op.long].filter(Boolean).join(" / ");
+      const dd = document.createElement("dd");
+      dd.textContent = [op.description, op.include_example || op.example, op.exclude_example]
+        .filter(Boolean).join(" — ");
+      frag.append(dt, dd);
+    });
+    return frag;
+  }
+  function renderSyntaxExamples(doc) {
+    const frag = document.createDocumentFragment();
+    (doc.examples || []).forEach((ex) => {
+      const item = document.createElement("div");
+      item.className = "syntax-help-panel__example";
+      const q = document.createElement("code");
+      q.textContent = ex.query;
+      const d = document.createElement("span");
+      d.textContent = ex.description;
+      item.append(q, document.createTextNode(" — "), d);
+      frag.append(item);
+    });
+    return frag;
+  }
+  if (syntaxToggle && syntaxPanel) {
+    syntaxToggle.addEventListener("click", async () => {
+      const opening = syntaxPanel.hidden;
+      syntaxToggle.setAttribute("aria-expanded", String(opening));
+      if (!opening) {
+        syntaxPanel.hidden = true;
+        return;
+      }
+      syntaxPanel.hidden = false;
+      if (syntaxLoaded) return;
+      try {
+        const resp = await fetch(`${STX_MOUNT}/api/search/syntax-help`);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const doc = await resp.json();
+        if (syntaxList) syntaxList.replaceChildren(renderSyntaxHelp(doc));
+        if (syntaxExamples) syntaxExamples.replaceChildren(renderSyntaxExamples(doc));
+        syntaxLoaded = true;
+      } catch (err) {
+        console.warn("syntax help unavailable:", err);
+        syntaxPanel.hidden = true;
+        syntaxToggle.setAttribute("aria-expanded", "false");
+      }
+    });
+  }
   let abstractFull = false;
   const ABSTRACT_TRUNCATE_AT = 300;
 
