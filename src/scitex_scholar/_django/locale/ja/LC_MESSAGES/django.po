@@ -521,6 +521,12 @@ msgstr "保存済み"
 msgid "Save failed"
 msgstr "保存に失敗"
 
+msgid "Add to library"
+msgstr "ライブラリに追加"
+
+msgid "Explore from here"
+msgstr "ここから探索"
+
 msgid "Select results to save."
 msgstr "保存する結果を選択してください。"
 

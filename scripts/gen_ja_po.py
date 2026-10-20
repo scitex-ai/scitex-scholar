@@ -104,6 +104,8 @@ JA = {
     "Zoom out": "ズームアウト",
     "Download PNG": "PNGをダウンロード",
     "Close": "閉じる",
+    "Add to library": "ライブラリに追加",
+    "Explore from here": "ここから探索",
     "bioRxiv — biology preprint server": "bioRxiv — 生物学プレプリントサーバー",
     "DOAJ — open-access journals": "DOAJ — オープンアクセスジャーナル",
     "PLOS — open-access science journals": "PLOS — オープンアクセス科学ジャーナル",
