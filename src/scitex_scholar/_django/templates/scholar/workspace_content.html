@@ -38,6 +38,21 @@
                         <div class="graph-card">
                             <div class="graph-card__header">
                                 <span class="graph-card__title">{% trans "Search Papers" %}</span>
+                                <!--
+                                    Old-direct U1: the `?` syntax-help
+                                    affordance. Toggles the panel below,
+                                    populated from GET api/search/syntax-help
+                                    by search.js (STX_MOUNT-joined). The
+                                    button is a bare `?` so it needs no
+                                    translation; the panel heading reuses the
+                                    single "Search syntax help" msgid.
+                                -->
+                                <button type="button" id="searchSyntaxToggle" class="syntax-help-toggle" aria-expanded="false" aria-controls="searchSyntaxPanel" title="{% trans "Search syntax help" %}">?</button>
+                            </div>
+                            <div id="searchSyntaxPanel" class="syntax-help-panel" hidden>
+                                <h3 class="syntax-help-panel__title">{% trans "Search syntax help" %}</h3>
+                                <dl id="searchSyntaxList" class="syntax-help-panel__list"></dl>
+                                <div id="searchSyntaxExamples" class="syntax-help-panel__examples"></div>
                             </div>
                             <div class="graph-card__body">
                                 <p class="graph-description">
@@ -136,6 +151,22 @@
                                                     <input type="checkbox" class="source-toggle" value="openalex" checked>
                                                     OpenAlex
                                                 </label>
+                                                <label class="search-advanced__check" title="{% trans "bioRxiv — biology preprint server" %}">
+                                                    <input type="checkbox" class="source-toggle" value="biorxiv" checked>
+                                                    bioRxiv
+                                                </label>
+                                                <label class="search-advanced__check" title="{% trans "DOAJ — open-access journals" %}">
+                                                    <input type="checkbox" class="source-toggle" value="doaj" checked>
+                                                    DOAJ
+                                                </label>
+                                                <label class="search-advanced__check" title="{% trans "PLOS — open-access science journals" %}">
+                                                    <input type="checkbox" class="source-toggle" value="plos" checked>
+                                                    PLOS
+                                                </label>
+                                                <label class="search-advanced__check" title="{% trans "PMC — open-access full-text archive" %}">
+                                                    <input type="checkbox" class="source-toggle" value="pmc" checked>
+                                                    PMC
+                                                </label>
                                             </div>
                                             <p class="search-sources-hint">{% trans "Uncheck sources to narrow the search. All checked searches the default set." %}</p>
                                         </div>
@@ -205,6 +236,22 @@
                             </div>
                             <div class="loading-text">{% trans "Searching databases... This may take a moment." %}</div>
                         </div>
+                        <!-- Queue status (old-direct U2 unification): hub
+                            progressive_loading panel shape -- per-engine
+                            status + counts. Hidden until a search runs;
+                            search.js shows it on submit and fills it from
+                            metadata.engine_events on response. Monotone +
+                            --accent only (operator color discipline). -->
+                        <div id="searchQueuePanel" class="search-queue" hidden>
+                            <div class="search-queue__head">
+                                <span class="search-queue__title">{% trans "Search Engine Queue Status" %}</span>
+                                <span class="search-queue__totals">
+                                    <span>{% trans "Active searches" %}: <strong id="searchQueueActive">0</strong></span>
+                                    <span>{% trans "Results" %}: <strong id="searchQueueTotal">0</strong></span>
+                                </span>
+                            </div>
+                            <div id="searchQueueEngines" class="search-queue__engines"></div>
+                        </div>
                         <!-- Error -->
                         <div id="searchError" class="graph-error hidden">
                             <p id="searchErrorMessage">{% trans "An error occurred" %}</p>
@@ -246,12 +293,20 @@
                                         results-header tools. Old-direct offers
                                         an abstract truncated/full toggle, an
                                         open-selected-URLs button, and an
-                                        export-selected-BibTeX button -- all
-                                        client-side over the checked rows.
+                                        export-selected-citations control --
+                                        U4 adds the RIS/EndNote format choice
+                                        (hub bulk shape) to the BibTeX-only
+                                        client Blob path. All client-side over
+                                        the checked rows.
                                     -->
                                     <button type="button" id="searchAbstractToggle" class="btn-control-library" data-mode="truncated" title="{% trans "Toggle abstract display" %}">{% trans "Abstract: truncated" %}</button>
                                     <button type="button" id="searchOpenUrls" class="btn-control-library" title="{% trans "Open selected papers in new tabs" %}">{% trans "Open URLs" %}</button>
-                                    <button type="button" id="searchExportBibtex" class="btn-control-library" title="{% trans "Download BibTeX for the selected results" %}">{% trans "Export BibTeX" %}</button>
+                                    <select id="searchExportFormat" class="form-select" aria-label="{% trans "Citation format" %}">
+                                        <option value="bibtex" selected>{% trans "BibTeX (.bib)" %}</option>
+                                        <option value="ris">{% trans "RIS (.ris)" %}</option>
+                                        <option value="endnote">{% trans "EndNote (.enw)" %}</option>
+                                    </select>
+                                    <button type="button" id="searchExportBibtex" class="btn-control-library" title="{% trans "Download citations for the selected results" %}">{% trans "Export" %}</button>
                                     <div class="search-bulk-bar" id="searchBulkBar">
                                         <label class="search-bulk-bar__select-all">
                                             <input type="checkbox" id="searchSelectAll">
@@ -584,14 +639,21 @@
                                                       margin-left: 12px"></small>
                                     </span>
                                     <div class="graph-controls">
+                                        <!-- Old-direct U5: step zoom (hub
+                                            zoomIn/zoomOut, factor 1.4). -->
+                                        <button id="zoomOutBtn" class="btn-control" title="{% trans "Zoom out" %}" aria-label="{% trans "Zoom out" %}">&#8722;</button>
+                                        <button id="zoomInBtn" class="btn-control" title="{% trans "Zoom in" %}" aria-label="{% trans "Zoom in" %}">+</button>
                                         <button id="fitViewBtn" class="btn-control" title="{% trans "Fit to view" %}">&#8689;</button>
                                         <button id="resetZoomBtn" class="btn-control" title="{% trans "Reset zoom" %}">&#8634;</button>
                                         <button id="downloadSvgBtn" class="btn-control" title="{% trans "Download SVG" %}">&#8681;</button>
+                                        <!-- Old-direct U6: PNG sibling (hub
+                                            downloadPngBtn). -->
+                                        <button id="downloadPngBtn" class="btn-control btn-control--text" title="{% trans "Download PNG" %}">PNG</button>
                                     </div>
                                 </div>
                                 <div class="graph-card__body" style="padding: 0; position: relative;">
                                     <div id="graphCanvas" class="graph-canvas-wrapper"></div>
-                                    <div id="nodeDetailsPanel" class="node-details-panel hidden"></div>
+                                    <div id="nodeDetailsPanel" class="node-details-panel hidden" role="dialog" aria-live="polite"></div>
                                 </div>
                             </div>
                         </div>

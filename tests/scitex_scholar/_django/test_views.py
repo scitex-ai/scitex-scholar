@@ -102,7 +102,10 @@ def test_index_body_leaks_no_unrendered_template_tags():
     assert "{% comment %}" not in body
 
 
-def test_index_body_contains_shared_branding_favicon():
+def test_index_body_contains_official_navy_favicon():
+    """Operator 2026-10-20: the official SciTeX mark (white snake on navy),
+    like production -- supplied through the shared partial's `favicon_href`
+    contract, not the SDK default green snake."""
     # Arrange
     rf = RequestFactory()
     request = rf.get("/")
@@ -110,7 +113,7 @@ def test_index_body_contains_shared_branding_favicon():
     # Act
     body = resp.content.decode()
     # Assert
-    assert '<link rel="icon" href="/static/scitex_sdk/ui/img/scitex-favicon.svg"' in body
+    assert ('<link rel="icon" href="/static/scholar/pwa/favicon-32.png"' in body)
 
 
 def test_index_does_not_shadow_shared_favicon_with_inline_icon():
@@ -935,7 +938,7 @@ def test_search_rejects_overlong_q_param():
     # into the engines and the cache key. The stub engine proves the
     # request reaches execution (200) instead of failing closed (400).
     class _StubEngine:
-        async def search(self, query, mode=None, max_results=20, sources=None, filters=None):
+        async def search(self, query, mode=None, max_results=20, sources=None, filters=None, on_progress=None):
             return {"results": [], "metadata": {}}
 
     rf = RequestFactory()
@@ -950,7 +953,7 @@ def test_search_strips_jats_markup_from_abstracts():
     # Arrange — EuropePMC/PMC abstracts arrive with raw JATS XML tags
     # (e.g. <jats:p>); the leaf must serve plain text (CCT 2759/2760).
     class _StubEngine:
-        async def search(self, query, mode=None, max_results=20, sources=None, filters=None):
+        async def search(self, query, mode=None, max_results=20, sources=None, filters=None, on_progress=None):
             return {
                 "results": [
                     {
@@ -1018,7 +1021,7 @@ def _prime_search_cache_as_alice():
     req_alice.user = SimpleNamespace(username="alice", is_authenticated=True)
 
     class _UserEngine:
-        async def search(self, query, mode=None, max_results=20, sources=None, filters=None):
+        async def search(self, query, mode=None, max_results=20, sources=None, filters=None, on_progress=None):
             return {"results": [], "metadata": {"served_user": "alice"}}
 
     body_alice = json.loads(views.search(req_alice, _engine=_UserEngine()).content)
@@ -1132,7 +1135,7 @@ def test_gui_search_response_carries_the_serving_tier():
     # Arrange -- a hand-rolled engine so the assertion is about the view's
     # pass-through, not about a live query (injected, not patched: PA-306).
     class _TieredEngine:
-        async def search(self, query, mode=None, max_results=20, sources=None, filters=None):
+        async def search(self, query, mode=None, max_results=20, sources=None, filters=None, on_progress=None):
             return {
                 "results": [],
                 "metadata": {"source_tier": "primary", "source_tier_reason": ""},

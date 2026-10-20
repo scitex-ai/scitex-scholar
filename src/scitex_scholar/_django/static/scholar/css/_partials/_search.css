@@ -287,3 +287,81 @@
   opacity: 0.6;
   cursor: default;
 }
+
+/*
+ * Old-direct U2: the queue-status chrome. Hub progressive_loading panel
+ * shape (per-engine status + counts), leaf tokens. Monotone + theme
+ * --accent only (operator color discipline 2026-10-20): done/error are
+ * text + opacity states, never bright fills.
+ */
+.search-queue {
+  margin-top: 16px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.search-queue__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.search-queue__title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.search-queue__totals {
+  display: flex;
+  gap: 12px;
+  color: var(--text-muted);
+}
+
+.search-queue__engines {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+.search-queue__engine {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.search-queue__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+
+.search-queue__engine[data-status="completed"] .search-queue__dot {
+  background: var(--accent);
+}
+
+.search-queue__engine[data-status="error"] .search-queue__dot {
+  background: none;
+  border: 1px solid var(--text-muted);
+}
+
+.search-queue__engine[data-status="error"] .search-queue__name {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.search-queue__name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.search-queue__count {
+  color: var(--text-muted);
+}

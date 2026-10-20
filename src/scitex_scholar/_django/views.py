@@ -39,8 +39,13 @@ try:
     from django.core.exceptions import ImproperlyConfigured
     from django.http import HttpResponse, JsonResponse
     from django.template.loader import render_to_string
+    from django.templatetags.static import static as _static_url
     from django.utils.translation import gettext as _i18n  # noqa: N816  (JS string dict)
-    from django.views.decorators.http import require_GET, require_POST
+    from django.views.decorators.http import (
+        require_GET,
+        require_POST,
+        require_http_methods,
+    )
 except ImportError as exc:  # django absent -- the [all]-gated GUI capability only
     raise ImportError(
         "scitex_scholar._django.views needs Django, which is not installed. "
@@ -433,6 +438,11 @@ def index_context(request, current_project=None):
         "stx_mount": mount_prefix(request),
         "app_label": _app_label("SciTeX Scholar"),
         "app_scope": "user",
+        # Operator 2026-10-20: the official SciTeX mark (white snake on
+        # navy), like production -- not the SDK default green snake. The
+        # shared branding partial honours this context var, so the leaf
+        # supplies its own file rather than shadowing the partial.
+        "favicon_href": _static_url("scholar/pwa/favicon-32.png"),
         "current_project": current_project,
         "current_scope": current_scope,
         # i18n (operator directive 2026-09-14): the whole page flips via
@@ -469,11 +479,10 @@ def render_workspace_content(request, current_project=None, *, stx_mount):
 def index(request):
     """Serve the Scholar SPA shell page.
 
-    No `favicon_href` is supplied: the template includes scitex-sdk's
-    branding partial, which ships the shared SciTeX mark. A locally
-    hand-rolled icon here would SHADOW that mark (the partial honours
-    favicon_href when given one) and drift from the rest of the fleet --
-    which is what the removed `_favicon_href()` did.
+    `favicon_href` carries the official SciTeX mark (white snake on navy,
+    operator 2026-10-20, like production): the shared branding partial
+    honours the var, so the leaf supplies its own file through the
+    contract rather than shadowing the partial with an inline icon.
     """
     html = render_to_string(
         "scholar/scholar.html",
@@ -621,6 +630,9 @@ def _js_i18n_dict() -> dict:
         "Paper not found": _i18n("Paper not found"),
         "Load failed. Try again later.": _i18n("Load failed. Try again later."),
         "Download failed. Try again later.": _i18n("Download failed. Try again later."),
+        # Old-direct U7: the node sheet close button renders client-side,
+        # so it MUST be a key here (same catalog-visibility rule).
+        "Close": _i18n("Close"),
         # Graph tab slice 3a (old-direct parity): the library-seed picker
         # renders these client-side, so each MUST be a key here -- an
         # English literal in citation-graph.js is invisible to the catalog
@@ -1211,6 +1223,19 @@ def search(request, _engine=None):
 
     try:
         engine = _engine or _get_search_engine()
+        # Old-direct U2: bind the pipeline progress callback. Last-wins
+        # per engine, first-seen order -- the queue panel renders exactly
+        # this list. Sync callback on a same-thread run; nothing escapes
+        # the request, so search behavior is unchanged.
+        engine_events = {}
+
+        def _collect_progress(engine_name, status, count):
+            engine_events[engine_name] = {
+                "engine": engine_name,
+                "status": status,
+                "count": count,
+            }
+
         result = asyncio.run(
             engine.search(
                 query=query,
@@ -1218,10 +1243,12 @@ def search(request, _engine=None):
                 max_results=max_results,
                 sources=sources,
                 filters=range_filters,
+                on_progress=_collect_progress,
             )
         )
         _strip_markup_from_search_abstracts(result)
         result.setdefault("metadata", {})["cached"] = False
+        result["metadata"]["engine_events"] = list(engine_events.values())
         if sources:
             result["metadata"]["sources_selected"] = sources
         _cache_set(cache_key, result)
@@ -1230,6 +1257,116 @@ def search(request, _engine=None):
     except Exception as e:
         logger.error(f"Search failed for {query!r}: {e}", exc_info=True)
         return JsonResponse({"error": "Search failed. Try again later."}, status=500)
+
+
+@require_GET
+def search_syntax_help(request):
+    """Search syntax documentation (old-direct U1 unification).
+
+    KEEP: the hub `api_search_syntax_help` document, verbatim -- status,
+    operator flags, examples, sources, query parameters. Static JSON: no
+    engine, no cache, no search behavior change (this view never calls
+    the `search` view or the search engine).
+    """
+    return JsonResponse(
+        {
+            "status": "success",
+            "syntax": {
+                "title_filter": {
+                    "short": "-t",
+                    "long": "--title",
+                    "description": "Filter by title content",
+                    "include_example": "-t neural",
+                    "exclude_example": "-t -mouse",
+                },
+                "author_filter": {
+                    "short": "-a",
+                    "long": "--author",
+                    "description": "Filter by author name",
+                    "include_example": "-a Smith",
+                    "exclude_example": "-a -Jones",
+                },
+                "journal_filter": {
+                    "short": "-j",
+                    "long": "--journal",
+                    "description": "Filter by journal name",
+                    "include_example": "-j Nature",
+                    "exclude_example": "-j -arXiv",
+                },
+                "year_min": {
+                    "short": "-ymin",
+                    "long": "--year-min",
+                    "description": "Minimum publication year",
+                    "example": "-ymin 2020",
+                },
+                "year_max": {
+                    "short": "-ymax",
+                    "long": "--year-max",
+                    "description": "Maximum publication year",
+                    "example": "-ymax 2024",
+                },
+                "citations_min": {
+                    "short": "-cmin",
+                    "long": "--citations-min",
+                    "description": "Minimum citation count",
+                    "example": "-cmin 100",
+                },
+                "citations_max": {
+                    "short": "-cmax",
+                    "long": "--citations-max",
+                    "description": "Maximum citation count",
+                    "example": "-cmax 1000",
+                },
+                "impact_factor_min": {
+                    "short": "-ifmin",
+                    "long": "--if-min",
+                    "description": "Minimum journal impact factor",
+                    "example": "-ifmin 5",
+                },
+                "impact_factor_max": {
+                    "short": "-ifmax",
+                    "long": "--if-max",
+                    "description": "Maximum journal impact factor",
+                    "example": "-ifmax 50",
+                },
+            },
+            "examples": [
+                {
+                    "query": "neural network -t deep learning -ymin 2020",
+                    "description": "Search for 'neural network', title must contain 'deep learning', published since 2020",
+                },
+                {
+                    "query": "CRISPR -a Doudna -j Nature -cmin 100",
+                    "description": "Search for 'CRISPR' by author Doudna in Nature journal with at least 100 citations",
+                },
+                {
+                    "query": "cancer treatment -t -mouse -t -rat -ymin 2022",
+                    "description": "Search for 'cancer treatment', exclude mouse and rat studies, since 2022",
+                },
+                {
+                    "query": "machine learning -ifmin 10 -cmin 50",
+                    "description": "Search 'machine learning' in journals with IF >= 10 and papers with >= 50 citations",
+                },
+            ],
+            "available_sources": [
+                "pubmed",
+                "arxiv",
+                "semantic",
+                "crossref",
+                "openalex",
+                "pmc",
+                "doaj",
+                "biorxiv",
+                "plos",
+            ],
+            "query_parameters": {
+                "q": "Search query with optional command syntax (required)",
+                "sources": "Comma-separated list of sources to search (optional)",
+                "max_results": "Maximum results per source, 1-100 (default: 20)",
+                "format": "'full' or 'compact' response format (default: full)",
+            },
+        }
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -3014,6 +3151,83 @@ def searches_delete(request):
         logger.error(f"searches delete failed: {e}", exc_info=True)
         return JsonResponse({"error": "Delete failed. Try again later."}, status=500)
     return JsonResponse({"deleted": True})
+
+
+#: Largest serialized `sources` selection stored per user (old-direct U3).
+#: Same class as the saved-search params bound: the prefs file is re-read
+#: whole per GET, so an unbounded value bloats every future read; 8k chars
+#: is far past any legitimate selection (~80 chars for all known sources).
+_MAX_SOURCE_PREFS_CHARS = 8000
+
+
+def _source_preferences_path(root: Path) -> Path:
+    """Single JSON file holding this user's source selection."""
+    return root / "source-preferences.json"
+
+
+def _load_source_preferences(root: Path):
+    """This user's stored sources, or {} when never saved or unreadable."""
+    try:
+        return json.loads(_source_preferences_path(root).read_text()).get("sources", {})
+    except (OSError, ValueError, AttributeError):
+        return {}
+
+
+@require_http_methods(["GET", "POST"])
+def preferences_sources(request):
+    """Source-selection persistence (old-direct U3 unification).
+
+    KEEP: hub `save_source_preferences` semantics -- a visitor gets a
+    session note (their client owns localStorage) while a file-user gets
+    persistence; invalid JSON fails closed (400) with hub's
+    {status: error} shape. CHANGE: persistence is a `source-preferences.json`
+    under the request's user-scoped root instead of the `UserPreference`
+    model (leaf stays off hub DB). GET reads back the stored selection
+    ({} default) so both paths round-trip; `?sources=` echo is untouched
+    (the search view owns it).
+    """
+    user = getattr(request, "user", None)
+    file_user = bool(getattr(user, "is_authenticated", False))
+    root = _library_root_for(request)
+    if request.method == "GET":
+        sources = _load_source_preferences(root) if file_user else {}
+        return JsonResponse({"status": "success", "sources": sources})
+    try:
+        payload = _json_body(request)
+    except ValueError as e:
+        if "too large" in str(e):
+            return JsonResponse({"status": "error", "message": str(e)}, status=413)
+        return JsonResponse({"status": "error", "message": "Invalid JSON body"}, status=400)
+    except TypeError:
+        return JsonResponse({"status": "error", "message": "Invalid JSON body"}, status=400)
+    sources = payload.get("sources", {})
+    if len(json.dumps(sources)) > _MAX_SOURCE_PREFS_CHARS:
+        return JsonResponse(
+            {"status": "error", "message": "sources must serialize to at most 8000 characters"},
+            status=400,
+        )
+    if not file_user:
+        return JsonResponse(
+            {
+                "status": "success",
+                "message": "Source preferences noted (login to save permanently)",
+                "saved_to": "session",
+            }
+        )
+    try:
+        path = _source_preferences_path(root)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps({"sources": sources}))
+    except OSError as e:
+        logger.error(f"source preferences save failed: {e}", exc_info=True)
+        return JsonResponse({"status": "error", "message": "Save failed. Try again later."}, status=500)
+    return JsonResponse(
+        {
+            "status": "success",
+            "message": "Source preferences saved to user library",
+            "saved_to": "user-root",
+        }
+    )
 
 
 # Old-direct parity slice 1 (operator mandate 2026-10-17): hub scholar_app

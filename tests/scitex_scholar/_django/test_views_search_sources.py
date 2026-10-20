@@ -33,7 +33,7 @@ class _RecordingEngine:
     def __init__(self):
         self.calls = []
 
-    async def search(self, query, mode=None, max_results=20, sources=None, filters=None):
+    async def search(self, query, mode=None, max_results=20, sources=None, filters=None, on_progress=None):
         self.calls.append(sources)
         return {"results": [], "metadata": {"engine_counts": {}}}
 
@@ -140,5 +140,41 @@ def test_search_js_renders_per_source_counts():
     # Arrange
     # Act
     present = "engine_counts" in SEARCH_JS
+    # Assert
+    assert present
+
+
+def test_sources_grid_offers_biorxiv_checkbox():
+    # Arrange -- engine parity: the registered BioRxiv engine must be
+    # selectable in the grid (hub old-direct source now in leaf).
+    # Act
+    present = 'value="biorxiv"' in TEMPLATE
+    # Assert
+    assert present
+
+
+def test_sources_grid_offers_doaj_checkbox():
+    # Arrange -- engine parity: the registered DOAJ engine must be
+    # selectable in the grid (hub old-direct source now in leaf).
+    # Act
+    present = 'value="doaj"' in TEMPLATE
+    # Assert
+    assert present
+
+
+def test_sources_grid_offers_plos_checkbox():
+    # Arrange -- engine parity: the registered PLOS engine must be
+    # selectable in the grid (hub old-direct source now in leaf).
+    # Act
+    present = 'value="plos"' in TEMPLATE
+    # Assert
+    assert present
+
+
+def test_sources_grid_offers_pmc_checkbox():
+    # Arrange -- engine parity: the registered PMC engine must be
+    # selectable in the grid (hub old-direct source now in leaf).
+    # Act
+    present = 'value="pmc"' in TEMPLATE
     # Assert
     assert present

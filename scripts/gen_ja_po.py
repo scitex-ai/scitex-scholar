@@ -97,6 +97,19 @@ JA = {
     "Citation Graph": "引用グラフ",
     # --- Search tab ---
     "Search Papers": "論文を検索",
+    "Search syntax help": "検索構文ヘルプ",
+    "Search Engine Queue Status": "検索エンジンのキューステータス",
+    "Active searches": "アクティブな検索",
+    "Zoom in": "ズームイン",
+    "Zoom out": "ズームアウト",
+    "Download PNG": "PNGをダウンロード",
+    "Close": "閉じる",
+    "bioRxiv — biology preprint server": "bioRxiv — 生物学プレプリントサーバー",
+    "DOAJ — open-access journals": "DOAJ — オープンアクセスジャーナル",
+    "PLOS — open-access science journals": "PLOS — オープンアクセス科学ジャーナル",
+    "PMC — open-access full-text archive": "PMC — オープンアクセス全文アーカイブ",
+    "Citation format": "引用形式",
+    "Download citations for the selected results": "選択した結果の引用をダウンロード",
     BLOCKTRANS_MSGIDS[0]: (
         "キーワードで学術データベース（OpenAlex、Crossref、PubMed、Semantic Scholar など）を検索します。"
         "これは<strong>外部データベース</strong>を検索するもので、ライブラリ（別のタブ）ではありません。"

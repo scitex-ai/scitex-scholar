@@ -26,6 +26,9 @@ msgstr "引用グラフ"
 msgid "Search Papers"
 msgstr "論文を検索"
 
+msgid "Search syntax help"
+msgstr "検索構文ヘルプ"
+
 msgid "Query"
 msgstr "クエリ"
 
@@ -68,6 +71,18 @@ msgstr "Crossref — DOIメタデータレジストリ"
 msgid "OpenAlex — open catalog of scholarly works"
 msgstr "OpenAlex — 学術成果物のオープンカタログ"
 
+msgid "bioRxiv — biology preprint server"
+msgstr "bioRxiv — 生物学プレプリントサーバー"
+
+msgid "DOAJ — open-access journals"
+msgstr "DOAJ — オープンアクセスジャーナル"
+
+msgid "PLOS — open-access science journals"
+msgstr "PLOS — オープンアクセス科学ジャーナル"
+
+msgid "PMC — open-access full-text archive"
+msgstr "PMC — オープンアクセス全文アーカイブ"
+
 msgid "Uncheck sources to narrow the search. All checked searches the default set."
 msgstr "ソースのチェックを外すと検索範囲が狭まります。すべて選択時はデフォルト設定で検索します。"
 
@@ -106,6 +121,12 @@ msgstr "未設定"
 
 msgid "Searching databases... This may take a moment."
 msgstr "データベースを検索中。少し時間がかかる場合があります。"
+
+msgid "Search Engine Queue Status"
+msgstr "検索エンジンのキューステータス"
+
+msgid "Active searches"
+msgstr "アクティブな検索"
 
 msgid "An error occurred"
 msgstr "エラーが発生しました"
@@ -149,11 +170,23 @@ msgstr "選択した論文を新しいタブで開く"
 msgid "Open URLs"
 msgstr "URLを開く"
 
-msgid "Download BibTeX for the selected results"
-msgstr "選択した結果のBibTeXをダウンロード"
+msgid "Citation format"
+msgstr "引用形式"
 
-msgid "Export BibTeX"
-msgstr "BibTeXをエクスポート"
+msgid "BibTeX (.bib)"
+msgstr "BibTeX (.bib)"
+
+msgid "RIS (.ris)"
+msgstr "RIS (.ris)"
+
+msgid "EndNote (.enw)"
+msgstr "EndNote (.enw)"
+
+msgid "Download citations for the selected results"
+msgstr "選択した結果の引用をダウンロード"
+
+msgid "Export"
+msgstr "エクスポート"
 
 msgid "Select all"
 msgstr "すべて選択"
@@ -169,18 +202,6 @@ msgstr "選択した結果のオープンアクセスPDFをダウンロード"
 
 msgid "PDFs"
 msgstr "PDF"
-
-msgid "Export"
-msgstr "エクスポート"
-
-msgid "BibTeX (.bib)"
-msgstr "BibTeX (.bib)"
-
-msgid "RIS (.ris)"
-msgstr "RIS (.ris)"
-
-msgid "EndNote (.enw)"
-msgstr "EndNote (.enw)"
 
 msgid "CSV (.csv)"
 msgstr "CSV (.csv)"
@@ -338,6 +359,12 @@ msgstr "引用ネットワークを構築中。少し時間がかかる場合が
 msgid "Citation Network"
 msgstr "引用ネットワーク"
 
+msgid "Zoom out"
+msgstr "ズームアウト"
+
+msgid "Zoom in"
+msgstr "ズームイン"
+
 msgid "Fit to view"
 msgstr "画面に合わせる"
 
@@ -346,6 +373,9 @@ msgstr "ズームをリセット"
 
 msgid "Download SVG"
 msgstr "SVG をダウンロード"
+
+msgid "Download PNG"
+msgstr "PNGをダウンロード"
 
 msgid "Related Papers"
 msgstr "関連論文"
@@ -634,6 +664,9 @@ msgstr "読み込みに失敗しました。後でもう一度お試しくださ
 
 msgid "Download failed. Try again later."
 msgstr "ダウンロードに失敗しました。後でもう一度お試しください。"
+
+msgid "Close"
+msgstr "閉じる"
 
 msgid "No papers with a DOI in your library yet."
 msgstr "ライブラリにはDOI付きの論文がまだありません。"

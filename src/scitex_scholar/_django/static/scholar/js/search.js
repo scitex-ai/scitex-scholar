@@ -58,6 +58,65 @@ document.addEventListener("DOMContentLoaded", () => {
   const abstractToggle = document.getElementById("searchAbstractToggle");
   const openUrlsBtn = document.getElementById("searchOpenUrls");
   const exportBibtexBtn = document.getElementById("searchExportBibtex");
+  // Old-direct U1: the `?` syntax-help toggle. The panel heading is
+  // server-rendered (translated); only the operator lists come from the
+  // endpoint (hub serves them EN-only -- KEEP). Fetched once; a failed
+  // fetch leaves the panel hidden so help can never break search.
+  const syntaxToggle = document.getElementById("searchSyntaxToggle");
+  const syntaxPanel = document.getElementById("searchSyntaxPanel");
+  const syntaxList = document.getElementById("searchSyntaxList");
+  const syntaxExamples = document.getElementById("searchSyntaxExamples");
+  let syntaxLoaded = false;
+  function renderSyntaxHelp(doc) {
+    const frag = document.createDocumentFragment();
+    Object.values(doc.syntax || {}).forEach((op) => {
+      const dt = document.createElement("dt");
+      dt.textContent = [op.short, op.long].filter(Boolean).join(" / ");
+      const dd = document.createElement("dd");
+      dd.textContent = [op.description, op.include_example || op.example, op.exclude_example]
+        .filter(Boolean).join(" — ");
+      frag.append(dt, dd);
+    });
+    return frag;
+  }
+  function renderSyntaxExamples(doc) {
+    const frag = document.createDocumentFragment();
+    (doc.examples || []).forEach((ex) => {
+      const item = document.createElement("div");
+      item.className = "syntax-help-panel__example";
+      const q = document.createElement("code");
+      q.textContent = ex.query;
+      const d = document.createElement("span");
+      d.textContent = ex.description;
+      item.append(q, document.createTextNode(" — "), d);
+      frag.append(item);
+    });
+    return frag;
+  }
+  if (syntaxToggle && syntaxPanel) {
+    syntaxToggle.addEventListener("click", async () => {
+      const opening = syntaxPanel.hidden;
+      syntaxToggle.setAttribute("aria-expanded", String(opening));
+      if (!opening) {
+        syntaxPanel.hidden = true;
+        return;
+      }
+      syntaxPanel.hidden = false;
+      if (syntaxLoaded) return;
+      try {
+        const resp = await fetch(`${STX_MOUNT}/api/search/syntax-help`);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const doc = await resp.json();
+        if (syntaxList) syntaxList.replaceChildren(renderSyntaxHelp(doc));
+        if (syntaxExamples) syntaxExamples.replaceChildren(renderSyntaxExamples(doc));
+        syntaxLoaded = true;
+      } catch (err) {
+        console.warn("syntax help unavailable:", err);
+        syntaxPanel.hidden = true;
+        syntaxToggle.setAttribute("aria-expanded", "false");
+      }
+    });
+  }
   let abstractFull = false;
   const ABSTRACT_TRUNCATE_AT = 300;
 
@@ -72,6 +131,49 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const show = (el) => el && el.classList.remove("hidden");
   const hide = (el) => el && el.classList.add("hidden");
+  // Old-direct U2: the queue-status chrome. Hub's progressive_loading
+  // panel shape (per-engine status + counts), bound to the response's
+  // metadata.engine_events that the view collects from the pipeline's
+  // on_progress callback. Hidden until a search runs; counts are numbers
+  // and engine names are proper nouns, so no i18n strings are needed.
+  const queuePanel = document.getElementById("searchQueuePanel");
+  const queueEngines = document.getElementById("searchQueueEngines");
+  const queueActive = document.getElementById("searchQueueActive");
+  const queueTotal = document.getElementById("searchQueueTotal");
+  function resetQueue() {
+    if (queueActive) queueActive.textContent = "…";
+    if (queueTotal) queueTotal.textContent = "…";
+    if (queueEngines) queueEngines.replaceChildren();
+  }
+  function fillQueue(metadata) {
+    const events = (metadata && metadata.engine_events) || [];
+    let active = 0;
+    let total = 0;
+    if (queueEngines) {
+      const frag = document.createDocumentFragment();
+      events.forEach((ev) => {
+        if (ev.status === "loading") active += 1;
+        total += Number(ev.count) || 0;
+        const row = document.createElement("div");
+        row.className = "search-queue__engine";
+        row.dataset.status = ev.status;
+        const dot = document.createElement("span");
+        dot.className = "search-queue__dot";
+        dot.setAttribute("aria-hidden", "true");
+        const name = document.createElement("span");
+        name.className = "search-queue__name";
+        name.textContent = ev.engine;
+        const count = document.createElement("span");
+        count.className = "search-queue__count";
+        count.textContent = String(ev.count);
+        row.append(dot, name, count);
+        frag.append(row);
+      });
+      queueEngines.replaceChildren(frag);
+    }
+    if (queueActive) queueActive.textContent = String(active);
+    if (queueTotal) queueTotal.textContent = String(total);
+  }
 
   // Error fallback (UX standard): the error box retries the operation that
   // failed, not just dismisses it. Each failure site passes its own retry;
@@ -92,6 +194,64 @@ document.addEventListener("DOMContentLoaded", () => {
       hide(errorBox);
       retryAction();
     });
+  }
+
+  // Old-direct U3: source-selection persistence. The visitor path is
+  // localStorage (their browser owns it); the file-user path is the
+  // server endpoint (user-root JSON, no UserPreference model). On change
+  // both are written; on load localStorage wins when present, otherwise
+  // the server value restores, otherwise the checked-by-default grid
+  // stays untouched. Failures are silent (console.warn) -- persistence
+  // must never break search.
+  const SOURCE_PREFS_KEY = "scitex-scholar:sources";
+  function readGridSources() {
+    if (!sourcesGrid) return null;
+    return Array.from(sourcesGrid.querySelectorAll("input.source-toggle"))
+      .filter((box) => box.checked)
+      .map((box) => box.value);
+  }
+  function applyGridSources(names) {
+    if (!sourcesGrid || !Array.isArray(names)) return false;
+    const wanted = new Set(names);
+    let applied = false;
+    sourcesGrid.querySelectorAll("input.source-toggle").forEach((box) => {
+      if (wanted.has(box.value)) {
+        if (!box.checked) { box.checked = true; applied = true; }
+      } else if (box.checked) { box.checked = false; applied = true; }
+    });
+    return applied;
+  }
+  async function persistSources() {
+    const names = readGridSources();
+    if (!names) return;
+    try {
+      localStorage.setItem(SOURCE_PREFS_KEY, JSON.stringify(names));
+    } catch (err) { console.warn("source prefs localStorage unavailable:", err); }
+    try {
+      await fetch(`${STX_MOUNT}/api/preferences/sources`, {
+        method: "POST",
+        headers: csrfHeaders({ "Content-Type": "application/json" }),
+        body: JSON.stringify({ sources: names }),
+      });
+    } catch (err) { console.warn("source prefs server save unavailable:", err); }
+  }
+  async function restoreSources() {
+    try {
+      const raw = localStorage.getItem(SOURCE_PREFS_KEY);
+      if (raw && applyGridSources(JSON.parse(raw))) return;
+    } catch (err) { console.warn("source prefs localStorage unreadable:", err); }
+    try {
+      const resp = await fetch(`${STX_MOUNT}/api/preferences/sources`);
+      if (!resp.ok) return;
+      const doc = await resp.json();
+      if (doc.sources && Object.keys(doc.sources).length) {
+        applyGridSources(Array.isArray(doc.sources) ? doc.sources : Object.keys(doc.sources));
+      }
+    } catch (err) { console.warn("source prefs server restore unavailable:", err); }
+  }
+  if (sourcesGrid) {
+    sourcesGrid.addEventListener("change", () => { persistSources(); });
+    restoreSources();
   }
 
   // CSRF: same pattern as library.js -- the mounted hub enables
@@ -398,6 +558,64 @@ document.addEventListener("DOMContentLoaded", () => {
     return selectedPapers().map(bibtexEntry).join("\n\n");
   }
 
+  // Old-direct U4: RIS + EndNote join the selected-papers Blob path.
+  // Shapes mirror hub citation_formats (to_ris / to_endnote): envelope
+  // tags, one AU/%A line per author, optional fields only when present,
+  // abstract capped at 1000 chars. Client rows carry authors[]/title/
+  // journal/year/doi/url/abstract; anything absent is skipped, never
+  // rendered as "undefined".
+  function citeAuthors(paper) {
+    return (paper.authors || [])
+      .map((a) => (typeof a === "string" ? a : a.name || ""))
+      .map((name) => name.trim())
+      .filter((name) => name);
+  }
+
+  function citeAbstract(paper) {
+    const text = String(paper.abstract || "").replace(/\s+/g, " ").trim();
+    return text.length > 1000 ? `${text.slice(0, 1000)}...` : text;
+  }
+
+  function risEntry(paper) {
+    const lines = ["TY  - JOUR"];
+    if (paper.title) lines.push(`TI  - ${paper.title}`);
+    citeAuthors(paper).forEach((author) => lines.push(`AU  - ${author}`));
+    if (paper.journal) lines.push(`JO  - ${paper.journal}`);
+    if (paper.year) lines.push(`PY  - ${paper.year}`);
+    if (paper.doi) lines.push(`DO  - ${paper.doi}`);
+    if (paper.url) lines.push(`UR  - ${paper.url}`);
+    const abstract = citeAbstract(paper);
+    if (abstract) lines.push(`AB  - ${abstract}`);
+    lines.push("ER  - ");
+    return lines.join("\n");
+  }
+
+  function endnoteEntry(paper) {
+    const lines = ["%0 Journal Article"];
+    if (paper.title) lines.push(`%T ${paper.title}`);
+    citeAuthors(paper).forEach((author) => lines.push(`%A ${author}`));
+    if (paper.journal) lines.push(`%J ${paper.journal}`);
+    if (paper.year) lines.push(`%D ${paper.year}`);
+    if (paper.doi) lines.push(`%R ${paper.doi}`);
+    if (paper.url) lines.push(`%U ${paper.url}`);
+    const abstract = citeAbstract(paper);
+    if (abstract) lines.push(`%X ${abstract}`);
+    return lines.join("\n");
+  }
+
+  function selectedCitation(format) {
+    const entries = {
+      bibtex: bibtexEntry,
+      ris: risEntry,
+      endnote: endnoteEntry,
+    }[format] || bibtexEntry;
+    return selectedPapers().map(entries).join("\n\n");
+  }
+
+  function selectedCitationExt(format) {
+    return { bibtex: "bib", ris: "ris", endnote: "enw" }[format] || "bib";
+  }
+
   function openSelectedUrls() {
     const papers = selectedPapers();
     if (!papers.length) {
@@ -423,11 +641,17 @@ document.addEventListener("DOMContentLoaded", () => {
       if (bulkStatus) bulkStatus.textContent = scholarT("Select results first.");
       return;
     }
-    const blob = new Blob([selectedBibtex()], { type: "text/plain" });
+    // Old-direct U4: the format choice rides the same Blob path (hub
+    // export_bulk_citations {format, paper_ids} shape, client-side over
+    // the checked rows). Unknown values fall back to BibTeX, never fail.
+    const formatSelect = document.getElementById("searchExportFormat");
+    const format = (formatSelect && formatSelect.value) || "bibtex";
+    const ext = selectedCitationExt(format);
+    const blob = new Blob([selectedCitation(format)], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `scholar-selected-${new Date().toISOString().slice(0, 10)}.bib`;
+    link.download = `scholar-selected-${new Date().toISOString().slice(0, 10)}.${ext}`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -716,6 +940,9 @@ document.addEventListener("DOMContentLoaded", () => {
     hide(errorBox);
     hide(results);
     show(loading);
+    // Old-direct U2: reveal the queue panel in its searching state.
+    if (queuePanel) queuePanel.hidden = false;
+    resetQueue();
 
     try {
       const params = new URLSearchParams({
@@ -752,11 +979,14 @@ document.addEventListener("DOMContentLoaded", () => {
           data.error || `Search failed (${response.status})`,
           () => form.requestSubmit(),
         );
+        if (queuePanel) queuePanel.hidden = true;
         return;
       }
       renderResults(data);
+      fillQueue(data.metadata);
     } catch (err) {
       showError(`Search failed: ${err.message}`, () => form.requestSubmit());
+      if (queuePanel) queuePanel.hidden = true;
     } finally {
       hide(loading);
     }

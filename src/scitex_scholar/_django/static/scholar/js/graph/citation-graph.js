@@ -65,9 +65,20 @@ class CitationGraphManager {
     const resetBtn = document.getElementById("resetZoomBtn");
     if (resetBtn) resetBtn.addEventListener("click", () => this.resetView());
 
+    // Old-direct U5: step zoom in/out (hub zoomInBtn/zoomOutBtn, factor
+    // 1.4 about the view center). Same clamp as the wheel path.
+    const zoomInBtn = document.getElementById("zoomInBtn");
+    if (zoomInBtn) zoomInBtn.addEventListener("click", () => this.zoomStep(1.4));
+    const zoomOutBtn = document.getElementById("zoomOutBtn");
+    if (zoomOutBtn) zoomOutBtn.addEventListener("click", () => this.zoomStep(1 / 1.4));
+
     const downloadBtn = document.getElementById("downloadSvgBtn");
     if (downloadBtn)
       downloadBtn.addEventListener("click", () => this.downloadSvg());
+
+    // Old-direct U6: PNG sibling of the SVG download (hub downloadPngBtn).
+    const pngBtn = document.getElementById("downloadPngBtn");
+    if (pngBtn) pngBtn.addEventListener("click", () => this.downloadPng());
 
     const fitBtn = document.getElementById("fitViewBtn");
     if (fitBtn) fitBtn.addEventListener("click", () => this.fitToView());
@@ -76,6 +87,14 @@ class CitationGraphManager {
     // seed as a recipe; the list lazy-loads on first tab open above.
     const saveBtn = document.getElementById("graphSaveBtn");
     if (saveBtn) saveBtn.addEventListener("click", () => this.saveCurrentGraph());
+
+    // Old-direct U7: Esc closes the node sheet from anywhere and
+    // returns focus to the invoking node (same path as the × button).
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      const panel = document.getElementById("nodeDetailsPanel");
+      if (panel && !panel.classList.contains("hidden")) this.hideNodeDetails();
+    });
 
     // Error fallback (UX standard): retry re-runs the failed build with the
     // same seed -- the error box retries, not just dismisses.
@@ -399,27 +418,52 @@ class CitationGraphManager {
       .querySelectorAll(".graph-node")
       .forEach((el) => el.classList.remove("selected"));
     const el = document.querySelector(`[data-id="${CSS.escape(node.id)}"]`);
-    if (el) el.classList.add("selected");
+    // Old-direct U7: the invoking node is the focus-return target when
+    // the sheet closes, so it must be focusable.
+    if (el) {
+      el.classList.add("selected");
+      el.setAttribute("tabindex", "-1");
+      this.lastSelectedEl = el;
+    }
     this.showNodeDetails(node);
+  }
+
+  // Old-direct U7: hide the sheet and return focus to the invoking node
+  // (or the graph canvas when the node is gone). Esc calls this too.
+  hideNodeDetails() {
+    const panel = document.getElementById("nodeDetailsPanel");
+    if (panel) panel.classList.add("hidden");
+    const target =
+      this.lastSelectedEl && document.contains(this.lastSelectedEl)
+        ? this.lastSelectedEl
+        : document.getElementById("graphCanvas");
+    if (target && typeof target.focus === "function") target.focus({ preventScroll: true });
   }
 
   showNodeDetails(node) {
     const panel = document.getElementById("nodeDetailsPanel");
     if (!panel) return;
     panel.classList.remove("hidden");
+    // Already-loaded graph_data only: journal + citation count join the
+    // existing title/meta/DOI (hub sheet shape). Values render through
+    // this.esc -- node metadata is third-party data.
+    const meta = [node.year || "?", node.journal || ""].filter(Boolean).join(" · ");
     panel.innerHTML = `
       <div class="node-details-header">
         <h6>${node.is_seed ? "&#9733; Seed Paper" : "Related Paper"}</h6>
-        <button class="btn-close-panel" onclick="document.getElementById('nodeDetailsPanel').classList.add('hidden')">&times;</button>
+        <button type="button" class="btn-close-panel" data-act="close" aria-label="${this.esc(scholarT("Close"))}">&times;</button>
       </div>
       <div class="node-details-content">
         <div class="detail-title">${this.esc(node.title)}</div>
         <div class="detail-authors">${this.esc((node.authors || []).join(", "))}</div>
-        <div class="detail-year">Published: ${this.esc(node.year || "?")}</div>
+        <div class="detail-year">${this.esc(meta)}</div>
+        ${node.citation_count != null ? `<div class="detail-cites">${this.esc(Number(node.citation_count).toLocaleString())} ${this.esc(scholarT("citations"))}</div>` : ""}
         ${node.similarity_score ? '<div class="detail-score">Similarity: <strong>' + node.similarity_score.toFixed(2) + "</strong></div>" : ""}
         <div class="detail-doi"><a href="https://doi.org/${encodeURIComponent(node.id)}" target="_blank" rel="noopener">View on DOI.org &#8599;</a></div>
       </div>
     `;
+    const closeBtn = panel.querySelector('[data-act="close"]');
+    if (closeBtn) closeBtn.addEventListener("click", () => this.hideNodeDetails());
   }
 
   async fetchRelatedPapers(doi, limit) {
@@ -513,6 +557,23 @@ class CitationGraphManager {
     this.renderer.applyTransform(this.transform);
   }
 
+  // Old-direct U5: step zoom about the SVG center (hub zoomBy(1.4)).
+  // Same 0.1-5 clamp as the wheel path; fit/reset are untouched.
+  zoomStep(factor) {
+    const svg = this.renderer.getSvg();
+    if (!svg) return;
+    const rect = svg.getBoundingClientRect();
+    const mx = rect.width / 2;
+    const my = rect.height / 2;
+    const newK = Math.max(0.1, Math.min(5, this.transform.k * factor));
+    this.transform.x =
+      mx - (mx - this.transform.x) * (newK / this.transform.k);
+    this.transform.y =
+      my - (my - this.transform.y) * (newK / this.transform.k);
+    this.transform.k = newK;
+    this.renderer.applyTransform(this.transform);
+  }
+
   fitToView() {
     if (!this.currentData) return;
     const svg = this.renderer.getSvg();
@@ -554,6 +615,54 @@ class CitationGraphManager {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  }
+
+  // Old-direct U6: download the current view as PNG (hub downloadPngBtn).
+  // The renderer is SVG, so rasterize client-side: serialize the live SVG,
+  // paint it onto a 2x canvas (sharp on hidpi), and Blob-download the PNG.
+  // No backend. Failures stay silent (console.warn) -- export must never
+  // break the graph.
+  downloadPng() {
+    const svg = document.getElementById("citationGraphSvg");
+    if (!svg) return;
+
+    const data = new XMLSerializer().serializeToString(svg);
+    const url = URL.createObjectURL(new Blob([data], { type: "image/svg+xml" }));
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const width = svg.clientWidth || 800;
+        const height = svg.clientHeight || 600;
+        const canvas = document.createElement("canvas");
+        canvas.width = width * 2;
+        canvas.height = height * 2;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) throw new Error("no 2d context");
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob((blob) => {
+          URL.revokeObjectURL(url);
+          if (!blob) return;
+          const pngUrl = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = pngUrl;
+          a.download = "citation-graph.png";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(pngUrl);
+        }, "image/png");
+      } catch (err) {
+        URL.revokeObjectURL(url);
+        console.warn("graph PNG export unavailable:", err);
+      }
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      console.warn("graph PNG export unavailable: SVG image failed to load");
+    };
+    img.src = url;
   }
 
   /**
