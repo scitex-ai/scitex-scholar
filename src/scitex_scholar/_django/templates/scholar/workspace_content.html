@@ -277,12 +277,20 @@
                                         results-header tools. Old-direct offers
                                         an abstract truncated/full toggle, an
                                         open-selected-URLs button, and an
-                                        export-selected-BibTeX button -- all
-                                        client-side over the checked rows.
+                                        export-selected-citations control --
+                                        U4 adds the RIS/EndNote format choice
+                                        (hub bulk shape) to the BibTeX-only
+                                        client Blob path. All client-side over
+                                        the checked rows.
                                     -->
                                     <button type="button" id="searchAbstractToggle" class="btn-control-library" data-mode="truncated" title="{% trans "Toggle abstract display" %}">{% trans "Abstract: truncated" %}</button>
                                     <button type="button" id="searchOpenUrls" class="btn-control-library" title="{% trans "Open selected papers in new tabs" %}">{% trans "Open URLs" %}</button>
-                                    <button type="button" id="searchExportBibtex" class="btn-control-library" title="{% trans "Download BibTeX for the selected results" %}">{% trans "Export BibTeX" %}</button>
+                                    <select id="searchExportFormat" class="form-select" aria-label="{% trans "Citation format" %}">
+                                        <option value="bibtex" selected>{% trans "BibTeX (.bib)" %}</option>
+                                        <option value="ris">{% trans "RIS (.ris)" %}</option>
+                                        <option value="endnote">{% trans "EndNote (.enw)" %}</option>
+                                    </select>
+                                    <button type="button" id="searchExportBibtex" class="btn-control-library" title="{% trans "Download citations for the selected results" %}">{% trans "Export" %}</button>
                                     <div class="search-bulk-bar" id="searchBulkBar">
                                         <label class="search-bulk-bar__select-all">
                                             <input type="checkbox" id="searchSelectAll">

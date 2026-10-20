@@ -100,6 +100,8 @@ JA = {
     "Search syntax help": "検索構文ヘルプ",
     "Search Engine Queue Status": "検索エンジンのキューステータス",
     "Active searches": "アクティブな検索",
+    "Citation format": "引用形式",
+    "Download citations for the selected results": "選択した結果の引用をダウンロード",
     BLOCKTRANS_MSGIDS[0]: (
         "キーワードで学術データベース（OpenAlex、Crossref、PubMed、Semantic Scholar など）を検索します。"
         "これは<strong>外部データベース</strong>を検索するもので、ライブラリ（別のタブ）ではありません。"
