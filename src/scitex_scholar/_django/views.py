@@ -41,7 +41,11 @@ try:
     from django.template.loader import render_to_string
     from django.templatetags.static import static as _static_url
     from django.utils.translation import gettext as _i18n  # noqa: N816  (JS string dict)
-    from django.views.decorators.http import require_GET, require_POST
+    from django.views.decorators.http import (
+        require_GET,
+        require_POST,
+        require_http_methods,
+    )
 except ImportError as exc:  # django absent -- the [all]-gated GUI capability only
     raise ImportError(
         "scitex_scholar._django.views needs Django, which is not installed. "
@@ -3144,6 +3148,83 @@ def searches_delete(request):
         logger.error(f"searches delete failed: {e}", exc_info=True)
         return JsonResponse({"error": "Delete failed. Try again later."}, status=500)
     return JsonResponse({"deleted": True})
+
+
+#: Largest serialized `sources` selection stored per user (old-direct U3).
+#: Same class as the saved-search params bound: the prefs file is re-read
+#: whole per GET, so an unbounded value bloats every future read; 8k chars
+#: is far past any legitimate selection (~80 chars for all known sources).
+_MAX_SOURCE_PREFS_CHARS = 8000
+
+
+def _source_preferences_path(root: Path) -> Path:
+    """Single JSON file holding this user's source selection."""
+    return root / "source-preferences.json"
+
+
+def _load_source_preferences(root: Path):
+    """This user's stored sources, or {} when never saved or unreadable."""
+    try:
+        return json.loads(_source_preferences_path(root).read_text()).get("sources", {})
+    except (OSError, ValueError, AttributeError):
+        return {}
+
+
+@require_http_methods(["GET", "POST"])
+def preferences_sources(request):
+    """Source-selection persistence (old-direct U3 unification).
+
+    KEEP: hub `save_source_preferences` semantics -- a visitor gets a
+    session note (their client owns localStorage) while a file-user gets
+    persistence; invalid JSON fails closed (400) with hub's
+    {status: error} shape. CHANGE: persistence is a `source-preferences.json`
+    under the request's user-scoped root instead of the `UserPreference`
+    model (leaf stays off hub DB). GET reads back the stored selection
+    ({} default) so both paths round-trip; `?sources=` echo is untouched
+    (the search view owns it).
+    """
+    user = getattr(request, "user", None)
+    file_user = bool(getattr(user, "is_authenticated", False))
+    root = _library_root_for(request)
+    if request.method == "GET":
+        sources = _load_source_preferences(root) if file_user else {}
+        return JsonResponse({"status": "success", "sources": sources})
+    try:
+        payload = _json_body(request)
+    except ValueError as e:
+        if "too large" in str(e):
+            return JsonResponse({"status": "error", "message": str(e)}, status=413)
+        return JsonResponse({"status": "error", "message": "Invalid JSON body"}, status=400)
+    except TypeError:
+        return JsonResponse({"status": "error", "message": "Invalid JSON body"}, status=400)
+    sources = payload.get("sources", {})
+    if len(json.dumps(sources)) > _MAX_SOURCE_PREFS_CHARS:
+        return JsonResponse(
+            {"status": "error", "message": "sources must serialize to at most 8000 characters"},
+            status=400,
+        )
+    if not file_user:
+        return JsonResponse(
+            {
+                "status": "success",
+                "message": "Source preferences noted (login to save permanently)",
+                "saved_to": "session",
+            }
+        )
+    try:
+        path = _source_preferences_path(root)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps({"sources": sources}))
+    except OSError as e:
+        logger.error(f"source preferences save failed: {e}", exc_info=True)
+        return JsonResponse({"status": "error", "message": "Save failed. Try again later."}, status=500)
+    return JsonResponse(
+        {
+            "status": "success",
+            "message": "Source preferences saved to user library",
+            "saved_to": "user-root",
+        }
+    )
 
 
 # Old-direct parity slice 1 (operator mandate 2026-10-17): hub scholar_app
