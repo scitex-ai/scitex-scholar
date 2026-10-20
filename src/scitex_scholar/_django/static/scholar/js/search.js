@@ -72,12 +72,34 @@ document.addEventListener("DOMContentLoaded", () => {
     Object.values(doc.syntax || {}).forEach((op) => {
       const dt = document.createElement("dt");
       dt.textContent = [op.short, op.long].filter(Boolean).join(" / ");
+      dt.className = "syntax-help-panel__insert";
+      dt.setAttribute("role", "button");
+      dt.setAttribute("tabindex", "0");
+      dt.addEventListener("click", () => insertSyntaxToken(op.short || op.long));
+      dt.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); insertSyntaxToken(op.short || op.long); }
+      });
       const dd = document.createElement("dd");
       dd.textContent = [op.description, op.include_example || op.example, op.exclude_example]
         .filter(Boolean).join(" — ");
       frag.append(dt, dd);
     });
     return frag;
+  }
+  // Catch-up: old-direct clickable operator chips. Inserts the flag at
+  // the cursor (appending with a space when the box is non-empty).
+  function insertSyntaxToken(token) {
+    if (!token || !input) return;
+    const insert = token.trim() + " ";
+    const start = typeof input.selectionStart === "number" ? input.selectionStart : input.value.length;
+    const end = typeof input.selectionEnd === "number" ? input.selectionEnd : input.value.length;
+    const before = input.value.slice(0, start);
+    const after = input.value.slice(end);
+    const spacer = before && !before.endsWith(" ") ? " " : "";
+    input.value = before + spacer + insert + after;
+    const caret = (before + spacer + insert).length;
+    input.focus();
+    try { input.setSelectionRange(caret, caret); } catch (err) { /* older WebViews */ }
   }
   function renderSyntaxExamples(doc) {
     const frag = document.createDocumentFragment();
