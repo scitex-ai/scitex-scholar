@@ -111,14 +111,12 @@
   }
 }
 
-/* TEMPORARY bridge (operator 2026-10-20, sunset when the SDK sheet
- * ships it): the SDK selected state recolors the text and rounds the
- * tab, so the underline renders as a rounded colored pill. Old-direct
- * parity + operator taste: underline ONLY -- siblings' text color,
- * sharp corners, transparent box. */
+/* TEMPORARY bridge (operator 2026-10-20/21: selected tab must read
+ * BRIGHTER than its siblings, no rounding, no blue. Underline + bright
+ * primary text; sunset when the SDK sheet ships it). */
 .stx-content-tabs .stx-content-tabs__tab[aria-selected="true"] {
   border-radius: 0;
-  color: var(--text-secondary, #4a4a4a);
+  color: var(--text-primary, #1a1a1a);
   border-color: transparent;
   background: transparent;
 }

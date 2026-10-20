@@ -42,11 +42,11 @@ def test_tabs_have_square_corners_for_a_sharp_underline():
     # inset underline inherits the rounding AND the text changes color
     # (operator: disgusting). Sunset when the SDK sheet ships it.
     # Act (no Act step: static text inspection)
-    # Assert -- selected tab keeps siblings' color, sharp corners.
+    # Assert -- selected tab reads BRIGHTER than siblings, sharp corners.
     from scitex_scholar._django import views as _views
     from pathlib import Path as _Path
     layout = (
         _Path(_views.__file__).parent
         / "static" / "scholar" / "css" / "_partials" / "_layout.css"
     ).read_text()
-    assert (".stx-content-tabs__tab" in layout) and ("border-radius: 0" in layout) and ("color: var(--text-secondary" in layout)
+    assert (".stx-content-tabs__tab" in layout) and ("border-radius: 0" in layout) and ("color: var(--text-primary" in layout)
