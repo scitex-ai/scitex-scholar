@@ -111,6 +111,22 @@
   }
 }
 
+/* Old-direct scroll model (operator parity 2026-10-21): the SDK shell
+ * makes `.ws-module-pane` the page scroller, so its own scrollbar gutter
+ * shrinks the header + content 15px off the module edge (measured 1265
+ * vs 1280). Old-direct keeps the outer fixed and scrolls inner panes.
+ * Scholar-scoped: `.app-container` exists only on this leaf's pages, so
+ * the shared sheets are untouched. */
+.ws-module-pane {
+  overflow-y: hidden;
+}
+
+.app-container {
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+}
+
 /* The shared sheet owns the header's phone behaviour (wrap at 600px, touch
  * targets); scholar keeps only its container height fix. */
 @media (max-width: 600px) {
