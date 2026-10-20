@@ -102,6 +102,7 @@ JA = {
     "Active searches": "アクティブな検索",
     "Zoom in": "ズームイン",
     "Zoom out": "ズームアウト",
+    "Download PNG": "PNGをダウンロード",
     "Citation format": "引用形式",
     "Download citations for the selected results": "選択した結果の引用をダウンロード",
     BLOCKTRANS_MSGIDS[0]: (

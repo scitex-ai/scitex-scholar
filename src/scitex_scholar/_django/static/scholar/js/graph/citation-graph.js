@@ -76,6 +76,10 @@ class CitationGraphManager {
     if (downloadBtn)
       downloadBtn.addEventListener("click", () => this.downloadSvg());
 
+    // Old-direct U6: PNG sibling of the SVG download (hub downloadPngBtn).
+    const pngBtn = document.getElementById("downloadPngBtn");
+    if (pngBtn) pngBtn.addEventListener("click", () => this.downloadPng());
+
     const fitBtn = document.getElementById("fitViewBtn");
     if (fitBtn) fitBtn.addEventListener("click", () => this.fitToView());
 
@@ -578,6 +582,54 @@ class CitationGraphManager {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  }
+
+  // Old-direct U6: download the current view as PNG (hub downloadPngBtn).
+  // The renderer is SVG, so rasterize client-side: serialize the live SVG,
+  // paint it onto a 2x canvas (sharp on hidpi), and Blob-download the PNG.
+  // No backend. Failures stay silent (console.warn) -- export must never
+  // break the graph.
+  downloadPng() {
+    const svg = document.getElementById("citationGraphSvg");
+    if (!svg) return;
+
+    const data = new XMLSerializer().serializeToString(svg);
+    const url = URL.createObjectURL(new Blob([data], { type: "image/svg+xml" }));
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const width = svg.clientWidth || 800;
+        const height = svg.clientHeight || 600;
+        const canvas = document.createElement("canvas");
+        canvas.width = width * 2;
+        canvas.height = height * 2;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) throw new Error("no 2d context");
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob((blob) => {
+          URL.revokeObjectURL(url);
+          if (!blob) return;
+          const pngUrl = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = pngUrl;
+          a.download = "citation-graph.png";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(pngUrl);
+        }, "image/png");
+      } catch (err) {
+        URL.revokeObjectURL(url);
+        console.warn("graph PNG export unavailable:", err);
+      }
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      console.warn("graph PNG export unavailable: SVG image failed to load");
+    };
+    img.src = url;
   }
 
   /**
