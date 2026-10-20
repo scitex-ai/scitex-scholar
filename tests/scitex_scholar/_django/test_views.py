@@ -2326,8 +2326,10 @@ def test_tabs_sdk_stylesheet_exists_in_installed_package():
     Regression guard for the 0.3.6 hold: the template linked
     scitex_sdk/ui/css/app/content-tabs.css while no PyPI release carried it,
     so the URL 404'd and tabs shipped unstyled. Linking the path is not
-    enough — the file must exist in the installed scitex-sdk (floor >=0.3.7)
-    and carry the selected-state rule the contract depends on.
+    enough — the file must exist in the installed scitex-sdk (floor >=0.3.9)
+    and carry the selected-state rule the contract depends on: underline-only
+    (transparent border/background, accent underline -- SDK #60), never the
+    pre-#60 boxed + brand-blue look the operator vetoed.
     """
     # Arrange
     import scitex_sdk.ui
@@ -2343,8 +2345,21 @@ def test_tabs_sdk_stylesheet_exists_in_installed_package():
     )
     # Act
     text = sheet.read_text()
-    # Assert
-    assert '.stx-content-tabs__tab[aria-selected="true"]' in text
+    # Assert -- one tuple compare: the contract selector exists AND the
+    # selected state is underline-only (transparent box), never the
+    # vetoed boxed + brand-blue language.
+    selected = re.search(
+        r'\.stx-content-tabs__tab\[aria-selected="true"\]\s*\{(.*?)\}',
+        text,
+        re.S,
+    )
+    body = selected.group(1) if selected else ""
+    assert (
+        selected is not None,
+        "border-color: transparent" in body,
+        "background: transparent" in body,
+        "--accent" in body,
+    ) == (True, True, True, True)
 
 
 def test_tabs_do_not_redefine_the_bar():
