@@ -1216,6 +1216,19 @@ def search(request, _engine=None):
 
     try:
         engine = _engine or _get_search_engine()
+        # Old-direct U2: bind the pipeline progress callback. Last-wins
+        # per engine, first-seen order -- the queue panel renders exactly
+        # this list. Sync callback on a same-thread run; nothing escapes
+        # the request, so search behavior is unchanged.
+        engine_events = {}
+
+        def _collect_progress(engine_name, status, count):
+            engine_events[engine_name] = {
+                "engine": engine_name,
+                "status": status,
+                "count": count,
+            }
+
         result = asyncio.run(
             engine.search(
                 query=query,
@@ -1223,10 +1236,12 @@ def search(request, _engine=None):
                 max_results=max_results,
                 sources=sources,
                 filters=range_filters,
+                on_progress=_collect_progress,
             )
         )
         _strip_markup_from_search_abstracts(result)
         result.setdefault("metadata", {})["cached"] = False
+        result["metadata"]["engine_events"] = list(engine_events.values())
         if sources:
             result["metadata"]["sources_selected"] = sources
         _cache_set(cache_key, result)

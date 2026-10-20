@@ -220,6 +220,22 @@
                             </div>
                             <div class="loading-text">{% trans "Searching databases... This may take a moment." %}</div>
                         </div>
+                        <!-- Queue status (old-direct U2 unification): hub
+                            progressive_loading panel shape -- per-engine
+                            status + counts. Hidden until a search runs;
+                            search.js shows it on submit and fills it from
+                            metadata.engine_events on response. Monotone +
+                            --accent only (operator color discipline). -->
+                        <div id="searchQueuePanel" class="search-queue" hidden>
+                            <div class="search-queue__head">
+                                <span class="search-queue__title">{% trans "Search Engine Queue Status" %}</span>
+                                <span class="search-queue__totals">
+                                    <span>{% trans "Active searches" %}: <strong id="searchQueueActive">0</strong></span>
+                                    <span>{% trans "Results" %}: <strong id="searchQueueTotal">0</strong></span>
+                                </span>
+                            </div>
+                            <div id="searchQueueEngines" class="search-queue__engines"></div>
+                        </div>
                         <!-- Error -->
                         <div id="searchError" class="graph-error hidden">
                             <p id="searchErrorMessage">{% trans "An error occurred" %}</p>

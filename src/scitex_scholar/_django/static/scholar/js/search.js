@@ -131,6 +131,49 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const show = (el) => el && el.classList.remove("hidden");
   const hide = (el) => el && el.classList.add("hidden");
+  // Old-direct U2: the queue-status chrome. Hub's progressive_loading
+  // panel shape (per-engine status + counts), bound to the response's
+  // metadata.engine_events that the view collects from the pipeline's
+  // on_progress callback. Hidden until a search runs; counts are numbers
+  // and engine names are proper nouns, so no i18n strings are needed.
+  const queuePanel = document.getElementById("searchQueuePanel");
+  const queueEngines = document.getElementById("searchQueueEngines");
+  const queueActive = document.getElementById("searchQueueActive");
+  const queueTotal = document.getElementById("searchQueueTotal");
+  function resetQueue() {
+    if (queueActive) queueActive.textContent = "…";
+    if (queueTotal) queueTotal.textContent = "…";
+    if (queueEngines) queueEngines.replaceChildren();
+  }
+  function fillQueue(metadata) {
+    const events = (metadata && metadata.engine_events) || [];
+    let active = 0;
+    let total = 0;
+    if (queueEngines) {
+      const frag = document.createDocumentFragment();
+      events.forEach((ev) => {
+        if (ev.status === "loading") active += 1;
+        total += Number(ev.count) || 0;
+        const row = document.createElement("div");
+        row.className = "search-queue__engine";
+        row.dataset.status = ev.status;
+        const dot = document.createElement("span");
+        dot.className = "search-queue__dot";
+        dot.setAttribute("aria-hidden", "true");
+        const name = document.createElement("span");
+        name.className = "search-queue__name";
+        name.textContent = ev.engine;
+        const count = document.createElement("span");
+        count.className = "search-queue__count";
+        count.textContent = String(ev.count);
+        row.append(dot, name, count);
+        frag.append(row);
+      });
+      queueEngines.replaceChildren(frag);
+    }
+    if (queueActive) queueActive.textContent = String(active);
+    if (queueTotal) queueTotal.textContent = String(total);
+  }
 
   // Error fallback (UX standard): the error box retries the operation that
   // failed, not just dismisses it. Each failure site passes its own retry;
@@ -775,6 +818,9 @@ document.addEventListener("DOMContentLoaded", () => {
     hide(errorBox);
     hide(results);
     show(loading);
+    // Old-direct U2: reveal the queue panel in its searching state.
+    if (queuePanel) queuePanel.hidden = false;
+    resetQueue();
 
     try {
       const params = new URLSearchParams({
@@ -811,11 +857,14 @@ document.addEventListener("DOMContentLoaded", () => {
           data.error || `Search failed (${response.status})`,
           () => form.requestSubmit(),
         );
+        if (queuePanel) queuePanel.hidden = true;
         return;
       }
       renderResults(data);
+      fillQueue(data.metadata);
     } catch (err) {
       showError(`Search failed: ${err.message}`, () => form.requestSubmit());
+      if (queuePanel) queuePanel.hidden = true;
     } finally {
       hide(loading);
     }
