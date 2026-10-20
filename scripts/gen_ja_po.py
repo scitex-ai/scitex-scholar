@@ -104,6 +104,7 @@ JA = {
     "Zoom out": "ズームアウト",
     "Download PNG": "PNGをダウンロード",
     "Close": "閉じる",
+    "bioRxiv — biology preprint server": "bioRxiv — 生物学プレプリントサーバー",
     "Citation format": "引用形式",
     "Download citations for the selected results": "選択した結果の引用をダウンロード",
     BLOCKTRANS_MSGIDS[0]: (
