@@ -107,6 +107,7 @@ JA = {
     "bioRxiv — biology preprint server": "bioRxiv — 生物学プレプリントサーバー",
     "DOAJ — open-access journals": "DOAJ — オープンアクセスジャーナル",
     "PLOS — open-access science journals": "PLOS — オープンアクセス科学ジャーナル",
+    "PMC — open-access full-text archive": "PMC — オープンアクセス全文アーカイブ",
     "Citation format": "引用形式",
     "Download citations for the selected results": "選択した結果の引用をダウンロード",
     BLOCKTRANS_MSGIDS[0]: (
