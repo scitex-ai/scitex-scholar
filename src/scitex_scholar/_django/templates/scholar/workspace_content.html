@@ -38,6 +38,21 @@
                         <div class="graph-card">
                             <div class="graph-card__header">
                                 <span class="graph-card__title">{% trans "Search Papers" %}</span>
+                                <!--
+                                    Old-direct U1: the `?` syntax-help
+                                    affordance. Toggles the panel below,
+                                    populated from GET api/search/syntax-help
+                                    by search.js (STX_MOUNT-joined). The
+                                    button is a bare `?` so it needs no
+                                    translation; the panel heading reuses the
+                                    single "Search syntax help" msgid.
+                                -->
+                                <button type="button" id="searchSyntaxToggle" class="syntax-help-toggle" aria-expanded="false" aria-controls="searchSyntaxPanel" title="{% trans "Search syntax help" %}">?</button>
+                            </div>
+                            <div id="searchSyntaxPanel" class="syntax-help-panel" hidden>
+                                <h3 class="syntax-help-panel__title">{% trans "Search syntax help" %}</h3>
+                                <dl id="searchSyntaxList" class="syntax-help-panel__list"></dl>
+                                <div id="searchSyntaxExamples" class="syntax-help-panel__examples"></div>
                             </div>
                             <div class="graph-card__body">
                                 <p class="graph-description">
