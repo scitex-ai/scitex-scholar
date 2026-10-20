@@ -556,6 +556,9 @@ def _js_i18n_dict() -> dict:
         "Saving…": _i18n("Saving…"),
         "Saved": _i18n("Saved"),
         "Save failed": _i18n("Save failed"),
+        # Catch-up: node sheet actions render client-side -- same rule.
+        "Add to library": _i18n("Add to library"),
+        "Explore from here": _i18n("Explore from here"),
         "Select results to save.": _i18n("Select results to save."),
         "Saved %(saved)s of %(total)s": _i18n("Saved %(saved)s of %(total)s"),
         "Enriched %(done)s of %(total)s": _i18n("Enriched %(done)s of %(total)s"),

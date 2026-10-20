@@ -460,10 +460,54 @@ class CitationGraphManager {
         ${node.citation_count != null ? `<div class="detail-cites">${this.esc(Number(node.citation_count).toLocaleString())} ${this.esc(scholarT("citations"))}</div>` : ""}
         ${node.similarity_score ? '<div class="detail-score">Similarity: <strong>' + node.similarity_score.toFixed(2) + "</strong></div>" : ""}
         <div class="detail-doi"><a href="https://doi.org/${encodeURIComponent(node.id)}" target="_blank" rel="noopener">View on DOI.org &#8599;</a></div>
+        <div class="detail-actions">
+          <button type="button" class="btn-control-library" data-act="add">${this.esc(scholarT("Add to library"))}</button>
+          ${node.is_seed ? "" : `<button type="button" class="btn-control-library" data-act="explore">${this.esc(scholarT("Explore from here"))}</button>`}
+        </div>
       </div>
     `;
     const closeBtn = panel.querySelector('[data-act="close"]');
     if (closeBtn) closeBtn.addEventListener("click", () => this.hideNodeDetails());
+    const addBtn = panel.querySelector('[data-act="add"]');
+    if (addBtn) addBtn.addEventListener("click", () => this.addToLibrary(node, addBtn));
+    const exploreBtn = panel.querySelector('[data-act="explore"]');
+    if (exploreBtn) exploreBtn.addEventListener("click", () => this.exploreFromHere(node));
+  }
+
+  // Catch-up: hub NodeSheet actions over already-loaded node metadata.
+  // Add persists through the existing single-save endpoint (same payload
+  // shape as the search surface); explore rebuilds from the node DOI.
+  async addToLibrary(node, btn) {
+    btn.disabled = true;
+    try {
+      const resp = await fetch(`${STX_MOUNT}/api/library/save`, {
+        method: "POST",
+        headers: this.csrfJsonHeaders(),
+        body: JSON.stringify({
+          title: node.title || "",
+          authors: node.authors || [],
+          year: node.year || null,
+          venue: node.journal || "",
+          doi: node.id || "",
+        }),
+      });
+      const data = await resp.json().catch(() => ({}));
+      if (!resp.ok) throw new Error(data.error || scholarT("Save failed"));
+      btn.textContent = scholarT("Saved");
+    } catch (err) {
+      btn.textContent = scholarT("Save failed");
+      btn.disabled = false;
+    }
+  }
+
+  exploreFromHere(node) {
+    if (!node || !node.id) return;
+    const doiInput = document.getElementById("doiInput");
+    if (doiInput) doiInput.value = node.id;
+    const topNSelect = document.getElementById("topN");
+    const topN = parseInt(topNSelect ? topNSelect.value : "20", 10) || 20;
+    this.hideNodeDetails();
+    this.buildGraph(node.id, topN);
   }
 
   async fetchRelatedPapers(doi, limit) {
