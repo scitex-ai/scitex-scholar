@@ -110,6 +110,12 @@ msgstr "未設定"
 msgid "Searching databases... This may take a moment."
 msgstr "データベースを検索中。少し時間がかかる場合があります。"
 
+msgid "Search Engine Queue Status"
+msgstr "検索エンジンのキューステータス"
+
+msgid "Active searches"
+msgstr "アクティブな検索"
+
 msgid "An error occurred"
 msgstr "エラーが発生しました"
 
