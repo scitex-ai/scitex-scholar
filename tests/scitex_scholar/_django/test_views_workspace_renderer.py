@@ -20,10 +20,16 @@ pytest_plugins = ("tests.scitex_scholar._django.test_views_shell_context",)
 
 
 def _leaf_assets(dom):
-    """Keep real leaf asset order/attributes and the translated JSON script."""
+    """Keep real leaf asset order/attributes and the translated JSON script.
+
+    The shell-head favicon (rel="icon", operator 2026-10-20 navy mark) is
+    deliberately excluded: it lives in the full page's branding partial,
+    which the hub fragment mount never renders -- including it here would
+    fail every fragment-vs-full comparison by construction.
+    """
     return tuple(str(node) for node in dom.select(
         'meta[name="stx-mount"], meta[name="theme-color"], '
-        'link[href^="/static/scholar/"], script[src^="/static/scholar/"], '
+        'link[href^="/static/scholar/"]:not([rel="icon"]), script[src^="/static/scholar/"], '
         'script#SCHOLAR_I18N'
     ))
 
