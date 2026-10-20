@@ -120,6 +120,52 @@
 }
 
 /*
+ * Slice 1 (old-direct unification): the Sources grid. Old-direct renders
+ * one checkbox per source (local corpora first, then external APIs); the
+ * leaf grid follows the same order with the shared check-label shape.
+ */
+.search-advanced__row--stack {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+.search-sources-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 2px 14px;
+  width: 100%;
+}
+.search-sources-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/*
+ * Slice 2 (old-direct unification): the Filters grid. Old-direct renders
+ * noUiSlider range sliders; the leaf uses native number inputs in the same
+ * grid shape (no slider dependency to carry).
+ */
+.search-filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px 14px;
+  width: 100%;
+}
+.search-filters-grid__item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.search-filters-grid__name {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.search-filters-grid__item .form-input {
+  width: 100%;
+}
+
+/*
  * L345 (compass 2026-09-10): per-result "Build citation graph" action. A
  * quiet secondary button next to the DOI -- the demotion path that lets a
  * graph be started FROM a search result instead of only via the top-level tab.

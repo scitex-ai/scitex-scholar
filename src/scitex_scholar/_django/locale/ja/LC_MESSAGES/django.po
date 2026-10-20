@@ -44,6 +44,54 @@ msgstr "すべてのソース（並列）"
 msgid "Single source"
 msgstr "単一ソース"
 
+msgid "Sources"
+msgstr "ソース"
+
+msgid "Crossref database on the SciTeX server — fast, unlimited"
+msgstr "SciTeXサーバー上のCrossrefデータベース — 高速、無制限"
+
+msgid "OpenAlex database on the SciTeX server — fast, unlimited"
+msgstr "SciTeXサーバー上のOpenAlexデータベース — 高速、無制限"
+
+msgid "NCBI PubMed — biomedical literature"
+msgstr "NCBI PubMed — 生物医学文献"
+
+msgid "arXiv — physics, mathematics, and computer science preprints"
+msgstr "arXiv — 物理学・数学・計算機科学のプレプリント"
+
+msgid "Semantic Scholar — AI-powered academic search"
+msgstr "Semantic Scholar — AI駆動の学術検索"
+
+msgid "Crossref — DOI metadata registry"
+msgstr "Crossref — DOIメタデータレジストリ"
+
+msgid "OpenAlex — open catalog of scholarly works"
+msgstr "OpenAlex — 学術成果物のオープンカタログ"
+
+msgid "Uncheck sources to narrow the search. All checked searches the default set."
+msgstr "ソースのチェックを外すと検索範囲が狭まります。すべて選択時はデフォルト設定で検索します。"
+
+msgid "Filters"
+msgstr "絞り込み"
+
+msgid "Year from"
+msgstr "開始年"
+
+msgid "Year to"
+msgstr "終了年"
+
+msgid "Min citations"
+msgstr "最小被引用数"
+
+msgid "Max citations"
+msgstr "最大被引用数"
+
+msgid "Min impact factor"
+msgstr "最小インパクトファクター"
+
+msgid "Max impact factor"
+msgstr "最大インパクトファクター"
+
 msgid "Ignore cache"
 msgstr "キャッシュを無視"
 
@@ -89,6 +137,24 @@ msgstr "ソース"
 msgid "All sources"
 msgstr "すべてのソース"
 
+msgid "Toggle abstract display"
+msgstr "抄録の表示を切り替え"
+
+msgid "Abstract: truncated"
+msgstr "抄録：省略表示"
+
+msgid "Open selected papers in new tabs"
+msgstr "選択した論文を新しいタブで開く"
+
+msgid "Open URLs"
+msgstr "URLを開く"
+
+msgid "Download BibTeX for the selected results"
+msgstr "選択した結果のBibTeXをダウンロード"
+
+msgid "Export BibTeX"
+msgstr "BibTeXをエクスポート"
+
 msgid "Select all"
 msgstr "すべて選択"
 
@@ -97,6 +163,12 @@ msgstr "選択を保存"
 
 msgid "Save & enrich"
 msgstr "保存して補完"
+
+msgid "Download open-access PDFs for the selected results"
+msgstr "選択した結果のオープンアクセスPDFをダウンロード"
+
+msgid "PDFs"
+msgstr "PDF"
 
 msgid "Export"
 msgstr "エクスポート"
@@ -110,8 +182,23 @@ msgstr "RIS (.ris)"
 msgid "EndNote (.enw)"
 msgstr "EndNote (.enw)"
 
+msgid "CSV (.csv)"
+msgstr "CSV (.csv)"
+
 msgid "Import BibTeX"
 msgstr "BibTeX をインポート"
+
+msgid "Import preview"
+msgstr "インポートのプレビュー"
+
+msgid "These entries will be added to your library. Entries already present are marked."
+msgstr "これらのエントリがライブラリに追加されます。既存のエントリには印が付きます。"
+
+msgid "Confirm import"
+msgstr "インポートを実行"
+
+msgid "Cancel"
+msgstr "キャンセル"
 
 msgid "Project"
 msgstr "プロジェクト"
@@ -173,6 +260,21 @@ msgstr "タイトル、著者、DOI"
 msgid "Clear filters"
 msgstr "絞り込みを解除"
 
+msgid "Sort"
+msgstr "並べ替え"
+
+msgid "Sort library"
+msgstr "ライブラリを並べ替え"
+
+msgid "Title (Z-A)"
+msgstr "タイトル（Z-A）"
+
+msgid "Importance (highest)"
+msgstr "重要度（高）"
+
+msgid "Importance (lowest)"
+msgstr "重要度（低）"
+
 msgid "Loading your library..."
 msgstr "ライブラリを読み込み中…"
 
@@ -199,6 +301,15 @@ msgstr "ライブラリからシードを選択"
 
 msgid "Loading your library…"
 msgstr "ライブラリを読み込み中…"
+
+msgid "Saved graphs"
+msgstr "保存したグラフ"
+
+msgid "Graph name"
+msgstr "グラフ名"
+
+msgid "Save current graph"
+msgstr "現在のグラフを保存"
 
 msgid "How It Works"
 msgstr "使い方"
@@ -359,6 +470,9 @@ msgstr "ローカルコーパス（NAS）"
 msgid "Online fallback"
 msgstr "オンラインへのフォールバック"
 
+msgid "Selected sources"
+msgstr "選択したソース"
+
 msgid "Imported %(n)s paper from %(file)s"
 msgstr "%(file)s から %(n)s 件の論文をインポートしました"
 
@@ -385,6 +499,141 @@ msgstr "%(total)s 件中 %(saved)s 件を保存"
 
 msgid "Enriched %(done)s of %(total)s"
 msgstr "%(total)s 件中 %(done)s 件を補完"
+
+msgid "Abstract: full"
+msgstr "抄録：全文表示"
+
+msgid "Select results first."
+msgstr "先に結果を選択してください。"
+
+msgid "No DOI links in selection."
+msgstr "選択範囲にDOIリンクがありません。"
+
+msgid "Copied %(n)s BibTeX entry"
+msgstr "%(n)s 件のBibTeXエントリをコピーしました"
+
+msgid "Copied %(n)s BibTeX entries"
+msgstr "%(n)s 件のBibTeXエントリをコピーしました"
+
+msgid "Copy failed"
+msgstr "コピーに失敗しました"
+
+msgid "To read"
+msgstr "未読"
+
+msgid "Reading"
+msgstr "読書中"
+
+msgid "Read"
+msgstr "既読"
+
+msgid "Referenced"
+msgstr "引用済み"
+
+msgid "Favorite"
+msgstr "お気に入り"
+
+msgid "Reading status"
+msgstr "読書状態"
+
+msgid "Importance"
+msgstr "重要度"
+
+msgid "Tags"
+msgstr "タグ"
+
+msgid "Add tag..."
+msgstr "タグを追加…"
+
+msgid "Personal notes"
+msgstr "個人メモ"
+
+msgid "Add your notes about this paper..."
+msgstr "この論文についてのメモを追加…"
+
+msgid "Save changes"
+msgstr "変更を保存"
+
+msgid "Previewing %(file)s…"
+msgstr "%(file)s をプレビュー中…"
+
+msgid "Previewing %(n)s paper from %(file)s"
+msgstr "%(file)s から %(n)s 件の論文をプレビュー中"
+
+msgid "Previewing %(n)s papers from %(file)s"
+msgstr "%(file)s から %(n)s 件の論文をプレビュー中"
+
+msgid "Importing %(file)s…"
+msgstr "%(file)s をインポート中…"
+
+msgid "Already in library"
+msgstr "登録済み"
+
+msgid "No saved graphs yet."
+msgstr "保存したグラフはまだありません。"
+
+msgid "Load"
+msgstr "読み込む"
+
+msgid "Delete"
+msgstr "削除"
+
+msgid "Name the graph and build it first."
+msgstr "グラフに名前を付けて、先に構築してください。"
+
+msgid "Graph saved"
+msgstr "グラフを保存しました"
+
+msgid "Graph not found"
+msgstr "グラフが見つかりません"
+
+msgid "Graph deleted"
+msgstr "グラフを削除しました"
+
+msgid "Delete failed"
+msgstr "削除に失敗しました"
+
+msgid "Remove from library"
+msgstr "ライブラリから削除"
+
+msgid "Remove this paper from the library?"
+msgstr "この論文をライブラリから削除しますか？"
+
+msgid "Remove failed"
+msgstr "削除に失敗しました"
+
+msgid "Rename"
+msgstr "名前を変更"
+
+msgid "Graph renamed"
+msgstr "グラフ名を変更しました"
+
+msgid "Rename failed"
+msgstr "名前の変更に失敗しました"
+
+msgid "Download PDF"
+msgstr "PDFをダウンロード"
+
+msgid "PDF downloaded"
+msgstr "PDFをダウンロードしました"
+
+msgid "Download failed"
+msgstr "ダウンロードに失敗しました"
+
+msgid "Downloaded %(done)s of %(total)s PDFs"
+msgstr "%(total)s 件中 %(done)s 件のPDFをダウンロードしました"
+
+msgid "No open-access PDF available"
+msgstr "オープンアクセスのPDFがありません"
+
+msgid "Paper not found"
+msgstr "論文が見つかりません"
+
+msgid "Load failed. Try again later."
+msgstr "読み込みに失敗しました。後でもう一度お試しください。"
+
+msgid "Download failed. Try again later."
+msgstr "ダウンロードに失敗しました。後でもう一度お試しください。"
 
 msgid "No papers with a DOI in your library yet."
 msgstr "ライブラリにはDOI付きの論文がまだありません。"

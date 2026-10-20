@@ -19,14 +19,20 @@
                 ever renders an empty column. -->
             <!-- Main Content -->
             <main class="app-main">
-                <!-- Tab Navigation: Search is the primary, default action. -->
-                <nav class="tab-nav">
-                    <button class="tab-btn active" data-tab="search">{% trans "Search databases" %}</button>
-                    <button class="tab-btn" data-tab="library">{% trans "Library" %}</button>
-                    <button class="tab-btn" data-tab="graph">{% trans "Citation Graph" %}</button>
-                </nav>
+                <!-- Tab Navigation: Search is the primary, default action.
+                    SDK SSoT content-tabs primitive
+                    (scitex_sdk/ui/css/app/content-tabs.css, linked in the
+                    workspace_assets head): the shared sheet owns the tab
+                    layout and the selected state, read from aria-selected.
+                    Roving tabindex + ArrowLeft/ArrowRight live in app.js,
+                    the producer. Search stays the default selected tab. -->
+                <div class="stx-content-tabs" role="tablist" aria-label="{% trans "SciTeX Scholar" %}">
+                    <button type="button" class="stx-content-tabs__tab" role="tab" id="scholar-tab-search" aria-selected="true" aria-controls="tab-search" tabindex="0">{% trans "Search databases" %}</button>
+                    <button type="button" class="stx-content-tabs__tab" role="tab" id="scholar-tab-library" aria-selected="false" aria-controls="tab-library" tabindex="-1">{% trans "Library" %}</button>
+                    <button type="button" class="stx-content-tabs__tab" role="tab" id="scholar-tab-graph" aria-selected="false" aria-controls="tab-graph" tabindex="-1">{% trans "Citation Graph" %}</button>
+                </div>
                 <!-- Search Tab (default) -->
-                <div id="tab-search" class="tab-panel active">
+                <div id="tab-search" class="tab-panel active" role="tabpanel" aria-labelledby="scholar-tab-search" tabindex="0">
                     <div class="citation-graph-container">
                         <!-- Input Form -->
                         <div class="graph-card">
@@ -86,6 +92,91 @@
                                                 <option value="parallel" selected>{% trans "All sources (parallel)" %}</option>
                                                 <option value="single">{% trans "Single source" %}</option>
                                             </select>
+                                        </div>
+                                        <!--
+                                            Slice 1 (old-direct unification): the
+                                            Sources grid. Old-direct renders one
+                                            checkbox per source (local corpora
+                                            first, then external APIs) plus an
+                                            ignore-cache toggle; the checked set
+                                            travels as ?sources=a,b,c. All
+                                            checked (or none) keeps the tiered
+                                            default -- the request omits the
+                                            param and behaves exactly as
+                                            before this slice.
+                                        -->
+                                        <div class="search-advanced__row search-advanced__row--stack">
+                                            <span class="form-label" id="searchSourcesLabel">{% trans "Sources" %}</span>
+                                            <div class="search-sources-grid" id="searchSourcesGrid" role="group" aria-labelledby="searchSourcesLabel">
+                                                <label class="search-advanced__check" title="{% trans "Crossref database on the SciTeX server — fast, unlimited" %}">
+                                                    <input type="checkbox" class="source-toggle" value="crossref_local" checked>
+                                                    Crossref (SciTeX)
+                                                </label>
+                                                <label class="search-advanced__check" title="{% trans "OpenAlex database on the SciTeX server — fast, unlimited" %}">
+                                                    <input type="checkbox" class="source-toggle" value="openalex_local" checked>
+                                                    OpenAlex (SciTeX)
+                                                </label>
+                                                <label class="search-advanced__check" title="{% trans "NCBI PubMed — biomedical literature" %}">
+                                                    <input type="checkbox" class="source-toggle" value="pubmed" checked>
+                                                    PubMed
+                                                </label>
+                                                <label class="search-advanced__check" title="{% trans "arXiv — physics, mathematics, and computer science preprints" %}">
+                                                    <input type="checkbox" class="source-toggle" value="arxiv" checked>
+                                                    arXiv
+                                                </label>
+                                                <label class="search-advanced__check" title="{% trans "Semantic Scholar — AI-powered academic search" %}">
+                                                    <input type="checkbox" class="source-toggle" value="semantic" checked>
+                                                    Semantic Scholar
+                                                </label>
+                                                <label class="search-advanced__check" title="{% trans "Crossref — DOI metadata registry" %}">
+                                                    <input type="checkbox" class="source-toggle" value="crossref" checked>
+                                                    Crossref
+                                                </label>
+                                                <label class="search-advanced__check" title="{% trans "OpenAlex — open catalog of scholarly works" %}">
+                                                    <input type="checkbox" class="source-toggle" value="openalex" checked>
+                                                    OpenAlex
+                                                </label>
+                                            </div>
+                                            <p class="search-sources-hint">{% trans "Uncheck sources to narrow the search. All checked searches the default set." %}</p>
+                                        </div>
+                                        <!--
+                                            Slice 2 (old-direct unification): the
+                                            Filters rows. Old-direct renders
+                                            year/citations/impact-factor range
+                                            sliders feeding hidden inputs; the
+                                            leaf uses native number inputs (no
+                                            slider dependency) with the same
+                                            hub param names. Empty means
+                                            unbounded on that side.
+                                        -->
+                                        <div class="search-advanced__row search-advanced__row--stack">
+                                            <span class="form-label" id="searchFiltersLabel">{% trans "Filters" %}</span>
+                                            <div class="search-filters-grid" role="group" aria-labelledby="searchFiltersLabel">
+                                                <label class="search-filters-grid__item">
+                                                    <span class="search-filters-grid__name">{% trans "Year from" %}</span>
+                                                    <input type="number" id="searchYearFrom" class="form-input" min="1000" max="2100" step="1" inputmode="numeric">
+                                                </label>
+                                                <label class="search-filters-grid__item">
+                                                    <span class="search-filters-grid__name">{% trans "Year to" %}</span>
+                                                    <input type="number" id="searchYearTo" class="form-input" min="1000" max="2100" step="1" inputmode="numeric">
+                                                </label>
+                                                <label class="search-filters-grid__item">
+                                                    <span class="search-filters-grid__name">{% trans "Min citations" %}</span>
+                                                    <input type="number" id="searchMinCitations" class="form-input" min="0" step="1" inputmode="numeric">
+                                                </label>
+                                                <label class="search-filters-grid__item">
+                                                    <span class="search-filters-grid__name">{% trans "Max citations" %}</span>
+                                                    <input type="number" id="searchMaxCitations" class="form-input" min="0" step="1" inputmode="numeric">
+                                                </label>
+                                                <label class="search-filters-grid__item">
+                                                    <span class="search-filters-grid__name">{% trans "Min impact factor" %}</span>
+                                                    <input type="number" id="searchMinImpact" class="form-input" min="0" step="0.1" inputmode="decimal">
+                                                </label>
+                                                <label class="search-filters-grid__item">
+                                                    <span class="search-filters-grid__name">{% trans "Max impact factor" %}</span>
+                                                    <input type="number" id="searchMaxImpact" class="form-input" min="0" step="0.1" inputmode="decimal">
+                                                </label>
+                                            </div>
                                         </div>
                                         <div class="search-advanced__row">
                                             <label class="search-advanced__check">
@@ -150,6 +241,17 @@
                                         <option value="" selected>{% trans "All sources" %}</option>
                                     </select>
                                     <span class="search-results-toolbar__sep" aria-hidden="true"></span>
+                                    <!--
+                                        Slice 3 (old-direct unification): the
+                                        results-header tools. Old-direct offers
+                                        an abstract truncated/full toggle, an
+                                        open-selected-URLs button, and an
+                                        export-selected-BibTeX button -- all
+                                        client-side over the checked rows.
+                                    -->
+                                    <button type="button" id="searchAbstractToggle" class="btn-control-library" data-mode="truncated" title="{% trans "Toggle abstract display" %}">{% trans "Abstract: truncated" %}</button>
+                                    <button type="button" id="searchOpenUrls" class="btn-control-library" title="{% trans "Open selected papers in new tabs" %}">{% trans "Open URLs" %}</button>
+                                    <button type="button" id="searchExportBibtex" class="btn-control-library" title="{% trans "Download BibTeX for the selected results" %}">{% trans "Export BibTeX" %}</button>
                                     <div class="search-bulk-bar" id="searchBulkBar">
                                         <label class="search-bulk-bar__select-all">
                                             <input type="checkbox" id="searchSelectAll">
@@ -157,6 +259,10 @@
                                         </label>
                                         <button type="button" id="searchSaveSelected" class="btn-control-library">{% trans "Save selected" %}</button>
                                         <button type="button" id="searchEnrichSelected" class="btn-control-library">{% trans "Save & enrich" %}</button>
+                                        <!-- Slice 11 (old-direct unification):
+                                             hub's header downloads PDFs for
+                                             the checked rows (OA only). -->
+                                        <button type="button" id="searchDownloadPdfs" class="btn-control-library" title="{% trans "Download open-access PDFs for the selected results" %}">{% trans "PDFs" %}</button>
                                         <span id="searchBulkStatus" class="search-bulk-status" role="status"></span>
                                     </div>
                                 </div>
@@ -169,7 +275,7 @@
                      contextual (per-paper) Enrichment action. Enrichment is an
                      operation ON a library item (#106), not a top-level tab
                      (#105 kept it off the nav). -->
-                <div id="tab-library" class="tab-panel">
+                <div id="tab-library" class="tab-panel" role="tabpanel" aria-labelledby="scholar-tab-library" tabindex="0">
                     <div class="citation-graph-container">
                         <div class="graph-card">
                             <div class="graph-card__header">
@@ -193,6 +299,7 @@
                                         <option value="bibtex" selected">{% trans "BibTeX (.bib)" %}</option>
                                         <option value="ris">{% trans "RIS (.ris)" %}</option>
                                         <option value="endnote">{% trans "EndNote (.enw)" %}</option>
+                                        <option value="csv">{% trans "CSV (.csv)" %}</option>
                                     </select>
                                     <button type="button" id="libraryExportBtn" class="btn-control-library">{% trans "Export" %}</button>
                                     <span class="library-io__sep"></span>
@@ -201,6 +308,21 @@
                                     <button type="button" id="libraryImportBtn" class="btn-control-library">{% trans "Import BibTeX" %}</button>
                                 </div>
                                 <div id="libraryIoStatus" class="library-io__status"></div>
+                                <!-- Slice 5 (old-direct unification): import
+                                     preview-before-save. Hub previews parsed
+                                     BibTeX (diff vs the library) before the
+                                     save; the leaf renders the parsed entries
+                                     with exists flags and confirms through
+                                     the unchanged import flow. -->
+                                <div id="libraryImportPreview" class="library-import-preview hidden">
+                                    <h4 class="library-ext__title">{% trans "Import preview" %}</h4>
+                                    <p class="library-ext__hint">{% trans "These entries will be added to your library. Entries already present are marked." %}</p>
+                                    <div id="libraryImportEntries" class="library-import-preview__entries"></div>
+                                    <div class="library-import-preview__actions">
+                                        <button type="button" id="libraryImportConfirm" class="btn-control-library">{% trans "Confirm import" %}</button>
+                                        <button type="button" id="libraryImportCancel" class="btn-control-library">{% trans "Cancel" %}</button>
+                                    </div>
+                                </div>
                                 <!-- Project sync (parity slice 3c): the header
                                      picker selects the project (?project=
                                      navigation); the Library view shows the
@@ -273,6 +395,20 @@
                                     <button type="button"
                                             id="libraryFilterClear"
                                             class="btn-control-library hidden">{% trans "Clear filters" %}</button>
+                                    <!-- Slice 4b (old-direct unification): hub
+                                         sorts the library list from the
+                                         toolbar; the leaf re-renders the
+                                         loaded rows client-side. -->
+                                    <label class="form-label" for="librarySort">{% trans "Sort" %}</label>
+                                    <select id="librarySort" class="form-select" aria-label="{% trans "Sort library" %}">
+                                        <option value="relevance" selected>{% trans "Relevance" %}</option>
+                                        <option value="title-asc">{% trans "Title (A-Z)" %}</option>
+                                        <option value="title-desc">{% trans "Title (Z-A)" %}</option>
+                                        <option value="year-desc">{% trans "Year (newest)" %}</option>
+                                        <option value="year-asc">{% trans "Year (oldest)" %}</option>
+                                        <option value="importance-desc">{% trans "Importance (highest)" %}</option>
+                                        <option value="importance-asc">{% trans "Importance (lowest)" %}</option>
+                                    </select>
                                 </div>
                                 <!-- CSRF: emitted by the standard {% csrf_token %}
                                      tag. Inert standalone (no CsrfViewMiddleware,
@@ -305,7 +441,7 @@
                     </div>
                 </div>
                 <!-- Citation Graph Tab (demoted: no longer the default) -->
-                <div id="tab-graph" class="tab-panel">
+                <div id="tab-graph" class="tab-panel" role="tabpanel" aria-labelledby="scholar-tab-graph" tabindex="0">
                     <div class="citation-graph-container">
                         <!-- Input Form -->
                         <div class="graph-card">
@@ -360,6 +496,29 @@
                                 <div id="graphLibrarySeed" class="graph-library-seed">
                                     <p class="empty-message">{% trans "Loading your library…" %}</p>
                                 </div>
+                            </div>
+                        </div>
+                        <!-- Saved graphs (old-direct unification, slice 9):
+                             hub's graph page saves/loads/deletes graphs; the
+                             leaf backend ships the same endpoints (parity
+                             slice 1) with no UI. Recipes rebuild from the
+                             seed DOI through the existing network endpoint --
+                             no new backend. -->
+                        <div class="graph-card">
+                            <div class="graph-card__header">
+                                <span class="graph-card__title">{% trans "Saved graphs" %}</span>
+                            </div>
+                            <div class="graph-card__body">
+                                <div id="graphSavedBar" class="graph-saved-bar">
+                                    <input type="text"
+                                           id="graphSaveName"
+                                           class="form-input graph-saved-bar__input"
+                                           placeholder="{% trans "Graph name" %}"
+                                           maxlength="200">
+                                    <button type="button" id="graphSaveBtn" class="btn-control-library">{% trans "Save current graph" %}</button>
+                                </div>
+                                <div id="graphSavedStatus" class="library-io__status" role="status"></div>
+                                <div id="graphSavedList" class="graph-saved-list"></div>
                             </div>
                         </div>
                         <!-- How It Works (old-direct parity, slice 3a): the

@@ -533,6 +533,10 @@ def _js_i18n_dict() -> dict:
         # Search tab: which tier answered (local NAS corpora vs online fallback).
         "Local corpus (NAS)": _i18n("Local corpus (NAS)"),
         "Online fallback": _i18n("Online fallback"),
+        # Search tab slice 1 (old-direct unification): an explicit Sources
+        # selection reports itself in the results header -- same catalog
+        # visibility rule as the tier strings above.
+        "Selected sources": _i18n("Selected sources"),
         "Imported %(n)s paper from %(file)s": _i18n("Imported %(n)s paper from %(file)s"),
         "Imported %(n)s papers from %(file)s": _i18n("Imported %(n)s papers from %(file)s"),
         # Search tab slice 2 (old-direct parity): per-result Save and the
@@ -546,6 +550,77 @@ def _js_i18n_dict() -> dict:
         "Select results to save.": _i18n("Select results to save."),
         "Saved %(saved)s of %(total)s": _i18n("Saved %(saved)s of %(total)s"),
         "Enriched %(done)s of %(total)s": _i18n("Enriched %(done)s of %(total)s"),
+        # Search tab slice 3 (old-direct unification): the results-header
+        # tools render these client-side -- same catalog-visibility rule.
+        "Abstract: truncated": _i18n("Abstract: truncated"),
+        "Abstract: full": _i18n("Abstract: full"),
+        "Select results first.": _i18n("Select results first."),
+        "No DOI links in selection.": _i18n("No DOI links in selection."),
+        "Copied %(n)s BibTeX entry": _i18n("Copied %(n)s BibTeX entry"),
+        "Copied %(n)s BibTeX entries": _i18n("Copied %(n)s BibTeX entries"),
+        "Copy failed": _i18n("Copy failed"),
+        # Library tab slice 4b (old-direct unification): the per-row
+        # details panel renders these client-side -- same rule.
+        "To read": _i18n("To read"),
+        "Reading": _i18n("Reading"),
+        "Read": _i18n("Read"),
+        "Referenced": _i18n("Referenced"),
+        "Favorite": _i18n("Favorite"),
+        "Reading status": _i18n("Reading status"),
+        "Importance": _i18n("Importance"),
+        "Tags": _i18n("Tags"),
+        "Add tag...": _i18n("Add tag..."),
+        "Personal notes": _i18n("Personal notes"),
+        "Add your notes about this paper...": _i18n(
+            "Add your notes about this paper..."
+        ),
+        "Save changes": _i18n("Save changes"),
+        "Details": _i18n("Details"),
+        # Library tab slice 5 (old-direct unification): the import
+        # preview panel renders these client-side -- same rule.
+        "Previewing %(file)s…": _i18n("Previewing %(file)s…"),
+        "Previewing %(n)s paper from %(file)s": _i18n(
+            "Previewing %(n)s paper from %(file)s"
+        ),
+        "Previewing %(n)s papers from %(file)s": _i18n(
+            "Previewing %(n)s papers from %(file)s"
+        ),
+        "Importing %(file)s…": _i18n("Importing %(file)s…"),
+        "Already in library": _i18n("Already in library"),
+        # Graph tab slice 9 (old-direct unification): the saved-graphs
+        # card renders these client-side -- same rule.
+        "No saved graphs yet.": _i18n("No saved graphs yet."),
+        "Load": _i18n("Load"),
+        "Delete": _i18n("Delete"),
+        "Name the graph and build it first.": _i18n("Name the graph and build it first."),
+        "Graph saved": _i18n("Graph saved"),
+        "Graph not found": _i18n("Graph not found"),
+        "Graph deleted": _i18n("Graph deleted"),
+        "Delete failed": _i18n("Delete failed"),
+        # Library tab slice 10 (old-direct unification): the details
+        # remove action renders client-side -- same rule.
+        "Remove from library": _i18n("Remove from library"),
+        "Remove this paper from the library?": _i18n(
+            "Remove this paper from the library?"
+        ),
+        "Remove failed": _i18n("Remove failed"),
+        # Graph tab slice 10: the saved-list rename action -- same rule.
+        "Rename": _i18n("Rename"),
+        "Graph renamed": _i18n("Graph renamed"),
+        "Rename failed": _i18n("Rename failed"),
+        # Search tab slice 11 (old-direct unification): the PDFs bulk
+        # pill + Library details download button -- same rule. Server
+        # per-item errors render through scholarT too, so they are keys.
+        "Download PDF": _i18n("Download PDF"),
+        "PDF downloaded": _i18n("PDF downloaded"),
+        "Download failed": _i18n("Download failed"),
+        "Downloaded %(done)s of %(total)s PDFs": _i18n(
+            "Downloaded %(done)s of %(total)s PDFs"
+        ),
+        "No open-access PDF available": _i18n("No open-access PDF available"),
+        "Paper not found": _i18n("Paper not found"),
+        "Load failed. Try again later.": _i18n("Load failed. Try again later."),
+        "Download failed. Try again later.": _i18n("Download failed. Try again later."),
         # Graph tab slice 3a (old-direct parity): the library-seed picker
         # renders these client-side, so each MUST be a key here -- an
         # English literal in citation-graph.js is invisible to the catalog
@@ -695,6 +770,174 @@ def graph_network(request, _builder=None):
 
     except Exception as e:
         logger.error(f"Error building network for {doi}: {e}", exc_info=True)
+        return JsonResponse({"error": "Failed to build network. Try again later."}, status=500)
+
+
+#: Largest accepted seed count on the multi-seed graph build (hub parity:
+#: hub allows 20 DOIs; each fans out to related-paper discovery, so an
+#: unbounded list is per-request graph + cache pressure).
+_MAX_GRAPH_SEEDS = 20
+
+
+@require_GET
+def graph_network_multi(request, _builder=None):
+    """Build a citation network from multiple seed DOIs (hub parity).
+
+    ?dois=a,b,c (required, at most 20) + num_related_per_doi (default 20,
+    capped at 50, hub parity) + the shared weights/no_cache. Hub wires no
+    UI to its multi endpoint either; this is API parity over the existing
+    builder, same validation/cache/error class as graph_network.
+
+    `_builder` is a test-injection seam (PA-306).
+    """
+    dois_raw = (request.GET.get("dois") or "").strip()
+    if not dois_raw:
+        return JsonResponse(
+            {"error": "dois parameter required (comma-separated DOIs)"}, status=400
+        )
+    dois = [d.strip() for d in dois_raw.split(",") if d.strip()]
+    if not dois:
+        return JsonResponse({"error": "At least one DOI required"}, status=400)
+    if len(dois) > _MAX_GRAPH_SEEDS:
+        return JsonResponse(
+            {"error": f"At most {_MAX_GRAPH_SEEDS} DOIs allowed"}, status=400
+        )
+    if any(len(d) > _MAX_DOI_CHARS for d in dois):
+        return _overlong_doi_response()
+
+    try:
+        num_related = int(request.GET.get("num_related_per_doi", 20))
+        num_related = max(1, min(num_related, 50))
+        weight_coupling = float(request.GET.get("weight_coupling", 2.0))
+        weight_cocitation = float(request.GET.get("weight_cocitation", 2.0))
+        weight_direct = float(request.GET.get("weight_direct", 1.0))
+    except ValueError:
+        return JsonResponse(
+            {
+                "error": (
+                    "num_related_per_doi, weight_coupling, weight_cocitation, and "
+                    "weight_direct must be numbers"
+                )
+            },
+            status=400,
+        )
+
+    use_cache = request.GET.get("no_cache", "false").lower() != "true"
+
+    cache_key = _make_cache_key(
+        "net-multi",
+        ",".join(sorted(d.lower() for d in dois)),
+        _cache_scope(request),
+        num_related=num_related,
+        wc=weight_coupling,
+        wco=weight_cocitation,
+        wd=weight_direct,
+    )
+    if use_cache:
+        cached = _cache_get(cache_key)
+        if cached:
+            cached["metadata"]["cached"] = True
+            return JsonResponse(cached)
+
+    builder = _builder or _get_builder()
+    if not builder:
+        return JsonResponse(_not_configured_payload(), status=503)
+
+    try:
+        graph = builder.build_from_dois(
+            dois=dois,
+            num_related_per_doi=num_related,
+            weight_coupling=weight_coupling,
+            weight_cocitation=weight_cocitation,
+            weight_direct=weight_direct,
+        )
+        result = graph.to_dict()
+        result["metadata"]["cached"] = False
+
+        seeds = {d.lower() for d in dois}
+        for node in result["nodes"]:
+            node["is_seed"] = node["id"].lower() in seeds
+
+        _cache_set(cache_key, result)
+        return JsonResponse(result)
+
+    except Exception as e:
+        logger.error(f"Error building multi-seed network: {e}", exc_info=True)
+        return JsonResponse({"error": "Failed to build network. Try again later."}, status=500)
+
+
+@require_GET
+def graph_network_query(request, _builder=None):
+    """Build a citation network from a text query (hub parity).
+
+    ?q= (required, capped like the search query) + num_related_per_doi +
+    the shared weights/no_cache. Same class as graph_network_multi above.
+
+    `_builder` is a test-injection seam (PA-306).
+    """
+    query = (request.GET.get("q") or "").strip()
+    if not query:
+        return JsonResponse({"error": "q parameter required"}, status=400)
+    if len(query) > _MAX_QUERY_CHARS:
+        return JsonResponse(
+            {"error": f"q must be at most {_MAX_QUERY_CHARS} characters"},
+            status=400,
+        )
+
+    try:
+        num_related = int(request.GET.get("num_related_per_doi", 20))
+        num_related = max(1, min(num_related, 50))
+        weight_coupling = float(request.GET.get("weight_coupling", 2.0))
+        weight_cocitation = float(request.GET.get("weight_cocitation", 2.0))
+        weight_direct = float(request.GET.get("weight_direct", 1.0))
+    except ValueError:
+        return JsonResponse(
+            {
+                "error": (
+                    "num_related_per_doi, weight_coupling, weight_cocitation, and "
+                    "weight_direct must be numbers"
+                )
+            },
+            status=400,
+        )
+
+    use_cache = request.GET.get("no_cache", "false").lower() != "true"
+
+    cache_key = _make_cache_key(
+        "net-query",
+        query,
+        _cache_scope(request),
+        num_related=num_related,
+        wc=weight_coupling,
+        wco=weight_cocitation,
+        wd=weight_direct,
+    )
+    if use_cache:
+        cached = _cache_get(cache_key)
+        if cached:
+            cached["metadata"]["cached"] = True
+            return JsonResponse(cached)
+
+    builder = _builder or _get_builder()
+    if not builder:
+        return JsonResponse(_not_configured_payload(), status=503)
+
+    try:
+        graph = builder.build_from_query(
+            query=query,
+            num_related_per_doi=num_related,
+            weight_coupling=weight_coupling,
+            weight_cocitation=weight_cocitation,
+            weight_direct=weight_direct,
+        )
+        result = graph.to_dict()
+        result["metadata"]["cached"] = False
+
+        _cache_set(cache_key, result)
+        return JsonResponse(result)
+
+    except Exception as e:
+        logger.error(f"Error building query network for {query!r}: {e}", exc_info=True)
         return JsonResponse({"error": "Failed to build network. Try again later."}, status=500)
 
 
@@ -929,9 +1172,36 @@ def search(request, _engine=None):
             {"error": "mode must be 'parallel' or 'single'"}, status=400
         )
 
+    # Explicit source selection (old-direct Sources grid, hub `?sources=a,b,c`).
+    # Unknown names are dropped, never a 400; an empty/all-unknown selection
+    # keeps the tiered default. The raw string rides the cache key so two
+    # different selections never share a cached result set.
+    from scitex_scholar.search_engines._source_tiers import normalize_sources
+
+    sources_raw = (request.GET.get("sources", "") or "").strip()
+    if len(sources_raw) > _MAX_SOURCES_CHARS:
+        return JsonResponse(
+            {"error": f"sources must be at most {_MAX_SOURCES_CHARS} characters"},
+            status=400,
+        )
+    sources = normalize_sources(sources_raw) if sources_raw else None
+
+    # Explicit range filters (old-direct Filters sliders, hub hidden-input
+    # names). Malformed numbers and inverted ranges fail closed (400), the
+    # same convention as max_results/mode above.
+    range_filters, range_error = _parse_range_filters(request.GET)
+    if range_error:
+        return JsonResponse({"error": range_error}, status=400)
+
     use_cache = request.GET.get("no_cache", "false").lower() != "true"
     cache_key = _make_cache_key(
-        "search", query, _cache_scope(request), mode=mode, max_results=max_results
+        "search",
+        query,
+        _cache_scope(request),
+        mode=mode,
+        max_results=max_results,
+        sources=",".join(sources) if sources else "",
+        filters=json.dumps(range_filters, sort_keys=True) if range_filters else "",
     )
     if use_cache:
         cached = _cache_get(cache_key)
@@ -942,10 +1212,18 @@ def search(request, _engine=None):
     try:
         engine = _engine or _get_search_engine()
         result = asyncio.run(
-            engine.search(query=query, mode=mode, max_results=max_results)
+            engine.search(
+                query=query,
+                mode=mode,
+                max_results=max_results,
+                sources=sources,
+                filters=range_filters,
+            )
         )
         _strip_markup_from_search_abstracts(result)
         result.setdefault("metadata", {})["cached"] = False
+        if sources:
+            result["metadata"]["sources_selected"] = sources
         _cache_set(cache_key, result)
         return JsonResponse(result)
 
@@ -1000,6 +1278,72 @@ _MAX_BULK_ITEMS = 500
 #: value is per-request cache + engine + log pressure; 500 chars is far past
 #: any real DOI (tens of chars).
 _MAX_DOI_CHARS = 500
+
+#: Largest accepted `sources` selection on the live search endpoint (hub
+#: `?sources=a,b,c`). Same fan-out class as _MAX_DOI_CHARS (cache key +
+#: engine fan-out); 500 chars is far past the seven known names (~80 chars).
+_MAX_SOURCES_CHARS = 500
+
+#: Bounds for the explicit range filters (old-direct Filters section, hub
+#: hidden-input names). A bound outside these is a client bug, not a search.
+_MIN_FILTER_YEAR = 1000
+_MAX_FILTER_YEAR = 2100
+_MAX_FILTER_CITATIONS = 100_000_000
+_MAX_FILTER_IMPACT_FACTOR = 1000.0
+
+
+def _parse_range_filters(params) -> tuple:
+    """Map hub range params to pipeline threshold keys.
+
+    Returns (filters_or_None, error_or_None). Empty strings count as
+    absent; malformed numbers, out-of-range values, and inverted ranges
+    return an error message for the view to fail closed with (400).
+    """
+    int_bounds = {
+        "year_from": ("min_year", _MIN_FILTER_YEAR, _MAX_FILTER_YEAR),
+        "year_to": ("max_year", _MIN_FILTER_YEAR, _MAX_FILTER_YEAR),
+        "min_citations": ("min_citations", 0, _MAX_FILTER_CITATIONS),
+        "max_citations": ("max_citations", 0, _MAX_FILTER_CITATIONS),
+    }
+    float_bounds = {
+        "min_impact_factor": ("min_impact_factor", 0.0, _MAX_FILTER_IMPACT_FACTOR),
+        "max_impact_factor": ("max_impact_factor", 0.0, _MAX_FILTER_IMPACT_FACTOR),
+    }
+    filters: dict = {}
+    for name, (key, lo, hi) in int_bounds.items():
+        raw = (params.get(name, "") or "").strip()
+        if not raw:
+            continue
+        try:
+            value = int(raw)
+        except ValueError:
+            return None, f"{name} must be an integer"
+        if not lo <= value <= hi:
+            return None, f"{name} must be between {lo} and {hi}"
+        filters[key] = value
+    for name, (key, lo, hi) in float_bounds.items():
+        raw = (params.get(name, "") or "").strip()
+        if not raw:
+            continue
+        try:
+            value = float(raw)
+        except ValueError:
+            return None, f"{name} must be a number"
+        if not lo <= value <= hi:
+            return None, f"{name} must be between {lo} and {hi}"
+        filters[key] = value
+    for low_key, high_key in (
+        ("min_year", "max_year"),
+        ("min_citations", "max_citations"),
+        ("min_impact_factor", "max_impact_factor"),
+    ):
+        if (
+            low_key in filters
+            and high_key in filters
+            and filters[low_key] > filters[high_key]
+        ):
+            return None, f"{low_key} must not exceed {high_key}"
+    return (filters or None), None
 
 #: Largest accepted Connected Papers seed id (Semantic Scholar 40-char SHA
 #: or DOI). Same fan-out class as _MAX_DOI_CHARS (cache key + upstream fetch
@@ -1328,6 +1672,20 @@ def library_list(request):
     except OSError:
         membership = {}
 
+    from scitex_scholar.storage import _library_annotations as _ann
+
+    def _row_annotations(paper_id: str) -> dict:
+        # Slice 4a: merge the annotations sidecar into each row. A missing
+        # or corrupt sidecar degrades to {} (read_annotations never raises),
+        # so an un-annotated library lists exactly as before this slice.
+        if not paper_id:
+            return {}
+        try:
+            safe_id = _assert_safe_library_id(paper_id)
+        except ValueError:
+            return {}
+        return _ann.read_annotations(root / "MASTER" / safe_id)
+
     papers = [
         {
             "paper_id": r.get("paper_id"),
@@ -1343,6 +1701,7 @@ def library_list(request):
             # papers carry [], never null, so the client can filter
             # without a second round-trip.
             "projects": sorted(membership.get(r.get("paper_id") or "", ())),
+            "annotations": _row_annotations(r.get("paper_id") or ""),
         }
         for r in rows
     ]
@@ -1540,7 +1899,7 @@ def library_enrich(request, _pipeline=None):
 # importer exists in the package, so those are not claimed).
 # ---------------------------------------------------------------------------
 
-LIBRARY_EXPORT_FORMATS = ("bibtex", "ris", "endnote")
+LIBRARY_EXPORT_FORMATS = ("bibtex", "ris", "endnote", "csv")
 LIBRARY_IMPORT_FORMATS = ("bibtex",)
 
 
@@ -1574,16 +1933,101 @@ def _row_to_formatting_dict(row: dict) -> dict:
         "year": row.get("year"),
         "journal": row.get("venue"),
         "doi": row.get("doi"),
+        "pmid": row.get("pmid"),
         "abstract": row.get("abstract"),
     }
 
 
+def _paper_obj_to_formatting_dict(paper) -> dict:
+    """Map a loaded Paper object to the dict shape papers_to_format expects.
+
+    Same keys as _row_to_formatting_dict (which maps index rows); the two
+    stay in sync so single-paper and whole-library exports render
+    identically.
+    """
+    authors = paper.metadata.basic.authors or []
+    names = [
+        a if isinstance(a, str) else (a.get("name") if isinstance(a, dict) else str(a))
+        for a in authors
+        if a
+    ]
+    return {
+        "title": paper.metadata.basic.title or "",
+        "authors": names,
+        "authors_str": " and ".join(names),
+        "year": paper.metadata.basic.year,
+        "journal": getattr(paper.metadata.publication, "journal", None),
+        "doi": paper.metadata.id.doi or "",
+        "pmid": getattr(paper.metadata.id, "pmid", None),
+        "abstract": paper.metadata.basic.abstract,
+    }
+
+
+@require_GET
+def library_citation(request):
+    """Format ONE library paper's citation (hub export get_citation parity).
+
+    ?library_id= (required) + ?format= over LIBRARY_EXPORT_FORMATS
+    (default bibtex). Returns {"citation": <string>, "format": fmt} for
+    copy-paste. Unknown papers are 404; traversal ids are 400 via the
+    shared validator. ?format= travels by GET, so no body cap applies.
+    """
+    fmt = (request.GET.get("format") or "bibtex").strip().lower()
+    if fmt not in LIBRARY_EXPORT_FORMATS:
+        return JsonResponse(
+            {
+                "error": "Unsupported export format",
+                "supported": list(LIBRARY_EXPORT_FORMATS),
+            },
+            status=400,
+        )
+    try:
+        safe_id = _assert_safe_library_id(request.GET.get("library_id", ""))
+    except ValueError as e:
+        return JsonResponse({"error": str(e)}, status=400)
+    root = _library_root_for(request)
+    if not (root / "MASTER" / safe_id / "metadata.json").is_file():
+        return JsonResponse({"error": "Paper not found"}, status=404)
+    from scitex_scholar.formatting import papers_to_format, to_csv_row
+
+    try:
+        paper = _load_library_paper(root, safe_id)
+        formatted = _paper_obj_to_formatting_dict(paper)
+        if fmt == "csv":
+            import csv as _csv
+            import io as _io
+
+            buffer = _io.StringIO()
+            fieldnames = [
+                "Title",
+                "Authors",
+                "Journal",
+                "Year",
+                "DOI",
+                "PMID",
+                "URL",
+                "Abstract",
+            ]
+            writer = _csv.DictWriter(buffer, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerow(to_csv_row(formatted))
+            citation = buffer.getvalue()
+        else:
+            citation = papers_to_format([formatted], fmt)
+    except Exception as e:
+        logger.error(f"library citation ({fmt}) failed: {e}", exc_info=True)
+        return JsonResponse({"error": "Citation failed. Try again later."}, status=500)
+    return JsonResponse({"citation": citation, "format": fmt})
+
+
 @require_GET
 def library_export(request):
-    """Export the user's local library to bibtex / ris / endnote.
+    """Export the user's local library to bibtex / ris / endnote / csv.
 
-    ?format=bibtex|ris|endnote (default bibtex). Streams the serialized
-    library as the response body with the right content type.
+    ?format=bibtex|ris|endnote|csv (default bibtex). Streams the serialized
+    library as the response body with the right content type. CSV uses the
+    hub column set (Title/Authors/Journal/Year/DOI/PMID/URL/Abstract) via
+    the package's to_csv_row (old-direct unification slice 7).
     """
     fmt = (request.GET.get("format") or "bibtex").strip().lower()
     if fmt not in LIBRARY_EXPORT_FORMATS:
@@ -1599,7 +2043,7 @@ def library_export(request):
         )
 
     root = _library_root_for(request)
-    from scitex_scholar.formatting import papers_to_format
+    from scitex_scholar.formatting import papers_to_format, to_csv_row
     from scitex_scholar.storage import _library_index as idx
 
     try:
@@ -1607,10 +2051,31 @@ def library_export(request):
     except FileNotFoundError:
         rows = []
     except ValueError as e:
-        return JsonResponse({"error": "Library inconsistent. Rebuild or repair the library."}, status=500)
+        return JsonResponse({"error": "Library index inconsistent. Rebuild or repair the library."}, status=500)
 
     try:
-        content = papers_to_format([_row_to_formatting_dict(r) for r in rows], fmt)
+        if fmt == "csv":
+            import csv as _csv
+            import io as _io
+
+            buffer = _io.StringIO()
+            fieldnames = [
+                "Title",
+                "Authors",
+                "Journal",
+                "Year",
+                "DOI",
+                "PMID",
+                "URL",
+                "Abstract",
+            ]
+            writer = _csv.DictWriter(buffer, fieldnames=fieldnames)
+            writer.writeheader()
+            for row in rows:
+                writer.writerow(to_csv_row(_row_to_formatting_dict(row)))
+            content = buffer.getvalue()
+        else:
+            content = papers_to_format([_row_to_formatting_dict(r) for r in rows], fmt)
     except Exception as e:
         logger.error(f"library export ({fmt}) failed: {e}", exc_info=True)
         return JsonResponse({"error": "Export failed. Try again later."}, status=500)
@@ -1619,8 +2084,9 @@ def library_export(request):
         "bibtex": "application/x-bibtex",
         "ris": "application/x-research-info-systems",
         "endnote": "application/x-endnote-references",
+        "csv": "text/csv",
     }[fmt]
-    ext = {"bibtex": "bib", "ris": "ris", "endnote": "enw"}[fmt]
+    ext = {"bibtex": "bib", "ris": "ris", "endnote": "enw", "csv": "csv"}[fmt]
     resp = HttpResponse(content, content_type=content_type)
     resp["Content-Disposition"] = f'attachment; filename="scholar-library.{ext}"'
     return resp
@@ -1641,6 +2107,27 @@ def _derived_library_id(paper) -> str:
     return hashlib.sha1(key.encode("utf-8")).hexdigest()[:8].upper()
 
 
+def _preview_import_entry(paper, root: Path) -> dict:
+    """One parsed BibTeX entry for the import preview (no writes).
+
+    The derived library_id is computed exactly as the save path computes
+    it, so the ``exists`` flag answers whether confirming would upsert an
+    entry that is already in the library. The id itself is NOT echoed
+    (same reflection rule as the save-bulk row handles); only display
+    fields travel.
+    """
+    library_id = _assert_safe_library_id(_derived_library_id(paper))
+    authors = paper.metadata.basic.authors or []
+    return {
+        "title": paper.metadata.basic.title or "",
+        "authors": [a for a in authors if isinstance(a, str)],
+        "year": paper.metadata.basic.year,
+        "venue": getattr(paper.metadata.publication, "journal", None),
+        "doi": paper.metadata.id.doi or "",
+        "exists": (root / "MASTER" / library_id / "metadata.json").is_file(),
+    }
+
+
 @require_POST
 def library_import(request):
     """Import BibTeX into the user's local library.
@@ -1649,6 +2136,11 @@ def library_import(request):
     parsed by the package's BibTeX handler and persisted to the same
     MASTER/<paper_id>/metadata.json path the list/enrich routes read, so imported
     papers are immediately visible and enrichable.
+
+    With preview=1 the entries are parsed and REPORTED (title/authors/year/
+    doi + whether each already exists) without writing anything -- hub's
+    preview-before-save step, minus the async job machinery. The confirm
+    path below is byte-for-byte the pre-slice save flow.
     """
     fmt = (request.POST.get("format") or "bibtex").strip().lower()
     if fmt not in LIBRARY_IMPORT_FORMATS:
@@ -1694,6 +2186,21 @@ def library_import(request):
             return JsonResponse(
                 {"error": f"Too many entries: at most {_MAX_BULK_ITEMS} per import"},
                 status=400,
+            )
+
+        if (request.POST.get("preview") or "").strip().lower() in (
+            "1",
+            "true",
+            "yes",
+            "on",
+        ):
+            # Preview-before-save (old-direct unification slice 5): report
+            # the parsed entries with exists flags, write nothing.
+            return JsonResponse(
+                {
+                    "preview": True,
+                    "entries": [_preview_import_entry(p, root) for p in papers],
+                }
             )
 
         imported = []
@@ -2177,6 +2684,204 @@ def library_save_bulk(request):
     return JsonResponse({"saved": saved, "failed": failed})
 
 
+@require_POST
+def library_annotate(request):
+    """Update one paper's user annotations (reading status, importance, tags, notes).
+
+    Body: {"library_id": ..., "reading_status"?, "importance"?, "tags"?, "notes"?}.
+    Partial updates merge into the annotations sidecar
+    (``MASTER/<library_id>/annotations.json``) -- never into metadata.json,
+    so enrichment rewrites can never clobber user data. Unknown fields are
+    refused (400); an unknown paper is 404; a traversal library_id is 400
+    via the shared id validator. Bodies over 256k are refused with 413
+    before parsing, same as the other library writes.
+    """
+    try:
+        payload = _json_body(request)
+    except ValueError as e:
+        if "too large" in str(e):
+            return JsonResponse({"error": str(e)}, status=413)
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    except TypeError:
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    if not isinstance(payload, dict):
+        return JsonResponse({"error": "Body must be an object"}, status=400)
+    try:
+        safe_id = _assert_safe_library_id(payload.get("library_id", ""))
+    except ValueError as e:
+        return JsonResponse({"error": str(e)}, status=400)
+    root = _library_root_for(request)
+    paper_dir = root / "MASTER" / safe_id
+    if not (paper_dir / "metadata.json").is_file():
+        return JsonResponse({"error": "Paper not found"}, status=404)
+    from scitex_scholar.storage import _library_annotations as _ann
+
+    fields = {
+        key: value for key, value in payload.items() if key != "library_id"
+    }
+    clean, error = _ann.validate_annotations(fields)
+    if error is not None or clean is None:
+        return JsonResponse({"error": error or "Invalid annotations"}, status=400)
+    try:
+        stored = _ann.write_annotations(paper_dir, clean)
+    except OSError as e:
+        logger.error(f"library annotate failed: {e}", exc_info=True)
+        return JsonResponse({"error": "Annotate failed. Try again later."}, status=500)
+    return JsonResponse(
+        {"annotated": True, "library_id": safe_id, "annotations": stored}
+    )
+
+
+@require_POST
+def library_remove(request):
+    """Remove ONE paper from the user's local library (explicit action).
+
+    Deletes the ``MASTER/<library_id>/`` tree (metadata, sidecars, and any
+    downloaded PDFs/texts) plus every project filing symlink that points
+    at it. Unknown papers are 404; traversal ids are 400 via the shared
+    validator. Bodies over 256k are refused with 413 before parsing, same
+    as the other library writes. The success body carries state only.
+    """
+    try:
+        payload = _json_body(request)
+    except ValueError as e:
+        if "too large" in str(e):
+            return JsonResponse({"error": str(e)}, status=413)
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    except TypeError:
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    if not isinstance(payload, dict):
+        return JsonResponse({"error": "Body must be an object"}, status=400)
+    try:
+        safe_id = _assert_safe_library_id(payload.get("library_id", ""))
+    except ValueError as e:
+        return JsonResponse({"error": str(e)}, status=400)
+    root = _library_root_for(request)
+    paper_dir = root / "MASTER" / safe_id
+    if not (paper_dir / "metadata.json").is_file():
+        return JsonResponse({"error": "Paper not found"}, status=404)
+    try:
+        from scitex_scholar.storage import _project_reconcile as _pr
+
+        try:
+            membership, _broken = _pr.build_project_membership(root)
+        except OSError:
+            membership = {}
+        for project in membership.get(safe_id, ()):
+            try:
+                safe_project = _assert_safe_project_name(project)
+            except ValueError:
+                continue
+            link = root / safe_project / safe_id
+            try:
+                if link.is_symlink():
+                    link.unlink()
+            except OSError as e:
+                logger.error(f"library remove unlink failed: {e}", exc_info=True)
+                return JsonResponse(
+                    {"error": "Remove failed. Try again later."}, status=500
+                )
+        import shutil as _shutil
+
+        _shutil.rmtree(paper_dir)
+    except OSError as e:
+        logger.error(f"library remove failed: {e}", exc_info=True)
+        return JsonResponse({"error": "Remove failed. Try again later."}, status=500)
+    return JsonResponse({"removed": True})
+
+
+#: Largest accepted download batch (hub parity: one network fetch per item
+#: through the OA strategy's own 60s timeout; an unbounded list parks the
+#: worker on network IO per request).
+_MAX_DOWNLOAD_IDS = 10
+
+
+@require_POST
+def library_download_pdfs(request, _fetch=None):
+    """Download open-access PDFs for library papers (explicit action).
+
+    Body: {"library_ids": [...], at most 10}. Each id resolves under the
+    request's user-scoped MASTER/ (a traversal id fails the whole batch
+    with 400 via the shared validator); papers without an OA URL and
+    unknown papers land in per-index ``failed`` rows, never raised.
+    Bodies over 256k are refused with 413 before parsing.
+
+    ``_fetch`` is a test-injection seam (PA-306): an async callable
+    ``(oa_url, output_path, metadata=None) -> Path | None``. Production
+    uses the package's plain-HTTP OA strategy (NOT the browser-bound
+    downloader class, which needs a Playwright context no view owns).
+    """
+    try:
+        payload = _json_body(request)
+    except ValueError as e:
+        if "too large" in str(e):
+            return JsonResponse({"error": str(e)}, status=413)
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    except TypeError:
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    if not isinstance(payload, dict):
+        return JsonResponse({"error": "Body must be an object"}, status=400)
+    library_ids = payload.get("library_ids")
+    if not isinstance(library_ids, list) or not library_ids:
+        return JsonResponse({"error": "library_ids must be a non-empty list"}, status=400)
+    if len(library_ids) > _MAX_DOWNLOAD_IDS:
+        return JsonResponse(
+            {"error": f"library_ids must contain at most {_MAX_DOWNLOAD_IDS} items"},
+            status=400,
+        )
+    safe_ids = []
+    for raw_id in library_ids:
+        try:
+            safe_ids.append(_assert_safe_library_id(raw_id))
+        except ValueError as e:
+            # Fixed validator message only; the caller-supplied id is never
+            # echoed (same reflection class as the save-bulk row handles).
+            return JsonResponse({"error": str(e)}, status=400)
+    root = _library_root_for(request)
+    if _fetch is None:
+        from scitex_scholar.pdf_download.strategies.open_access_download import (
+            try_download_open_access_async as _fetch,
+        )
+    from scitex_scholar.storage.PaperIO import PaperIO
+
+    downloaded, failed = [], []
+    for i, safe_id in enumerate(safe_ids):
+        paper_dir = root / "MASTER" / safe_id
+        if not (paper_dir / "metadata.json").is_file():
+            failed.append({"index": i, "error": "Paper not found"})
+            continue
+        try:
+            paper = _load_library_paper(root, safe_id)
+        except Exception as e:
+            logger.error(f"library download-pdfs load failed: {e}", exc_info=True)
+            failed.append({"index": i, "error": "Load failed. Try again later."})
+            continue
+        oa_url = (paper.metadata.access.oa_url or "").strip()
+        if not oa_url:
+            failed.append({"index": i, "error": "No open-access PDF available"})
+            continue
+        try:
+            fetched = asyncio.run(
+                _fetch(oa_url, paper_dir / "download-tmp.pdf", metadata=None)
+            )
+            if not fetched:
+                failed.append({"index": i, "error": "Download failed. Try again later."})
+                continue
+            io = PaperIO(paper, base_dir=root / "MASTER")
+            io.save_pdf(Path(fetched))
+            _save_library_paper(paper, root)
+            downloaded.append({"library_id": safe_id})
+        except Exception as e:
+            logger.error(f"library download-pdfs failed: {e}", exc_info=True)
+            failed.append({"index": i, "error": "Download failed. Try again later."})
+        finally:
+            try:
+                (paper_dir / "download-tmp.pdf").unlink(missing_ok=True)
+            except OSError:
+                pass
+    return JsonResponse({"downloaded": downloaded, "failed": failed})
+
+
 def _saved_searches_path(root: Path) -> Path:
     """Single JSON file holding this user's saved searches."""
     return root / "SAVED_SEARCHES" / "saved_searches.json"
@@ -2435,6 +3140,55 @@ def graphs_delete(request):
         logger.error(f"graphs delete failed: {e}", exc_info=True)
         return JsonResponse({"error": "Delete failed. Try again later."}, status=500)
     return JsonResponse({"deleted": True})
+
+
+@require_POST
+def graphs_rename(request):
+    """Rename one saved graph; 404 when unknown (hub api_rename_graph parity).
+
+    Body: {"id": ..., "name": ...}. Names cap at 200 chars like graphs_save.
+    Unlike hub (409 on a name clash), duplicate names are allowed -- the
+    leaf save path never enforced uniqueness either, so rename stays
+    consistent with save rather than stricter than it. Bodies over 256k
+    are refused with 413 before parsing. The success body carries the
+    stored id + name (server-issued state, not caller input verbatim --
+    the name passed validation first).
+    """
+    try:
+        payload = _json_body(request)
+    except ValueError as e:
+        if "too large" in str(e):
+            return JsonResponse({"error": str(e)}, status=413)
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    except TypeError:
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    if not isinstance(payload, dict):
+        return JsonResponse({"error": "Body must be an object"}, status=400)
+    graph_id = payload.get("id")
+    if not graph_id:
+        return JsonResponse({"error": "id is required"}, status=400)
+    name = (payload.get("name") or "").strip()
+    if not name:
+        return JsonResponse({"error": "name is required"}, status=400)
+    if len(name) > _MAX_GRAPH_NAME_CHARS:
+        return JsonResponse(
+            {"error": f"name must be at most {_MAX_GRAPH_NAME_CHARS} characters"},
+            status=400,
+        )
+    root = _library_root_for(request)
+    rows = _load_saved_graphs(root)
+    for row in rows:
+        if row.get("id") == graph_id:
+            row["name"] = name
+            break
+    else:
+        return JsonResponse({"error": "Unknown id"}, status=404)
+    try:
+        _write_saved_graphs(root, rows)
+    except OSError as e:
+        logger.error(f"graphs rename failed: {e}", exc_info=True)
+        return JsonResponse({"error": "Rename failed. Try again later."}, status=500)
+    return JsonResponse({"renamed": True, "id": graph_id, "name": name})
 
 
 # EOF

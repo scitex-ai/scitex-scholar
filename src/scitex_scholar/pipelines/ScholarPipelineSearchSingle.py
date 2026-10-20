@@ -33,10 +33,13 @@ from typing import Any, Dict, List
 import scitex_logging as logging
 
 from scitex_scholar.core import Paper
+from scitex_scholar.pipelines._search_thresholds import apply_threshold_filters
 from scitex_scholar.search_engines._source_tiers import (
     build_tiered_engines,
     declared_source_tiers,
+    normalize_sources,
     resolve_tier,
+    select_engines,
 )
 
 logger = logging.getLogger(__name__)
@@ -113,6 +116,7 @@ class ScholarPipelineSearchSingle:
         doi: str = None,
         filters: Dict = None,
         max_results: int = 100,
+        sources: Any = None,
     ) -> Dict[str, Any]:
         """Search for papers across multiple engines sequentially.
 
@@ -122,6 +126,9 @@ class ScholarPipelineSearchSingle:
             doi: DOI to search for (alternative to query)
             filters: Additional filters (year_start, year_end, open_access, etc.)
             max_results: Maximum number of results to return
+            sources: Optional explicit source selection (hub ``?sources=a,b,c``
+                or canonical engine names). Runs exactly those engines with
+                no tier short-circuit. None/empty keeps the tiered default.
 
         Returns:
             Dict with:
@@ -144,34 +151,63 @@ class ScholarPipelineSearchSingle:
         # Prepare search parameters
         filters = filters or {}
 
-        # Tier 1: the NAS-local corpora, alone. Online engines are reached only
-        # if this tier cannot answer (same policy as the parallel pipeline).
-        all_papers, engines_used = await self._search_tier(
-            engines=self.primary_engines,
-            query=search_query,
-            filters=filters,
-            max_results=max_results,
-        )
-        source_tier, fallback_reason = resolve_tier(
-            len(all_papers), self.primary_engines, self.min_primary_results
-        )
-        if source_tier == "online_fallback":
-            logger.warning(
-                f"{self.name}: online fallback ({fallback_reason}); "
-                f"querying {len(self.fallback_engines)} public API engines"
-            )
+        # --- Explicit source selection (old-direct Sources grid) ------------
+        # Same contract as the parallel pipeline: a selection runs exactly
+        # those engines with no tier short-circuit; None/empty keeps the
+        # tiered default below untouched.
+        engine_counts: Dict[str, int] = {}
+        wanted = normalize_sources(sources)
+        selected: Dict[str, Any] = {}
+        if wanted:
+            selected = select_engines(self.engines, wanted)
             all_papers, engines_used = await self._search_tier(
-                engines=self.fallback_engines,
+                engines=selected,
                 query=search_query,
                 filters=filters,
                 max_results=max_results,
+                engine_counts=engine_counts,
             )
+            source_tier = "selected"
+            fallback_reason = (
+                f"explicit selection: {', '.join(selected)}"
+                if selected
+                else f"explicit selection {', '.join(wanted)} not available here"
+            )
+        else:
+            # Tier 1: the NAS-local corpora, alone. Online engines are reached only
+            # if this tier cannot answer (same policy as the parallel pipeline).
+            all_papers, engines_used = await self._search_tier(
+                engines=self.primary_engines,
+                query=search_query,
+                filters=filters,
+                max_results=max_results,
+                engine_counts=engine_counts,
+            )
+            source_tier, fallback_reason = resolve_tier(
+                len(all_papers), self.primary_engines, self.min_primary_results
+            )
+            if source_tier == "online_fallback":
+                logger.warning(
+                    f"{self.name}: online fallback ({fallback_reason}); "
+                    f"querying {len(self.fallback_engines)} public API engines"
+                )
+                all_papers, engines_used = await self._search_tier(
+                    engines=self.fallback_engines,
+                    query=search_query,
+                    filters=filters,
+                    max_results=max_results,
+                    engine_counts=engine_counts,
+                )
 
         # Deduplicate by DOI and title
         unique_papers = self._deduplicate_papers(all_papers)
 
         # Enrich papers with impact factors
         unique_papers = self._enrich_impact_factors(unique_papers)
+
+        # Apply threshold filters (same bounds as the parallel pipeline --
+        # old-direct's Filters section applies whatever the mode).
+        unique_papers = apply_threshold_filters(unique_papers, filters)
 
         # Sort if requested
         sort_by = filters.get("sort_by", "relevance")
@@ -193,9 +229,13 @@ class ScholarPipelineSearchSingle:
         self.stats["successful_searches"] += 1
 
         tier_size = (
-            len(self.primary_engines)
-            if source_tier == "primary"
-            else len(self.fallback_engines)
+            len(selected)
+            if source_tier == "selected"
+            else (
+                len(self.primary_engines)
+                if source_tier == "primary"
+                else len(self.fallback_engines)
+            )
         )
 
         logger.success(
@@ -216,6 +256,7 @@ class ScholarPipelineSearchSingle:
                 "total_results": len(response_papers),
                 "search_time": search_time,
                 "timestamp": datetime.now().isoformat(),
+                "engine_counts": engine_counts,  # Per-engine result counts
                 # Which tier answered, and why it was that one.
                 "source_tier": source_tier,
                 "source_tier_reason": fallback_reason,
@@ -230,8 +271,10 @@ class ScholarPipelineSearchSingle:
         query: str,
         filters: Dict,
         max_results: int,
+        engine_counts: Dict[str, int] = None,
     ) -> tuple:
         """Run ONE tier's engines one by one; return (papers, engines_used)."""
+        engine_counts = {} if engine_counts is None else engine_counts
         if not engines:
             return [], []
 
@@ -250,6 +293,7 @@ class ScholarPipelineSearchSingle:
                     max_results=per_engine_limit,
                 )
 
+                engine_counts[engine_name] = len(results or [])
                 if results:
                     all_papers.extend(results)
                     engines_used.append(engine_name)
@@ -265,6 +309,7 @@ class ScholarPipelineSearchSingle:
             except Exception as e:
                 logger.error(f"{self.name}: {engine_name} search failed: {e}")
                 self.stats["engine_stats"][engine_name]["failures"] += 1
+                engine_counts[engine_name] = 0
 
         return all_papers, engines_used
 

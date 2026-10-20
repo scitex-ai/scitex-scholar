@@ -25,6 +25,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("searchInput");
   const maxResults = document.getElementById("searchMaxResults");
   const modeSelect = document.getElementById("searchMode");
+  const sourcesGrid = document.getElementById("searchSourcesGrid");
+  // Slice 2 (old-direct unification): the Filters number inputs. Empty
+  // means unbounded; non-empty values travel under the hub param names.
+  const filterInputs = {
+    year_from: document.getElementById("searchYearFrom"),
+    year_to: document.getElementById("searchYearTo"),
+    min_citations: document.getElementById("searchMinCitations"),
+    max_citations: document.getElementById("searchMaxCitations"),
+    min_impact_factor: document.getElementById("searchMinImpact"),
+    max_impact_factor: document.getElementById("searchMaxImpact"),
+  };
   const noCache = document.getElementById("searchNoCache");
   const loading = document.getElementById("searchLoading");
   const errorBox = document.getElementById("searchError");
@@ -39,6 +50,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const saveSelectedBtn = document.getElementById("searchSaveSelected");
   const enrichSelectedBtn = document.getElementById("searchEnrichSelected");
   const bulkStatus = document.getElementById("searchBulkStatus");
+  // Slice 11 (old-direct unification): PDFs bulk pill -- hub downloads
+  // OA PDFs for the checked rows.
+  const downloadPdfsBtn = document.getElementById("searchDownloadPdfs");
+  // Slice 3 (old-direct unification): the results-header tools -- abstract
+  // truncated/full toggle, open-selected-URLs, export-selected-BibTeX.
+  const abstractToggle = document.getElementById("searchAbstractToggle");
+  const openUrlsBtn = document.getElementById("searchOpenUrls");
+  const exportBibtexBtn = document.getElementById("searchExportBibtex");
+  let abstractFull = false;
+  const ABSTRACT_TRUNCATE_AT = 300;
 
   // The last fetched result set (engine order = relevance) plus the user's
   // selection, keyed by DOI-or-title so re-sorts keep the checked rows.
@@ -110,7 +131,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (doiInput && doi) {
       doiInput.value = doi;
     }
-    const graphTab = document.querySelector('.tab-btn[data-tab="graph"]');
+    const graphTab = document.querySelector(
+      '.stx-content-tabs__tab[aria-controls="tab-graph"]',
+    );
     if (graphTab) graphTab.click();
     if (doiInput) doiInput.focus();
   }
@@ -219,9 +242,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (paper.abstract) {
       const abstract = document.createElement("div");
       abstract.className = "search-result__abstract";
-      const text = paper.abstract;
-      abstract.textContent =
-        text.length > 300 ? `${text.slice(0, 300)}...` : text;
+      // The full text rides the DOM so the header toggle flips length
+      // without a refetch; textContent keeps third-party data inert.
+      abstract.dataset.full = paper.abstract;
+      abstract.textContent = abstractText(paper.abstract);
       body.appendChild(abstract);
     }
 
@@ -313,6 +337,103 @@ document.addEventListener("DOMContentLoaded", () => {
       visible.length > 0 && visible.every((key) => selected.has(key));
   }
 
+  // Slice 3: abstract length follows the header toggle (default truncated,
+  // the pre-slice rendering, so nothing changes until the user flips it).
+  function abstractText(full) {
+    if (abstractFull || full.length <= ABSTRACT_TRUNCATE_AT) return full;
+    return `${full.slice(0, ABSTRACT_TRUNCATE_AT)}...`;
+  }
+
+  function applyAbstractMode() {
+    document.querySelectorAll(".search-result__abstract").forEach((el) => {
+      el.textContent = abstractText(el.dataset.full || "");
+    });
+    if (abstractToggle) {
+      abstractToggle.textContent = abstractFull
+        ? scholarT("Abstract: full")
+        : scholarT("Abstract: truncated");
+      abstractToggle.dataset.mode = abstractFull ? "full" : "truncated";
+    }
+  }
+
+  // Slice 3: client-side BibTeX for the checked rows (hub parity: generated
+  // in-browser, Blob download, no backend round-trip).
+  function bibtexEscape(value) {
+    return String(value || "")
+      .replace(/\\/g, "\\\\")
+      .replace(/([{}])/g, "\\$1");
+  }
+
+  function bibtexAuthors(paper) {
+    const authors = paper.authors || [];
+    return authors
+      .map((a) => (typeof a === "string" ? a : a.name || ""))
+      .filter((name) => name)
+      .join(" and ");
+  }
+
+  function bibtexKey(paper) {
+    const first = (paper.authors || [])
+      .map((a) => (typeof a === "string" ? a : a.name || ""))
+      .find((name) => name);
+    const last = first ? first.trim().split(/\s+/).pop() : "unknown";
+    const year = paper.year || "nodate";
+    const word = (paper.title || "untitled").trim().split(/\s+/)[0] || "untitled";
+    return `${last}${year}${word}`.replace(/[^A-Za-z0-9]/g, "");
+  }
+
+  function bibtexEntry(paper) {
+    const fields = [
+      `  title = {${bibtexEscape(paper.title || "Untitled")}}`,
+      `  author = {${bibtexEscape(bibtexAuthors(paper))}}`,
+    ];
+    if (paper.year) fields.push(`  year = {${bibtexEscape(paper.year)}}`);
+    if (paper.journal) fields.push(`  journal = {${bibtexEscape(paper.journal)}}`);
+    if (paper.doi) fields.push(`  doi = {${bibtexEscape(paper.doi)}}`);
+    if (paper.abstract) fields.push(`  abstract = {${bibtexEscape(paper.abstract)}}`);
+    return `@article{${bibtexKey(paper)},\n${fields.join(",\n")}\n}`;
+  }
+
+  function selectedBibtex() {
+    return selectedPapers().map(bibtexEntry).join("\n\n");
+  }
+
+  function openSelectedUrls() {
+    const papers = selectedPapers();
+    if (!papers.length) {
+      if (bulkStatus) bulkStatus.textContent = scholarT("Select results first.");
+      return;
+    }
+    const urls = papers
+      .filter((paper) => paper.doi)
+      .map((paper) => `https://doi.org/${paper.doi}`);
+    if (!urls.length) {
+      if (bulkStatus) bulkStatus.textContent = scholarT("No DOI links in selection.");
+      return;
+    }
+    // Direct click handler: one window.open per URL keeps the popup
+    // blocker satisfied the same way hub's toolbar button does.
+    urls.forEach((url) => window.open(url, "_blank", "noopener"));
+    if (bulkStatus) bulkStatus.textContent = "";
+  }
+
+  function downloadSelectedBibtex() {
+    const papers = selectedPapers();
+    if (!papers.length) {
+      if (bulkStatus) bulkStatus.textContent = scholarT("Select results first.");
+      return;
+    }
+    const blob = new Blob([selectedBibtex()], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scholar-selected-${new Date().toISOString().slice(0, 10)}.bib`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
   function renderResults(data) {
     const papers = data.results || [];
     lastPapers = papers;
@@ -342,13 +463,23 @@ document.addEventListener("DOMContentLoaded", () => {
     // READINESS: which corpus answered. The configured policy is local-first,
     // and the user (and a bug report) must be able to see when the network was
     // actually needed -- a silent fallback is indistinguishable from a local
-    // hit that happened to work.
-    if (metadata.source_tier) {
+    // hit that happened to work. An explicit Sources selection reports
+    // itself plus the per-engine counts (old-direct's inline source status).
+    if (metadata.source_tier === "selected") {
+      parts.push(scholarT("Selected sources"));
+    } else if (metadata.source_tier) {
       parts.push(
         metadata.source_tier === "primary"
           ? scholarT("Local corpus (NAS)")
           : scholarT("Online fallback"),
       );
+    }
+    const counts = metadata.engine_counts || {};
+    const counted = Object.keys(counts);
+    if (counted.length) {
+      // Per-source options are corpus proper nouns and stay as-is (same
+      // convention as the source filter's dynamically built options).
+      parts.push(counted.map((name) => `${name} ${counts[name]}`).join(", "));
     }
     stats.textContent = parts.join(" · ");
     show(results);
@@ -478,6 +609,101 @@ document.addEventListener("DOMContentLoaded", () => {
   if (enrichSelectedBtn) {
     enrichSelectedBtn.addEventListener("click", enrichSelected);
   }
+  // Slice 11: save-then-download. Search rows are not library papers, so
+  // the pill files the selection first (existing save-bulk), then fetches
+  // OA PDFs for the filed ids (max 10 per the endpoint cap).
+  async function downloadSelectedPdfs() {
+    const papers = selectedPapers();
+    if (!papers.length) {
+      if (bulkStatus) bulkStatus.textContent = scholarT("Select results to save.");
+      return;
+    }
+    if (downloadPdfsBtn) downloadPdfsBtn.disabled = true;
+    if (bulkStatus) bulkStatus.textContent = "";
+    try {
+      const saveResp = await fetch(`${STX_MOUNT}/api/library/save-bulk`, {
+        method: "POST",
+        headers: csrfHeaders({ "Content-Type": "application/json" }),
+        body: JSON.stringify({ papers: papers.map(savePayload), project: currentProject() }),
+      });
+      const saved = await saveResp.json();
+      if (!saveResp.ok) throw new Error(saved.error || scholarT("Save failed"));
+      const ids = (saved.saved || []).map((row) => row.library_id).filter((id) => id);
+      if (!ids.length) throw new Error(scholarT("Save failed"));
+      const dlResp = await fetch(`${STX_MOUNT}/api/library/download-pdfs`, {
+        method: "POST",
+        headers: csrfHeaders({ "Content-Type": "application/json" }),
+        body: JSON.stringify({ library_ids: ids.slice(0, 10) }),
+      });
+      const data = await dlResp.json();
+      if (!dlResp.ok) throw new Error(data.error || scholarT("Download failed"));
+      const done = (data.downloaded || []).length;
+      const failed = (data.failed || []).length;
+      if (bulkStatus) {
+        bulkStatus.textContent = scholarT("Downloaded %(done)s of %(total)s PDFs", {
+          done,
+          total: done + failed,
+        });
+      }
+    } catch (err) {
+      showError(`${scholarT("Download failed")}: ${err.message}`, downloadSelectedPdfs);
+    } finally {
+      if (downloadPdfsBtn) downloadPdfsBtn.disabled = false;
+    }
+  }
+  if (downloadPdfsBtn) {
+    downloadPdfsBtn.addEventListener("click", downloadSelectedPdfs);
+  }
+  // Slice 3: header tools over the checked rows (hub results-header parity).
+  if (abstractToggle) {
+    abstractToggle.addEventListener("click", () => {
+      abstractFull = !abstractFull;
+      applyAbstractMode();
+    });
+  }
+  if (openUrlsBtn) openUrlsBtn.addEventListener("click", openSelectedUrls);
+  if (exportBibtexBtn) {
+    exportBibtexBtn.addEventListener("click", downloadSelectedBibtex);
+  }
+  document.addEventListener("keydown", (event) => {
+    // Hub parity: Ctrl/Cmd+C copies selected BibTeX when no text is
+    // selected. Unlike hub, keystrokes inside inputs are never hijacked --
+    // copying from the query box must keep working.
+    const target = event.target;
+    if (
+      (event.ctrlKey || event.metaKey) &&
+      !event.shiftKey &&
+      !event.altKey &&
+      (event.key === "c" || event.key === "C")
+    ) {
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+      const selection = window.getSelection();
+      if (selection && selection.toString().trim().length > 0) return;
+      const papers = selectedPapers();
+      if (!papers.length) return;
+      event.preventDefault();
+      navigator.clipboard
+        .writeText(selectedBibtex())
+        .then(() => {
+          if (bulkStatus) {
+            bulkStatus.textContent =
+              papers.length === 1
+                ? scholarT("Copied %(n)s BibTeX entry", { n: papers.length })
+                : scholarT("Copied %(n)s BibTeX entries", { n: papers.length });
+          }
+        })
+        .catch(() => {
+          if (bulkStatus) bulkStatus.textContent = scholarT("Copy failed");
+        });
+    }
+  });
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -497,6 +723,26 @@ document.addEventListener("DOMContentLoaded", () => {
         max_results: maxResults.value,
       });
       if (modeSelect) params.set("mode", modeSelect.value);
+      if (sourcesGrid) {
+        // Old-direct Sources semantics: the checked set travels as
+        // ?sources=a,b,c. All (or none) checked is the tiered default --
+        // omit the param so the request behaves exactly as before.
+        const boxes = Array.from(
+          sourcesGrid.querySelectorAll("input.source-toggle"),
+        );
+        const checked = boxes
+          .filter((box) => box.checked)
+          .map((box) => box.value);
+        if (checked.length && checked.length < boxes.length) {
+          params.set("sources", checked.join(","));
+        }
+      }
+      // Slice 2: range filters travel only when set; the backend fails
+      // closed (400) on malformed values and surfaces the message.
+      Object.keys(filterInputs).forEach((name) => {
+        const el = filterInputs[name];
+        if (el && el.value.trim() !== "") params.set(name, el.value.trim());
+      });
       if (noCache && noCache.checked) params.set("no_cache", "true");
       const response = await fetch(`${STX_MOUNT}/api/search?${params}`);
       const data = await response.json();

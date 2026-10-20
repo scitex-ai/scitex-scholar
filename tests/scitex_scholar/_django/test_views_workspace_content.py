@@ -109,7 +109,7 @@ def test_index_workspace_content_preserves_native_rendering(
                 response.cookies[settings.CSRF_COOKIE_NAME].value,
             ),
             "languages": (full.html["lang"], response.headers["Content-Language"]),
-            "library_text": fragment.select_one('[data-tab="library"]').get_text(),
+            "library_text": fragment.select_one('[aria-controls="tab-library"]').get_text(),
             "shell_content_panes": len(full.select("main#main-content.ws-module-pane")),
             "scripts": tuple(
                 node["src"] for node in full.select("script[src]")
