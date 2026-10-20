@@ -113,7 +113,7 @@ def test_index_body_contains_official_navy_favicon():
     # Act
     body = resp.content.decode()
     # Assert
-    assert ('<link rel="icon" href="/static/scholar/pwa/favicon-32.png"' in body)
+    assert ('<link rel="icon" href="/static/scholar/img/scitex-favicon-navy.svg"' in body)
 
 
 def test_index_does_not_shadow_shared_favicon_with_inline_icon():

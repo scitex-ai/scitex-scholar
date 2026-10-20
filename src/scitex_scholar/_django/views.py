@@ -442,7 +442,7 @@ def index_context(request, current_project=None):
         # navy), like production -- not the SDK default green snake. The
         # shared branding partial honours this context var, so the leaf
         # supplies its own file rather than shadowing the partial.
-        "favicon_href": _static_url("scholar/pwa/favicon-32.png"),
+        "favicon_href": _static_url("scholar/img/scitex-favicon-navy.svg"),
         "current_project": current_project,
         "current_scope": current_scope,
         # i18n (operator directive 2026-09-14): the whole page flips via
