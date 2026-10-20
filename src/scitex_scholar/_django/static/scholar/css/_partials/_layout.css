@@ -119,3 +119,17 @@
     min-height: calc(100dvh - 118px);
   }
 }
+
+/* Operator 2026-10-20: the header version pill reads as loud UI chrome.
+ * Subdue it leaf-side (the shared sheet owns the pill shape): 10px muted
+ * text, no weight, no border. Reversible; hide entirely only if the
+ * operator asks -- the version stays in the DOM for bug reports. */
+.scholar-app-header .stx-app-header__version {
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--text-muted);
+  border: none;
+  background: none;
+  padding: 0;
+}

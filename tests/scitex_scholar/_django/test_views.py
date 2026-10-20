@@ -680,7 +680,13 @@ def test_header_links_sdk_ssot_stylesheet():
 
 
 def test_header_does_not_redefine_the_row():
-    """Scholar carries no .stx-app-header rules: the shared sheet owns shape."""
+    """Scholar carries no BARE .stx-app-header rules: the shared sheet owns shape.
+
+    One deliberate exception (operator 2026-10-20): the version pill may be
+    subdued through a `.scholar-app-header`-SCOPED rule only
+    (test_header_version_is_subdued_by_leaf_rule pins it). A bare
+    `.stx-app-header...` rule would fork the shared row and is still banned.
+    """
     # Arrange
     layout = (
         Path(views.__file__).parent
@@ -690,8 +696,13 @@ def test_header_does_not_redefine_the_row():
         / "_partials"
         / "_layout.css"
     ).read_text()
-    # Act — a RULE (selector + block), not a prose mention in a comment.
-    redefined = re.search(r"\.stx-app-header[\w-]*\s*\{", layout)
+    # Act -- a bare shared-sheet selector (not the scoped exception below).
+    lines = [
+        line
+        for line in layout.splitlines()
+        if ".scholar-app-header" not in line
+    ]
+    redefined = re.search(r"\.stx-app-header[\w-]*\s*\{", "\n".join(lines))
     # Assert
     assert redefined is None
 
