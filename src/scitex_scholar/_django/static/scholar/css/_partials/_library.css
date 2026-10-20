@@ -273,8 +273,8 @@
 
 .library-project__chip--active {
   color: var(--text-on-accent, #fff);
-  background: var(--accent, #1f6feb);
-  border-color: var(--accent, #1f6feb);
+  background: var(--accent, #1a2a40);
+  border-color: var(--accent, #1a2a40);
 }
 
 .library-project__chip--static {
