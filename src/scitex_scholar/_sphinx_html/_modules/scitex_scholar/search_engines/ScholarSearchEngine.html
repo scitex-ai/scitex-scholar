@@ -531,7 +531,7 @@
 <span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">scitex_logging</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">logging</span>
 
@@ -609,6 +609,7 @@
         <span class="n">max_results</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
         <span class="n">parse_query</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">sources</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">on_progress</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">"""Search for academic papers across multiple databases.</span>
 
@@ -620,6 +621,10 @@
 <span class="sd">            parse_query: Whether to parse query for advanced syntax</span>
 <span class="sd">            sources: Optional explicit source selection (old-direct Sources</span>
 <span class="sd">                grid). Runs exactly those engines; None/empty keeps tiers.</span>
+<span class="sd">            on_progress: Optional callback(engine_name, status, count) --</span>
+<span class="sd">                old-direct U2 queue panel binds this; the parallel pipeline</span>
+<span class="sd">                fires it per engine ('loading'/'completed'/'error').</span>
+<span class="sd">                None (default) keeps existing behavior exactly.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Dict with:</span>
@@ -680,14 +685,25 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s2">"single_searches"</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Using single (sequential) search mode"</span><span class="p">)</span>
 
-        <span class="c1"># Execute search</span>
+        <span class="c1"># Execute search (old-direct U2: the queue panel binds this callback;</span>
+        <span class="c1"># None by default, so existing callers see zero behavior change --</span>
+        <span class="c1"># the single pipeline has no progress hook, so it stays unwired).</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">search_async</span><span class="p">(</span>
-                <span class="n">query</span><span class="o">=</span><span class="n">clean_query</span><span class="p">,</span>
-                <span class="n">filters</span><span class="o">=</span><span class="n">combined_filters</span><span class="p">,</span>
-                <span class="n">max_results</span><span class="o">=</span><span class="n">max_results</span><span class="p">,</span>
-                <span class="n">sources</span><span class="o">=</span><span class="n">sources</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">search_mode</span> <span class="o">==</span> <span class="s2">"parallel"</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">search_async</span><span class="p">(</span>
+                    <span class="n">query</span><span class="o">=</span><span class="n">clean_query</span><span class="p">,</span>
+                    <span class="n">filters</span><span class="o">=</span><span class="n">combined_filters</span><span class="p">,</span>
+                    <span class="n">max_results</span><span class="o">=</span><span class="n">max_results</span><span class="p">,</span>
+                    <span class="n">sources</span><span class="o">=</span><span class="n">sources</span><span class="p">,</span>
+                    <span class="n">on_progress</span><span class="o">=</span><span class="n">on_progress</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">search_async</span><span class="p">(</span>
+                    <span class="n">query</span><span class="o">=</span><span class="n">clean_query</span><span class="p">,</span>
+                    <span class="n">filters</span><span class="o">=</span><span class="n">combined_filters</span><span class="p">,</span>
+                    <span class="n">max_results</span><span class="o">=</span><span class="n">max_results</span><span class="p">,</span>
+                    <span class="n">sources</span><span class="o">=</span><span class="n">sources</span><span class="p">,</span>
+                <span class="p">)</span>
 
             <span class="c1"># Update statistics</span>
             <span class="n">search_time</span> <span class="o">=</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
