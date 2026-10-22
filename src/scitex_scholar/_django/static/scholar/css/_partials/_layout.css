@@ -111,13 +111,16 @@
   }
 }
 
-/* TEMPORARY bridge (operator 2026-10-20/21: selected tab must read
- * BRIGHTER than its siblings, no rounding, no blue. Underline + bright
- * primary text; sunset when the SDK sheet ships it). */
+/* Selected-tab legibility guard (operator 2026-10-20/21 + SDK #60 polish):
+ * the SDK content-tabs sheet owns the underline indicator; this rule only
+ * restores the border-bottom the `border-color: transparent` reset would
+ * otherwise clear (cascade order), and brightens the label. No box, no
+ * weight change — underline only, per the UI standard. */
 .stx-content-tabs .stx-content-tabs__tab[aria-selected="true"] {
   border-radius: 0;
   color: var(--text-primary, #1a1a1a);
   border-color: transparent;
+  border-bottom: 2px solid var(--accent, #1a2a40);
   background: transparent;
 }
 
