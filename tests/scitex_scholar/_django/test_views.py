@@ -102,10 +102,9 @@ def test_index_body_leaks_no_unrendered_template_tags():
     assert "{% comment %}" not in body
 
 
-def test_index_body_contains_official_navy_favicon():
-    """Operator 2026-10-20: the official SciTeX mark (white snake on navy),
-    like production -- supplied through the shared partial's `favicon_href`
-    contract, not the SDK default green snake."""
+def test_index_body_contains_sdk_ssot_favicon():
+    """Operator 2026-10-22: favicon is the SDK SSOT -- Scholar supplies no
+    `favicon_href` override, so the shared partial emits the SDK default."""
     # Arrange
     rf = RequestFactory()
     request = rf.get("/")
@@ -113,7 +112,8 @@ def test_index_body_contains_official_navy_favicon():
     # Act
     body = resp.content.decode()
     # Assert
-    assert ('<link rel="icon" href="/static/scholar/img/scitex-favicon-navy.svg"' in body)
+    assert ('/static/scitex_sdk/ui/img/scitex-favicon.svg' in body)
+    assert 'scholar/img/scitex-favicon-navy.svg' not in body
 
 
 def test_index_does_not_shadow_shared_favicon_with_inline_icon():

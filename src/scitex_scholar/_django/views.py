@@ -437,11 +437,9 @@ def index_context(request, current_project=None):
         "stx_mount": mount_prefix(request),
         "app_label": _app_label("SciTeX Scholar"),
         "app_scope": "user",
-        # Operator 2026-10-20: the official SciTeX mark (white snake on
-        # navy), like production -- not the SDK default green snake. The
-        # shared branding partial honours this context var, so the leaf
-        # supplies its own file rather than shadowing the partial.
-        "favicon_href": _static_url("scholar/img/scitex-favicon-navy.svg"),
+        # Operator 2026-10-22: favicon is the SDK SSOT (branding.py +
+        # _branding_head.html). No leaf override: the shell falls back to
+        # the shared SciTeX mark.
         "current_project": current_project,
         "current_scope": current_scope,
         # i18n (operator directive 2026-09-14): the whole page flips via
@@ -476,13 +474,7 @@ def render_workspace_content(request, current_project=None, *, stx_mount):
 
 
 def index(request):
-    """Serve the Scholar SPA shell page.
-
-    `favicon_href` carries the official SciTeX mark (white snake on navy,
-    operator 2026-10-20, like production): the shared branding partial
-    honours the var, so the leaf supplies its own file through the
-    contract rather than shadowing the partial with an inline icon.
-    """
+    """Serve the Scholar SPA shell page (favicon: SDK SSOT default)."""
     html = render_to_string(
         "scholar/scholar.html",
         index_context(request),
