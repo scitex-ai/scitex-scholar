@@ -30,6 +30,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const show = (el) => el && el.classList.remove("hidden");
   const hide = (el) => el && el.classList.add("hidden");
+  // Non-JSON guard (operator 2026-10-22: the Library pane showed a raw
+  // "Unexpected token '<'" when an endpoint answered HTML instead of JSON).
+  // Every parse site below goes through here so a wrong-content response
+  // surfaces its status instead of a SyntaxError.
+  async function readJson(resp) {
+    const text = await resp.text();
+    try {
+      return JSON.parse(text);
+    } catch (err) {
+      throw new Error(`Server returned non-JSON (status ${resp.status})`);
+    }
+  }
   let loaded = false;
   let filterTimer = null;
   // Slice 4b (old-direct unification): the loaded rows stay cached so the
@@ -105,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!projectChipsEl || projectChipsEl.dataset.done) return;
     try {
       const resp = await fetch(`${STX_MOUNT}/api/projects`);
-      const data = await resp.json();
+      const data = await readJson(resp);
       if (!resp.ok) return;
       projectChipsEl.dataset.done = "1";
       const all = document.createElement("a");
@@ -382,7 +394,7 @@ document.addEventListener("DOMContentLoaded", () => {
           headers: csrfJsonHeaders(),
           body: JSON.stringify(payload),
         });
-        const data = await resp.json();
+        const data = await readJson(resp);
         if (!resp.ok) throw new Error(data.error || scholarT("Save failed"));
         paper.annotations = data.annotations || {};
         renderBadges(badgesEl, paper);
@@ -416,7 +428,7 @@ document.addEventListener("DOMContentLoaded", () => {
           headers: csrfJsonHeaders(),
           body: JSON.stringify({ library_ids: [paper.paper_id] }),
         });
-        const data = await resp.json();
+        const data = await readJson(resp);
         if (!resp.ok) throw new Error(data.error || scholarT("Download failed"));
         if ((data.downloaded || []).length) {
           pdfMsg.textContent = scholarT("PDF downloaded");
@@ -452,7 +464,7 @@ document.addEventListener("DOMContentLoaded", () => {
           headers: csrfJsonHeaders(),
           body: JSON.stringify({ library_id: paper.paper_id }),
         });
-        const data = await resp.json();
+        const data = await readJson(resp);
         if (!resp.ok) throw new Error(data.error || scholarT("Remove failed"));
         lastRows = lastRows.filter((p) => p.paper_id !== paper.paper_id);
         renderRows();
@@ -478,7 +490,7 @@ document.addEventListener("DOMContentLoaded", () => {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: params.toString(),
       });
-      const data = await resp.json();
+      const data = await readJson(resp);
       if (!resp.ok) throw new Error(data.error || scholarT("Enrichment failed (HTTP %(status)s)", { status: resp.status }));
       // Reflect the fresh metadata on the row without a full reload.
       if (data.abstract_chars) {
@@ -567,7 +579,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ? `${STX_MOUNT}/api/library?${qp.join("&")}`
         : `${STX_MOUNT}/api/library`;
       const resp = await fetch(url);
-      const data = await resp.json();
+      const data = await readJson(resp);
       if (!resp.ok) throw new Error(data.error || `Library load failed (${resp.status})`);
       hide(loadingEl);
       listEl.replaceChildren();
@@ -577,6 +589,16 @@ document.addEventListener("DOMContentLoaded", () => {
         statsEl.textContent = data.filtered
           ? scholarT("%(count)s of %(total)s Papers", { count: n, total: data.total })
           : n + " " + scholarT(n === 1 ? "Paper" : "Papers");
+        // Details strip (operator 2026-10-22): the Library section mirrors
+        // the list counts plus the project the header picker selected.
+        const stripSummary = document.getElementById("libraryStripSummary");
+        if (stripSummary) {
+          reflectProjectIndicator();
+          const scope = projectCurrentEl ? projectCurrentEl.textContent : "";
+          stripSummary.textContent = scope
+            ? `${statsEl.textContent} · ${scope}`
+            : statsEl.textContent;
+        }
       }
       if (!papers.length) {
         listEl.appendChild(emptyState(data));
@@ -701,7 +723,7 @@ document.addEventListener("DOMContentLoaded", () => {
         headers: importHeaders(),
         body: params.toString(),
       });
-      const data = await resp.json();
+      const data = await readJson(resp);
       if (!resp.ok) throw new Error(data.error || `Import failed (${resp.status})`);
       // A dict keyed call, not a template literal: scholarT looks the string
       // up verbatim, so an interpolated literal could never match the
@@ -748,7 +770,7 @@ document.addEventListener("DOMContentLoaded", () => {
           headers: importHeaders(),
           body: params.toString(),
         });
-        const data = await resp.json();
+        const data = await readJson(resp);
         if (!resp.ok) throw new Error(data.error || `Import failed (${resp.status})`);
         pendingImportText = text;
         pendingImportName = file.name;

@@ -35,90 +35,6 @@ msgstr "クエリ"
 msgid "Results"
 msgstr "結果"
 
-msgid "Advanced"
-msgstr "詳細"
-
-msgid "Search source"
-msgstr "検索ソース"
-
-msgid "All sources (parallel)"
-msgstr "すべてのソース（並列）"
-
-msgid "Single source"
-msgstr "単一ソース"
-
-msgid "Sources"
-msgstr "ソース"
-
-msgid "Crossref database on the SciTeX server — fast, unlimited"
-msgstr "SciTeXサーバー上のCrossrefデータベース — 高速、無制限"
-
-msgid "OpenAlex database on the SciTeX server — fast, unlimited"
-msgstr "SciTeXサーバー上のOpenAlexデータベース — 高速、無制限"
-
-msgid "NCBI PubMed — biomedical literature"
-msgstr "NCBI PubMed — 生物医学文献"
-
-msgid "arXiv — physics, mathematics, and computer science preprints"
-msgstr "arXiv — 物理学・数学・計算機科学のプレプリント"
-
-msgid "Semantic Scholar — AI-powered academic search"
-msgstr "Semantic Scholar — AI駆動の学術検索"
-
-msgid "Crossref — DOI metadata registry"
-msgstr "Crossref — DOIメタデータレジストリ"
-
-msgid "OpenAlex — open catalog of scholarly works"
-msgstr "OpenAlex — 学術成果物のオープンカタログ"
-
-msgid "bioRxiv — biology preprint server"
-msgstr "bioRxiv — 生物学プレプリントサーバー"
-
-msgid "DOAJ — open-access journals"
-msgstr "DOAJ — オープンアクセスジャーナル"
-
-msgid "PLOS — open-access science journals"
-msgstr "PLOS — オープンアクセス科学ジャーナル"
-
-msgid "PMC — open-access full-text archive"
-msgstr "PMC — オープンアクセス全文アーカイブ"
-
-msgid "Uncheck sources to narrow the search. All checked searches the default set."
-msgstr "ソースのチェックを外すと検索範囲が狭まります。すべて選択時はデフォルト設定で検索します。"
-
-msgid "Filters"
-msgstr "絞り込み"
-
-msgid "Year from"
-msgstr "開始年"
-
-msgid "Year to"
-msgstr "終了年"
-
-msgid "Min citations"
-msgstr "最小被引用数"
-
-msgid "Max citations"
-msgstr "最大被引用数"
-
-msgid "Min impact factor"
-msgstr "最小インパクトファクター"
-
-msgid "Max impact factor"
-msgstr "最大インパクトファクター"
-
-msgid "Ignore cache"
-msgstr "キャッシュを無視"
-
-msgid "CrossRef API"
-msgstr "CrossRef API"
-
-msgid "Configured"
-msgstr "設定済み"
-
-msgid "Not configured"
-msgstr "未設定"
-
 msgid "Searching databases... This may take a moment."
 msgstr "データベースを検索中。少し時間がかかる場合があります。"
 
@@ -203,12 +119,6 @@ msgstr "選択した結果のオープンアクセスPDFをダウンロード"
 msgid "PDFs"
 msgstr "PDF"
 
-msgid "CSV (.csv)"
-msgstr "CSV (.csv)"
-
-msgid "Import BibTeX"
-msgstr "BibTeX をインポート"
-
 msgid "Import preview"
 msgstr "インポートのプレビュー"
 
@@ -220,57 +130,6 @@ msgstr "インポートを実行"
 
 msgid "Cancel"
 msgstr "キャンセル"
-
-msgid "Project"
-msgstr "プロジェクト"
-
-msgid "Zotero"
-msgstr "Zotero"
-
-msgid "Import from your local Zotero database, or download the library as BibTeX for Zotero."
-msgstr "ローカルの Zotero データベースからインポートするか、ライブラリを Zotero 用の BibTeX としてダウンロードできます。"
-
-msgid "Checking..."
-msgstr "確認中…"
-
-msgid "Import source"
-msgstr "インポート元"
-
-msgid "All papers"
-msgstr "すべての論文"
-
-msgid "By collection"
-msgstr "コレクション別"
-
-msgid "By tags"
-msgstr "タグ別"
-
-msgid "Tags, comma-separated"
-msgstr "タグ（カンマ区切り）"
-
-msgid "Import from Zotero"
-msgstr "Zotero からインポート"
-
-msgid "Download BibTeX for Zotero"
-msgstr "Zotero 用に BibTeX をダウンロード"
-
-msgid "Connected Papers"
-msgstr "Connected Papers"
-
-msgid "Import a Connected Papers graph by seed paper."
-msgstr "起点論文から Connected Papers のグラフをインポートします。"
-
-msgid "Find paper IDs at semanticscholar.org"
-msgstr "論文 ID は semanticscholar.org で確認できます"
-
-msgid "Semantic Scholar paper ID"
-msgstr "Semantic Scholar 論文 ID"
-
-msgid "40-char SHA or DOI"
-msgstr "40文字の SHA または DOI"
-
-msgid "Import Graph"
-msgstr "グラフをインポート"
 
 msgid "Filter your library"
 msgstr "ライブラリを絞り込む"
@@ -389,8 +248,161 @@ msgstr "ステータスパネルを展開する"
 msgid "Details"
 msgstr "詳細"
 
+msgid "Databases"
+msgstr "データベース"
+
+msgid "No search yet."
+msgstr "まだ検索していません。"
+
+msgid "Advanced"
+msgstr "詳細"
+
+msgid "Search source"
+msgstr "検索ソース"
+
+msgid "All sources (parallel)"
+msgstr "すべてのソース（並列）"
+
+msgid "Single source"
+msgstr "単一ソース"
+
+msgid "Sources"
+msgstr "ソース"
+
+msgid "Crossref database on the SciTeX server — fast, unlimited"
+msgstr "SciTeXサーバー上のCrossrefデータベース — 高速、無制限"
+
+msgid "OpenAlex database on the SciTeX server — fast, unlimited"
+msgstr "SciTeXサーバー上のOpenAlexデータベース — 高速、無制限"
+
+msgid "NCBI PubMed — biomedical literature"
+msgstr "NCBI PubMed — 生物医学文献"
+
+msgid "arXiv — physics, mathematics, and computer science preprints"
+msgstr "arXiv — 物理学・数学・計算機科学のプレプリント"
+
+msgid "Semantic Scholar — AI-powered academic search"
+msgstr "Semantic Scholar — AI駆動の学術検索"
+
+msgid "Crossref — DOI metadata registry"
+msgstr "Crossref — DOIメタデータレジストリ"
+
+msgid "OpenAlex — open catalog of scholarly works"
+msgstr "OpenAlex — 学術成果物のオープンカタログ"
+
+msgid "bioRxiv — biology preprint server"
+msgstr "bioRxiv — 生物学プレプリントサーバー"
+
+msgid "DOAJ — open-access journals"
+msgstr "DOAJ — オープンアクセスジャーナル"
+
+msgid "PLOS — open-access science journals"
+msgstr "PLOS — オープンアクセス科学ジャーナル"
+
+msgid "PMC — open-access full-text archive"
+msgstr "PMC — オープンアクセス全文アーカイブ"
+
+msgid "Uncheck sources to narrow the search. All checked searches the default set."
+msgstr "ソースのチェックを外すと検索範囲が狭まります。すべて選択時はデフォルト設定で検索します。"
+
+msgid "Filters"
+msgstr "絞り込み"
+
+msgid "Year from"
+msgstr "開始年"
+
+msgid "Year to"
+msgstr "終了年"
+
+msgid "Min citations"
+msgstr "最小被引用数"
+
+msgid "Max citations"
+msgstr "最大被引用数"
+
+msgid "Min impact factor"
+msgstr "最小インパクトファクター"
+
+msgid "Max impact factor"
+msgstr "最大インパクトファクター"
+
+msgid "Ignore cache"
+msgstr "キャッシュを無視"
+
+msgid "CrossRef API"
+msgstr "CrossRef API"
+
+msgid "Configured"
+msgstr "設定済み"
+
+msgid "Not configured"
+msgstr "未設定"
+
+msgid "Library not loaded yet."
+msgstr "ライブラリはまだ読み込まれていません。"
+
+msgid "Project"
+msgstr "プロジェクト"
+
+msgid "CSV (.csv)"
+msgstr "CSV (.csv)"
+
+msgid "Import BibTeX"
+msgstr "BibTeX をインポート"
+
+msgid "Zotero"
+msgstr "Zotero"
+
+msgid "Import from your local Zotero database, or download the library as BibTeX for Zotero."
+msgstr "ローカルの Zotero データベースからインポートするか、ライブラリを Zotero 用の BibTeX としてダウンロードできます。"
+
+msgid "Checking..."
+msgstr "確認中…"
+
+msgid "Import source"
+msgstr "インポート元"
+
+msgid "All papers"
+msgstr "すべての論文"
+
+msgid "By collection"
+msgstr "コレクション別"
+
+msgid "By tags"
+msgstr "タグ別"
+
+msgid "Tags, comma-separated"
+msgstr "タグ（カンマ区切り）"
+
+msgid "Import from Zotero"
+msgstr "Zotero からインポート"
+
+msgid "Download BibTeX for Zotero"
+msgstr "Zotero 用に BibTeX をダウンロード"
+
+msgid "Connected Papers"
+msgstr "Connected Papers"
+
+msgid "Import a Connected Papers graph by seed paper."
+msgstr "起点論文から Connected Papers のグラフをインポートします。"
+
+msgid "Find paper IDs at semanticscholar.org"
+msgstr "論文 ID は semanticscholar.org で確認できます"
+
+msgid "Semantic Scholar paper ID"
+msgstr "Semantic Scholar 論文 ID"
+
+msgid "40-char SHA or DOI"
+msgstr "40文字の SHA または DOI"
+
+msgid "Import Graph"
+msgstr "グラフをインポート"
+
 msgid "Graph Controls"
 msgstr "グラフ操作"
+
+msgid "No graph built yet."
+msgstr "グラフはまだ作成されていません。"
 
 msgid "Scroll"
 msgstr "スクロール"

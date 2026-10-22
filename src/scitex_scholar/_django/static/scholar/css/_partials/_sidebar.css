@@ -212,3 +212,49 @@
     order: 3;
   }
 }
+
+/* ── Per-tab Details sections (operator 2026-10-22) ────────────────
+ * Search brings its Databases controls (Advanced), Library its ops, Graph
+ * its controls + node sheet. The strip is 208px: controls go full-width,
+ * multi-column grids collapse to one column, everything else keeps its
+ * own sheet. Monotone + theme tokens only (operator color discipline).
+ */
+.sidebar-section__summary {
+  margin: 0 0 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.status-strip__body .sidebar-section__content {
+  padding: 10px;
+}
+
+.status-strip__body .form-select,
+.status-strip__body .form-input {
+  width: 100%;
+  max-width: 100%;
+}
+
+.status-strip__body .search-sources-grid,
+.status-strip__body .search-filters-grid {
+  grid-template-columns: 1fr;
+}
+
+.status-strip__body .search-advanced,
+.status-strip__body .library-io,
+.status-strip__body .library-ext {
+  margin: 8px 0 0;
+}
+
+.status-strip__body .library-project {
+  margin: 0 0 4px;
+}
+
+/* The node sheet is an overlay on the canvas; in the strip it is a plain
+ * stacked card under the graph controls. */
+.app-status-strip .node-details-panel {
+  position: static;
+  width: auto;
+  box-shadow: none;
+  margin-top: 8px;
+}

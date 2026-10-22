@@ -84,147 +84,12 @@
                                         </div>
                                     </div>
                                 </form>
-                                <!--
-                                    Advanced: collapsed by default. Houses the
-                                    query-syntax help, the search source (mode),
-                                    the "Ignore cache" control, and the CrossRef
-                                    API status -- things a researcher does not
-                                    need on the first screen (compass L653).
-                                -->
-                                <details class="search-advanced">
-                                    <summary class="search-advanced__summary">{% trans "Advanced" %}</summary>
-                                    <div class="search-advanced__body">
-                                        <p class="search-advanced__syntax">
-                                            {% blocktrans %}Query syntax:
-                                            <code>-word</code> excludes a term,
-                                            <code>year:2020-2024</code> bounds the
-                                            publication year,
-                                            <code>if:&gt;5</code> filters by impact factor.{% endblocktrans %}
-                                        </p>
-                                        <div class="search-advanced__row">
-                                            <label class="form-label" for="searchMode">{% trans "Search source" %}</label>
-                                            <select id="searchMode" class="form-select">
-                                                <option value="parallel" selected>{% trans "All sources (parallel)" %}</option>
-                                                <option value="single">{% trans "Single source" %}</option>
-                                            </select>
-                                        </div>
-                                        <!--
-                                            Slice 1 (old-direct unification): the
-                                            Sources grid. Old-direct renders one
-                                            checkbox per source (local corpora
-                                            first, then external APIs) plus an
-                                            ignore-cache toggle; the checked set
-                                            travels as ?sources=a,b,c. All
-                                            checked (or none) keeps the tiered
-                                            default -- the request omits the
-                                            param and behaves exactly as
-                                            before this slice.
-                                        -->
-                                        <div class="search-advanced__row search-advanced__row--stack">
-                                            <span class="form-label" id="searchSourcesLabel">{% trans "Sources" %}</span>
-                                            <div class="search-sources-grid" id="searchSourcesGrid" role="group" aria-labelledby="searchSourcesLabel">
-                                                <label class="search-advanced__check" title="{% trans "Crossref database on the SciTeX server — fast, unlimited" %}">
-                                                    <input type="checkbox" class="source-toggle" value="crossref_local" checked>
-                                                    Crossref (SciTeX)
-                                                </label>
-                                                <label class="search-advanced__check" title="{% trans "OpenAlex database on the SciTeX server — fast, unlimited" %}">
-                                                    <input type="checkbox" class="source-toggle" value="openalex_local" checked>
-                                                    OpenAlex (SciTeX)
-                                                </label>
-                                                <label class="search-advanced__check" title="{% trans "NCBI PubMed — biomedical literature" %}">
-                                                    <input type="checkbox" class="source-toggle" value="pubmed" checked>
-                                                    PubMed
-                                                </label>
-                                                <label class="search-advanced__check" title="{% trans "arXiv — physics, mathematics, and computer science preprints" %}">
-                                                    <input type="checkbox" class="source-toggle" value="arxiv" checked>
-                                                    arXiv
-                                                </label>
-                                                <label class="search-advanced__check" title="{% trans "Semantic Scholar — AI-powered academic search" %}">
-                                                    <input type="checkbox" class="source-toggle" value="semantic" checked>
-                                                    Semantic Scholar
-                                                </label>
-                                                <label class="search-advanced__check" title="{% trans "Crossref — DOI metadata registry" %}">
-                                                    <input type="checkbox" class="source-toggle" value="crossref" checked>
-                                                    Crossref
-                                                </label>
-                                                <label class="search-advanced__check" title="{% trans "OpenAlex — open catalog of scholarly works" %}">
-                                                    <input type="checkbox" class="source-toggle" value="openalex" checked>
-                                                    OpenAlex
-                                                </label>
-                                                <label class="search-advanced__check" title="{% trans "bioRxiv — biology preprint server" %}">
-                                                    <input type="checkbox" class="source-toggle" value="biorxiv" checked>
-                                                    bioRxiv
-                                                </label>
-                                                <label class="search-advanced__check" title="{% trans "DOAJ — open-access journals" %}">
-                                                    <input type="checkbox" class="source-toggle" value="doaj" checked>
-                                                    DOAJ
-                                                </label>
-                                                <label class="search-advanced__check" title="{% trans "PLOS — open-access science journals" %}">
-                                                    <input type="checkbox" class="source-toggle" value="plos" checked>
-                                                    PLOS
-                                                </label>
-                                                <label class="search-advanced__check" title="{% trans "PMC — open-access full-text archive" %}">
-                                                    <input type="checkbox" class="source-toggle" value="pmc" checked>
-                                                    PMC
-                                                </label>
-                                            </div>
-                                            <p class="search-sources-hint">{% trans "Uncheck sources to narrow the search. All checked searches the default set." %}</p>
-                                        </div>
-                                        <!--
-                                            Slice 2 (old-direct unification): the
-                                            Filters rows. Old-direct renders
-                                            year/citations/impact-factor range
-                                            sliders feeding hidden inputs; the
-                                            leaf uses native number inputs (no
-                                            slider dependency) with the same
-                                            hub param names. Empty means
-                                            unbounded on that side.
-                                        -->
-                                        <div class="search-advanced__row search-advanced__row--stack">
-                                            <span class="form-label" id="searchFiltersLabel">{% trans "Filters" %}</span>
-                                            <div class="search-filters-grid" role="group" aria-labelledby="searchFiltersLabel">
-                                                <label class="search-filters-grid__item">
-                                                    <span class="search-filters-grid__name">{% trans "Year from" %}</span>
-                                                    <input type="number" id="searchYearFrom" class="form-input" min="1000" max="2100" step="1" inputmode="numeric">
-                                                </label>
-                                                <label class="search-filters-grid__item">
-                                                    <span class="search-filters-grid__name">{% trans "Year to" %}</span>
-                                                    <input type="number" id="searchYearTo" class="form-input" min="1000" max="2100" step="1" inputmode="numeric">
-                                                </label>
-                                                <label class="search-filters-grid__item">
-                                                    <span class="search-filters-grid__name">{% trans "Min citations" %}</span>
-                                                    <input type="number" id="searchMinCitations" class="form-input" min="0" step="1" inputmode="numeric">
-                                                </label>
-                                                <label class="search-filters-grid__item">
-                                                    <span class="search-filters-grid__name">{% trans "Max citations" %}</span>
-                                                    <input type="number" id="searchMaxCitations" class="form-input" min="0" step="1" inputmode="numeric">
-                                                </label>
-                                                <label class="search-filters-grid__item">
-                                                    <span class="search-filters-grid__name">{% trans "Min impact factor" %}</span>
-                                                    <input type="number" id="searchMinImpact" class="form-input" min="0" step="0.1" inputmode="decimal">
-                                                </label>
-                                                <label class="search-filters-grid__item">
-                                                    <span class="search-filters-grid__name">{% trans "Max impact factor" %}</span>
-                                                    <input type="number" id="searchMaxImpact" class="form-input" min="0" step="0.1" inputmode="decimal">
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="search-advanced__row">
-                                            <label class="search-advanced__check">
-                                                <input type="checkbox" id="searchNoCache">
-                                                {% trans "Ignore cache" %}
-                                            </label>
-                                        </div>
-                                        <div class="search-advanced__row search-advanced__api">
-                                            <span class="form-label">{% trans "CrossRef API" %}</span>
-                                            {% if api_available %}
-                                                <span style="color: var(--accent);">&#9679;</span> {% trans "Configured" %}
-                                            {% else %}
-                                                <span style="color: var(--status-error);">&#9679;</span> {% trans "Not configured" %}
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </details>
+                                <!-- Advanced lives in the Details strip
+                                    ([data-search-hint], operator 2026-10-22):
+                                    query-syntax help, search source (mode),
+                                    the Sources grid, the Filters grid, the
+                                    "Ignore cache" control, and the CrossRef
+                                    API status. -->
                             </div>
                         </div>
                         <!-- Loading -->
@@ -345,24 +210,11 @@
                                     <strong>Import</strong> BibTeX and
                                     <strong>Export</strong> your library.{% endblocktrans %}
                                 </p>
-                                <!-- Import / Export (#106 / L327): library-level
-                                     operations, thin wrappers over the package's
-                                     BibTeX handler + formatter. -->
-                                <div class="library-io">
-                                    <label class="library-io__label" for="libraryExportFormat">{% trans "Export" %}</label>
-                                    <select id="libraryExportFormat" class="form-select library-io__select">
-                                        <option value="bibtex" selected">{% trans "BibTeX (.bib)" %}</option>
-                                        <option value="ris">{% trans "RIS (.ris)" %}</option>
-                                        <option value="endnote">{% trans "EndNote (.enw)" %}</option>
-                                        <option value="csv">{% trans "CSV (.csv)" %}</option>
-                                    </select>
-                                    <button type="button" id="libraryExportBtn" class="btn-control-library">{% trans "Export" %}</button>
-                                    <span class="library-io__sep"></span>
-                                    <input type="file" id="libraryImportFile" class="library-io__file"
-                                           accept=".bib,.bibtex,.txt" hidden>
-                                    <button type="button" id="libraryImportBtn" class="btn-control-library">{% trans "Import BibTeX" %}</button>
-                                </div>
-                                <div id="libraryIoStatus" class="library-io__status"></div>
+                                <!-- Import / Export + Zotero + Connected Papers
+                                    live in the Details strip
+                                    ([data-library-hint], operator 2026-10-22);
+                                    shown only while the Library tab is
+                                    active. Control ids and wiring unchanged. -->
                                 <!-- Slice 5 (old-direct unification): import
                                      preview-before-save. Hub previews parsed
                                      BibTeX (diff vs the library) before the
@@ -378,62 +230,9 @@
                                         <button type="button" id="libraryImportCancel" class="btn-control-library">{% trans "Cancel" %}</button>
                                     </div>
                                 </div>
-                                <!-- Project sync (parity slice 3c): the header
-                                     picker selects the project (?project=
-                                     navigation); the Library view shows the
-                                     sync target and filters to filed papers.
-                                     Chips are rendered by library.js from
-                                     the existing /api/projects endpoint. -->
-                                <div class="library-project">
-                                    <span id="libraryProjectCurrent" class="library-project__current">{% trans "Project" %}</span>
-                                    <span class="library-io__sep"></span>
-                                    <div id="libraryProjectChips" class="library-project__chips"></div>
-                                </div>
-                                <!-- External imports (parity slice 3b): Zotero
-                                     local-DB and Connected Papers reflection
-                                     over the existing package backends (same
-                                     thin-view class as the BibTeX
-                                     import/export above). -->
-                                <div class="library-ext">
-                                    <h4 class="library-ext__title">{% trans "Zotero" %}</h4>
-                                    <p class="library-ext__hint">
-                                        {% trans "Import from your local Zotero database, or download the library as BibTeX for Zotero." %}
-                                    </p>
-                                    <div class="library-ext__row">
-                                        <span id="zoteroStatus" class="library-ext__status">{% trans "Checking..." %}</span>
-                                    </div>
-                                    <div class="library-ext__controls">
-                                        <label class="library-io__label" for="zoteroMode">{% trans "Import source" %}</label>
-                                        <select id="zoteroMode" class="form-select library-io__select">
-                                            <option value="all">{% trans "All papers" %}</option>
-                                            <option value="collection">{% trans "By collection" %}</option>
-                                            <option value="tags">{% trans "By tags" %}</option>
-                                        </select>
-                                        <select id="zoteroCollection" class="form-select library-io__select" hidden></select>
-                                        <input type="text" id="zoteroTags" class="form-input library-ext__input"
-                                               placeholder="{% trans "Tags, comma-separated" %}" hidden>
-                                        <button type="button" id="zoteroImportBtn" class="btn-control-library">{% trans "Import from Zotero" %}</button>
-                                        <button type="button" id="zoteroExportBtn" class="btn-control-library">{% trans "Download BibTeX for Zotero" %}</button>
-                                    </div>
-                                    <div id="zoteroIoStatus" class="library-io__status"></div>
-                                </div>
-                                <div class="library-ext">
-                                    <h4 class="library-ext__title">{% trans "Connected Papers" %}</h4>
-                                    <p class="library-ext__hint">
-                                        {% trans "Import a Connected Papers graph by seed paper." %}
-                                        {% trans "Find paper IDs at semanticscholar.org" %}
-                                    </p>
-                                    <div class="library-ext__row">
-                                        <span id="cpStatus" class="library-ext__status">{% trans "Checking..." %}</span>
-                                    </div>
-                                    <div class="library-ext__controls">
-                                        <label class="library-io__label" for="cpPaperId">{% trans "Semantic Scholar paper ID" %}</label>
-                                        <input type="text" id="cpPaperId" class="form-input library-ext__input"
-                                               placeholder="{% trans "40-char SHA or DOI" %}">
-                                        <button type="button" id="cpImportBtn" class="btn-control-library">{% trans "Import Graph" %}</button>
-                                    </div>
-                                    <div id="cpIoStatus" class="library-io__status"></div>
-                                </div>
+                                <!-- Project sync target lives in the Details strip
+                                    ([data-library-hint]); the header picker
+                                    stays the one selection control. -->
                                 <!-- Filter: the Library list's empty state has a
                                      FILTERED variant ("no papers match"), which
                                      is unreachable without a real filter control
@@ -653,7 +452,9 @@
                                 </div>
                                 <div class="graph-card__body" style="padding: 0; position: relative;">
                                     <div id="graphCanvas" class="graph-canvas-wrapper"></div>
-                                    <div id="nodeDetailsPanel" class="node-details-panel hidden" role="dialog" aria-live="polite"></div>
+                                    <!-- The node details sheet lives in the
+                                        Details strip ([data-graph-hint]);
+                                        citation-graph.js addresses it by id. -->
                                 </div>
                             </div>
                         </div>
@@ -682,14 +483,248 @@
                         data-label-expand="{% trans "Expand status panel" %}">&raquo;</button>
                 <div class="status-strip__body">
                     <div class="status-strip__title">{% trans "Details" %}</div>
-                    <!-- Graph interaction hints: shown only while the Graph
-                        tab is active (operator 2026-10-17: no left sidebar
-                        on any tab, Details集約). Visibility is driven by
-                        syncGraphHint in app.js via [data-graph-hint]. -->
-                    <div class="sidebar-section graph-controls-hint" data-graph-hint>
+                    <!-- Databases: the Search tab's source/syntax/status
+                        controls (operator 2026-10-22: Advanced belongs in
+                        the Details space). Shown only while the Search tab
+                        is active; visibility via syncStripHints in app.js.
+                        Control ids and wiring unchanged. -->
+                    <div class="sidebar-section" data-search-hint>
+                        <div class="sidebar-section__header">
+                            <span class="sidebar-section__title">{% trans "Databases" %}</span>
+                        </div>
+                        <div class="sidebar-section__content">
+                            <p class="sidebar-section__summary" id="searchStripSummary">{% trans "No search yet." %}</p>
+                            <details class="search-advanced">
+                                <summary class="search-advanced__summary">{% trans "Advanced" %}</summary>
+                                <div class="search-advanced__body">
+                                    <p class="search-advanced__syntax">
+                                        {% blocktrans %}Query syntax:
+                                        <code>-word</code> excludes a term,
+                                        <code>year:2020-2024</code> bounds the
+                                        publication year,
+                                        <code>if:&gt;5</code> filters by impact factor.{% endblocktrans %}
+                                    </p>
+                                    <div class="search-advanced__row">
+                                        <label class="form-label" for="searchMode">{% trans "Search source" %}</label>
+                                        <select id="searchMode" class="form-select">
+                                            <option value="parallel" selected>{% trans "All sources (parallel)" %}</option>
+                                            <option value="single">{% trans "Single source" %}</option>
+                                        </select>
+                                    </div>
+                                    <!--
+                                        Slice 1 (old-direct unification): the
+                                        Sources grid. Old-direct renders one
+                                        checkbox per source (local corpora
+                                        first, then external APIs) plus an
+                                        ignore-cache toggle; the checked set
+                                        travels as ?sources=a,b,c. All
+                                        checked (or none) keeps the tiered
+                                        default -- the request omits the
+                                        param and behaves exactly as
+                                        before this slice.
+                                    -->
+                                    <div class="search-advanced__row search-advanced__row--stack">
+                                        <span class="form-label" id="searchSourcesLabel">{% trans "Sources" %}</span>
+                                        <div class="search-sources-grid" id="searchSourcesGrid" role="group" aria-labelledby="searchSourcesLabel">
+                                            <label class="search-advanced__check" title="{% trans "Crossref database on the SciTeX server — fast, unlimited" %}">
+                                                <input type="checkbox" class="source-toggle" value="crossref_local" checked>
+                                                Crossref (SciTeX)
+                                            </label>
+                                            <label class="search-advanced__check" title="{% trans "OpenAlex database on the SciTeX server — fast, unlimited" %}">
+                                                <input type="checkbox" class="source-toggle" value="openalex_local" checked>
+                                                OpenAlex (SciTeX)
+                                            </label>
+                                            <label class="search-advanced__check" title="{% trans "NCBI PubMed — biomedical literature" %}">
+                                                <input type="checkbox" class="source-toggle" value="pubmed" checked>
+                                                PubMed
+                                            </label>
+                                            <label class="search-advanced__check" title="{% trans "arXiv — physics, mathematics, and computer science preprints" %}">
+                                                <input type="checkbox" class="source-toggle" value="arxiv" checked>
+                                                arXiv
+                                            </label>
+                                            <label class="search-advanced__check" title="{% trans "Semantic Scholar — AI-powered academic search" %}">
+                                                <input type="checkbox" class="source-toggle" value="semantic" checked>
+                                                Semantic Scholar
+                                            </label>
+                                            <label class="search-advanced__check" title="{% trans "Crossref — DOI metadata registry" %}">
+                                                <input type="checkbox" class="source-toggle" value="crossref" checked>
+                                                Crossref
+                                            </label>
+                                            <label class="search-advanced__check" title="{% trans "OpenAlex — open catalog of scholarly works" %}">
+                                                <input type="checkbox" class="source-toggle" value="openalex" checked>
+                                                OpenAlex
+                                            </label>
+                                            <label class="search-advanced__check" title="{% trans "bioRxiv — biology preprint server" %}">
+                                                <input type="checkbox" class="source-toggle" value="biorxiv" checked>
+                                                bioRxiv
+                                            </label>
+                                            <label class="search-advanced__check" title="{% trans "DOAJ — open-access journals" %}">
+                                                <input type="checkbox" class="source-toggle" value="doaj" checked>
+                                                DOAJ
+                                            </label>
+                                            <label class="search-advanced__check" title="{% trans "PLOS — open-access science journals" %}">
+                                                <input type="checkbox" class="source-toggle" value="plos" checked>
+                                                PLOS
+                                            </label>
+                                            <label class="search-advanced__check" title="{% trans "PMC — open-access full-text archive" %}">
+                                                <input type="checkbox" class="source-toggle" value="pmc" checked>
+                                                PMC
+                                            </label>
+                                        </div>
+                                        <p class="search-sources-hint">{% trans "Uncheck sources to narrow the search. All checked searches the default set." %}</p>
+                                    </div>
+                                    <!--
+                                        Slice 2 (old-direct unification): the
+                                        Filters rows. Old-direct renders
+                                        year/citations/impact-factor range
+                                        sliders feeding hidden inputs; the
+                                        leaf uses native number inputs (no
+                                        slider dependency) with the same
+                                        hub param names. Empty means
+                                        unbounded on that side.
+                                    -->
+                                    <div class="search-advanced__row search-advanced__row--stack">
+                                        <span class="form-label" id="searchFiltersLabel">{% trans "Filters" %}</span>
+                                        <div class="search-filters-grid" role="group" aria-labelledby="searchFiltersLabel">
+                                            <label class="search-filters-grid__item">
+                                                <span class="search-filters-grid__name">{% trans "Year from" %}</span>
+                                                <input type="number" id="searchYearFrom" class="form-input" min="1000" max="2100" step="1" inputmode="numeric">
+                                            </label>
+                                            <label class="search-filters-grid__item">
+                                                <span class="search-filters-grid__name">{% trans "Year to" %}</span>
+                                                <input type="number" id="searchYearTo" class="form-input" min="1000" max="2100" step="1" inputmode="numeric">
+                                            </label>
+                                            <label class="search-filters-grid__item">
+                                                <span class="search-filters-grid__name">{% trans "Min citations" %}</span>
+                                                <input type="number" id="searchMinCitations" class="form-input" min="0" step="1" inputmode="numeric">
+                                            </label>
+                                            <label class="search-filters-grid__item">
+                                                <span class="search-filters-grid__name">{% trans "Max citations" %}</span>
+                                                <input type="number" id="searchMaxCitations" class="form-input" min="0" step="1" inputmode="numeric">
+                                            </label>
+                                            <label class="search-filters-grid__item">
+                                                <span class="search-filters-grid__name">{% trans "Min impact factor" %}</span>
+                                                <input type="number" id="searchMinImpact" class="form-input" min="0" step="0.1" inputmode="decimal">
+                                            </label>
+                                            <label class="search-filters-grid__item">
+                                                <span class="search-filters-grid__name">{% trans "Max impact factor" %}</span>
+                                                <input type="number" id="searchMaxImpact" class="form-input" min="0" step="0.1" inputmode="decimal">
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="search-advanced__row">
+                                        <label class="search-advanced__check">
+                                            <input type="checkbox" id="searchNoCache">
+                                            {% trans "Ignore cache" %}
+                                        </label>
+                                    </div>
+                                    <div class="search-advanced__row search-advanced__api">
+                                        <span class="form-label">{% trans "CrossRef API" %}</span>
+                                        {% if api_available %}
+                                            <span style="color: var(--accent);">&#9679;</span> {% trans "Configured" %}
+                                        {% else %}
+                                            <span style="color: var(--status-error);">&#9679;</span> {% trans "Not configured" %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+                    <!-- Library ops: Import / Export, project sync target,
+                        Zotero, Connected Papers (operator 2026-10-22: the
+                        Library tab's controls belong in the Details space).
+                        Shown only while the Library tab is active. The paper
+                        list, filter, and import preview stay in the main
+                        area. Control ids and wiring unchanged. -->
+                    <div class="sidebar-section hidden" data-library-hint>
+                        <div class="sidebar-section__header">
+                            <span class="sidebar-section__title">{% trans "Library" %}</span>
+                        </div>
+                        <div class="sidebar-section__content">
+                            <p class="sidebar-section__summary" id="libraryStripSummary">{% trans "Library not loaded yet." %}</p>
+                            <div class="library-project">
+                                <span id="libraryProjectCurrent" class="library-project__current">{% trans "Project" %}</span>
+                                <span class="library-io__sep"></span>
+                                <div id="libraryProjectChips" class="library-project__chips"></div>
+                            </div>
+                            <!-- Import / Export (#106 / L327): library-level
+                                 operations, thin wrappers over the package's
+                                 BibTeX handler + formatter. -->
+                            <div class="library-io">
+                                <label class="library-io__label" for="libraryExportFormat">{% trans "Export" %}</label>
+                                <select id="libraryExportFormat" class="form-select library-io__select">
+                                    <option value="bibtex" selected>{% trans "BibTeX (.bib)" %}</option>
+                                    <option value="ris">{% trans "RIS (.ris)" %}</option>
+                                    <option value="endnote">{% trans "EndNote (.enw)" %}</option>
+                                    <option value="csv">{% trans "CSV (.csv)" %}</option>
+                                </select>
+                                <button type="button" id="libraryExportBtn" class="btn-control-library">{% trans "Export" %}</button>
+                                <span class="library-io__sep"></span>
+                                <input type="file" id="libraryImportFile" class="library-io__file"
+                                       accept=".bib,.bibtex,.txt" hidden>
+                                <button type="button" id="libraryImportBtn" class="btn-control-library">{% trans "Import BibTeX" %}</button>
+                            </div>
+                            <div id="libraryIoStatus" class="library-io__status"></div>
+                            <!-- External imports (parity slice 3b): Zotero
+                                 local-DB and Connected Papers reflection
+                                 over the existing package backends (same
+                                 thin-view class as the BibTeX
+                                 import/export above). -->
+                            <div class="library-ext">
+                                <h4 class="library-ext__title">{% trans "Zotero" %}</h4>
+                                <p class="library-ext__hint">
+                                    {% trans "Import from your local Zotero database, or download the library as BibTeX for Zotero." %}
+                                </p>
+                                <div class="library-ext__row">
+                                    <span id="zoteroStatus" class="library-ext__status">{% trans "Checking..." %}</span>
+                                </div>
+                                <div class="library-ext__controls">
+                                    <label class="library-io__label" for="zoteroMode">{% trans "Import source" %}</label>
+                                    <select id="zoteroMode" class="form-select library-io__select">
+                                        <option value="all">{% trans "All papers" %}</option>
+                                        <option value="collection">{% trans "By collection" %}</option>
+                                        <option value="tags">{% trans "By tags" %}</option>
+                                    </select>
+                                    <select id="zoteroCollection" class="form-select library-io__select" hidden></select>
+                                    <input type="text" id="zoteroTags" class="form-input library-ext__input"
+                                           placeholder="{% trans "Tags, comma-separated" %}" hidden>
+                                    <button type="button" id="zoteroImportBtn" class="btn-control-library">{% trans "Import from Zotero" %}</button>
+                                    <button type="button" id="zoteroExportBtn" class="btn-control-library">{% trans "Download BibTeX for Zotero" %}</button>
+                                </div>
+                                <div id="zoteroIoStatus" class="library-io__status"></div>
+                            </div>
+                            <div class="library-ext">
+                                <h4 class="library-ext__title">{% trans "Connected Papers" %}</h4>
+                                <p class="library-ext__hint">
+                                    {% trans "Import a Connected Papers graph by seed paper." %}
+                                    {% trans "Find paper IDs at semanticscholar.org" %}
+                                </p>
+                                <div class="library-ext__row">
+                                    <span id="cpStatus" class="library-ext__status">{% trans "Checking..." %}</span>
+                                </div>
+                                <div class="library-ext__controls">
+                                    <label class="library-io__label" for="cpPaperId">{% trans "Semantic Scholar paper ID" %}</label>
+                                    <input type="text" id="cpPaperId" class="form-input library-ext__input"
+                                           placeholder="{% trans "40-char SHA or DOI" %}">
+                                    <button type="button" id="cpImportBtn" class="btn-control-library">{% trans "Import Graph" %}</button>
+                                </div>
+                                <div id="cpIoStatus" class="library-io__status"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Node details + graph controls: shown only while the
+                        Graph tab is active (operator 2026-10-17: no left
+                        sidebar on any tab, Details集約; operator
+                        2026-10-22: the graph details belong in the Details
+                        space). Visibility is driven by syncStripHints in
+                        app.js via [data-graph-hint]. The node sheet is
+                        addressed by id from citation-graph.js, so location
+                        is free. -->
+                    <div class="sidebar-section graph-controls-hint hidden" data-graph-hint>
                         <div class="sidebar-section__header">
                             <span class="sidebar-section__title">{% trans "Graph Controls" %}</span>
                         </div>
+                        <p class="sidebar-section__summary" id="graphStripSummary">{% trans "No graph built yet." %}</p>
                         <div class="sidebar-section__content"
                              style="font-size: 11px;
                                     color: var(--text-muted)">
@@ -712,6 +747,10 @@
                                             font-size: 10px">{% trans "Click" %}</kbd> {% trans "Select node" %}
                             </div>
                         </div>
+                        <!-- The node details sheet (U7): clicking a graph
+                            node renders the paper details here, in the
+                            Details space, instead of over the canvas. -->
+                        <div id="nodeDetailsPanel" class="node-details-panel hidden" role="dialog" aria-live="polite"></div>
                     </div>
                     <details class="status-expand" open>
                         <summary class="status-expand__summary" aria-label="{% trans "Service Status" %}">

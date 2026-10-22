@@ -55,3 +55,12 @@ def test_sheet_escape_and_close_return_focus_to_the_node():
         and '.focus()' in _GRAPH_JS
         and 'tabindex", "-1"' in _GRAPH_JS
     )
+
+
+def test_graph_strip_section_mirrors_build_counts():
+    # Arrange -- operator 2026-10-22: the Details strip's graph section
+    # mirrors the build counts next to the controls.
+    # Act
+    present = 'getElementById("graphStripSummary")' in _GRAPH_JS
+    # Assert
+    assert present
