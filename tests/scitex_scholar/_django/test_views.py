@@ -394,7 +394,7 @@ def test_graph_health_unconfigured_paragraph_is_translated_in_japanese():
     # on their JA-only phrases so an EN fallback fails loudly.
     assert (
         body["error"],
-        "引用グラフは crossref-local" in body["detail"],
+        "引用グラフは引用データ" in body["detail"],
         "再起動してください" in body["fix"],
     ) == ("CrossRef API 未設定", True, True)
 
@@ -427,7 +427,7 @@ def test_graph_health_degraded_paragraph_is_translated_in_japanese():
     # Assert — error exact, detail/fix keyed on JA-only phrases.
     assert (
         body["error"],
-        "確認用の論文" in body["detail"],
+        "サンプル論文" in body["detail"],
         "想定どおりのコーパス" in body["fix"],
     ) == ("引用グラフ：制限あり", True, True)
 
