@@ -2234,8 +2234,12 @@ def test_search_primary_distinct_from_build_graph():
     body = _compass_index_body()
     # Act
     # The Search submit is btn-primary; the Build Graph submit stays btn-build.
+    # (Matched by id-then-label, not by the full tag: the button carries an
+    # id + disabled attribute for the empty-DOI arming behavior.)
     search_is_primary = 'class="btn-primary">Search databases<' in body
-    build_graph_stays_secondary = 'class="btn-build">Build Graph<' in body
+    build_graph_stays_secondary = (
+        'id="graphBuildBtn"' in body and ">Build Graph<" in body
+    )
     # Negative control: the search button is NOT also btn-build (that was the
     # pre-fix state — a single shared class with no visual distinction).
     search_not_btn_build = 'class="btn-build">Search databases<' not in body

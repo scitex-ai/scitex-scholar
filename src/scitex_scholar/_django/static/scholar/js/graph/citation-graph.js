@@ -38,13 +38,14 @@ class CitationGraphManager {
     this.bindLazyHealthProbe();
   }
 
-  /** Probe once, the first time the Citation Graph tab is opened. */
+  /** Probe once, the first time the Citation Graph tab opens (however it
+      opens: click, swipe, arrow key, or prefill jump). The single producer
+      path is app.js activateTab; this module listens for that announcement
+      instead of its own click clone, so the status resolves on arrival
+      rather than only on one input modality. */
   bindLazyHealthProbe() {
-    const graphTab = document.querySelector(
-      '.stx-content-tabs__tab[aria-controls="tab-graph"]',
-    );
-    if (!graphTab) return;
-    graphTab.addEventListener("click", () => {
+    document.addEventListener("scholar:tab-activated", (event) => {
+      if (event.detail?.tab !== "graph") return;
       if (this.probed) return;
       this.probed = true;
       this.checkServiceHealth(true);
@@ -61,6 +62,21 @@ class CitationGraphManager {
   bindEvents() {
     const form = document.getElementById("graphForm");
     if (form) form.addEventListener("submit", (e) => this.handleSubmit(e));
+
+    // Operator 2026-10-22 (screenshot loop): Build stays disabled until a
+    // DOI is typed; Save stays disabled until a build exists. Both are
+    // progressive enhancement only -- handleSubmit/saveCurrentGraph keep
+    // their own fail-closed guards, so no-JS/atypical callers behave as
+    // before.
+    const doiInput = document.getElementById("doiInput");
+    const buildBtn = document.getElementById("graphBuildBtn");
+    if (doiInput && buildBtn) {
+      const syncBuild = () => {
+        buildBtn.disabled = !doiInput.value.trim();
+      };
+      doiInput.addEventListener("input", syncBuild);
+      syncBuild();
+    }
 
     const resetBtn = document.getElementById("resetZoomBtn");
     if (resetBtn) resetBtn.addEventListener("click", () => this.resetView());
@@ -255,6 +271,8 @@ class CitationGraphManager {
 
   async buildGraph(doi, topN) {
     this.lastBuild = { doi, topN };
+    const saveBtn = document.getElementById("graphSaveBtn");
+    if (saveBtn) saveBtn.disabled = false;
     this.showLoading(true);
     this.hideError();
 
