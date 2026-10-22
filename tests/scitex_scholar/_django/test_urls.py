@@ -83,4 +83,15 @@ def test_control_django_include_would_fail_the_flatness_check():
     assert resolvers, "include() no longer yields a URLResolver; the guard above is dead"
 
 
+def test_every_route_carries_a_unique_name():
+    # Arrange -- clients join STX_MOUNT + route, and hub docs plus
+    # reverse() rely on stable names; an unnamed route is a hole in the
+    # predictable surface (API consistency rule, operator /goal).
+    patterns = [p for p in scholar_urls.urlpatterns if isinstance(p, URLPattern)]
+    # Act
+    names = [p.name for p in patterns]
+    # Assert
+    assert (len(patterns) > 0, all(names), len(set(names))) == (True, True, len(patterns))
+
+
 # EOF

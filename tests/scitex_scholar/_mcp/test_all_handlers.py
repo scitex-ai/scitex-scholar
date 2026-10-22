@@ -4,6 +4,8 @@ Auto-generated subpackage mirror placeholder; replace with real tests
 as the module matures. Satisfies the src<->tests mirror audit rule.
 """
 
+import asyncio
+
 import pytest
 
 
@@ -22,3 +24,26 @@ def test_import_all_handlers_module_loads_via_importorskip():
     mod = pytest.importorskip(name)
     # Assert
     assert mod.__name__ == name
+
+
+def test_every_registered_handler_is_an_async_callable():
+    """The FastMCP server registers every ``__all__`` entry as a tool.
+
+    ``_mcp_server._register_all_handlers`` wraps each name as
+    ``scholar_<stem>`` and FastMCP awaits it, so a sync def or a
+    non-callable would break the tool surface at serve time instead of
+    at commit time (API consistency rule, operator /goal).
+    """
+    # Arrange
+    mod = pytest.importorskip("scitex_scholar._mcp.all_handlers")
+    # Act
+    bad = [
+        name
+        for name in mod.__all__
+        if not (
+            callable(getattr(mod, name, None))
+            and asyncio.iscoroutinefunction(getattr(mod, name))
+        )
+    ]
+    # Assert
+    assert bad == []
