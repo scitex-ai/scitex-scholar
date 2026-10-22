@@ -59,7 +59,7 @@ def test_index_body_contains_title():
     # Act
     body = resp.content.decode()
     # Assert
-    assert "<title>SciTeX Scholar</title>" in body
+    assert "<title>Scholar</title>" in body
 
 
 def test_index_body_leaks_no_django_template_comment_markers():
@@ -3399,7 +3399,7 @@ def test_main_page_renders_in_english_by_default():
     # Act
     en = _render_index_in("en")
     # Assert -- the EN default carries the English header and the i18n JS dict.
-    assert "SciTeX Scholar" in en and "SCHOLAR_I18N" in en
+    assert "Scholar" in en and "SCHOLAR_I18N" in en
 
 
 def _i18n_script_body(page: str) -> str:
@@ -3486,7 +3486,7 @@ def test_ja_catalog_translates_every_msgid():
     # Proper nouns / format labels that stay in Latin in Japanese UI (translating
     # them would be wrong, not a missed translation).
     proper_nouns = {
-        "SciTeX Scholar", "DOI", "CrossRef API",
+        "Scholar", "DOI", "CrossRef API",
         "BibTeX (.bib)", "RIS (.ris)", "EndNote (.enw)", "CSV (.csv)",
         "Zotero", "Connected Papers",
     }
