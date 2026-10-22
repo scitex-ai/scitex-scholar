@@ -30,17 +30,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const show = (el) => el && el.classList.remove("hidden");
   const hide = (el) => el && el.classList.add("hidden");
-  // Non-JSON guard (operator 2026-10-22: the Library pane showed a raw
-  // "Unexpected token '<'" when an endpoint answered HTML instead of JSON).
-  // Every parse site below goes through here so a wrong-content response
-  // surfaces its status instead of a SyntaxError.
+  // Non-JSON guard (apps-lead probe 2026-10-22: an expired/missing
+  // credential is 302'd to the hub login page, so the pane gets HTML
+  // where JSON was expected). The login-page shape becomes a re-login
+  // prompt; any other non-JSON body keeps its status. Every parse site
+  // below goes through here so a wrong-content response never surfaces
+  // a raw SyntaxError.
   async function readJson(resp) {
     const text = await resp.text();
+    let data = null;
     try {
-      return JSON.parse(text);
+      data = JSON.parse(text);
     } catch (err) {
-      throw new Error(`Server returned non-JSON (status ${resp.status})`);
+      data = null;
     }
+    if (data !== null) return data;
+    const location = resp.url || "";
+    const contentType = (resp.headers && resp.headers.get("content-type")) || "";
+    const loginShaped =
+      /login/i.test(location) &&
+      (/text\/html/i.test(contentType) || /^\s*</.test(text));
+    if (loginShaped) {
+      throw new Error(scholarT("Session expired. Please log in again."));
+    }
+    throw new Error(
+      scholarT("Server returned non-JSON (status %(status)s)", {
+        status: resp.status,
+      }),
+    );
   }
   let loaded = false;
   let filterTimer = null;

@@ -680,6 +680,12 @@ msgstr "論文が見つかりません"
 msgid "Load failed. Try again later."
 msgstr "読み込みに失敗しました。後でもう一度お試しください。"
 
+msgid "Session expired. Please log in again."
+msgstr "セッションの有効期限が切れました。再度ログインしてください。"
+
+msgid "Server returned non-JSON (status %(status)s)"
+msgstr "サーバーがJSON以外を返しました（ステータス%(status)s）。"
+
 msgid "Download failed. Try again later."
 msgstr "ダウンロードに失敗しました。後でもう一度お試しください。"
 

@@ -341,6 +341,8 @@ JA = {
     "No open-access PDF available": "オープンアクセスのPDFがありません",
     "Paper not found": "論文が見つかりません",
     "Load failed. Try again later.": "読み込みに失敗しました。後でもう一度お試しください。",
+    "Session expired. Please log in again.": "セッションの有効期限が切れました。再度ログインしてください。",
+    "Server returned non-JSON (status %(status)s)": "サーバーがJSON以外を返しました（ステータス%(status)s）。",
     "Download failed. Try again later.": "ダウンロードに失敗しました。後でもう一度お試しください。",
     "Imported %(n)s paper from %(file)s": "%(file)s から %(n)s 件の論文をインポートしました",
     "Imported %(n)s papers from %(file)s": "%(file)s から %(n)s 件の論文をインポートしました",
