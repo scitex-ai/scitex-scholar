@@ -5611,3 +5611,15 @@ class TestLibraryCanonicalCommandParser:
         parsed = SearchQueryParser.from_shell_syntax(query).get_filters()
         # Assert
         assert parsed == {"positive_keywords": query.split()}
+
+
+def test_search_empty_state_visible_before_first_search():
+    # Arrange
+    body = _compass_index_body()
+    # Act
+    present = 'id="searchEmptyState"' in body and "Run a search to see results" in body
+    hidden_on_submit = 'hide(emptyState)' in (
+        Path(views.__file__).parent / "static" / "scholar" / "js" / "search.js"
+    ).read_text()
+    # Assert
+    assert present and hidden_on_submit
