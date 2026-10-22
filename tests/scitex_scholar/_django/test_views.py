@@ -110,7 +110,7 @@ def test_index_body_contains_shared_branding_favicon():
     # Act
     body = resp.content.decode()
     # Assert
-    assert '<link rel="icon" href="/static/scitex_sdk/ui/img/scitex-favicon.svg"' in body
+    assert '<link rel="icon" type="image/svg+xml" href="/static/scitex_sdk/ui/img/scitex-favicon.svg"' in body
 
 
 def test_index_does_not_shadow_shared_favicon_with_inline_icon():
