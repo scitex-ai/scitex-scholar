@@ -25,8 +25,11 @@ def test_header_keeps_version_in_dom():
     # Arrange
     body = _views.index(_RequestFactory().get("/")).content.decode()
     # Act (no Act step: static markup inspection)
-    # Assert -- debuggability kept: version span + package tooltip survive.
-    assert ('class="stx-app-header__version"' in body) and ('title="scitex-scholar package serving this page"' in body)
+    # Assert -- debuggability kept: the mount carries the installed version
+    # as a data attribute (the badge renders client-side from it).
+    import importlib.metadata
+
+    assert f'data-app-version="{importlib.metadata.version("scitex-scholar")}"' in body
 
 
 def test_header_version_is_subdued_by_leaf_rule():

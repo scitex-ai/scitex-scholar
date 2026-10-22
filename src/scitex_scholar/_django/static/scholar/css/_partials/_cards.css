@@ -108,6 +108,17 @@
   white-space: nowrap;
 }
 
+/* Catch-up: operator flags are clickable (insert into the query box). */
+.syntax-help-panel__insert {
+  cursor: pointer;
+}
+
+.syntax-help-panel__insert:hover,
+.syntax-help-panel__insert:focus-visible {
+  color: var(--accent);
+  outline: none;
+}
+
 .syntax-help-panel__list dd {
   margin: 0;
 }
