@@ -123,14 +123,20 @@ document.addEventListener("DOMContentLoaded", () => {
   // ?project= so the server resolves and remembers the selection.
   const projectChipsEl = document.getElementById("libraryProjectChips");
   const projectCurrentEl = document.getElementById("libraryProjectCurrent");
+  // Reflect the header picker's project (?project=<id>) into the Details
+  // strip indicator. Called on chips load and after each list load so the
+  // strip mirrors the live selection.
+  function reflectProjectIndicator() {
+    if (!projectCurrentEl) return;
+    const current = currentProject();
+    projectCurrentEl.textContent = current
+      ? scholarT("Project: %(project)s", { project: current })
+      : scholarT("All projects");
+  }
   async function loadProjectChips() {
     if (!projectChipsEl && !projectCurrentEl) return;
+    reflectProjectIndicator();
     const current = currentProject();
-    if (projectCurrentEl) {
-      projectCurrentEl.textContent = current
-        ? scholarT("Project: %(project)s", { project: current })
-        : scholarT("All projects");
-    }
     if (!projectChipsEl || projectChipsEl.dataset.done) return;
     try {
       const resp = await fetch(`${STX_MOUNT}/api/projects`);
