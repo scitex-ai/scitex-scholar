@@ -49,10 +49,10 @@ BLOCKTRANS_MSGIDS = [
     "                                            <code>year:2020-2024</code> bounds the\n"
     "                                            publication year,\n"
     "                                            <code>if:&gt;5</code> filters by impact factor.",
-    "Your papers, stored locally. Use <strong>Enrich</strong>\n"
-    "                                    to fill in metadata (abstract, citations, impact\n"
-    "                                    factor) from the databases, or\n"
-    "                                    <strong>Import</strong> BibTeX and\n"
+    "Your papers, stored locally. Use the per-paper\n"
+    "                                    <strong>Enrich</strong> action to fill in metadata\n"
+    "                                    (abstract, citations, impact factor) from the\n"
+    "                                    databases, or <strong>Import</strong> BibTeX and\n"
     "                                    <strong>Export</strong> your library.",
 ]
 

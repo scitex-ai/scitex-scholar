@@ -320,3 +320,37 @@ def test_library_save_bulk_files_each_into_project(tmp_path):
         filed = [(tmp_path / "projA" / f"PIDB{i}").is_symlink() for i in (1, 2)]
         # Assert
         assert (len(data["saved"]), filed) == (2, [True, True])
+
+
+def test_library_strip_has_no_orphan_separators():
+    # Arrange -- operator 2026-10-22 (screenshot loop): lone '|' dividers
+    # after Export and after the project indicator read as broken flex.
+    # The rows below are flex-wrapped with gap, so separators have no job.
+    # Act
+    orphan_free = 'class="library-io__sep"' not in TEMPLATE
+    # Assert
+    assert orphan_free
+
+
+def test_library_export_select_fits_longest_option():
+    # Arrange -- operator 2026-10-22 (screenshot loop): the select clipped
+    # 'BibTeX (.bib' with no closing paren (160px cap). The strip rule
+    # drops the cap and floors the width at 11em.
+    # Act
+    css = (
+        Path(views.__file__).parent
+        / "static" / "scholar" / "css" / "_partials" / "_library.css"
+    ).read_text()
+    fits = "min-width: 11em" in css and "max-width: 160px" not in css
+    # Assert
+    assert fits
+
+
+def test_library_intro_names_the_per_paper_enrich_action():
+    # Arrange -- operator 2026-10-22 (screenshot loop): the intro said
+    # 'Use Enrich' with no Enrich control in view. Enrich IS per-row
+    # (library.js enrich button); the copy must say per-paper.
+    # Act
+    names_action = "per-paper" in TEMPLATE and "Enrich" in TEMPLATE
+    # Assert
+    assert names_action
