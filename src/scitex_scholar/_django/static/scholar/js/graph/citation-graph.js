@@ -296,6 +296,12 @@ class CitationGraphManager {
     if (statsEl) {
       statsEl.textContent = `${data.nodes.length} nodes, ${data.edges.length} edges`;
     }
+    // Details strip (operator 2026-10-22): the graph section mirrors the
+    // build counts next to the controls.
+    const stripSummary = document.getElementById("graphStripSummary");
+    if (stripSummary) {
+      stripSummary.textContent = `${data.nodes.length} nodes, ${data.edges.length} edges`;
+    }
 
     this.renderer.render(canvas, data.nodes, data.edges);
     this.setupZoomPan(canvas);

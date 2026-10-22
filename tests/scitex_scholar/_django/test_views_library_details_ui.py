@@ -71,3 +71,25 @@ def test_library_details_edits_tags_and_notes():
     )
     # Assert
     assert present
+
+
+def test_library_parse_sites_reject_non_json_with_status():
+    # Arrange -- operator 2026-10-22: the Library pane showed a raw
+    # "Unexpected token '<'" when an endpoint answered HTML instead of JSON.
+    # Act
+    guarded = "readJson(resp)" in LIBRARY_JS
+    raw_gone = "await resp.json();" not in LIBRARY_JS
+    # Assert
+    assert (guarded, raw_gone) == (True, True)
+
+
+def test_library_strip_section_mirrors_list_counts():
+    # Arrange -- operator 2026-10-22: the Details strip's Library section
+    # shows the list counts plus the header picker's project.
+    # Act
+    present = (
+        'getElementById("libraryStripSummary")' in LIBRARY_JS
+        and "reflectProjectIndicator()" in LIBRARY_JS
+    )
+    # Assert
+    assert present

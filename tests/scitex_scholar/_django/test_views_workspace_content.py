@@ -25,6 +25,7 @@ _CONTENT_IDS = {
     "libraryImportBtn", "libraryExportBtn", "graphForm", "tab-graph",
     "searchSort", "searchSourceFilter", "searchBulkBar", "searchSelectAll",
     "searchSaveSelected", "searchEnrichSelected", "searchBulkStatus",
+    "searchStripSummary", "libraryStripSummary", "graphStripSummary",
 }
 
 
@@ -145,3 +146,31 @@ def test_index_workspace_content_preserves_native_rendering(
         }
         # Assert
         assert result == expected
+
+
+def test_details_strip_sections_hold_their_tabs_controls(_private_context):
+    # Arrange -- operator 2026-10-22: Advanced (Search), library ops
+    # (Library), and the node sheet (Graph) live in the Details strip,
+    # one section per tab; only the active tab's section shows.
+    request = RequestFactory().get("/")
+    # Act
+    dom = BeautifulSoup(views.index(request).content.decode(), "html.parser")
+    search = dom.select_one("[data-search-hint]")
+    library = dom.select_one("[data-library-hint]")
+    graph = dom.select_one("[data-graph-hint]")
+    placed = (
+        search.select_one("#searchMode") is not None
+        and search.select_one("#searchSourcesGrid") is not None
+        and search.select_one("#searchNoCache") is not None
+        and library.select_one("#libraryExportBtn") is not None
+        and library.select_one("#zoteroImportBtn") is not None
+        and library.select_one("#cpImportBtn") is not None
+        and graph.select_one("#nodeDetailsPanel") is not None
+    )
+    shown = (
+        "hidden" not in search.get("class", [])
+        and "hidden" in library.get("class", [])
+        and "hidden" in graph.get("class", [])
+    )
+    # Assert
+    assert (placed, shown) == (True, True)
