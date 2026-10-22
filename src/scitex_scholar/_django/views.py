@@ -268,9 +268,8 @@ def _not_configured_payload() -> dict:
     return {
         "error": _i18n("CrossRef API not configured"),
         "detail": _i18n(
-            "The citation graph reads its data from a crossref-local HTTP API; "
-            "scholar never opens the corpus files itself. No endpoint is "
-            "configured, so there is nothing to query."
+            "The citation graph reads its data from a citation-data HTTP API. "
+            "No endpoint is configured, so there is nothing to query."
         ),
         "fix": _i18n(
             "Set %(setting)s to a running crossref-local endpoint (env var of "
@@ -1081,9 +1080,9 @@ def graph_health(request):
                 "probed": False,
                 "error": _i18n("Citation Graph: not checked"),
                 "detail": _i18n(
-                    "A crossref-local endpoint is configured. The graph backend "
-                    "is probed when you open the Citation Graph tab, so a slow "
-                    "or unreachable backend cannot delay the rest of the page."
+                    "A citation-data endpoint is configured. The graph backend "
+                    "is checked when you open the Citation Graph tab, so a slow "
+                    "or unreachable service cannot delay the rest of the page."
                 ),
                 "fix": _i18n("Open the Citation Graph tab to check it."),
             }
@@ -1109,12 +1108,12 @@ def graph_health(request):
                 "probed": True,
                 "error": _i18n("Citation Graph: unavailable"),
                 "detail": _i18n(
-                    "The crossref-local endpoint is configured but could not "
+                    "The citation-data endpoint is configured but could not "
                     "be reached right now, so citation graphs cannot be built."
                 ),
                 "fix": _i18n(
-                    "Verify the crossref-local service is running and that "
-                    "the endpoint is reachable, then retry."
+                    "The citation service may be temporarily down — wait a "
+                    "moment and retry by opening the Citation Graph tab."
                 ),
             }
         )
@@ -1131,12 +1130,12 @@ def _degraded_payload() -> dict:
         "status": "degraded",
         "error": _i18n("Citation Graph: limited"),
         "detail": _i18n(
-            "The crossref-local endpoint is configured and reachable, but the "
-            "probe returned no data for the canary paper. Citation graphs may "
+            "The citation-data endpoint is configured and reachable, but the "
+            "check returned no data for the sample paper. Citation graphs may "
             "be incomplete."
         ),
         "fix": _i18n(
-            "Check that the crossref-local endpoint is serving the corpus you "
+            "Check that the citation-data endpoint is serving the corpus you "
             "expect; the citation graph depends on it."
         ),
     }
