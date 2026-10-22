@@ -91,6 +91,10 @@ JA = {
     "Graph Controls": "グラフ操作",
     "Scroll": "スクロール", "Zoom": "ズーム", "Drag": "ドラッグ", "Pan": "パン",
     "Click": "クリック", "Select node": "ノードを選択",
+    "Databases": "データベース",
+    "No search yet.": "まだ検索していません。",
+    "Library not loaded yet.": "ライブラリはまだ読み込まれていません。",
+    "No graph built yet.": "グラフはまだ作成されていません。",
     # --- Tabs ---
     "Search databases": "データベースを検索",
     "Library": "ライブラリ",

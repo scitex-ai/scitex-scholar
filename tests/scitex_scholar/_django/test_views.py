@@ -4063,14 +4063,22 @@ def test_library_empty_state_names_no_action_that_does_not_exist():
 
 def test_library_empty_state_actions_are_real_controls():
     # Arrange -- each action the empty state renders must hit a control or
-    # endpoint that exists: Import -> the Library's own import button (POST
-    # /api/library/import), Clear -> the filter input beside the list.
+    # endpoint that exists: Import -> the Details strip's library-section
+    # import button (operator 2026-10-22: library ops live in the Details
+    # space; POST /api/library/import), Clear -> the filter input beside
+    # the list, which stays in the Library tab's main area.
     script = _library_js()
     panel = _library_panel_html()
+    page = views.index(RequestFactory().get("/")).content.decode()
+    strip_library = page.split(
+        '<div class="sidebar-section hidden" data-library-hint>', 1
+    )[1].split(
+        '<div class="sidebar-section graph-controls-hint hidden" data-graph-hint>', 1
+    )[0]
     # Act
     imports_existing_button = (
         'document.getElementById("libraryImportBtn")' in script
-        and 'id="libraryImportBtn"' in panel
+        and 'id="libraryImportBtn"' in strip_library
     )
     clears_existing_filter = (
         'document.getElementById("libraryFilter")' in script

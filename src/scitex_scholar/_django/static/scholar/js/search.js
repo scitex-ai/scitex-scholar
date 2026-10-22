@@ -728,6 +728,15 @@ document.addEventListener("DOMContentLoaded", () => {
       parts.push(counted.map((name) => `${name} ${counts[name]}`).join(", "));
     }
     stats.textContent = parts.join(" · ");
+    // Details strip (operator 2026-10-22): the Databases section mirrors
+    // the database side of the header meta (tier + per-source counts).
+    // The count already owns the results header; the strip keeps what
+    // that header deliberately omits.
+    const stripSummary = document.getElementById("searchStripSummary");
+    if (stripSummary) {
+      const tail = parts.slice(1);
+      stripSummary.textContent = tail.length ? tail.join(" · ") : parts[0];
+    }
     show(results);
   }
 
