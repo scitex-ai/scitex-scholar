@@ -191,27 +191,6 @@ msgstr "グラフ名"
 msgid "Save current graph"
 msgstr "現在のグラフを保存"
 
-msgid "How It Works"
-msgstr "使い方"
-
-msgid "Bibliographic Coupling"
-msgstr "書誌結合"
-
-msgid "Papers sharing common references"
-msgstr "共通の参考文献を持つ論文"
-
-msgid "Co-citation"
-msgstr "共引用"
-
-msgid "Papers frequently cited together"
-msgstr "共に引用されることの多い論文"
-
-msgid "Direct Citations"
-msgstr "直接引用"
-
-msgid "Papers citing or cited by the seed"
-msgstr "シード論文を引用または被引用する論文"
-
 msgid "Building citation network... This may take a moment."
 msgstr "引用ネットワークを構築中。少し時間がかかる場合があります。"
 
@@ -431,8 +410,8 @@ msgstr "キーワードで学術データベース（OpenAlex、Crossref、PubMe
 msgid "Query syntax:\n                                            <code>-word</code> excludes a term,\n                                            <code>year:2020-2024</code> bounds the\n                                            publication year,\n                                            <code>if:&gt;5</code> filters by impact factor."
 msgstr "クエリ構文：<code>-word</code> で用語を除外、<code>year:2020-2024</code> で発行年を指定、<code>if:&gt;5</code> でインパクトファクターで絞り込みます。"
 
-msgid "Your papers, stored locally. Use <strong>Enrich</strong>\n                                    to fill in metadata (abstract, citations, impact\n                                    factor) from the databases, or\n                                    <strong>Import</strong> BibTeX and\n                                    <strong>Export</strong> your library."
-msgstr "ローカルに保存された論文です。<strong>補完</strong> でデータベースからメタデータ（抄録、被引用数、インパクトファクター）を入力するか、<strong>インポート</strong> で BibTeX をインポートしてライブラリを<strong>エクスポート</strong>できます。"
+msgid "Your papers, stored locally. Use the per-paper\n                                    <strong>Enrich</strong> action to fill in metadata\n                                    (abstract, citations, impact factor) from the\n                                    databases, or <strong>Import</strong> BibTeX and\n                                    <strong>Export</strong> your library."
+msgstr "ローカルに保存された論文です。各論文の<strong>補完</strong>アクションでデータベースからメタデータ（抄録、被引用数、インパクトファクター）を入力するか、<strong>インポート</strong> で BibTeX をインポートしてライブラリを<strong>エクスポート</strong>できます。"
 
 msgid "CrossRef API not configured"
 msgstr "CrossRef API 未設定"

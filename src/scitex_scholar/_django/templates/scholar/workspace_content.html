@@ -205,10 +205,10 @@
                             </div>
                             <div class="graph-card__body">
                                 <p class="graph-description">
-                                    {% blocktrans %}Your papers, stored locally. Use <strong>Enrich</strong>
-                                    to fill in metadata (abstract, citations, impact
-                                    factor) from the databases, or
-                                    <strong>Import</strong> BibTeX and
+                                    {% blocktrans %}Your papers, stored locally. Use the per-paper
+                                    <strong>Enrich</strong> action to fill in metadata
+                                    (abstract, citations, impact factor) from the
+                                    databases, or <strong>Import</strong> BibTeX and
                                     <strong>Export</strong> your library.{% endblocktrans %}
                                 </p>
                                 <!-- Import / Export + Zotero + Connected Papers
@@ -614,7 +614,6 @@
                             <p class="sidebar-section__summary" id="libraryStripSummary">{% trans "Library not loaded yet." %}</p>
                             <div class="library-project">
                                 <span id="libraryProjectCurrent" class="library-project__current">{% trans "Project" %}</span>
-                                <span class="library-io__sep"></span>
                                 <div id="libraryProjectChips" class="library-project__chips"></div>
                             </div>
                             <!-- Import / Export (#106 / L327): library-level
@@ -629,7 +628,6 @@
                                     <option value="csv">{% trans "CSV (.csv)" %}</option>
                                 </select>
                                 <button type="button" id="libraryExportBtn" class="btn-control-library">{% trans "Export" %}</button>
-                                <span class="library-io__sep"></span>
                                 <input type="file" id="libraryImportFile" class="library-io__file"
                                        accept=".bib,.bibtex,.txt" hidden>
                                 <button type="button" id="libraryImportBtn" class="btn-control-library">{% trans "Import BibTeX" %}</button>
