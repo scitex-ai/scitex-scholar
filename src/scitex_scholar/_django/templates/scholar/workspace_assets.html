@@ -58,4 +58,11 @@
         <script src="{% static 'scholar/js/graph/ForceSimulation.js' %}"></script>
         <script src="{% static 'scholar/js/graph/GraphRenderer.js' %}"></script>
         <script src="{% static 'scholar/js/graph/citation-graph.js' %}"></script>
+        {% comment %}
+        Shared AppHeader mount + picker placement. Deferred modules run in
+        document order, so the mount client registers before this placement
+        script, and both run before DOMContentLoaded fires.
+        {% endcomment %}
+        <script type="module" src="{% static 'scitex_sdk/ui/js/app/app-header.js' %}"></script>
+        <script type="module" src="{% static 'scholar/js/header-picker.js' %}"></script>
 {% endif %}

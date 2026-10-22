@@ -19,6 +19,7 @@ pytest_plugins = ("tests.scitex_scholar._django.test_views_shell_context",)
 _SCRIPT_NAMES = (
     "stx-mount.js", "app.js", "search.js", "library.js",
     "graph/ForceSimulation.js", "graph/GraphRenderer.js", "graph/citation-graph.js",
+    "header-picker.js",
 )
 _CONTENT_IDS = {
     "searchForm", "tab-search", "tab-library", "libraryImportFile",
