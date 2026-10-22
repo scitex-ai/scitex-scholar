@@ -1,18 +1,17 @@
-{% load i18n scitex_project_picker %}
-        <!-- Scholar leaf header: SDK SSoT row (writer shape). The ROW is the
-            shared `.stx-app-header` sheet (linked in workspace_assets head);
-            the leaf owns only identity (title + live leaf version, never a
-            subtitle) and the project-selector slot. -->
-        <header class="stx-app-header scholar-app-header">
-            <div class="stx-app-header__identity">
-                <span class="stx-app-header__title">{% trans "SciTeX Scholar" %}</span>
-                <span class="stx-app-header__version"
-                      title="scitex-scholar package serving this page">v{{ scholar_version }}</span>
-            </div>
-            <div class="stx-app-header__slot--project-selector">
-                {% scitex_project_picker scope=app_scope current=current_project %}
-            </div>
-        </header>
+{% load i18n scitex_project_picker static %}
+        {# Shared AppHeader primitive (data-stx-app-header mount), like every #}
+        {# other leaf — replaces the hand-rolled header row. The wrapper keeps #}
+        {# the `.scholar-app-header` scope for the operator-ruled version-pill #}
+        {# subdue (2026-10-20, reversible); it is a div, never a <header>. #}
+        <div class="scholar-app-header">
+          <link rel="stylesheet" href="{% static 'scitex_sdk/ui/css/app/app-header.css' %}">
+          <div data-stx-app-header
+               data-app-title="{% translate "SciTeX Scholar" %}"
+               {% if scholar_version %}data-app-version="{{ scholar_version }}"{% endif %}></div>
+          <script type="module" src="{% static 'scitex_sdk/ui/js/app/app-header.js' %}"></script>
+          {% include "scholar/_project_picker.html" %}
+          <script type="module" src="{% static 'scholar/js/header-picker.js' %}"></script>
+        </div>
         <div class="app-container" data-scholar-root>
             <!-- No left sidebar: even graph interaction hints live in the
                 right-edge Details strip (operator 2026-10-17), so no tab
