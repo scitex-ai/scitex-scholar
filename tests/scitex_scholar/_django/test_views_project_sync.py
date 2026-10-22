@@ -186,8 +186,7 @@ def test_library_list_ignores_traversal_project(tmp_path):
         resp = views.library_list(rf.get("/api/library?project=../MASTER"))
         data = _json.loads(resp.content)
         # Assert
-        assert resp.status_code == 200
-        assert [p["paper_id"] for p in data["papers"]] == ["PIDT"]
+        assert (resp.status_code, [p["paper_id"] for p in data["papers"]]) == (200, ["PIDT"])
 
 
 def test_library_list_ignores_hub_style_project_id(tmp_path):
@@ -200,8 +199,7 @@ def test_library_list_ignores_hub_style_project_id(tmp_path):
         resp = views.library_list(rf.get("/api/library?project=ywatanabe/dotfiles"))
         data = _json.loads(resp.content)
         # Assert
-        assert resp.status_code == 200
-        assert [p["paper_id"] for p in data["papers"]] == ["PIDH"]
+        assert (resp.status_code, [p["paper_id"] for p in data["papers"]]) == (200, ["PIDH"])
 
 
 def test_library_save_files_into_project(tmp_path):
