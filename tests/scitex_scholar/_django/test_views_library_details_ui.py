@@ -83,6 +83,20 @@ def test_library_parse_sites_reject_non_json_with_status():
     assert (guarded, raw_gone) == (True, True)
 
 
+def test_library_login_redirect_becomes_relogin_prompt():
+    # Arrange -- apps-lead probe 2026-10-22: an expired/missing credential
+    # is 302'd to the hub login page, so the pane gets HTML where JSON was
+    # expected. That shape must prompt re-login, not crash on JSON.parse.
+    # Act
+    detected = (
+        "Session expired. Please log in again." in LIBRARY_JS
+        and "/login/i" in LIBRARY_JS
+        and "content-type" in LIBRARY_JS
+    )
+    # Assert
+    assert detected
+
+
 def test_library_strip_section_mirrors_list_counts():
     # Arrange -- operator 2026-10-22: the Details strip's Library section
     # shows the list counts plus the header picker's project.

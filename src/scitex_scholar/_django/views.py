@@ -632,6 +632,17 @@ def _js_i18n_dict() -> dict:
         "No open-access PDF available": _i18n("No open-access PDF available"),
         "Paper not found": _i18n("Paper not found"),
         "Load failed. Try again later.": _i18n("Load failed. Try again later."),
+        # Library pane hardening (apps-lead probe 2026-10-22): an
+        # expired/missing credential is 302'd to the hub login page, so
+        # the pane gets HTML where JSON was expected. The client turns
+        # that shape into a re-login prompt, not a SyntaxError; other
+        # non-JSON bodies keep the status-surfaced error.
+        "Session expired. Please log in again.": _i18n(
+            "Session expired. Please log in again."
+        ),
+        "Server returned non-JSON (status %(status)s)": _i18n(
+            "Server returned non-JSON (status %(status)s)"
+        ),
         "Download failed. Try again later.": _i18n("Download failed. Try again later."),
         # Old-direct U7: the node sheet close button renders client-side,
         # so it MUST be a key here (same catalog-visibility rule).
