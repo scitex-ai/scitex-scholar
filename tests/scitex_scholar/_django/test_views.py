@@ -708,7 +708,7 @@ def test_header_does_not_redefine_the_row():
 
 
 def test_header_shows_leaf_version_without_subtitle():
-    """Title + leaf version (writer shape), no subtitle element."""
+    """Title + leaf version via the shared AppHeader mount, no subtitle element."""
     # Arrange
     template = (
         Path(views.__file__).parent
@@ -718,7 +718,7 @@ def test_header_shows_leaf_version_without_subtitle():
     ).read_text()
     # Act
     shaped = (
-        "stx-app-header__version" in template and "scholar_version" in template,
+        "data-app-version" in template and "scholar_version" in template,
         "stx-app-header__subtitle" not in template,
     )
     # Assert
@@ -734,8 +734,8 @@ def test_header_version_matches_installed_package():
     request = rf.get("/")
     # Act
     html = views.index(request).content.decode()
-    # Assert
-    assert ("v" + importlib.metadata.version("scitex-scholar")) in html
+    # Assert — the badge renders client-side; the server contract is the attr.
+    assert ('data-app-version="' + importlib.metadata.version("scitex-scholar") + '"') in html
 
 
 def test_saved_graphs_roundtrip_through_list(tmp_path):
@@ -3704,19 +3704,21 @@ def test_index_user_scope_agrees_with_manifest(_rendered_user_scope_header):
 
 
 def test_index_user_scope_keeps_canonical_identity(_rendered_user_scope_header):
-    # Arrange
+    # Arrange — the app row is the shared primitive mount, not hand-rolled markup.
     # Act
     html = _rendered_user_scope_header["html"]
     # Assert
-    assert html.count('class="stx-app-header__identity"') == 1
+    assert html.count("<div data-stx-app-header") == 1
 
 
 def test_index_user_scope_keeps_canonical_picker_slot(_rendered_user_scope_header):
-    # Arrange
+    # Arrange — the slot is created client-side by the primitive; the server
+    # contract is the picker partial feeding it.
     # Act
     html = _rendered_user_scope_header["html"]
+    source = (Path(views.__file__).parent / "templates" / "scholar" / "workspace_content.html").read_text()
     # Assert
-    assert html.count('class="stx-app-header__slot--project-selector"') == 1
+    assert "_project_picker.html" in source
 
 
 def test_index_user_scope_suppresses_picker(_rendered_user_scope_header):
@@ -3812,8 +3814,8 @@ def test_header_source_places_picker_after_identity_before_content():
     source = _scholar_template_source(TEMPLATE)
     # Act
     positions = [
-        source.index('class="stx-app-header__identity"'),
-        source.index('class="stx-app-header__slot--project-selector"'),
+        source.index("data-stx-app-header"),
+        source.index("_project_picker.html"),
         source.index('class="app-container"'),
     ]
     # Assert
