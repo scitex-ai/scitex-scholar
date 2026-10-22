@@ -30,8 +30,81 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const show = (el) => el && el.classList.remove("hidden");
   const hide = (el) => el && el.classList.add("hidden");
+  // Non-JSON guard (apps-lead probe 2026-10-22: an expired/missing
+  // credential is 302'd to the hub login page, so the pane gets HTML
+  // where JSON was expected). The login-page shape becomes a re-login
+  // prompt; any other non-JSON body keeps its status. Every parse site
+  // below goes through here so a wrong-content response never surfaces
+  // a raw SyntaxError.
+  async function readJson(resp) {
+    const text = await resp.text();
+    let data = null;
+    try {
+      data = JSON.parse(text);
+    } catch (err) {
+      data = null;
+    }
+    if (data !== null) return data;
+    const location = resp.url || "";
+    const contentType = (resp.headers && resp.headers.get("content-type")) || "";
+    const loginShaped =
+      /login/i.test(location) &&
+      (/text\/html/i.test(contentType) || /^\s*</.test(text));
+    if (loginShaped) {
+      throw new Error(scholarT("Session expired. Please log in again."));
+    }
+    throw new Error(
+      scholarT("Server returned non-JSON (status %(status)s)", {
+        status: resp.status,
+      }),
+    );
+  }
   let loaded = false;
   let filterTimer = null;
+  // Slice 4b (old-direct unification): the loaded rows stay cached so the
+  // sort select re-renders client-side (hub sorts the list from its toolbar).
+  let lastRows = [];
+  const sortEl = document.getElementById("librarySort");
+
+  function annotationOf(paper) {
+    return (paper && paper.annotations) || {};
+  }
+
+  function importanceOf(paper) {
+    const value = annotationOf(paper).importance;
+    return typeof value === "number" ? value : 0;
+  }
+
+  function sortedRows() {
+    const mode = sortEl ? sortEl.value : "relevance";
+    const rows = lastRows.slice();
+    const byTitle = (a, b) =>
+      String(a.title || a.paper_id || "").localeCompare(
+        String(b.title || b.paper_id || ""),
+      );
+    const byYear = (a, b) => (a.year || 0) - (b.year || 0);
+    const byImportance = (a, b) => importanceOf(a) - importanceOf(b);
+    if (mode === "title-asc") rows.sort(byTitle);
+    else if (mode === "title-desc") rows.sort((a, b) => byTitle(b, a));
+    else if (mode === "year-desc") rows.sort((a, b) => byYear(b, a));
+    else if (mode === "year-asc") rows.sort(byYear);
+    else if (mode === "importance-desc")
+      rows.sort((a, b) => byImportance(b, a));
+    else if (mode === "importance-asc") rows.sort(byImportance);
+    return rows;
+  }
+
+  function renderRows() {
+    if (!listEl) return;
+    listEl.replaceChildren();
+    sortedRows().forEach((p) => listEl.appendChild(makeRow(p)));
+  }
+
+  if (sortEl) {
+    sortEl.addEventListener("change", () => {
+      if (loaded) renderRows();
+    });
+  }
 
   // Project sync (parity slice 3c): the header picker navigates with
   // ?project=<id> (the SDK picker's default contract), so the selection is
@@ -45,19 +118,48 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Read-only sync indicator (operator CCT4597): the HEADER picker is the
-  // one project selector and navigates with ?project=<id> (the SDK picker's
-  // default contract), so the selection is readable here with no extra
-  // state. This span only reflects it as text; it never selects. Saves
-  // elsewhere (search.js) file into the same selection; the list filters
-  // to it server-side.
+  // Project chips + sync indicator, from the existing /api/projects
+  // endpoint (the picker's provider contract). Chips navigate with
+  // ?project= so the server resolves and remembers the selection.
+  const projectChipsEl = document.getElementById("libraryProjectChips");
   const projectCurrentEl = document.getElementById("libraryProjectCurrent");
+  // Reflect the header picker's project (?project=<id>) into the Details
+  // strip indicator. Called on chips load and after each list load so the
+  // strip mirrors the live selection.
   function reflectProjectIndicator() {
     if (!projectCurrentEl) return;
     const current = currentProject();
     projectCurrentEl.textContent = current
       ? scholarT("Project: %(project)s", { project: current })
       : scholarT("All projects");
+  }
+  async function loadProjectChips() {
+    if (!projectChipsEl && !projectCurrentEl) return;
+    reflectProjectIndicator();
+    const current = currentProject();
+    if (!projectChipsEl || projectChipsEl.dataset.done) return;
+    try {
+      const resp = await fetch(`${STX_MOUNT}/api/projects`);
+      const data = await readJson(resp);
+      if (!resp.ok) return;
+      projectChipsEl.dataset.done = "1";
+      const all = document.createElement("a");
+      all.className = "library-project__chip" + (current ? "" : " library-project__chip--active");
+      all.href = window.location.pathname;
+      all.textContent = scholarT("All projects");
+      projectChipsEl.appendChild(all);
+      (data.projects || []).forEach((p) => {
+        const chip = document.createElement("a");
+        const id = typeof p === "string" ? p : p.id || "";
+        if (!id) return;
+        chip.className = "library-project__chip" + (id === current ? " library-project__chip--active" : "");
+        chip.href = `${window.location.pathname}?project=${encodeURIComponent(id)}`;
+        chip.textContent = (typeof p === "string" ? p : p.name || p.id) || "";
+        projectChipsEl.appendChild(chip);
+      });
+    } catch (e) {
+      /* chips are progressive enhancement; the list still loads */
+    }
   }
 
   function formatAuthors(paper) {
@@ -119,6 +221,13 @@ document.addEventListener("DOMContentLoaded", () => {
       main.appendChild(proj);
     }
 
+    // Slice 4b: annotation badges (reading status, stars, tags) render from
+    // the row's annotations merge -- no extra round-trip.
+    const badges = document.createElement("div");
+    badges.className = "library-item__annotations";
+    renderBadges(badges, paper);
+    main.appendChild(badges);
+
     // Enrichment status line (filled in after an enrich round-trip).
     const status = document.createElement("div");
     status.className = "library-item__enrich-status";
@@ -141,9 +250,256 @@ document.addEventListener("DOMContentLoaded", () => {
     );
     actions.appendChild(enrichBtn);
 
+    // Slice 4b: per-row Details toggle -- hub expands a details panel from
+    // each library row (status, stars, tags, notes, save).
+    const detailsToggle = document.createElement("button");
+    detailsToggle.type = "button";
+    detailsToggle.className = "library-details-toggle library-enrich-btn";
+    detailsToggle.textContent = scholarT("Details");
+    actions.appendChild(detailsToggle);
+
     item.appendChild(main);
     item.appendChild(actions);
+
+    const details = makeDetails(paper, badges);
+    details.hidden = true;
+    detailsToggle.addEventListener("click", () => {
+      details.hidden = !details.hidden;
+    });
+    item.appendChild(details);
     return item;
+  }
+
+  // Slice 4b: status radios + star rating + tags + notes, saved through the
+  // slice-4a /api/library/annotate endpoint (partial merge, same doc the
+  // list rows already carry).
+  const READING_STATUSES = [
+    ["to_read", "To read"],
+    ["reading", "Reading"],
+    ["read", "Read"],
+    ["referenced", "Referenced"],
+    ["favorite", "Favorite"],
+  ];
+
+  function renderBadges(badgesEl, paper) {
+    badgesEl.replaceChildren();
+    const ann = annotationOf(paper);
+    if (ann.reading_status) {
+      const chip = document.createElement("span");
+      chip.className = "library-annotation__chip";
+      const label = (READING_STATUSES.find(([v]) => v === ann.reading_status) || [])[1];
+      chip.textContent = scholarT(label || ann.reading_status);
+      badgesEl.appendChild(chip);
+    }
+    if (typeof ann.importance === "number" && ann.importance > 0) {
+      const stars = document.createElement("span");
+      stars.className = "library-annotation__stars";
+      stars.textContent = "★".repeat(ann.importance) + "☆".repeat(5 - ann.importance);
+      stars.title = scholarT("Importance");
+      badgesEl.appendChild(stars);
+    }
+    (ann.tags || []).forEach((tag) => {
+      const chip = document.createElement("span");
+      chip.className = "library-annotation__chip library-annotation__chip--tag";
+      chip.textContent = tag;
+      badgesEl.appendChild(chip);
+    });
+  }
+
+  function makeDetails(paper, badgesEl) {
+    const ann = annotationOf(paper);
+    const panel = document.createElement("div");
+    panel.className = "library-item__details";
+
+    const statusLabel = document.createElement("div");
+    statusLabel.className = "library-details__label";
+    statusLabel.textContent = scholarT("Reading status");
+    panel.appendChild(statusLabel);
+
+    const statusGroup = document.createElement("div");
+    statusGroup.className = "library-details__status-group";
+    const groupName = `reading-status-${paper.paper_id || Math.random().toString(36).slice(2)}`;
+    READING_STATUSES.forEach(([value, label]) => {
+      const option = document.createElement("label");
+      option.className = "library-details__status-option";
+      const radio = document.createElement("input");
+      radio.type = "radio";
+      radio.name = groupName;
+      radio.value = value;
+      if (ann.reading_status === value) radio.checked = true;
+      option.appendChild(radio);
+      const text = document.createElement("span");
+      text.textContent = scholarT(label);
+      option.appendChild(text);
+      statusGroup.appendChild(option);
+    });
+    panel.appendChild(statusGroup);
+
+    const starsLabel = document.createElement("div");
+    starsLabel.className = "library-details__label";
+    starsLabel.textContent = scholarT("Importance");
+    panel.appendChild(starsLabel);
+
+    const starsRow = document.createElement("div");
+    starsRow.className = "library-details__stars";
+    let importance = typeof ann.importance === "number" ? ann.importance : 0;
+    const starBtns = [];
+    const paintStars = () => {
+      // forEach index idx is 0-based: the first `importance` buttons fill.
+      starBtns.forEach((btn, idx) => {
+        btn.textContent = idx < importance ? "★" : "☆";
+      });
+    };
+    for (let i = 1; i <= 5; i += 1) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "library-details__star";
+      btn.setAttribute("aria-label", scholarT("Importance") + ` ${i}`);
+      btn.addEventListener("click", () => {
+        // Clicking the current rating clears it (0 = unrated).
+        importance = importance === i ? 0 : i;
+        paintStars();
+      });
+      starBtns.push(btn);
+      starsRow.appendChild(btn);
+    }
+    paintStars();
+    panel.appendChild(starsRow);
+
+    const tagsLabel = document.createElement("div");
+    tagsLabel.className = "library-details__label";
+    tagsLabel.textContent = scholarT("Tags");
+    panel.appendChild(tagsLabel);
+    const tagsInput = document.createElement("input");
+    tagsInput.type = "text";
+    tagsInput.className = "form-input library-details__tags";
+    tagsInput.id = "details-tags";
+    tagsInput.placeholder = scholarT("Add tag...");
+    tagsInput.value = (ann.tags || []).join(", ");
+    panel.appendChild(tagsInput);
+
+    const notesLabel = document.createElement("div");
+    notesLabel.className = "library-details__label";
+    notesLabel.textContent = scholarT("Personal notes");
+    panel.appendChild(notesLabel);
+    const notesInput = document.createElement("textarea");
+    notesInput.className = "form-input library-details__notes";
+    notesInput.id = "details-notes";
+    notesInput.rows = 4;
+    notesInput.placeholder = scholarT("Add your notes about this paper...");
+    notesInput.value = ann.notes || "";
+    panel.appendChild(notesInput);
+
+    const saveRow = document.createElement("div");
+    saveRow.className = "library-details__actions";
+    const saveBtn = document.createElement("button");
+    saveBtn.type = "button";
+    saveBtn.className = "btn-control-library";
+    saveBtn.textContent = scholarT("Save changes");
+    const saveMsg = document.createElement("span");
+    saveMsg.className = "library-details__status";
+    saveMsg.setAttribute("role", "status");
+    saveBtn.addEventListener("click", async () => {
+      saveMsg.textContent = "";
+      const picked = statusGroup.querySelector("input:checked");
+      const payload = { library_id: paper.paper_id };
+      if (picked) payload.reading_status = picked.value;
+      payload.importance = importance;
+      payload.tags = tagsInput.value
+        .split(",")
+        .map((t) => t.trim())
+        .filter((t) => t);
+      payload.notes = notesInput.value;
+      saveBtn.disabled = true;
+      try {
+        const resp = await fetch(`${STX_MOUNT}/api/library/annotate`, {
+          method: "POST",
+          headers: csrfJsonHeaders(),
+          body: JSON.stringify(payload),
+        });
+        const data = await readJson(resp);
+        if (!resp.ok) throw new Error(data.error || scholarT("Save failed"));
+        paper.annotations = data.annotations || {};
+        renderBadges(badgesEl, paper);
+        saveMsg.textContent = scholarT("Saved");
+      } catch (err) {
+        saveMsg.textContent = `${scholarT("Save failed")}: ${err.message}`;
+      } finally {
+        saveBtn.disabled = false;
+      }
+    });
+    saveRow.appendChild(saveBtn);
+    saveRow.appendChild(saveMsg);
+    panel.appendChild(saveRow);
+
+    // Slice 11: per-paper OA PDF download (hub library PDF actions).
+    const pdfRow = document.createElement("div");
+    pdfRow.className = "library-details__actions";
+    const pdfBtn = document.createElement("button");
+    pdfBtn.type = "button";
+    pdfBtn.className = "btn-control-library";
+    pdfBtn.textContent = scholarT("Download PDF");
+    const pdfMsg = document.createElement("span");
+    pdfMsg.className = "library-details__status";
+    pdfMsg.setAttribute("role", "status");
+    pdfBtn.addEventListener("click", async () => {
+      pdfMsg.textContent = "";
+      pdfBtn.disabled = true;
+      try {
+        const resp = await fetch(`${STX_MOUNT}/api/library/download-pdfs`, {
+          method: "POST",
+          headers: csrfJsonHeaders(),
+          body: JSON.stringify({ library_ids: [paper.paper_id] }),
+        });
+        const data = await readJson(resp);
+        if (!resp.ok) throw new Error(data.error || scholarT("Download failed"));
+        if ((data.downloaded || []).length) {
+          pdfMsg.textContent = scholarT("PDF downloaded");
+        } else {
+          const first = (data.failed || [])[0] || {};
+          pdfMsg.textContent = first.error || scholarT("Download failed");
+        }
+      } catch (err) {
+        pdfMsg.textContent = `${scholarT("Download failed")}: ${err.message}`;
+      } finally {
+        pdfBtn.disabled = false;
+      }
+    });
+    pdfRow.appendChild(pdfBtn);
+    pdfRow.appendChild(pdfMsg);
+    panel.appendChild(pdfRow);
+
+    // Slice 10: remove-from-library (hub details parity). Guarded by a
+    // confirm -- hub deletes directly, but an undeleteable file tree
+    // deserves one explicit gate.
+    const dangerRow = document.createElement("div");
+    dangerRow.className = "library-details__actions";
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.className = "btn-control-library library-details__remove";
+    removeBtn.textContent = scholarT("Remove from library");
+    removeBtn.addEventListener("click", async () => {
+      if (!window.confirm(scholarT("Remove this paper from the library?"))) return;
+      removeBtn.disabled = true;
+      try {
+        const resp = await fetch(`${STX_MOUNT}/api/library/remove`, {
+          method: "POST",
+          headers: csrfJsonHeaders(),
+          body: JSON.stringify({ library_id: paper.paper_id }),
+        });
+        const data = await readJson(resp);
+        if (!resp.ok) throw new Error(data.error || scholarT("Remove failed"));
+        lastRows = lastRows.filter((p) => p.paper_id !== paper.paper_id);
+        renderRows();
+      } catch (err) {
+        saveMsg.textContent = `${scholarT("Remove failed")}: ${err.message}`;
+      } finally {
+        removeBtn.disabled = false;
+      }
+    });
+    dangerRow.appendChild(removeBtn);
+    panel.appendChild(dangerRow);
+    return panel;
   }
 
   async function enrich(paper, btn, statusEl) {
@@ -157,7 +513,7 @@ document.addEventListener("DOMContentLoaded", () => {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: params.toString(),
       });
-      const data = await resp.json();
+      const data = await readJson(resp);
       if (!resp.ok) throw new Error(data.error || scholarT("Enrichment failed (HTTP %(status)s)", { status: resp.status }));
       // Reflect the fresh metadata on the row without a full reload.
       if (data.abstract_chars) {
@@ -246,7 +602,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ? `${STX_MOUNT}/api/library?${qp.join("&")}`
         : `${STX_MOUNT}/api/library`;
       const resp = await fetch(url);
-      const data = await resp.json();
+      const data = await readJson(resp);
       if (!resp.ok) throw new Error(data.error || `Library load failed (${resp.status})`);
       hide(loadingEl);
       listEl.replaceChildren();
@@ -256,11 +612,22 @@ document.addEventListener("DOMContentLoaded", () => {
         statsEl.textContent = data.filtered
           ? scholarT("%(count)s of %(total)s Papers", { count: n, total: data.total })
           : n + " " + scholarT(n === 1 ? "Paper" : "Papers");
+        // Details strip (operator 2026-10-22): the Library section mirrors
+        // the list counts plus the project the header picker selected.
+        const stripSummary = document.getElementById("libraryStripSummary");
+        if (stripSummary) {
+          reflectProjectIndicator();
+          const scope = projectCurrentEl ? projectCurrentEl.textContent : "";
+          stripSummary.textContent = scope
+            ? `${statsEl.textContent} · ${scope}`
+            : statsEl.textContent;
+        }
       }
       if (!papers.length) {
         listEl.appendChild(emptyState(data));
       } else {
-        papers.forEach((p) => listEl.appendChild(makeRow(p)));
+        lastRows = papers;
+        renderRows();
       }
       loaded = true;
     } catch (err) {
@@ -293,7 +660,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const blob = await resp.blob();
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
-        const ext = { bibtex: "bib", ris: "ris", endnote: "enw" }[fmt] || "txt";
+        const ext = { bibtex: "bib", ris: "ris", endnote: "enw", csv: "csv" }[fmt] || "txt";
         a.href = url;
         a.download = `scholar-library.${ext}`;
         document.body.appendChild(a);
@@ -311,46 +678,137 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const importBtn = document.getElementById("libraryImportBtn");
   const importFile = document.getElementById("libraryImportFile");
+  // Slice 5 (old-direct unification): preview-before-save. The chosen file's
+  // text is held here between the preview POST and the confirm POST.
+  const importPreview = document.getElementById("libraryImportPreview");
+  const importEntries = document.getElementById("libraryImportEntries");
+  const importConfirmBtn = document.getElementById("libraryImportConfirm");
+  const importCancelBtn = document.getElementById("libraryImportCancel");
+  let pendingImportText = "";
+  let pendingImportName = "";
+
+  function importHeaders() {
+    // CSRF: the mounted hub enables CsrfViewMiddleware, so the Import POST
+    // must carry the token. Read it from the hidden input rendered by the
+    // {% csrf_token %} tag (populated by the middleware when enabled;
+    // empty/inert standalone).
+    const csrfInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
+    const csrf = csrfInput ? csrfInput.value : "";
+    const headers = { "Content-Type": "application/x-www-form-urlencoded" };
+    if (csrf) headers["X-CSRFToken"] = csrf;
+    return headers;
+  }
+
+  function renderImportPreview(entries) {
+    importEntries.replaceChildren();
+    entries.forEach((entry) => {
+      const row = document.createElement("div");
+      row.className = "library-import-preview__entry";
+      const title = document.createElement("div");
+      title.className = "library-import-preview__title";
+      title.textContent = entry.title || scholarT("Untitled");
+      row.appendChild(title);
+      const meta = document.createElement("div");
+      meta.className = "library-import-preview__meta";
+      const bits = [];
+      if ((entry.authors || []).length) bits.push(entry.authors.join(", "));
+      if (entry.year) bits.push(String(entry.year));
+      if (entry.doi) bits.push(entry.doi);
+      meta.textContent = bits.join(" · ");
+      row.appendChild(meta);
+      if (entry.exists) {
+        const flag = document.createElement("span");
+        flag.className = "library-import-preview__exists";
+        flag.textContent = scholarT("Already in library");
+        row.appendChild(flag);
+      }
+      importEntries.appendChild(row);
+    });
+    show(importPreview);
+  }
+
+  function hideImportPreview() {
+    hide(importPreview);
+    if (importEntries) importEntries.replaceChildren();
+    pendingImportText = "";
+    pendingImportName = "";
+    if (importFile) importFile.value = "";
+  }
+
+  async function confirmImport() {
+    if (!pendingImportText) return;
+    importConfirmBtn.disabled = true;
+    setIoStatus(scholarT("Importing %(file)s…", { file: pendingImportName }));
+    try {
+      const params = new URLSearchParams({ format: "bibtex", bibtex: pendingImportText });
+      const resp = await fetch(`${STX_MOUNT}/api/library/import`, {
+        method: "POST",
+        headers: importHeaders(),
+        body: params.toString(),
+      });
+      const data = await readJson(resp);
+      if (!resp.ok) throw new Error(data.error || `Import failed (${resp.status})`);
+      // A dict keyed call, not a template literal: scholarT looks the string
+      // up verbatim, so an interpolated literal could never match the
+      // catalog and the JA page showed English here (review blocker 2).
+      setIoStatus(
+        scholarT(
+          data.imported === 1
+            ? "Imported %(n)s paper from %(file)s"
+            : "Imported %(n)s papers from %(file)s",
+          { n: data.imported, file: pendingImportName },
+        ),
+      );
+      hideImportPreview();
+      loadLibrary(true); // refresh the list to show the imported papers
+    } catch (err) {
+      setIoStatus(String(err.message || err), true);
+    } finally {
+      importConfirmBtn.disabled = false;
+    }
+  }
+
+  if (importConfirmBtn) {
+    importConfirmBtn.addEventListener("click", confirmImport);
+  }
+  if (importCancelBtn) {
+    importCancelBtn.addEventListener("click", () => {
+      hideImportPreview();
+      setIoStatus("");
+    });
+  }
   if (importBtn && importFile) {
     importBtn.addEventListener("click", () => importFile.click());
     importFile.addEventListener("change", async () => {
       const file = importFile.files && importFile.files[0];
       if (!file) return;
       importBtn.disabled = true;
-      setIoStatus(`Importing ${file.name}…`);
+      hideImportPreview();
+      setIoStatus(scholarT("Previewing %(file)s…", { file: file.name }));
       try {
         const text = await file.text();
-        const params = new URLSearchParams({ format: "bibtex", bibtex: text });
-        // CSRF: the mounted hub enables CsrfViewMiddleware, so the Import POST
-        // must carry the token. Read it from the hidden input rendered by the
-        // {% csrf_token %} tag (populated by the middleware when enabled;
-        // empty/inert standalone).
-        const csrfInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
-        const csrf = csrfInput ? csrfInput.value : "";
-        const headers = { "Content-Type": "application/x-www-form-urlencoded" };
-        if (csrf) headers["X-CSRFToken"] = csrf;
+        const params = new URLSearchParams({ format: "bibtex", bibtex: text, preview: "1" });
         const resp = await fetch(`${STX_MOUNT}/api/library/import`, {
           method: "POST",
-          headers,
+          headers: importHeaders(),
           body: params.toString(),
         });
-        const data = await resp.json();
+        const data = await readJson(resp);
         if (!resp.ok) throw new Error(data.error || `Import failed (${resp.status})`);
-        // A dict keyed call, not a template literal: scholarT looks the string
-        // up verbatim, so an interpolated literal could never match the
-        // catalog and the JA page showed English here (review blocker 2).
+        pendingImportText = text;
+        pendingImportName = file.name;
+        renderImportPreview(data.entries || []);
         setIoStatus(
           scholarT(
-            data.imported === 1
-              ? "Imported %(n)s paper from %(file)s"
-              : "Imported %(n)s papers from %(file)s",
-            { n: data.imported, file: file.name },
+            (data.entries || []).length === 1
+              ? "Previewing %(n)s paper from %(file)s"
+              : "Previewing %(n)s papers from %(file)s",
+            { n: (data.entries || []).length, file: file.name },
           ),
         );
-        importFile.value = "";
-        loadLibrary(true); // refresh the list to show the imported papers
       } catch (err) {
         setIoStatus(String(err.message || err), true);
+        importFile.value = "";
       } finally {
         importBtn.disabled = false;
       }
@@ -521,11 +979,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Lazy-load the list the first time the Library tab is activated.
-  const libTabBtn = document.querySelector('.tab-btn[data-tab="library"]');
+  const libTabBtn = document.querySelector(
+    '.stx-content-tabs__tab[aria-controls="tab-library"]',
+  );
   if (libTabBtn) {
     libTabBtn.addEventListener("click", () => {
       if (!loaded) loadLibrary();
-      reflectProjectIndicator();
+      loadProjectChips();
       checkExtStatuses();
     });
   }
@@ -547,7 +1007,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // If the page loads with Library already active (it does not by default), load now.
   if (listPanel.classList.contains("active")) {
     loadLibrary();
-    reflectProjectIndicator();
+    loadProjectChips();
     checkExtStatuses();
   }
 });

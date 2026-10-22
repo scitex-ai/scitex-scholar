@@ -32,10 +32,13 @@ from typing import Any, Callable, Dict, List, Optional
 import scitex_logging as logging
 
 from scitex_scholar.core import Paper, normalize_journal_name
+from scitex_scholar.pipelines._search_thresholds import apply_threshold_filters
 from scitex_scholar.search_engines._source_tiers import (
     build_tiered_engines,
     declared_source_tiers,
+    normalize_sources,
     resolve_tier,
+    select_engines,
 )
 
 logger = logging.getLogger(__name__)
@@ -125,6 +128,7 @@ class ScholarPipelineSearchParallel:
         filters: Dict = None,
         max_results: int = 100,
         on_progress: Optional[Callable[[str, str, int], None]] = None,
+        sources: Any = None,
     ) -> Dict[str, Any]:
         """Search for papers across multiple engines in parallel.
 
@@ -139,6 +143,9 @@ class ScholarPipelineSearchParallel:
                 - engine_name: Name of the search engine (str)
                 - status: 'loading', 'completed', or 'error' (str)
                 - count: Number of results found (int)
+            sources: Optional explicit source selection (hub ``?sources=a,b,c``
+                or canonical engine names). Runs exactly those engines with
+                no tier short-circuit. None/empty keeps the tiered default.
 
         Returns:
             Dict with:
@@ -162,32 +169,37 @@ class ScholarPipelineSearchParallel:
         filters = filters or {}
         search_fields = search_fields or ["title", "abstract"]
 
-        # --- Tier 1: the NAS-local corpora (primary) --------------------------
-        # The configured policy names CrossRefLocal/OpenAlexLocal primary, so
-        # they run FIRST and alone. The online engines below are reached only
-        # when this tier cannot answer (see resolve_tier for the reason).
+        # --- Explicit source selection (old-direct Sources grid) ------------
+        # A user selection runs exactly those engines in parallel with no
+        # tier short-circuit -- hub parity runs every checked source. None
+        # or empty keeps the tiered default path below untouched.
         engine_counts = {}
-        all_papers, engines_used = await self._search_tier(
-            engines=self.primary_engines,
-            query=search_query,
-            search_fields=search_fields,
-            filters=filters,
-            max_results=max_results,
-            on_progress=on_progress,
-            engine_counts=engine_counts,
-        )
-
-        source_tier, fallback_reason = resolve_tier(
-            len(all_papers), self.primary_engines, self.min_primary_results
-        )
-
-        if source_tier == "online_fallback":
-            logger.warning(
-                f"{self.name}: online fallback ({fallback_reason}); "
-                f"querying {len(self.fallback_engines)} public API engines"
-            )
+        wanted = normalize_sources(sources)
+        selected: Dict[str, Any] = {}
+        if wanted:
+            selected = select_engines(self.engines, wanted)
             all_papers, engines_used = await self._search_tier(
-                engines=self.fallback_engines,
+                engines=selected,
+                query=search_query,
+                search_fields=search_fields,
+                filters=filters,
+                max_results=max_results,
+                on_progress=on_progress,
+                engine_counts=engine_counts,
+            )
+            source_tier = "selected"
+            fallback_reason = (
+                f"explicit selection: {', '.join(selected)}"
+                if selected
+                else f"explicit selection {', '.join(wanted)} not available here"
+            )
+        else:
+            # --- Tier 1: the NAS-local corpora (primary) --------------------------
+            # The configured policy names CrossRefLocal/OpenAlexLocal primary, so
+            # they run FIRST and alone. The online engines below are reached only
+            # when this tier cannot answer (see resolve_tier for the reason).
+            all_papers, engines_used = await self._search_tier(
+                engines=self.primary_engines,
                 query=search_query,
                 search_fields=search_fields,
                 filters=filters,
@@ -196,14 +208,37 @@ class ScholarPipelineSearchParallel:
                 engine_counts=engine_counts,
             )
 
+            source_tier, fallback_reason = resolve_tier(
+                len(all_papers), self.primary_engines, self.min_primary_results
+            )
+
+            if source_tier == "online_fallback":
+                logger.warning(
+                    f"{self.name}: online fallback ({fallback_reason}); "
+                    f"querying {len(self.fallback_engines)} public API engines"
+                )
+                all_papers, engines_used = await self._search_tier(
+                    engines=self.fallback_engines,
+                    query=search_query,
+                    search_fields=search_fields,
+                    filters=filters,
+                    max_results=max_results,
+                    on_progress=on_progress,
+                    engine_counts=engine_counts,
+                )
+
         # Deduplicate by DOI and title
         unique_papers = self._deduplicate_papers(all_papers)
 
         # Enrich papers with missing citation counts (e.g., from PubMed). This
         # is a NETWORK call through OpenAlex, so it is part of the fallback, not
         # of a local-corpus answer -- running it after a primary hit would put
-        # the network back on the local path.
-        if source_tier == "online_fallback":
+        # the network back on the local path. An explicit selection containing
+        # online engines gets the same enrichment as a fallback answer.
+        selected_online = any(name in self.fallback_engines for name in selected)
+        if source_tier == "online_fallback" or (
+            source_tier == "selected" and selected_online
+        ):
             unique_papers = await self._enrich_citations(unique_papers)
 
         # Enrich papers with impact factors
@@ -232,9 +267,13 @@ class ScholarPipelineSearchParallel:
         self.stats["successful_searches"] += 1
 
         tier_size = (
-            len(self.primary_engines)
-            if source_tier == "primary"
-            else len(self.fallback_engines)
+            len(selected)
+            if source_tier == "selected"
+            else (
+                len(self.primary_engines)
+                if source_tier == "primary"
+                else len(self.fallback_engines)
+            )
         )
 
         logger.success(
@@ -627,101 +666,21 @@ class ScholarPipelineSearchParallel:
     ) -> List[Paper]:
         """Apply threshold filters to papers.
 
+        Single implementation lives in :mod:`_search_thresholds` so the
+        single pipeline honors the identical bounds; this wrapper keeps the
+        established method name for existing callers.
+
         Args:
             papers: List of Paper objects
             filters: Dictionary containing threshold filters:
-                - min_year: Minimum publication year
-                - max_year: Maximum publication year
-                - min_citations: Minimum citation count
-                - min_impact_factor: Minimum journal impact factor
+                - min_year / max_year: publication-year bounds
+                - min_citations / max_citations: citation-count bounds
+                - min_impact_factor / max_impact_factor: journal IF bounds
 
         Returns:
             Filtered list of papers
         """
-        filtered_papers = []
-        filter_stats = {
-            "min_year": 0,
-            "max_year": 0,
-            "min_citations": 0,
-            "min_impact_factor": 0,
-        }
-
-        for paper in papers:
-            # Check year range
-            if "min_year" in filters:
-                try:
-                    min_year = int(filters["min_year"])
-                    year = (
-                        paper.metadata.basic.year
-                        if hasattr(paper.metadata, "basic")
-                        else None
-                    )
-                    if not year or year < min_year:
-                        filter_stats["min_year"] += 1
-                        continue
-                except (ValueError, AttributeError):
-                    pass
-
-            if "max_year" in filters:
-                try:
-                    max_year = int(filters["max_year"])
-                    year = (
-                        paper.metadata.basic.year
-                        if hasattr(paper.metadata, "basic")
-                        else None
-                    )
-                    if not year or year > max_year:
-                        filter_stats["max_year"] += 1
-                        continue
-                except (ValueError, AttributeError):
-                    pass
-
-            # Check minimum citations
-            if "min_citations" in filters:
-                try:
-                    min_citations = int(filters["min_citations"])
-                    citations = 0
-                    if hasattr(paper.metadata, "citation_count"):
-                        citations = paper.metadata.citation_count.total or 0
-                    if citations < min_citations:
-                        filter_stats["min_citations"] += 1
-                        continue
-                except (ValueError, AttributeError):
-                    pass
-
-            # Check minimum impact factor
-            if "min_impact_factor" in filters:
-                try:
-                    min_if = float(filters["min_impact_factor"])
-                    impact_factor = 0.0
-                    if (
-                        hasattr(paper.metadata, "publication")
-                        and paper.metadata.publication.impact_factor
-                    ):
-                        impact_factor = paper.metadata.publication.impact_factor or 0.0
-                    if impact_factor < min_if:
-                        filter_stats["min_impact_factor"] += 1
-                        continue
-                except (ValueError, AttributeError):
-                    pass
-
-            # Paper passed all filters
-            filtered_papers.append(paper)
-
-        # Log filter statistics
-        total_filtered = sum(filter_stats.values())
-        if total_filtered > 0:
-            filter_msgs = [
-                f"{count} by {name}"
-                for name, count in filter_stats.items()
-                if count > 0
-            ]
-            logger.info(
-                f"{self.name}: Filtered {total_filtered} papers ({', '.join(filter_msgs)}), "
-                f"{len(filtered_papers)} remain"
-            )
-
-        return filtered_papers
+        return apply_threshold_filters(papers, filters)
 
     def _sort_papers(
         self, papers: List[Paper], sort_by: str, sort_order: str = "desc"

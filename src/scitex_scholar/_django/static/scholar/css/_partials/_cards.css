@@ -54,3 +54,75 @@
   color: var(--text-muted);
   margin-left: 12px;
 }
+
+/*
+ * Old-direct U1: the `?` syntax-help affordance in the Search header.
+ * Monotone + theme --accent only (operator color discipline 2026-10-20:
+ * no bright colors; navy CTA light / gold CTA dark comes from --accent).
+ */
+.syntax-help-toggle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--border-default);
+  background: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+
+.syntax-help-toggle:hover,
+.syntax-help-toggle[aria-expanded="true"] {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.syntax-help-panel {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-default);
+  background: var(--bg-tertiary);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.syntax-help-panel__title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 8px;
+}
+
+.syntax-help-panel__list {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 12px;
+  margin: 0 0 8px;
+}
+
+.syntax-help-panel__list dt {
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+/* Catch-up: operator flags are clickable (insert into the query box). */
+.syntax-help-panel__insert {
+  cursor: pointer;
+}
+
+.syntax-help-panel__insert:hover,
+.syntax-help-panel__insert:focus-visible {
+  color: var(--accent);
+  outline: none;
+}
+
+.syntax-help-panel__list dd {
+  margin: 0;
+}
+
+.syntax-help-panel__example {
+  margin-top: 4px;
+}

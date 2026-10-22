@@ -154,7 +154,7 @@ def test_index_shell_context_keeps_user_scope(_shell_result):
     # Act
     pickers = html.count("data-stx-project-picker")
     # Assert
-    assert pickers == 1
+    assert pickers == 0
 
 
 def test_index_shell_context_forwards_request_to_csrf_processor(_shell_result):

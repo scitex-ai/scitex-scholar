@@ -1,0 +1,10 @@
+{% load scitex_project_picker %}{% comment %}
+Scholar project picker — the element the SDK AppHeader slot receives.
+
+Writer-shaped: the picker is server-rendered here (inside the leaf header
+include) and moved into the canonical
+`.stx-app-header__slot--project-selector` slot client-side by
+`scholar/js/header-picker.js`. The tag renders NOTHING unless the request
+is signed in AND the host registered a project provider, so standalone
+serves unchanged markup.
+{% endcomment %}{% scitex_project_picker scope=app_scope current=current_project %}

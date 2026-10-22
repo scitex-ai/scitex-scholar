@@ -25,6 +25,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("searchInput");
   const maxResults = document.getElementById("searchMaxResults");
   const modeSelect = document.getElementById("searchMode");
+  const sourcesGrid = document.getElementById("searchSourcesGrid");
+  // Slice 2 (old-direct unification): the Filters number inputs. Empty
+  // means unbounded; non-empty values travel under the hub param names.
+  const filterInputs = {
+    year_from: document.getElementById("searchYearFrom"),
+    year_to: document.getElementById("searchYearTo"),
+    min_citations: document.getElementById("searchMinCitations"),
+    max_citations: document.getElementById("searchMaxCitations"),
+    min_impact_factor: document.getElementById("searchMinImpact"),
+    max_impact_factor: document.getElementById("searchMaxImpact"),
+  };
   const noCache = document.getElementById("searchNoCache");
   const loading = document.getElementById("searchLoading");
   const errorBox = document.getElementById("searchError");
@@ -32,6 +43,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const retryBtn = document.getElementById("searchRetryBtn");
   const results = document.getElementById("searchResults");
   const resultsContent = document.getElementById("searchResultsContent");
+  // Pre-search empty state (operator 2026-10-22): hidden on first submit,
+  // never re-shown — zero-result searches use the in-results empty-message.
+  const emptyState = document.getElementById("searchEmptyState");
   const stats = document.getElementById("searchStats");
   const sortSelect = document.getElementById("searchSort");
   const sourceFilter = document.getElementById("searchSourceFilter");
@@ -39,6 +53,97 @@ document.addEventListener("DOMContentLoaded", () => {
   const saveSelectedBtn = document.getElementById("searchSaveSelected");
   const enrichSelectedBtn = document.getElementById("searchEnrichSelected");
   const bulkStatus = document.getElementById("searchBulkStatus");
+  // Slice 11 (old-direct unification): PDFs bulk pill -- hub downloads
+  // OA PDFs for the checked rows.
+  const downloadPdfsBtn = document.getElementById("searchDownloadPdfs");
+  // Slice 3 (old-direct unification): the results-header tools -- abstract
+  // truncated/full toggle, open-selected-URLs, export-selected-BibTeX.
+  const abstractToggle = document.getElementById("searchAbstractToggle");
+  const openUrlsBtn = document.getElementById("searchOpenUrls");
+  const exportBibtexBtn = document.getElementById("searchExportBibtex");
+  // Old-direct U1: the `?` syntax-help toggle. The panel heading is
+  // server-rendered (translated); only the operator lists come from the
+  // endpoint (hub serves them EN-only -- KEEP). Fetched once; a failed
+  // fetch leaves the panel hidden so help can never break search.
+  const syntaxToggle = document.getElementById("searchSyntaxToggle");
+  const syntaxPanel = document.getElementById("searchSyntaxPanel");
+  const syntaxList = document.getElementById("searchSyntaxList");
+  const syntaxExamples = document.getElementById("searchSyntaxExamples");
+  let syntaxLoaded = false;
+  function renderSyntaxHelp(doc) {
+    const frag = document.createDocumentFragment();
+    Object.values(doc.syntax || {}).forEach((op) => {
+      const dt = document.createElement("dt");
+      dt.textContent = [op.short, op.long].filter(Boolean).join(" / ");
+      dt.className = "syntax-help-panel__insert";
+      dt.setAttribute("role", "button");
+      dt.setAttribute("tabindex", "0");
+      dt.addEventListener("click", () => insertSyntaxToken(op.short || op.long));
+      dt.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); insertSyntaxToken(op.short || op.long); }
+      });
+      const dd = document.createElement("dd");
+      dd.textContent = [op.description, op.include_example || op.example, op.exclude_example]
+        .filter(Boolean).join(" — ");
+      frag.append(dt, dd);
+    });
+    return frag;
+  }
+  // Catch-up: old-direct clickable operator chips. Inserts the flag at
+  // the cursor (appending with a space when the box is non-empty).
+  function insertSyntaxToken(token) {
+    if (!token || !input) return;
+    const insert = token.trim() + " ";
+    const start = typeof input.selectionStart === "number" ? input.selectionStart : input.value.length;
+    const end = typeof input.selectionEnd === "number" ? input.selectionEnd : input.value.length;
+    const before = input.value.slice(0, start);
+    const after = input.value.slice(end);
+    const spacer = before && !before.endsWith(" ") ? " " : "";
+    input.value = before + spacer + insert + after;
+    const caret = (before + spacer + insert).length;
+    input.focus();
+    try { input.setSelectionRange(caret, caret); } catch (err) { /* older WebViews */ }
+  }
+  function renderSyntaxExamples(doc) {
+    const frag = document.createDocumentFragment();
+    (doc.examples || []).forEach((ex) => {
+      const item = document.createElement("div");
+      item.className = "syntax-help-panel__example";
+      const q = document.createElement("code");
+      q.textContent = ex.query;
+      const d = document.createElement("span");
+      d.textContent = ex.description;
+      item.append(q, document.createTextNode(" — "), d);
+      frag.append(item);
+    });
+    return frag;
+  }
+  if (syntaxToggle && syntaxPanel) {
+    syntaxToggle.addEventListener("click", async () => {
+      const opening = syntaxPanel.hidden;
+      syntaxToggle.setAttribute("aria-expanded", String(opening));
+      if (!opening) {
+        syntaxPanel.hidden = true;
+        return;
+      }
+      syntaxPanel.hidden = false;
+      if (syntaxLoaded) return;
+      try {
+        const resp = await fetch(`${STX_MOUNT}/api/search/syntax-help`);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const doc = await resp.json();
+        if (syntaxList) syntaxList.replaceChildren(renderSyntaxHelp(doc));
+        if (syntaxExamples) syntaxExamples.replaceChildren(renderSyntaxExamples(doc));
+        syntaxLoaded = true;
+      } catch (err) {
+        console.warn("syntax help unavailable:", err);
+        syntaxPanel.hidden = true;
+        syntaxToggle.setAttribute("aria-expanded", "false");
+      }
+    });
+  }
+  let abstractFull = false;
+  const ABSTRACT_TRUNCATE_AT = 300;
 
   // The last fetched result set (engine order = relevance) plus the user's
   // selection, keyed by DOI-or-title so re-sorts keep the checked rows.
@@ -51,6 +156,49 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const show = (el) => el && el.classList.remove("hidden");
   const hide = (el) => el && el.classList.add("hidden");
+  // Old-direct U2: the queue-status chrome. Hub's progressive_loading
+  // panel shape (per-engine status + counts), bound to the response's
+  // metadata.engine_events that the view collects from the pipeline's
+  // on_progress callback. Hidden until a search runs; counts are numbers
+  // and engine names are proper nouns, so no i18n strings are needed.
+  const queuePanel = document.getElementById("searchQueuePanel");
+  const queueEngines = document.getElementById("searchQueueEngines");
+  const queueActive = document.getElementById("searchQueueActive");
+  const queueTotal = document.getElementById("searchQueueTotal");
+  function resetQueue() {
+    if (queueActive) queueActive.textContent = "…";
+    if (queueTotal) queueTotal.textContent = "…";
+    if (queueEngines) queueEngines.replaceChildren();
+  }
+  function fillQueue(metadata) {
+    const events = (metadata && metadata.engine_events) || [];
+    let active = 0;
+    let total = 0;
+    if (queueEngines) {
+      const frag = document.createDocumentFragment();
+      events.forEach((ev) => {
+        if (ev.status === "loading") active += 1;
+        total += Number(ev.count) || 0;
+        const row = document.createElement("div");
+        row.className = "search-queue__engine";
+        row.dataset.status = ev.status;
+        const dot = document.createElement("span");
+        dot.className = "search-queue__dot";
+        dot.setAttribute("aria-hidden", "true");
+        const name = document.createElement("span");
+        name.className = "search-queue__name";
+        name.textContent = ev.engine;
+        const count = document.createElement("span");
+        count.className = "search-queue__count";
+        count.textContent = String(ev.count);
+        row.append(dot, name, count);
+        frag.append(row);
+      });
+      queueEngines.replaceChildren(frag);
+    }
+    if (queueActive) queueActive.textContent = String(active);
+    if (queueTotal) queueTotal.textContent = String(total);
+  }
 
   // Error fallback (UX standard): the error box retries the operation that
   // failed, not just dismisses it. Each failure site passes its own retry;
@@ -71,6 +219,64 @@ document.addEventListener("DOMContentLoaded", () => {
       hide(errorBox);
       retryAction();
     });
+  }
+
+  // Old-direct U3: source-selection persistence. The visitor path is
+  // localStorage (their browser owns it); the file-user path is the
+  // server endpoint (user-root JSON, no UserPreference model). On change
+  // both are written; on load localStorage wins when present, otherwise
+  // the server value restores, otherwise the checked-by-default grid
+  // stays untouched. Failures are silent (console.warn) -- persistence
+  // must never break search.
+  const SOURCE_PREFS_KEY = "scitex-scholar:sources";
+  function readGridSources() {
+    if (!sourcesGrid) return null;
+    return Array.from(sourcesGrid.querySelectorAll("input.source-toggle"))
+      .filter((box) => box.checked)
+      .map((box) => box.value);
+  }
+  function applyGridSources(names) {
+    if (!sourcesGrid || !Array.isArray(names)) return false;
+    const wanted = new Set(names);
+    let applied = false;
+    sourcesGrid.querySelectorAll("input.source-toggle").forEach((box) => {
+      if (wanted.has(box.value)) {
+        if (!box.checked) { box.checked = true; applied = true; }
+      } else if (box.checked) { box.checked = false; applied = true; }
+    });
+    return applied;
+  }
+  async function persistSources() {
+    const names = readGridSources();
+    if (!names) return;
+    try {
+      localStorage.setItem(SOURCE_PREFS_KEY, JSON.stringify(names));
+    } catch (err) { console.warn("source prefs localStorage unavailable:", err); }
+    try {
+      await fetch(`${STX_MOUNT}/api/preferences/sources`, {
+        method: "POST",
+        headers: csrfHeaders({ "Content-Type": "application/json" }),
+        body: JSON.stringify({ sources: names }),
+      });
+    } catch (err) { console.warn("source prefs server save unavailable:", err); }
+  }
+  async function restoreSources() {
+    try {
+      const raw = localStorage.getItem(SOURCE_PREFS_KEY);
+      if (raw && applyGridSources(JSON.parse(raw))) return;
+    } catch (err) { console.warn("source prefs localStorage unreadable:", err); }
+    try {
+      const resp = await fetch(`${STX_MOUNT}/api/preferences/sources`);
+      if (!resp.ok) return;
+      const doc = await resp.json();
+      if (doc.sources && Object.keys(doc.sources).length) {
+        applyGridSources(Array.isArray(doc.sources) ? doc.sources : Object.keys(doc.sources));
+      }
+    } catch (err) { console.warn("source prefs server restore unavailable:", err); }
+  }
+  if (sourcesGrid) {
+    sourcesGrid.addEventListener("change", () => { persistSources(); });
+    restoreSources();
   }
 
   // CSRF: same pattern as library.js -- the mounted hub enables
@@ -110,7 +316,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (doiInput && doi) {
       doiInput.value = doi;
     }
-    const graphTab = document.querySelector('.tab-btn[data-tab="graph"]');
+    const graphTab = document.querySelector(
+      '.stx-content-tabs__tab[aria-controls="tab-graph"]',
+    );
     if (graphTab) graphTab.click();
     if (doiInput) doiInput.focus();
   }
@@ -219,9 +427,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (paper.abstract) {
       const abstract = document.createElement("div");
       abstract.className = "search-result__abstract";
-      const text = paper.abstract;
-      abstract.textContent =
-        text.length > 300 ? `${text.slice(0, 300)}...` : text;
+      // The full text rides the DOM so the header toggle flips length
+      // without a refetch; textContent keeps third-party data inert.
+      abstract.dataset.full = paper.abstract;
+      abstract.textContent = abstractText(paper.abstract);
       body.appendChild(abstract);
     }
 
@@ -313,6 +522,167 @@ document.addEventListener("DOMContentLoaded", () => {
       visible.length > 0 && visible.every((key) => selected.has(key));
   }
 
+  // Slice 3: abstract length follows the header toggle (default truncated,
+  // the pre-slice rendering, so nothing changes until the user flips it).
+  function abstractText(full) {
+    if (abstractFull || full.length <= ABSTRACT_TRUNCATE_AT) return full;
+    return `${full.slice(0, ABSTRACT_TRUNCATE_AT)}...`;
+  }
+
+  function applyAbstractMode() {
+    document.querySelectorAll(".search-result__abstract").forEach((el) => {
+      el.textContent = abstractText(el.dataset.full || "");
+    });
+    if (abstractToggle) {
+      abstractToggle.textContent = abstractFull
+        ? scholarT("Abstract: full")
+        : scholarT("Abstract: truncated");
+      abstractToggle.dataset.mode = abstractFull ? "full" : "truncated";
+    }
+  }
+
+  // Slice 3: client-side BibTeX for the checked rows (hub parity: generated
+  // in-browser, Blob download, no backend round-trip).
+  function bibtexEscape(value) {
+    return String(value || "")
+      .replace(/\\/g, "\\\\")
+      .replace(/([{}])/g, "\\$1");
+  }
+
+  function bibtexAuthors(paper) {
+    const authors = paper.authors || [];
+    return authors
+      .map((a) => (typeof a === "string" ? a : a.name || ""))
+      .filter((name) => name)
+      .join(" and ");
+  }
+
+  function bibtexKey(paper) {
+    const first = (paper.authors || [])
+      .map((a) => (typeof a === "string" ? a : a.name || ""))
+      .find((name) => name);
+    const last = first ? first.trim().split(/\s+/).pop() : "unknown";
+    const year = paper.year || "nodate";
+    const word = (paper.title || "untitled").trim().split(/\s+/)[0] || "untitled";
+    return `${last}${year}${word}`.replace(/[^A-Za-z0-9]/g, "");
+  }
+
+  function bibtexEntry(paper) {
+    const fields = [
+      `  title = {${bibtexEscape(paper.title || "Untitled")}}`,
+      `  author = {${bibtexEscape(bibtexAuthors(paper))}}`,
+    ];
+    if (paper.year) fields.push(`  year = {${bibtexEscape(paper.year)}}`);
+    if (paper.journal) fields.push(`  journal = {${bibtexEscape(paper.journal)}}`);
+    if (paper.doi) fields.push(`  doi = {${bibtexEscape(paper.doi)}}`);
+    if (paper.abstract) fields.push(`  abstract = {${bibtexEscape(paper.abstract)}}`);
+    return `@article{${bibtexKey(paper)},\n${fields.join(",\n")}\n}`;
+  }
+
+  function selectedBibtex() {
+    return selectedPapers().map(bibtexEntry).join("\n\n");
+  }
+
+  // Old-direct U4: RIS + EndNote join the selected-papers Blob path.
+  // Shapes mirror hub citation_formats (to_ris / to_endnote): envelope
+  // tags, one AU/%A line per author, optional fields only when present,
+  // abstract capped at 1000 chars. Client rows carry authors[]/title/
+  // journal/year/doi/url/abstract; anything absent is skipped, never
+  // rendered as "undefined".
+  function citeAuthors(paper) {
+    return (paper.authors || [])
+      .map((a) => (typeof a === "string" ? a : a.name || ""))
+      .map((name) => name.trim())
+      .filter((name) => name);
+  }
+
+  function citeAbstract(paper) {
+    const text = String(paper.abstract || "").replace(/\s+/g, " ").trim();
+    return text.length > 1000 ? `${text.slice(0, 1000)}...` : text;
+  }
+
+  function risEntry(paper) {
+    const lines = ["TY  - JOUR"];
+    if (paper.title) lines.push(`TI  - ${paper.title}`);
+    citeAuthors(paper).forEach((author) => lines.push(`AU  - ${author}`));
+    if (paper.journal) lines.push(`JO  - ${paper.journal}`);
+    if (paper.year) lines.push(`PY  - ${paper.year}`);
+    if (paper.doi) lines.push(`DO  - ${paper.doi}`);
+    if (paper.url) lines.push(`UR  - ${paper.url}`);
+    const abstract = citeAbstract(paper);
+    if (abstract) lines.push(`AB  - ${abstract}`);
+    lines.push("ER  - ");
+    return lines.join("\n");
+  }
+
+  function endnoteEntry(paper) {
+    const lines = ["%0 Journal Article"];
+    if (paper.title) lines.push(`%T ${paper.title}`);
+    citeAuthors(paper).forEach((author) => lines.push(`%A ${author}`));
+    if (paper.journal) lines.push(`%J ${paper.journal}`);
+    if (paper.year) lines.push(`%D ${paper.year}`);
+    if (paper.doi) lines.push(`%R ${paper.doi}`);
+    if (paper.url) lines.push(`%U ${paper.url}`);
+    const abstract = citeAbstract(paper);
+    if (abstract) lines.push(`%X ${abstract}`);
+    return lines.join("\n");
+  }
+
+  function selectedCitation(format) {
+    const entries = {
+      bibtex: bibtexEntry,
+      ris: risEntry,
+      endnote: endnoteEntry,
+    }[format] || bibtexEntry;
+    return selectedPapers().map(entries).join("\n\n");
+  }
+
+  function selectedCitationExt(format) {
+    return { bibtex: "bib", ris: "ris", endnote: "enw" }[format] || "bib";
+  }
+
+  function openSelectedUrls() {
+    const papers = selectedPapers();
+    if (!papers.length) {
+      if (bulkStatus) bulkStatus.textContent = scholarT("Select results first.");
+      return;
+    }
+    const urls = papers
+      .filter((paper) => paper.doi)
+      .map((paper) => `https://doi.org/${paper.doi}`);
+    if (!urls.length) {
+      if (bulkStatus) bulkStatus.textContent = scholarT("No DOI links in selection.");
+      return;
+    }
+    // Direct click handler: one window.open per URL keeps the popup
+    // blocker satisfied the same way hub's toolbar button does.
+    urls.forEach((url) => window.open(url, "_blank", "noopener"));
+    if (bulkStatus) bulkStatus.textContent = "";
+  }
+
+  function downloadSelectedBibtex() {
+    const papers = selectedPapers();
+    if (!papers.length) {
+      if (bulkStatus) bulkStatus.textContent = scholarT("Select results first.");
+      return;
+    }
+    // Old-direct U4: the format choice rides the same Blob path (hub
+    // export_bulk_citations {format, paper_ids} shape, client-side over
+    // the checked rows). Unknown values fall back to BibTeX, never fail.
+    const formatSelect = document.getElementById("searchExportFormat");
+    const format = (formatSelect && formatSelect.value) || "bibtex";
+    const ext = selectedCitationExt(format);
+    const blob = new Blob([selectedCitation(format)], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scholar-selected-${new Date().toISOString().slice(0, 10)}.${ext}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
   function renderResults(data) {
     const papers = data.results || [];
     lastPapers = papers;
@@ -342,15 +712,34 @@ document.addEventListener("DOMContentLoaded", () => {
     // READINESS: which corpus answered. The configured policy is local-first,
     // and the user (and a bug report) must be able to see when the network was
     // actually needed -- a silent fallback is indistinguishable from a local
-    // hit that happened to work.
-    if (metadata.source_tier) {
+    // hit that happened to work. An explicit Sources selection reports
+    // itself plus the per-engine counts (old-direct's inline source status).
+    if (metadata.source_tier === "selected") {
+      parts.push(scholarT("Selected sources"));
+    } else if (metadata.source_tier) {
       parts.push(
         metadata.source_tier === "primary"
           ? scholarT("Local corpus (NAS)")
           : scholarT("Online fallback"),
       );
     }
+    const counts = metadata.engine_counts || {};
+    const counted = Object.keys(counts);
+    if (counted.length) {
+      // Per-source options are corpus proper nouns and stay as-is (same
+      // convention as the source filter's dynamically built options).
+      parts.push(counted.map((name) => `${name} ${counts[name]}`).join(", "));
+    }
     stats.textContent = parts.join(" · ");
+    // Details strip (operator 2026-10-22): the Databases section mirrors
+    // the database side of the header meta (tier + per-source counts).
+    // The count already owns the results header; the strip keeps what
+    // that header deliberately omits.
+    const stripSummary = document.getElementById("searchStripSummary");
+    if (stripSummary) {
+      const tail = parts.slice(1);
+      stripSummary.textContent = tail.length ? tail.join(" · ") : parts[0];
+    }
     show(results);
   }
 
@@ -478,6 +867,101 @@ document.addEventListener("DOMContentLoaded", () => {
   if (enrichSelectedBtn) {
     enrichSelectedBtn.addEventListener("click", enrichSelected);
   }
+  // Slice 11: save-then-download. Search rows are not library papers, so
+  // the pill files the selection first (existing save-bulk), then fetches
+  // OA PDFs for the filed ids (max 10 per the endpoint cap).
+  async function downloadSelectedPdfs() {
+    const papers = selectedPapers();
+    if (!papers.length) {
+      if (bulkStatus) bulkStatus.textContent = scholarT("Select results to save.");
+      return;
+    }
+    if (downloadPdfsBtn) downloadPdfsBtn.disabled = true;
+    if (bulkStatus) bulkStatus.textContent = "";
+    try {
+      const saveResp = await fetch(`${STX_MOUNT}/api/library/save-bulk`, {
+        method: "POST",
+        headers: csrfHeaders({ "Content-Type": "application/json" }),
+        body: JSON.stringify({ papers: papers.map(savePayload), project: currentProject() }),
+      });
+      const saved = await saveResp.json();
+      if (!saveResp.ok) throw new Error(saved.error || scholarT("Save failed"));
+      const ids = (saved.saved || []).map((row) => row.library_id).filter((id) => id);
+      if (!ids.length) throw new Error(scholarT("Save failed"));
+      const dlResp = await fetch(`${STX_MOUNT}/api/library/download-pdfs`, {
+        method: "POST",
+        headers: csrfHeaders({ "Content-Type": "application/json" }),
+        body: JSON.stringify({ library_ids: ids.slice(0, 10) }),
+      });
+      const data = await dlResp.json();
+      if (!dlResp.ok) throw new Error(data.error || scholarT("Download failed"));
+      const done = (data.downloaded || []).length;
+      const failed = (data.failed || []).length;
+      if (bulkStatus) {
+        bulkStatus.textContent = scholarT("Downloaded %(done)s of %(total)s PDFs", {
+          done,
+          total: done + failed,
+        });
+      }
+    } catch (err) {
+      showError(`${scholarT("Download failed")}: ${err.message}`, downloadSelectedPdfs);
+    } finally {
+      if (downloadPdfsBtn) downloadPdfsBtn.disabled = false;
+    }
+  }
+  if (downloadPdfsBtn) {
+    downloadPdfsBtn.addEventListener("click", downloadSelectedPdfs);
+  }
+  // Slice 3: header tools over the checked rows (hub results-header parity).
+  if (abstractToggle) {
+    abstractToggle.addEventListener("click", () => {
+      abstractFull = !abstractFull;
+      applyAbstractMode();
+    });
+  }
+  if (openUrlsBtn) openUrlsBtn.addEventListener("click", openSelectedUrls);
+  if (exportBibtexBtn) {
+    exportBibtexBtn.addEventListener("click", downloadSelectedBibtex);
+  }
+  document.addEventListener("keydown", (event) => {
+    // Hub parity: Ctrl/Cmd+C copies selected BibTeX when no text is
+    // selected. Unlike hub, keystrokes inside inputs are never hijacked --
+    // copying from the query box must keep working.
+    const target = event.target;
+    if (
+      (event.ctrlKey || event.metaKey) &&
+      !event.shiftKey &&
+      !event.altKey &&
+      (event.key === "c" || event.key === "C")
+    ) {
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+      const selection = window.getSelection();
+      if (selection && selection.toString().trim().length > 0) return;
+      const papers = selectedPapers();
+      if (!papers.length) return;
+      event.preventDefault();
+      navigator.clipboard
+        .writeText(selectedBibtex())
+        .then(() => {
+          if (bulkStatus) {
+            bulkStatus.textContent =
+              papers.length === 1
+                ? scholarT("Copied %(n)s BibTeX entry", { n: papers.length })
+                : scholarT("Copied %(n)s BibTeX entries", { n: papers.length });
+          }
+        })
+        .catch(() => {
+          if (bulkStatus) bulkStatus.textContent = scholarT("Copy failed");
+        });
+    }
+  });
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -489,7 +973,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     hide(errorBox);
     hide(results);
+    hide(emptyState);
     show(loading);
+    // Old-direct U2: reveal the queue panel in its searching state.
+    if (queuePanel) queuePanel.hidden = false;
+    resetQueue();
 
     try {
       const params = new URLSearchParams({
@@ -497,6 +985,26 @@ document.addEventListener("DOMContentLoaded", () => {
         max_results: maxResults.value,
       });
       if (modeSelect) params.set("mode", modeSelect.value);
+      if (sourcesGrid) {
+        // Old-direct Sources semantics: the checked set travels as
+        // ?sources=a,b,c. All (or none) checked is the tiered default --
+        // omit the param so the request behaves exactly as before.
+        const boxes = Array.from(
+          sourcesGrid.querySelectorAll("input.source-toggle"),
+        );
+        const checked = boxes
+          .filter((box) => box.checked)
+          .map((box) => box.value);
+        if (checked.length && checked.length < boxes.length) {
+          params.set("sources", checked.join(","));
+        }
+      }
+      // Slice 2: range filters travel only when set; the backend fails
+      // closed (400) on malformed values and surfaces the message.
+      Object.keys(filterInputs).forEach((name) => {
+        const el = filterInputs[name];
+        if (el && el.value.trim() !== "") params.set(name, el.value.trim());
+      });
       if (noCache && noCache.checked) params.set("no_cache", "true");
       const response = await fetch(`${STX_MOUNT}/api/search?${params}`);
       const data = await response.json();
@@ -506,11 +1014,14 @@ document.addEventListener("DOMContentLoaded", () => {
           data.error || `Search failed (${response.status})`,
           () => form.requestSubmit(),
         );
+        if (queuePanel) queuePanel.hidden = true;
         return;
       }
       renderResults(data);
+      fillQueue(data.metadata);
     } catch (err) {
       showError(`Search failed: ${err.message}`, () => form.requestSubmit());
+      if (queuePanel) queuePanel.hidden = true;
     } finally {
       hide(loading);
     }

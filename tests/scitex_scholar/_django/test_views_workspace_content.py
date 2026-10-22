@@ -19,12 +19,14 @@ pytest_plugins = ("tests.scitex_scholar._django.test_views_shell_context",)
 _SCRIPT_NAMES = (
     "stx-mount.js", "app.js", "search.js", "library.js",
     "graph/ForceSimulation.js", "graph/GraphRenderer.js", "graph/citation-graph.js",
+    "header-picker.js",
 )
 _CONTENT_IDS = {
     "searchForm", "tab-search", "tab-library", "libraryImportFile",
     "libraryImportBtn", "libraryExportBtn", "graphForm", "tab-graph",
     "searchSort", "searchSourceFilter", "searchBulkBar", "searchSelectAll",
     "searchSaveSelected", "searchEnrichSelected", "searchBulkStatus",
+    "searchStripSummary", "libraryStripSummary", "graphStripSummary",
 }
 
 
@@ -47,19 +49,7 @@ def _rendered_dom(html, secret):
 
 
 def _body_elements(dom):
-    """Compare the two genuine content roots, retaining their inner DOM/text.
-
-    The SDK picker's i18n catalog script is document-level dedup state, not
-    leaf content: the full page (shell emitted it first) suppresses the
-    nested copy while the standalone fragment emits it. Strip it on both
-    sides -- script node and its trailing newline -- so the comparison stays
-    about Scholar's own markup.
-    """
-    for catalog in dom.select('script[id^="scitex-i18n-catalog-"]'):
-        trailing = catalog.next_sibling
-        catalog.decompose()
-        if isinstance(trailing, str) and not trailing.strip():
-            trailing.extract()
+    """Compare the two genuine content roots, retaining their inner DOM/text."""
     return tuple(
         str(dom.select_one(selector))
         for selector in (".stx-app-header", ".app-container")
@@ -108,15 +98,10 @@ def test_index_workspace_content_preserves_native_rendering(
         fragment, fragment_csrf = _rendered_dom(fragment_html, secret)
         result = {
             "status": response.status_code,
-            # Counted BEFORE _body_elements below: the shared picker is
-            # self-contained (stylesheet link + i18n catalog script + module
-            # script, operator CCT4595), and _body_elements strips the catalog
-            # as document-level dedup state. The fragment carries exactly that
-            # triple, nothing else.
+            "content_roots": _body_elements(fragment),
             "fragment_outer_or_assets": len(
                 fragment.select("html,head,body,script,link,meta")
             ),
-            "content_roots": _body_elements(fragment),
             "content_ids": {
                 node["id"] for node in fragment.select("[id]")
             } & _CONTENT_IDS,
@@ -126,7 +111,7 @@ def test_index_workspace_content_preserves_native_rendering(
                 response.cookies[settings.CSRF_COOKIE_NAME].value,
             ),
             "languages": (full.html["lang"], response.headers["Content-Language"]),
-            "library_text": fragment.select_one('[data-tab="library"]').get_text(),
+            "library_text": fragment.select_one('[aria-controls="tab-library"]').get_text(),
             "shell_content_panes": len(full.select("main#main-content.ws-module-pane")),
             "scripts": tuple(
                 node["src"] for node in full.select("script[src]")
@@ -145,7 +130,7 @@ def test_index_workspace_content_preserves_native_rendering(
         expected = {
             "status": 200,
             "content_roots": _body_elements(full),
-            "fragment_outer_or_assets": 3,
+            "fragment_outer_or_assets": 0,
             "content_ids": _CONTENT_IDS,
             "csrf": ([True], [True]),
             "cookies": (secret, secret),
@@ -162,3 +147,31 @@ def test_index_workspace_content_preserves_native_rendering(
         }
         # Assert
         assert result == expected
+
+
+def test_details_strip_sections_hold_their_tabs_controls(_private_context):
+    # Arrange -- operator 2026-10-22: Advanced (Search), library ops
+    # (Library), and the node sheet (Graph) live in the Details strip,
+    # one section per tab; only the active tab's section shows.
+    request = RequestFactory().get("/")
+    # Act
+    dom = BeautifulSoup(views.index(request).content.decode(), "html.parser")
+    search = dom.select_one("[data-search-hint]")
+    library = dom.select_one("[data-library-hint]")
+    graph = dom.select_one("[data-graph-hint]")
+    placed = (
+        search.select_one("#searchMode") is not None
+        and search.select_one("#searchSourcesGrid") is not None
+        and search.select_one("#searchNoCache") is not None
+        and library.select_one("#libraryExportBtn") is not None
+        and library.select_one("#zoteroImportBtn") is not None
+        and library.select_one("#cpImportBtn") is not None
+        and graph.select_one("#nodeDetailsPanel") is not None
+    )
+    shown = (
+        "hidden" not in search.get("class", [])
+        and "hidden" in library.get("class", [])
+        and "hidden" in graph.get("class", [])
+    )
+    # Assert
+    assert (placed, shown) == (True, True)

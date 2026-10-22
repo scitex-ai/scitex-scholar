@@ -42,7 +42,9 @@
   --bg-secondary: #efeeed;
   --bg-tertiary: #e8e7e5;
   --bg-monaco: #fdfcfa;
-  --accent-hover: #059669;
+  /* Operator hue decision 2026-10-20: navy CTA (base #1a2a40), hover
+   * darkened one step. The old green is gone. */
+  --accent-hover: #0f1e33;
   --edge-color: #c0bfbd;
   /*
    * #93: the database-search input is the app's primary control, so it is
@@ -69,7 +71,9 @@
   --bg-secondary: #151515;
   --bg-tertiary: #1a1a1a;
   --bg-monaco: #1e1e1e;
-  --accent-hover: #047857;
+  /* Operator hue decision 2026-10-20: gold CTA (base #d4a87a), hover
+   * darkened one step. The old green is gone. */
+  --accent-hover: #b98d5f;
   --edge-color: #3a3a3a;
 }
 

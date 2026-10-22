@@ -20,10 +20,16 @@ pytest_plugins = ("tests.scitex_scholar._django.test_views_shell_context",)
 
 
 def _leaf_assets(dom):
-    """Keep real leaf asset order/attributes and the translated JSON script."""
+    """Keep real leaf asset order/attributes and the translated JSON script.
+
+    The shell-head favicon (rel="icon", operator 2026-10-20 navy mark) is
+    deliberately excluded: it lives in the full page's branding partial,
+    which the hub fragment mount never renders -- including it here would
+    fail every fragment-vs-full comparison by construction.
+    """
     return tuple(str(node) for node in dom.select(
         'meta[name="stx-mount"], meta[name="theme-color"], '
-        'link[href^="/static/scholar/"], script[src^="/static/scholar/"], '
+        'link[href^="/static/scholar/"]:not([rel="icon"]), script[src^="/static/scholar/"], '
         'script#SCHOLAR_I18N'
     ))
 
@@ -88,7 +94,7 @@ def test_workspace_renderer_conserves_index_at_trusted_root(
                 "outer_shell": len(fragment.select("html,head,body")),
                 "mount": [node["content"] for node in fragment.select('meta[name="stx-mount"]')],
                 "language": fragment_response.headers["Content-Language"],
-                "library_text": fragment.select_one('[data-tab="library"]').get_text(),
+                "library_text": fragment.select_one('[aria-controls="tab-library"]').get_text(),
                 "csrf": (full_csrf, fragment_csrf),
                 "cookie": fragment_response.cookies[settings.CSRF_COOKIE_NAME].value,
                 "roots": (before, tuple(views._library_root_for(req) for req in (request, fragment_request))),

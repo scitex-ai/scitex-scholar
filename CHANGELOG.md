@@ -7,6 +7,50 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.19.0] - 2026-10-20
+
+Old-direct unification tail (U1-U8, PR #252-#259) + the four hub-only
+search engines (PR #260-#263) + the official navy favicon (PR #251):
+
+### Added
+- Search syntax-help endpoint + `?` header affordance (U1, PR #252).
+- Search engine queue-status chrome bound to the pipeline progress
+  callback (U2, PR #253).
+- Source-selection persistence: visitor localStorage + file-user
+  user-root JSON, no UserPreference model (U3, PR #254).
+- Bulk citations in RIS/EndNote over selected results (U4, PR #255).
+- Graph step zoom in/out on the renderer transform (U5, PR #256).
+- Graph download-PNG rasterized from the live SVG (U6, PR #257).
+- Graph node detail sheet from loaded metadata, Esc + focus return
+  (U7, PR #258).
+- bioRxiv search engine (PR #260).
+- DOAJ search engine (PR #261).
+- PLOS search engine (PR #262).
+- PMC search engine with esummary metadata (PR #263).
+- Official navy favicon (white snake on navy) via the branding
+  partial (PR #251).
+
+## [1.18.0] - 2026-10-19
+
+Old-direct unification, 11 slices (PR #237-#247), plus Scholar tabs
+convergence onto the SDK content-tabs SSoT primitive (PR #236):
+
+### Added
+- Search Sources grid end to end (?sources=) (slice 1, PR #237).
+- Search range filters: year, cites, IF (slice 2, PR #238).
+- Results-header tools: abstract toggle, open URLs, BibTeX (slice 3,
+  PR #239).
+- Library annotations: sidecar backend + details UI (slice 4, PR #240).
+- BibTeX import preview-before-save (slice 5, PR #241).
+- Graph multi-seed + query builds API parity (slice 6, PR #242).
+- CSV library export (slice 7, PR #243).
+- Single-paper citation endpoint (slice 8, PR #244).
+- Saved-graphs UI: save/load/delete (slice 9, PR #245).
+- Library remove + graph rename close-out writes (slice 10, PR #246).
+- Open-access PDF download (slice 11, PR #247).
+- Scholar tabs converged onto the SDK content-tabs SSoT primitive
+  (PR #236).
+
 ## [1.17.0] - 2026-10-19
 
 ### Added

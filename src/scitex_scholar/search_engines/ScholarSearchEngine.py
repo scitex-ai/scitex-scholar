@@ -28,7 +28,7 @@ IO:
 """
 
 from datetime import datetime
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Callable, Dict, List, Literal, Optional
 
 import scitex_logging as logging
 
@@ -98,6 +98,8 @@ class ScholarSearchEngine:
         filters: Optional[Dict[str, Any]] = None,
         max_results: int = 100,
         parse_query: bool = True,
+        sources: Any = None,
+        on_progress: Optional[Callable[[str, str, int], None]] = None,
     ) -> Dict[str, Any]:
         """Search for academic papers across multiple databases.
 
@@ -107,6 +109,12 @@ class ScholarSearchEngine:
             filters: Additional filters (merged with parsed query filters)
             max_results: Maximum number of results to return
             parse_query: Whether to parse query for advanced syntax
+            sources: Optional explicit source selection (old-direct Sources
+                grid). Runs exactly those engines; None/empty keeps tiers.
+            on_progress: Optional callback(engine_name, status, count) --
+                old-direct U2 queue panel binds this; the parallel pipeline
+                fires it per engine ('loading'/'completed'/'error').
+                None (default) keeps existing behavior exactly.
 
         Returns:
             Dict with:
@@ -167,13 +175,25 @@ class ScholarSearchEngine:
             self.stats["single_searches"] += 1
             logger.info(f"{self.name}: Using single (sequential) search mode")
 
-        # Execute search
+        # Execute search (old-direct U2: the queue panel binds this callback;
+        # None by default, so existing callers see zero behavior change --
+        # the single pipeline has no progress hook, so it stays unwired).
         try:
-            result = await pipeline.search_async(
-                query=clean_query,
-                filters=combined_filters,
-                max_results=max_results,
-            )
+            if search_mode == "parallel":
+                result = await pipeline.search_async(
+                    query=clean_query,
+                    filters=combined_filters,
+                    max_results=max_results,
+                    sources=sources,
+                    on_progress=on_progress,
+                )
+            else:
+                result = await pipeline.search_async(
+                    query=clean_query,
+                    filters=combined_filters,
+                    max_results=max_results,
+                    sources=sources,
+                )
 
             # Update statistics
             search_time = (datetime.now() - start_time).total_seconds()

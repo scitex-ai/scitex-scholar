@@ -120,6 +120,52 @@
 }
 
 /*
+ * Slice 1 (old-direct unification): the Sources grid. Old-direct renders
+ * one checkbox per source (local corpora first, then external APIs); the
+ * leaf grid follows the same order with the shared check-label shape.
+ */
+.search-advanced__row--stack {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+.search-sources-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 2px 14px;
+  width: 100%;
+}
+.search-sources-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/*
+ * Slice 2 (old-direct unification): the Filters grid. Old-direct renders
+ * noUiSlider range sliders; the leaf uses native number inputs in the same
+ * grid shape (no slider dependency to carry).
+ */
+.search-filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px 14px;
+  width: 100%;
+}
+.search-filters-grid__item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.search-filters-grid__name {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.search-filters-grid__item .form-input {
+  width: 100%;
+}
+
+/*
  * L345 (compass 2026-09-10): per-result "Build citation graph" action. A
  * quiet secondary button next to the DOI -- the demotion path that lets a
  * graph be started FROM a search result instead of only via the top-level tab.
@@ -240,4 +286,82 @@
 .search-result__save-btn:disabled {
   opacity: 0.6;
   cursor: default;
+}
+
+/*
+ * Old-direct U2: the queue-status chrome. Hub progressive_loading panel
+ * shape (per-engine status + counts), leaf tokens. Monotone + theme
+ * --accent only (operator color discipline 2026-10-20): done/error are
+ * text + opacity states, never bright fills.
+ */
+.search-queue {
+  margin-top: 16px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.search-queue__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.search-queue__title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.search-queue__totals {
+  display: flex;
+  gap: 12px;
+  color: var(--text-muted);
+}
+
+.search-queue__engines {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+.search-queue__engine {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.search-queue__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+
+.search-queue__engine[data-status="completed"] .search-queue__dot {
+  background: var(--accent);
+}
+
+.search-queue__engine[data-status="error"] .search-queue__dot {
+  background: none;
+  border: 1px solid var(--text-muted);
+}
+
+.search-queue__engine[data-status="error"] .search-queue__name {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.search-queue__name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.search-queue__count {
+  color: var(--text-muted);
 }

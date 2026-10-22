@@ -144,7 +144,9 @@
 }
 
 .library-io__select {
-  max-width: 160px;
+  max-width: none;
+  width: auto;
+  min-width: 11em;
 }
 
 .btn-control-library {
@@ -236,10 +238,9 @@
  * Same surface as the Import/Export row and filter bar so the three read
  * as one toolbar family; title/hint/status are quiet secondary text and
  * the controls reuse .library-io__* and .btn-control-library. Tokens only.
- * Project sync: the Library shows the sync target as read-only text only
- * (operator CCT4597 -- the header picker is the one selector, so the
- * interactive filter chips are gone); per-row filed-project badges reuse
- * the quiet chip shape below with --static.
+ * Parity slice 3c: project-sync row (sync target + filter chips) and
+ * per-row filed-project chips. Chips are links (navigation), so they read
+ * as controls, not badges; the --active chip names the current sync target.
  */
 .library-project {
   display: flex;
@@ -255,6 +256,12 @@
   color: var(--text-secondary);
 }
 
+.library-project__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
 .library-project__chip {
   display: inline-block;
   padding: 2px 10px;
@@ -266,6 +273,12 @@
   border-radius: 999px;
 }
 
+.library-project__chip--active {
+  color: var(--text-on-accent, #fff);
+  background: var(--accent, #1a2a40);
+  border-color: var(--accent, #1a2a40);
+}
+
 .library-project__chip--static {
   cursor: default;
 }
@@ -275,6 +288,139 @@
   flex-wrap: wrap;
   gap: 6px;
   margin-top: 4px;
+}
+
+/*
+ * Slice 4b (old-direct unification): annotation badges + per-row details
+ * panel (reading status, stars, tags, notes, save). Shapes reuse the
+ * project-chip and secondary-button tokens.
+ */
+.library-item__annotations {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+.library-item__annotations:empty {
+  display: none;
+}
+.library-annotation__chip {
+  font-size: 11px;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: 10px;
+  padding: 1px 8px;
+}
+.library-annotation__stars {
+  font-size: 12px;
+  color: var(--accent);
+  letter-spacing: 1px;
+}
+.library-item__details {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.library-details__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.library-details__status-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+.library-details__status-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-primary);
+  cursor: pointer;
+  min-height: var(--input-height, 44px);
+}
+.library-details__status-option input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+.library-details__stars {
+  display: flex;
+  gap: 2px;
+}
+.library-details__star {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+.library-details__notes {
+  min-height: 88px;
+  resize: vertical;
+}
+.library-details__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.library-details__status {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.library-details__remove {
+  color: var(--status-error);
+  border-color: var(--status-error);
+}
+
+/*
+ * Slice 5 (old-direct unification): import preview-before-save panel.
+ * Entry rows reuse the library-item title/meta shapes.
+ */
+.library-import-preview {
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+}
+.library-import-preview__entries {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 8px 0;
+  max-height: 320px;
+  overflow-y: auto;
+}
+.library-import-preview__title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.library-import-preview__meta {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.library-import-preview__exists {
+  font-size: 11px;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  padding: 1px 8px;
+  margin-left: 8px;
+}
+.library-import-preview__actions {
+  display: flex;
+  gap: 10px;
 }
 
 .library-ext {

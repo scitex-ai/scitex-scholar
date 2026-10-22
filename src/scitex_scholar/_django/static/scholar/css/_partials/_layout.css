@@ -1,5 +1,5 @@
 /**
- * Scholar GUI - App shell layout and tab navigation.
+ * Scholar GUI - App shell layout (tab bar: SDK content-tabs SSoT sheet).
  */
 
 /* ── Layout ────────────────────────────────────────────────── */
@@ -31,42 +31,14 @@
 }
 
 /* ── Tabs ──────────────────────────────────────────────────── */
-.tab-nav {
-  display: flex;
-  border-bottom: 1px solid var(--border-default);
-  background: var(--bg-secondary);
-  padding: 0 16px;
-}
-
-.tab-btn {
-  /*
-   * Touch-target minimum on the tab bar (compass L303 / WCAG 2.5.5).
-   * Same token as the search input so the whole UI grows together when
-   * scitex-ui merges --input-height.
-   */
-  min-height: var(--input-height, 44px);
-  padding: 12px 20px;
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  color: var(--text-muted);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  transition:
-    color 0.15s,
-    border-color 0.15s;
-}
-
-.tab-btn:hover {
-  color: var(--text-primary);
-}
-.tab-btn.active {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
-}
+/*
+ * The tab BAR is the SDK SSoT sheet (scitex_sdk/ui/css/app/content-tabs.css,
+ * linked in the workspace_assets head): no .stx-content-tabs selectors live
+ * here at all — the shared sheet owns the layout, the 13px labels, the 44px
+ * touch targets, and the selected state (aria-selected). Scholar keeps only
+ * its panel show/hide below; panels are not part of the shared primitive.
+ * See test_tabs_use_sdk_ssot_stylesheet / test_tabs_do_not_redefine_the_bar.
+ */
 
 .tab-panel {
   display: none;
@@ -139,6 +111,35 @@
   }
 }
 
+/* Selected-tab legibility guard (operator 2026-10-20/21 + SDK #60 polish):
+ * the SDK content-tabs sheet owns the underline indicator; this rule only
+ * restores the border-bottom the `border-color: transparent` reset would
+ * otherwise clear (cascade order), and brightens the label. No box, no
+ * weight change — underline only, per the UI standard. */
+.stx-content-tabs .stx-content-tabs__tab[aria-selected="true"] {
+  border-radius: 0;
+  color: var(--text-primary, #1a1a1a);
+  border-color: transparent;
+  border-bottom: 2px solid var(--accent, #1a2a40);
+  background: transparent;
+}
+
+/* Old-direct scroll model (operator parity 2026-10-21): the SDK shell
+ * makes `.ws-module-pane` the page scroller, so its own scrollbar gutter
+ * shrinks the header + content 15px off the module edge (measured 1265
+ * vs 1280). Old-direct keeps the outer fixed and scrolls inner panes.
+ * Scholar-scoped: `.app-container` exists only on this leaf's pages, so
+ * the shared sheets are untouched. */
+.ws-module-pane {
+  overflow-y: hidden;
+}
+
+.app-container {
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+}
+
 /* The shared sheet owns the header's phone behaviour (wrap at 600px, touch
  * targets); scholar keeps only its container height fix. */
 @media (max-width: 600px) {
@@ -146,4 +147,18 @@
     height: auto;
     min-height: calc(100dvh - 118px);
   }
+}
+
+/* Operator 2026-10-20: the header version pill reads as loud UI chrome.
+ * Subdue it leaf-side (the shared sheet owns the pill shape): 10px muted
+ * text, no weight, no border. Reversible; hide entirely only if the
+ * operator asks -- the version stays in the DOM for bug reports. */
+.scholar-app-header .stx-app-header__version {
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--text-muted);
+  border: none;
+  background: none;
+  padding: 0;
 }
