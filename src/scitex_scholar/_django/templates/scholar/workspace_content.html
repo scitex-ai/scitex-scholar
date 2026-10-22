@@ -316,7 +316,7 @@
                                                        required
                                                        aria-describedby="graphSeedHelp"
                                                        placeholder="e.g. 10.1038/s41586-020-2008-3">
-                                                <button type="submit" class="btn-build">{% trans "Build Graph" %}</button>
+                                                <button type="submit" class="btn-build" id="graphBuildBtn" disabled>{% trans "Build Graph" %}</button>
                                             </div>
                                             <small id="graphSeedHelp">{% trans "Paste the DOI for one seed paper; titles and keywords belong in Search." %}</small>
                                         </div>
@@ -368,41 +368,10 @@
                                            class="form-input graph-saved-bar__input"
                                            placeholder="{% trans "Graph name" %}"
                                            maxlength="200">
-                                    <button type="button" id="graphSaveBtn" class="btn-control-library">{% trans "Save current graph" %}</button>
+                                    <button type="button" id="graphSaveBtn" class="btn-control-library" disabled>{% trans "Save current graph" %}</button>
                                 </div>
                                 <div id="graphSavedStatus" class="library-io__status" role="status"></div>
                                 <div id="graphSavedList" class="graph-saved-list"></div>
-                            </div>
-                        </div>
-                        <!-- How It Works (old-direct parity, slice 3a): the
-                             three relatedness signals the graph renders.
-                             Static explainer, translated like every other
-                             label (JA rule). -->
-                        <div class="graph-card">
-                            <div class="graph-card__header">
-                                <span class="graph-card__title">{% trans "How It Works" %}</span>
-                            </div>
-                            <div class="graph-card__body">
-                                <div class="info-list">
-                                    <div class="info-item">
-                                        <div>
-                                            <strong>{% trans "Bibliographic Coupling" %}</strong>
-                                            <p>{% trans "Papers sharing common references" %}</p>
-                                        </div>
-                                    </div>
-                                    <div class="info-item">
-                                        <div>
-                                            <strong>{% trans "Co-citation" %}</strong>
-                                            <p>{% trans "Papers frequently cited together" %}</p>
-                                        </div>
-                                    </div>
-                                    <div class="info-item">
-                                        <div>
-                                            <strong>{% trans "Direct Citations" %}</strong>
-                                            <p>{% trans "Papers citing or cited by the seed" %}</p>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                         <!-- Loading -->
