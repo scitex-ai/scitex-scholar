@@ -4,13 +4,15 @@
         {# the `.scholar-app-header` scope for the operator-ruled version-pill #}
         {# subdue (2026-10-20, reversible); it is a div, never a <header>. #}
         <div class="scholar-app-header">
-          <link rel="stylesheet" href="{% static 'scitex_sdk/ui/css/app/app-header.css' %}">
           <div data-stx-app-header
                data-app-title="{% translate "SciTeX Scholar" %}"
                {% if scholar_version %}data-app-version="{{ scholar_version }}"{% endif %}></div>
-          <script type="module" src="{% static 'scitex_sdk/ui/js/app/app-header.js' %}"></script>
+          {# app-header.css + the prebuilt mount module load page-wide from #}
+          {# workspace_assets (head/scripts stages), not from this fragment: #}
+          {# the fragment must stay pure content (see the native-render test). #}
           {% include "scholar/_project_picker.html" %}
-          <script type="module" src="{% static 'scholar/js/header-picker.js' %}"></script>
+          {# header-picker.js likewise loads from the scripts stage, after #}
+          {# the mount module, so its DOMContentLoaded listener runs later. #}
         </div>
         <div class="app-container" data-scholar-root>
             <!-- No left sidebar: even graph interaction hints live in the
