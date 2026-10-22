@@ -43,6 +43,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const retryBtn = document.getElementById("searchRetryBtn");
   const results = document.getElementById("searchResults");
   const resultsContent = document.getElementById("searchResultsContent");
+  // Pre-search empty state (operator 2026-10-22): hidden on first submit,
+  // never re-shown — zero-result searches use the in-results empty-message.
+  const emptyState = document.getElementById("searchEmptyState");
   const stats = document.getElementById("searchStats");
   const sortSelect = document.getElementById("searchSort");
   const sourceFilter = document.getElementById("searchSourceFilter");
@@ -970,6 +973,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     hide(errorBox);
     hide(results);
+    hide(emptyState);
     show(loading);
     // Old-direct U2: reveal the queue panel in its searching state.
     if (queuePanel) queuePanel.hidden = false;

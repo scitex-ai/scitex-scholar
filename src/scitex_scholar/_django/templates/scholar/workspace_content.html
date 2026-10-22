@@ -93,6 +93,17 @@
                                     API status. -->
                             </div>
                         </div>
+                        <!-- Pre-search empty state (operator 2026-10-22: no dead
+                            void below the form). search.js hides it on
+                            submit next to hide(results); zero-result
+                            searches keep their own in-results empty-message.
+                            Reuses the shared .tab-placeholder shape. -->
+                        <div id="searchEmptyState" class="tab-placeholder">
+                            <div>
+                                <h3>{% trans "Run a search to see results" %}</h3>
+                                <p>{% trans "Enter a query above — papers from OpenAlex, Crossref, PubMed and more will appear here." %}</p>
+                            </div>
+                        </div>
                         <!-- Loading -->
                         <div id="searchLoading" class="graph-loading hidden">
                             <div class="loading-spinner">
