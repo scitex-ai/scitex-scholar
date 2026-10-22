@@ -96,6 +96,15 @@ function initScholarTabs(root) {
 
     if (focus) tab.focus();
     syncStripHints(tabKey(tab));
+    // Producer announcement (operator 2026-10-22): consumers that act on
+    // tab-opening (graph health probe, lazy loaders) listen for this
+    // instead of cloning tab-input listeners that miss swipe/arrow/prefill.
+    root.dispatchEvent(
+      new CustomEvent("scholar:tab-activated", {
+        detail: { tab: tabKey(tab) },
+        bubbles: true,
+      }),
+    );
   }
 
   function stepTab(delta, focus) {
