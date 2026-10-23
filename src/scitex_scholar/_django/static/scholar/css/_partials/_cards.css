@@ -3,11 +3,14 @@
  */
 
 /* ── Citation Graph Container ──────────────────────────────── */
+/* Operator 2026-10-23: no margins on the largest div (tab-panel content).
+ * The tab body itself already spans the module; the wrapper keeps only
+ * gap, no padding (per-tab cards keep their own inner padding). */
 .citation-graph-container {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 16px;
+  padding: 0;
   flex: 1;
   min-height: 0;
 }
