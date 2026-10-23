@@ -144,7 +144,7 @@
 }
 
 .library-io__select {
-  max-width: none;
+  max-width: 100%;
   width: auto;
   min-width: 11em;
 }
