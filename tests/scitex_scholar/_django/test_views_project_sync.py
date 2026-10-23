@@ -323,13 +323,16 @@ def test_library_strip_has_no_orphan_separators():
 def test_library_export_select_fits_longest_option():
     # Arrange -- operator 2026-10-22 (screenshot loop): the select clipped
     # 'BibTeX (.bib' with no closing paren (160px cap). The strip rule
-    # drops the cap and floors the width at 11em.
+    # drops the cap and floors the width. Operator 2026-10-23: an 11em
+    # floor overran the narrow strip card (min-width beats max-width, so
+    # the card overflowed); the flex-basis 8em floor keeps the no-cap
+    # intent at a width the strip fits.
     # Act
     css = (
         Path(views.__file__).parent
         / "static" / "scholar" / "css" / "_partials" / "_library.css"
     ).read_text()
-    fits = "min-width: 11em" in css and "max-width: 160px" not in css
+    fits = "flex: 1 1 8em" in css and "max-width: 160px" not in css
     # Assert
     assert fits
 
