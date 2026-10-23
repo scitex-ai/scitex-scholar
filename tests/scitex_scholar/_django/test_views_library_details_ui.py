@@ -21,6 +21,7 @@ TEMPLATE = (
 LIBRARY_JS = (
     Path(views.__file__).parent / "static" / "scholar" / "js" / "library.js"
 ).read_text()
+CSS_DIR = Path(views.__file__).parent / "static" / "scholar" / "css" / "_partials"
 
 
 def test_library_filter_row_carries_sort_select():
@@ -108,3 +109,22 @@ def test_library_strip_section_mirrors_list_counts():
     )
     # Assert
     assert counts_only
+
+
+def test_details_export_select_clamps_to_strip_width():
+    # Arrange -- operator 2026-10-23 Details-tab style: the Export
+    # dropdown overran its narrow strip card (measured live). It must
+    # clamp to the card instead of forcing its min-width.
+    # Act
+    css = (CSS_DIR / "_library.css").read_text()
+    # Assert
+    assert (".library-io__select" in css, "max-width: 100%" in css) == (True, True)
+
+
+def test_details_advanced_marker_is_ascii_safe():
+    # Arrange -- the Details Advanced toggle used U+25B8/25BE markers,
+    # which render as tofu boxes on minimal fonts (measured live).
+    # Act
+    css = (CSS_DIR / "_search.css").read_text()
+    # Assert
+    assert ('content: "+ "' in css, "\\25B8" not in css) == (True, True)
