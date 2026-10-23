@@ -1631,12 +1631,25 @@ def _assert_safe_project_name(project: str) -> str:
     Reserved store names (MASTER, downloads, ...) are refused too: they are
     real directories under the root but never projects, and the picker
     filter excludes them for the same reason.
+
+    The SDK header picker navigates with ``?project=<owner>/<slug>`` (the
+    provider id contract), so a value carrying exactly one ``owner/``
+    prefix is accepted by filtering on its last component -- the slug is
+    the filing directory, the owner is identity context, not a path.
+    Anything else with a separator still fails closed.
     """
     from scitex_scholar.storage._project_reconcile import RESERVED_LIBRARY_DIRS
 
     if not isinstance(project, str):
         raise ValueError("unsafe project name: not a string")
-    if not project or "/" in project or "\\" in project or "\x00" in project:
+    if "\\" in project or "\x00" in project:
+        raise ValueError("unsafe project name: not a single path component")
+    # Accept the SDK picker id form ``owner/slug``: the slug (last
+    # component) is the filing directory. Deeper paths stay refused.
+    parts = project.split("/")
+    if len(parts) == 2 and all(parts):
+        project = parts[1]
+    elif not project or "/" in project:
         raise ValueError("unsafe project name: not a single path component")
     if project in (".", ".."):
         raise ValueError("unsafe project name: traversal token")
