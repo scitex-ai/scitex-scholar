@@ -7,6 +7,15 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.21.0] - 2026-10-23
+
+Seed-only Graph tab: the typed-DOI Build Citation Network card and the
+Saved graphs card are deleted (backend `api/graphs/*` endpoints kept for
+Library-tab CRUD). Seeds build directly at the fixed graph width; Search
+per-result buttons jump to the Graph tab and dispatch one-shot
+`scholar:build-graph` events. Tab content full-bleed: the 16px wrapper
+padding is removed (cards keep their own inner padding).
+
 ## [1.20.0] - 2026-10-23
 
 Operator Scholar UI batch (2026-10-23): header, Details, inputs, favicon,
