@@ -585,14 +585,14 @@ def test_status_strip_sits_at_right_edge():
     assert placed == (True, True, True)
 
 
-def test_status_strip_uses_led_dots_with_expand():
-    """The strip follows the old Sources style: LED dots + expandable detail.
+def test_status_strip_has_no_shared_expander():
+    """No shared Service Status expander duplicates the per-tab status.
 
-    Hub's old Scholar UI (scholar_base.html) shows per-source LED dots
-    (data-source + data-status) synced with an expandable Sources panel.
-    The strip renders one dot per backend (CrossRef API, citation graph) and
-    the translated detail/fix paragraph inside <details> expanders; the
-    #serviceStatus id stays so checkServiceHealth keeps rendering into it.
+    Operator 2026-10-23: the shared <details class="status-expand"> (LED
+    dots + CrossRef/Citation rows) duplicated what each tab's own Details
+    section already shows. Each backend status lives in its tab's section:
+    CrossRef in Search Advanced, the graph backend (same #serviceStatus id
+    checkServiceHealth renders into) in the Graph section.
     """
     # Arrange
     template = (
@@ -602,13 +602,13 @@ def test_status_strip_uses_led_dots_with_expand():
         / "workspace_content.html"
     ).read_text()
     # Act
-    styled = (
-        'data-source="crossref"' in template and 'data-source="graph"' in template,
-        "<details" in template and 'id="serviceStatus"' in template,
-        "data-status" in template,
+    per_tab = (
+        "status-expand" not in template,
+        "status-led" not in template,
+        'id="serviceStatus"' in template,
     )
     # Assert
-    assert styled == (True, True, True)
+    assert per_tab == (True, True, True)
 
 
 def test_status_strip_is_collapsible():
@@ -3481,8 +3481,10 @@ def test_main_page_ja_render_has_no_untranslated_labels():
     # Act
     ja = _render_index_in("ja")
     # Assert -- the EN source of a header label is absent (replaced by JA) and
-    # the JA catalog produced Japanese text on the page.
-    assert "Service Status" not in ja and "サービス状態" in ja
+    # the JA catalog produced Japanese text on the page. Operator 2026-10-23
+    # deleted the shared Service Status expander, so the probe label is the
+    # Graph tab's own backend-status label (per-tab status, no duplication).
+    assert "Citation Graph" not in ja and "引用グラフ" in ja
 
 
 def test_ja_catalog_translates_every_msgid():
