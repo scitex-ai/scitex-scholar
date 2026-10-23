@@ -7,4 +7,4 @@ include) and moved into the canonical
 `scholar/js/header-picker.js`. The tag renders NOTHING unless the request
 is signed in AND the host registered a project provider, so standalone
 serves unchanged markup.
-{% endcomment %}{% scitex_project_picker scope=app_scope current=current_project %}
+{% endcomment %}{% scitex_project_picker scope=app_scope current=current_project allow_user_scope=True current_scope=current_scope %}
