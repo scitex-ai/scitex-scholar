@@ -56,12 +56,12 @@
   list-style: none;
 }
 .search-advanced__summary::before {
-  content: "\25B8 "; /* ▸ collapsed, ▾ expanded */
+  content: "+ "; /* ASCII-safe collapsed marker (U+25B8 tofu on minimal fonts) */
   display: inline-block;
   transition: transform 0.15s;
 }
 .search-advanced[open] .search-advanced__summary::before {
-  content: "\25BE ";
+  content: "– ";
 }
 .search-advanced__summary::-webkit-details-marker {
   display: none;

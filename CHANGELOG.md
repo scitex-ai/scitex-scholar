@@ -7,6 +7,50 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.21.0] - 2026-10-23
+
+Seed-only Graph tab: the typed-DOI Build Citation Network card and the
+Saved graphs card are deleted (backend `api/graphs/*` endpoints kept for
+Library-tab CRUD). Seeds build directly at the fixed graph width; Search
+per-result buttons jump to the Graph tab and dispatch one-shot
+`scholar:build-graph` events. Tab content full-bleed: the 16px wrapper
+padding is removed (cards keep their own inner padding).
+
+## [1.20.0] - 2026-10-23
+
+Operator Scholar UI batch (2026-10-23): header, Details, inputs, favicon,
+and the old-direct Details follow-ups.
+
+### Added
+- Header project picker with user-scope opt-in: an explicit "No project
+  selected" user-space state; the selection is the on-screen scope
+  indicator and drives `?project=` filtering/saves.
+- Collapsible Details sections (old-direct ctrl-section parity): click or
+  Enter/Space on a section header toggles it, chevron rotates,
+  `aria-expanded` stays in sync.
+- Graph backend status row inside the Graph Details section (same
+  `#serviceStatus` id the health probe renders into).
+
+### Changed
+- Shared control height is the two-line `--scholar-search-height` (52px):
+  inputs, selects, and buttons resolve the same token, so each row's
+  controls align exactly (old-direct one-height parity).
+- Official-mark favicon via a leaf `favicon_href` override (white snake on
+  navy, byte copy of the SDK-develop mark). SUNSET: drop the override once
+  the installed SDK serves the official mark.
+- Library Details carries no project selector (header picker only);
+  per-row filed-project chips stay (display only).
+- Export select clamps to the narrow Details strip (`flex: 1 1 8em`,
+  `min-width: 0`) instead of overrunning its card.
+- Advanced toggle marker is ASCII-safe (`+`/`–`, was tofu-prone U+25B8/25BE).
+- The shared Service Status expander is deleted (it duplicated the per-tab
+  status rows).
+
+### Fixed
+- `?project=owner/slug` (SDK picker id contract) accepted by the library
+  project filter; unknown-but-safe selections degrade to unfiltered,
+  writes stay fail-closed (verified live with hub slugs).
+
 ## [1.19.0] - 2026-10-20
 
 Old-direct unification tail (U1-U8, PR #252-#259) + the four hub-only
