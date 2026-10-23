@@ -80,6 +80,28 @@ function initScholarTabs(root) {
     if (graphHint) graphHint.classList.toggle("hidden", key !== "graph");
   }
 
+  // Operator 2026-10-23 (old-direct parity): Details sections collapse
+  // like old-direct's ctrl-section -- click (or Enter/Space on) the
+  // header toggles the section, chevron rotates via CSS, aria-expanded
+  // stays in sync. Tab switching (hidden) and collapsing (.collapsed)
+  // are orthogonal states.
+  function toggleSection(header) {
+    const section = header.closest(".sidebar-section");
+    if (!section) return;
+    const collapsed = section.classList.toggle("collapsed");
+    header.setAttribute("aria-expanded", String(!collapsed));
+  }
+
+  root.querySelectorAll(".sidebar-section__header").forEach((header) => {
+    header.addEventListener("click", () => toggleSection(header));
+    header.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        toggleSection(header);
+      }
+    });
+  });
+
   function activateTab(tab, focus) {
     tabs.forEach((t) => {
       const selected = t === tab;

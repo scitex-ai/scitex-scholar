@@ -26,6 +26,36 @@
   color: var(--text-primary);
 }
 
+/*
+ * Operator 2026-10-23 (old-direct parity): Details sections collapse
+ * like old-direct's ctrl-section (click the header, chevron rotates).
+ * Collapsing hides everything below the header, never the header itself.
+ * The chevron is pure CSS (no icon font, no new strings): aria-expanded
+ * on the header carries the state.
+ */
+.sidebar-section__chevron {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid var(--text-secondary);
+  transition: transform 0.15s;
+  flex-shrink: 0;
+}
+
+.sidebar-section.collapsed > :not(.sidebar-section__header) {
+  display: none;
+}
+
+.sidebar-section.collapsed .sidebar-section__chevron {
+  transform: rotate(-90deg);
+}
+
+.sidebar-section__header:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
 .sidebar-section__content {
   padding: 12px;
   border-top: 1px solid var(--border-default);

@@ -128,3 +128,27 @@ def test_details_advanced_marker_is_ascii_safe():
     css = (CSS_DIR / "_search.css").read_text()
     # Assert
     assert ('content: "+ "' in css, "\\25B8" not in css) == (True, True)
+
+
+def test_details_sections_collapse_like_old_direct():
+    # Arrange -- operator 2026-10-23 Details-tab style, old-direct parity:
+    # old-direct's ctrl-sections collapse on header click (chevron).
+    # The strip headers carry the toggle affordance, CSS hides the
+    # collapsed body, and app.js wires click + keyboard.
+    # Act
+    template = (
+        Path(views.__file__).parent
+        / "templates"
+        / "scholar"
+        / "workspace_content.html"
+    ).read_text()
+    sidebar = (CSS_DIR / "_sidebar.css").read_text()
+    app_js = (
+        Path(views.__file__).parent / "static" / "scholar" / "js" / "app.js"
+    ).read_text()
+    # Assert
+    assert (
+        template.count('sidebar-section__header" role="button"') == 3,
+        ".sidebar-section.collapsed > :not(.sidebar-section__header)" in sidebar,
+        "toggleSection" in app_js,
+    ) == (True, True, True)
