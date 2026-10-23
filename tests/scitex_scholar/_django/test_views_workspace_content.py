@@ -21,9 +21,12 @@ _SCRIPT_NAMES = (
     "graph/ForceSimulation.js", "graph/GraphRenderer.js", "graph/citation-graph.js",
     "header-picker.js",
 )
+# Operator 2026-10-23 (seed-only Graph tab): the typed-DOI form is
+# deleted, so graphForm is no longer a native-rendered id. The seed list
+# (graphLibrarySeed) + canvas + saved-entity CRUD live in the Graph JS.
 _CONTENT_IDS = {
     "searchForm", "tab-search", "tab-library", "libraryImportFile",
-    "libraryImportBtn", "libraryExportBtn", "graphForm", "tab-graph",
+    "libraryImportBtn", "libraryExportBtn", "tab-graph",
     "searchSort", "searchSourceFilter", "searchBulkBar", "searchSelectAll",
     "searchSaveSelected", "searchEnrichSelected", "searchBulkStatus",
     "searchStripSummary", "libraryStripSummary", "graphStripSummary",

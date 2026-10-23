@@ -185,8 +185,12 @@ def test_library_details_carries_remove_action():
 
 
 def test_graph_saved_list_carries_rename_action():
-    # Arrange -- hub renames saved graphs from the graph page.
+    # Arrange -- operator 2026-10-23 (seed-only tab): the saved-graphs
+    # list is deleted; rename ships as a CRUD row action instead. The
+    # backend endpoint stays and the rename verb is pinned at the API
+    # layer (test_rename_updates_the_recipe_name); the UI asserts its own
+    # absence here so a future re-add of the saved area fails loudly.
     # Act
-    present = "/api/graphs/rename" in GRAPH_JS
+    present = 'id="graphSavedList"' not in TEMPLATE
     # Assert
     assert present

@@ -55,12 +55,10 @@ def test_graph_js_loads_seed_from_existing_library_endpoint():
 
 
 def test_graph_js_seed_selection_builds_graph():
-    """Clicking a library seed builds the graph for its DOI."""
+    """Clicking a library seed builds the graph directly (no form)."""
     # Arrange
     # Act
-    builds = "doiInput" in GRAPH_JS and (
-        "requestSubmit" in GRAPH_JS or "handleSubmit" in GRAPH_JS
-    )
+    builds = "DEFAULT_TOP_N" in GRAPH_JS and "handleSubmit" not in GRAPH_JS
     # Assert
     assert builds
 
@@ -79,24 +77,13 @@ def test_slice3a_js_strings_are_translatable():
     assert present == (True,) * 3
 
 
-def test_graph_build_stays_disabled_until_doi_typed():
-    # Arrange -- operator 2026-10-22 (screenshot loop): Build Graph enabled
-    # with an empty DOI box invites a no-op submit; it arms on input.
+def test_graph_seed_items_build_directly_at_fixed_width():
+    # Arrange -- operator 2026-10-23 (seed-only tab): no DOI form, so no
+    # disabled-until-typed arming; clicking a seed builds directly.
     # Act
-    starts_disabled = 'id="graphBuildBtn" disabled' in TEMPLATE
-    wired = 'getElementById("graphBuildBtn")' in GRAPH_JS and "syncBuild" in GRAPH_JS
+    direct = "buildGraph(doi, CitationGraphManager.DEFAULT_TOP_N)" in GRAPH_JS
     # Assert
-    assert (starts_disabled, wired) == (True, True)
-
-
-def test_graph_save_stays_disabled_until_build_exists():
-    # Arrange -- operator 2026-10-22 (screenshot loop): Save current graph
-    # enabled with no graph built invites a no-op save; buildGraph arms it.
-    # Act
-    starts_disabled = 'id="graphSaveBtn" class="btn-control-library" disabled' in TEMPLATE
-    armed_on_build = "saveBtn.disabled = false" in GRAPH_JS
-    # Assert
-    assert (starts_disabled, armed_on_build) == (True, True)
+    assert direct
 
 
 def test_graph_tab_announces_activation_for_lazy_consumers():

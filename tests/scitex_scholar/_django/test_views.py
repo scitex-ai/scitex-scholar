@@ -2246,9 +2246,7 @@ def test_search_primary_distinct_from_build_graph():
     # (Matched by id-then-label, not by the full tag: the button carries an
     # id + disabled attribute for the empty-DOI arming behavior.)
     search_is_primary = 'class="btn-primary">Search databases<' in body
-    build_graph_stays_secondary = (
-        'id="graphBuildBtn"' in body and ">Build Graph<" in body
-    )
+    build_graph_stays_secondary = 'id="graphBuildBtn"' not in body
     # Negative control: the search button is NOT also btn-build (that was the
     # pre-fix state — a single shared class with no visual distinction).
     search_not_btn_build = 'class="btn-build">Search databases<' not in body
@@ -4334,28 +4332,33 @@ def test_library_filter_field_label_is_translated_in_japanese():
 def test_graph_initial_state_explains_seed_and_library_workflow():
     # Arrange
     html = views.index(RequestFactory().get("/")).content.decode()
-    # Act
-    expected = ["Start with a DOI", "Search or your Library", "Max papers in graph"]
+    # Act -- operator 2026-10-23 seed-only: no DOI typing, no max-papers.
+    expected = ["Seed from your Library"]
+    dropped = ["Start with a DOI", "Max papers in graph", 'id="doiInput"']
     # Assert
-    assert all(text in html for text in expected)
+    assert all(text in html for text in expected) and all(text not in html for text in dropped)
 
 
-def test_graph_seed_is_required_and_not_prefilled():
-    # Arrange
+def test_graph_tab_carries_seed_list_not_doi_form():
+    # Arrange -- operator 2026-10-23 seed-only: DOI input deleted.
     html = views.index(RequestFactory().get("/")).content.decode()
     # Act
-    input_tag = re.search(r'<input[^>]+id="doiInput"[^>]*>', html).group(0)
+    seed_only = ('id="graphLibrarySeed"' in html, 'id="doiInput"' not in html)
     # Assert
-    assert "required" in input_tag and "value=" not in input_tag
+    assert seed_only == (True, True)
 
 
-def test_graph_limit_has_visible_and_accessible_meaning():
-    # Arrange
-    html = views.index(RequestFactory().get("/")).content.decode()
+def test_graph_width_is_a_fixed_constant():
+    # Arrange -- operator 2026-10-23 seed-only: no topN select.
+    from pathlib import Path as _Path
+    leaf_js = (
+        _Path(views.__file__).parent
+        / "static" / "scholar" / "js" / "graph" / "citation-graph.js"
+    ).read_text()
     # Act
-    select_tag = re.search(r'<select[^>]+id="topN"[^>]*>', html).group(0)
+    fixed = ("DEFAULT_TOP_N" in leaf_js, 'id="topN"' not in leaf_js)
     # Assert
-    assert 'aria-label="Maximum papers in citation graph"' in select_tag
+    assert fixed == (True, True)
 
 
 def _save_payload(paper_id="PID9", doi="10.9/example", title="Saved paper"):
