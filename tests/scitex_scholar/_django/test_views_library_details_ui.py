@@ -118,7 +118,7 @@ def test_details_export_select_clamps_to_strip_width():
     # Act
     css = (CSS_DIR / "_library.css").read_text()
     # Assert
-    assert (".library-io__select" in css, "max-width: 100%" in css) == (True, True)
+    assert (".library-io__select" in css, "min-width: 0" in css) == (True, True)
 
 
 def test_details_advanced_marker_is_ascii_safe():
