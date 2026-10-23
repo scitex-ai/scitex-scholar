@@ -70,10 +70,10 @@ def _private_context(tmp_path):
 
 @pytest.fixture(
     params=[
-        ("en", "/", "standalone", "SciTeX Scholar"),
-        ("ja", "/", "standalone", "SciTeX Scholar"),
-        ("en", "/apps/scholar/v2/", "hub", "SciTeX Scholar (hub)"),
-        ("ja", "/apps/scholar/v2/", "hub", "SciTeX Scholar (hub)"),
+        ("en", "/", "standalone", "Scholar"),
+        ("ja", "/", "standalone", "Scholar"),
+        ("en", "/apps/scholar/v2/", "hub", "Scholar (hub)"),
+        ("ja", "/apps/scholar/v2/", "hub", "Scholar (hub)"),
     ],
     ids=["en-root", "ja-root", "en-mounted", "ja-mounted"],
 )
@@ -371,21 +371,21 @@ def test_anonymous_leaf_search_reports_required_query(_anonymous_public_results)
 
 @pytest.fixture(
     params=[
-        ("en", "/", "standalone", None, "SciTeX Scholar"),
-        ("ja", "/", "standalone", None, "SciTeX Scholar"),
+        ("en", "/", "standalone", None, "Scholar"),
+        ("ja", "/", "standalone", None, "Scholar"),
         (
             "en",
             "/apps/scholar/v2/",
             "hub",
             "http://127.0.0.1:1",
-            "SciTeX Scholar (hub)",
+            "Scholar (hub)",
         ),
         (
             "ja",
             "/apps/scholar/v2/",
             "hub",
             "http://127.0.0.1:1",
-            "SciTeX Scholar (hub)",
+            "Scholar (hub)",
         ),
     ],
     ids=["en-root", "ja-root", "en-mounted", "ja-mounted"],
