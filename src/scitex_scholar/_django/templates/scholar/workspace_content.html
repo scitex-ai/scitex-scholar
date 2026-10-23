@@ -471,8 +471,9 @@
                         is active; visibility via syncStripHints in app.js.
                         Control ids and wiring unchanged. -->
                     <div class="sidebar-section" data-search-hint>
-                        <div class="sidebar-section__header">
+                        <div class="sidebar-section__header" role="button" tabindex="0" aria-expanded="true">
                             <span class="sidebar-section__title">{% trans "Databases" %}</span>
+                            <span class="sidebar-section__chevron" aria-hidden="true"></span>
                         </div>
                         <div class="sidebar-section__content">
                             <p class="sidebar-section__summary" id="searchStripSummary">{% trans "No search yet." %}</p>
@@ -619,8 +620,9 @@
                         list, filter, and import preview stay in the main
                         area. Control ids and wiring unchanged. -->
                     <div class="sidebar-section hidden" data-library-hint>
-                        <div class="sidebar-section__header">
+                        <div class="sidebar-section__header" role="button" tabindex="0" aria-expanded="true">
                             <span class="sidebar-section__title">{% trans "Library" %}</span>
+                            <span class="sidebar-section__chevron" aria-hidden="true"></span>
                         </div>
                         <div class="sidebar-section__content">
                             <p class="sidebar-section__summary" id="libraryStripSummary">{% trans "Library not loaded yet." %}</p>
@@ -700,8 +702,9 @@
                         addressed by id from citation-graph.js, so location
                         is free. -->
                     <div class="sidebar-section graph-controls-hint hidden" data-graph-hint>
-                        <div class="sidebar-section__header">
+                        <div class="sidebar-section__header" role="button" tabindex="0" aria-expanded="true">
                             <span class="sidebar-section__title">{% trans "Graph Controls" %}</span>
+                            <span class="sidebar-section__chevron" aria-hidden="true"></span>
                         </div>
                         <p class="sidebar-section__summary" id="graphStripSummary">{% trans "No graph built yet." %}</p>
                         <!-- Operator 2026-10-23: no shared status expander
