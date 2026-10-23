@@ -150,11 +150,14 @@ def test_index_shell_context_keeps_explicit_unused_pane(_shell_result, pane):
 
 def test_index_shell_context_keeps_user_scope(_shell_result):
     # Arrange
+    # Operator 2026-10-23: user scope opts into the header picker, so the
+    # shell keeps exactly one picker with the explicit user state.
     html = _shell_result["html"]
     # Act
     pickers = html.count("data-stx-project-picker")
+    user_state = 'data-current-scope="user"' in html
     # Assert
-    assert pickers == 0
+    assert (pickers, user_state) == (1, True)
 
 
 def test_index_shell_context_forwards_request_to_csrf_processor(_shell_result):

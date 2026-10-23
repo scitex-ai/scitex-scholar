@@ -36,45 +36,42 @@ SEARCH_JS = (
 ).read_text()
 
 
-def test_user_header_keeps_picker_suppressed():
-    """User scope never opts into the picker (tested page contract).
+PICKER_TEMPLATE = (
+    Path(views.__file__).parent
+    / "templates"
+    / "scholar"
+    / "_project_picker.html"
+).read_text()
 
-    Scholar is user-scoped; the SDK picker renders for project scope only.
-    Standalone project selection travels through the Library chips'
-    ?project= navigation, which the server resolves and remembers.
+
+def test_user_header_opts_into_picker():
+    """User scope opts into the header picker (tested page contract).
+
+    Scholar is user-scoped; the SDK picker tag renders for project scope
+    unless the app opts in. Operator 2026-10-23: the header carries an
+    explicit selector with a user-space choice, replacing the removed
+    Details-strip chips — so the picker template passes allow_user_scope
+    with the explicit current_scope state.
     """
     # Arrange
     # Act
-    opted = "allow_user_scope" in TEMPLATE
+    opted = ("allow_user_scope=True" in PICKER_TEMPLATE, "current_scope" in PICKER_TEMPLATE)
     # Assert
-    assert not opted
+    assert opted == (True, True)
 
 
-def test_library_chips_navigate_with_project_query():
-    """Chips select via the picker's ?project= contract, no new backend."""
+def test_library_details_carry_no_project_selector():
+    """No project selector lives in the Library Details strip.
+
+    Operator 2026-10-23: the header picker is the single selection
+    control. The Details chips + current-project indicator are deleted;
+    the list still follows the header picker's ?project= server-side.
+    """
     # Arrange
     # Act
-    wired = ("?project=" in LIBRARY_JS, "/api/projects" in LIBRARY_JS)
+    gone = ('id="libraryProjectChips"' not in TEMPLATE, 'id="libraryProjectCurrent"' not in TEMPLATE)
     # Assert
-    assert wired == (True, True)
-
-
-def test_library_tab_carries_project_chips():
-    """The Library tab filters by project; old-direct scopes the view."""
-    # Arrange
-    # Act
-    present = 'id="libraryProjectChips"' in TEMPLATE
-    # Assert
-    assert present
-
-
-def test_library_tab_carries_current_project_indicator():
-    """The Library tab says which project the view is synced to."""
-    # Arrange
-    # Act
-    present = 'id="libraryProjectCurrent"' in TEMPLATE
-    # Assert
-    assert present
+    assert gone == (True, True)
 
 
 def test_library_js_reads_project_selection():
@@ -93,15 +90,6 @@ def test_search_js_sends_project_on_save():
     sends = ("project" in SEARCH_JS, "savePayload" in SEARCH_JS)
     # Assert
     assert sends == (True, True)
-
-
-def test_project_strings_are_translated_labels():
-    """Project UI copy is {% trans %} labels, not English literals (JA rule)."""
-    # Arrange
-    # Act
-    labelled = ('{% trans "Project" %}' in TEMPLATE,)
-    # Assert
-    assert labelled == (True,)
 
 
 def test_index_context_reports_user_scope_without_project(tmp_path):

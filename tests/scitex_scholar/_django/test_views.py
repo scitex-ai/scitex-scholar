@@ -102,9 +102,11 @@ def test_index_body_leaks_no_unrendered_template_tags():
     assert "{% comment %}" not in body
 
 
-def test_index_body_contains_sdk_ssot_favicon():
-    """Operator 2026-10-22: favicon is the SDK SSOT -- Scholar supplies no
-    `favicon_href` override, so the shared partial emits the SDK default."""
+def test_index_body_contains_official_favicon_override():
+    """Operator 2026-10-23: the tab icon is the official mark (white snake
+    on navy), no dev/prod switching. The installed SDK SSOT (0.3.12) still
+    serves the retired green snake, so Scholar supplies its own official
+    file via `favicon_href` (SUNSET once the SDK ships the mark)."""
     # Arrange
     rf = RequestFactory()
     request = rf.get("/")
@@ -112,8 +114,8 @@ def test_index_body_contains_sdk_ssot_favicon():
     # Act
     body = resp.content.decode()
     # Assert
-    assert ('/static/scitex_sdk/ui/img/scitex-favicon.svg' in body)
-    assert 'scholar/img/scitex-favicon-navy.svg' not in body
+    assert ('scholar/img/scitex-favicon-official.svg' in body)
+    assert 'scitex_sdk/ui/img/scitex-favicon.svg' not in body
 
 
 def test_index_does_not_shadow_shared_favicon_with_inline_icon():
@@ -2159,7 +2161,7 @@ def test_search_results_offer_build_citation_graph():
     assert action_in_js and styled
 
 
-def test_search_input_has_a_44px_touch_target():
+def test_search_input_uses_shared_two_line_height():
     # Arrange
     forms_css = (COMPASS_CSS_DIR / "_forms.css").read_text()
     base_css = (COMPASS_CSS_DIR / "_base.css").read_text()
@@ -2167,11 +2169,16 @@ def test_search_input_has_a_44px_touch_target():
     # #93: the search input is sized via a scholar-owned token (declared in
     # _base.css, always linked) rather than a raw px or an unlinked scitex-ui
     # --input-height fallback. The token must be declared AND referenced.
+    # Operator 2026-10-23: two-line activation height, shared across the
+    # row's inputs, selects, and buttons (old-direct one-height parity).
     token_declared = "--scholar-search-height" in base_css
     token_referenced = "min-height: var(--scholar-search-height)" in forms_css
     no_raw_fallback = "var(--input-height, 44px)" not in forms_css
+    shared_row_height = (
+        forms_css.count("min-height: var(--scholar-search-height)") >= 3
+    )
     # Assert
-    assert token_declared and token_referenced and no_raw_fallback
+    assert (token_declared, token_referenced, no_raw_fallback, shared_row_height) == (True,) * 4
 
 
 # --- item 94: the search placeholder must tell the user WHAT to type --------
@@ -2247,19 +2254,21 @@ def test_search_primary_distinct_from_build_graph():
     assert search_is_primary and build_graph_stays_secondary and search_not_btn_build
 
 
-def test_btn_primary_uses_accent_token_and_44px_minimum():
+def test_btn_primary_uses_accent_token_and_shared_height():
     # Arrange
     forms_css = (COMPASS_CSS_DIR / "_forms.css").read_text()
     # Act
     # .btn-primary must be present and use the shared scitex-ui --accent token
-    # (theme-aware: light + dark both resolve from theme.css) with a 44px
-    # touch-target minimum, so it reads as primary AND stays tappable on
-    # mobile without hardcoding a colour or a sub-44px height.
+    # (theme-aware: light + dark both resolve from theme.css). Operator
+    # 2026-10-23: its height is the shared two-line token, not a raw px, so
+    # the primary button aligns exactly with its input row (old-direct
+    # one-height parity) while staying above the 44px touch minimum.
     has_btn_primary = ".btn-primary {" in forms_css
     uses_accent = "background: var(--accent)" in forms_css
-    touch_44 = "min-height: 44px" in forms_css
+    shared_height = "min-height: var(--scholar-search-height)" in forms_css
+    no_raw_height = "min-height: 44px" not in forms_css
     # Assert
-    assert has_btn_primary and uses_accent and touch_44
+    assert (has_btn_primary, uses_accent, shared_height, no_raw_height) == (True,) * 4
 
 
 def test_search_description_clarifies_external_databases_not_library():
@@ -3678,7 +3687,7 @@ def _rendered_user_scope_header(request, tmp_path):
         html = response.content.decode()
         project_html = render_to_string(
             "scholar/scholar.html",
-            {"app_scope": "project", "current_project": "Alpha"},
+            {"app_scope": "project", "current_project": "Alpha", "current_scope": "project"},
             request=http_request,
         )
     return {
@@ -3725,13 +3734,19 @@ def test_index_user_scope_keeps_canonical_picker_slot(_rendered_user_scope_heade
     assert "_project_picker.html" in source
 
 
-def test_index_user_scope_suppresses_picker(_rendered_user_scope_header):
+def test_index_user_scope_carries_picker_with_user_scope(_rendered_user_scope_header):
     # Arrange
-    # A project query cannot turn the user-level index into a project-scoped page.
+    # Operator 2026-10-23: user scope opts into the header picker, so the
+    # user-level index carries exactly one picker with the explicit user
+    # state (the "No project selected" choice), not a suppressed slot.
     # Act
     # Read the actual index markup supplied by the fixture.
     # Assert
-    assert _rendered_user_scope_header["html"].count("data-stx-project-picker") == 0
+    html = _rendered_user_scope_header["html"]
+    # The default param selects nothing (explicit user scope); the
+    # explicit-project param resolves Alpha (explicit project scope).
+    # Either way the picker is present exactly once with an explicit state.
+    assert (html.count("data-stx-project-picker"), 'data-current-scope=' in html) == (1, True)
 
 
 def test_project_header_renders_one_picker(_rendered_user_scope_header):
@@ -3757,18 +3772,22 @@ def _rendered_project_query_header(tmp_path):
         html = views.index(request).content.decode()
         project_html = render_to_string(
             "scholar/scholar.html",
-            {"app_scope": "project", "current_project": "Alpha"},
+            {"app_scope": "project", "current_project": "Alpha", "current_scope": "project"},
             request=request,
         )
     return {"html": html, "project_html": project_html}
 
 
-def test_user_index_has_no_project_navigation(_rendered_project_query_header):
+def test_user_index_picker_carries_resolved_project_navigation(_rendered_project_query_header):
     # Arrange
+    # Operator 2026-10-23: the header picker is the scope indicator, so a
+    # resolved ?project= selection surfaces its navigation contract on the
+    # user-level index (the picker shows the project; it does not imply a
+    # project-scoped page).
     # Act
     html = _rendered_project_query_header["html"]
     # Assert
-    assert 'data-current="Alpha" data-navigate="?project={id}"' not in html
+    assert 'data-current="Alpha" data-navigate="?project={id}"' in html
 
 
 def test_project_header_keeps_project_navigation(_rendered_project_query_header):
@@ -3792,17 +3811,23 @@ def _rendered_host_scope_header(tmp_path):
     with _project_root_env(tmp_path), settings_override:
         html = views.index(request).content.decode()
         project_html = render_to_string(
-            "scholar/scholar.html", {"app_scope": "project"}, request=request
+            "scholar/scholar.html",
+            {"app_scope": "project", "current_scope": "project"},
+            request=request,
         )
     return {"html": html, "project_html": project_html}
 
 
-def test_user_index_has_no_host_project_picker(_rendered_host_scope_header):
+def test_user_index_picker_uses_host_provider_url(_rendered_host_scope_header):
     # Arrange
+    # Operator 2026-10-23: user scope opts into the header picker, so the
+    # user-level index carries it against the host URL when the host
+    # registers a provider (the picker lists host projects; the leaf holds
+    # no Hub model or authorization logic).
     # Act
     html = _rendered_host_scope_header["html"]
     # Assert
-    assert 'data-provider-url="/host/api/project-scope/"' not in html
+    assert 'data-provider-url="/host/api/project-scope/"' in html
 
 
 def test_project_header_keeps_host_provider_url(_rendered_host_scope_header):
@@ -3965,12 +3990,15 @@ def test_user_index_returns_200_for_each_bound_user(_user_scope_library_outcomes
     assert all(result["status"] == 200 for result in results)
 
 
-def test_user_index_suppresses_picker_for_each_bound_user(_user_scope_library_outcomes):
+def test_user_index_carries_picker_for_each_bound_user(_user_scope_library_outcomes):
     # Arrange
+    # Operator 2026-10-23: every bound user gets the header picker (user
+    # scope opts in); the picker lists their projects, the roots stay
+    # request-bound (pinned by test_user_index_keeps_request_bound...).
     # Act
     results = _user_scope_library_outcomes["results"]
     # Assert
-    assert all("data-stx-project-picker" not in result["html"] for result in results)
+    assert all(result["html"].count("data-stx-project-picker") == 1 for result in results)
 
 
 def test_user_index_lists_one_paper_for_each_bound_user(_user_scope_library_outcomes):

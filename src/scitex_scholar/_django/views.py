@@ -437,9 +437,14 @@ def index_context(request, current_project=None):
         "stx_mount": mount_prefix(request),
         "app_label": _app_label("Scholar"),
         "app_scope": "user",
-        # Operator 2026-10-22: favicon is the SDK SSOT (branding.py +
-        # _branding_head.html). No leaf override: the shell falls back to
-        # the shared SciTeX mark.
+        # Operator 2026-10-23: the tab icon is the official mark (white
+        # snake on navy), no dev/prod switching. The installed SDK SSOT
+        # (0.3.12) still serves the retired green snake; the official mark
+        # exists only in SDK develop (unreleased). SUNSET: drop this
+        # override + the file once the installed SDK serves the official
+        # mark, and pin that SDK floor in pyproject.toml. Provenance: byte
+        # copy of SDK develop's scitex-favicon.svg (same snake artwork).
+        "favicon_href": _static_url("scholar/img/scitex-favicon-official.svg"),
         "current_project": current_project,
         "current_scope": current_scope,
         # i18n (operator directive 2026-09-14): the whole page flips via
@@ -474,7 +479,14 @@ def render_workspace_content(request, current_project=None, *, stx_mount):
 
 
 def index(request):
-    """Serve the Scholar SPA shell page (favicon: SDK SSOT default)."""
+    """Serve the Scholar SPA shell page.
+
+    `favicon_href` carries the official SciTeX mark (white snake on navy,
+    operator 2026-10-23): the shared branding partial honours the var, so
+    the leaf supplies its own file through the contract rather than
+    shadowing the partial with an inline icon. SUNSET: drop the override
+    once the installed SDK SSOT serves the official mark.
+    """
     html = render_to_string(
         "scholar/scholar.html",
         index_context(request),

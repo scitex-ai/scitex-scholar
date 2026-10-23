@@ -246,10 +246,6 @@
   margin: 8px 0 0;
 }
 
-.status-strip__body .library-project {
-  margin: 0 0 4px;
-}
-
 /* The node sheet is an overlay on the canvas; in the strip it is a plain
  * stacked card under the graph controls. */
 .app-status-strip .node-details-panel {

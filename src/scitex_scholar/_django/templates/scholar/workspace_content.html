@@ -242,9 +242,10 @@
                                         <button type="button" id="libraryImportCancel" class="btn-control-library">{% trans "Cancel" %}</button>
                                     </div>
                                 </div>
-                                <!-- Project sync target lives in the Details strip
-                                    ([data-library-hint]); the header picker
-                                    stays the one selection control. -->
+                                <!-- Project sync target follows the header
+                                    picker's ?project= (operator 2026-10-23:
+                                    header picker is the single selection
+                                    control; no selector in Details). -->
                                 <!-- Filter: the Library list's empty state has a
                                      FILTERED variant ("no papers match"), which
                                      is unreachable without a real filter control
@@ -623,10 +624,9 @@
                         </div>
                         <div class="sidebar-section__content">
                             <p class="sidebar-section__summary" id="libraryStripSummary">{% trans "Library not loaded yet." %}</p>
-                            <div class="library-project">
-                                <span id="libraryProjectCurrent" class="library-project__current">{% trans "Project" %}</span>
-                                <div id="libraryProjectChips" class="library-project__chips"></div>
-                            </div>
+                            <!-- Operator 2026-10-23: no project selector in
+                                 Details — the header picker is the single
+                                 selection control. -->
                             <!-- Import / Export (#106 / L327): library-level
                                  operations, thin wrappers over the package's
                                  BibTeX handler + formatter. -->

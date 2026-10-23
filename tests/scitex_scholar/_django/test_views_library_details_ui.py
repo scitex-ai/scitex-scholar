@@ -98,12 +98,13 @@ def test_library_login_redirect_becomes_relogin_prompt():
 
 
 def test_library_strip_section_mirrors_list_counts():
-    # Arrange -- operator 2026-10-22: the Details strip's Library section
-    # shows the list counts plus the header picker's project.
+    # Arrange -- operator 2026-10-23: the Details strip's Library section
+    # shows the list counts only; the project selection lives in the
+    # header picker, so no scope suffix and no indicator mirroring.
     # Act
-    present = (
+    counts_only = (
         'getElementById("libraryStripSummary")' in LIBRARY_JS
-        and "reflectProjectIndicator()" in LIBRARY_JS
+        and "reflectProjectIndicator()" not in LIBRARY_JS
     )
     # Assert
-    assert present
+    assert counts_only

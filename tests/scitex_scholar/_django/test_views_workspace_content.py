@@ -48,6 +48,25 @@ def _rendered_dom(html, secret):
     return dom, validations
 
 
+def _picker_asset(node):
+    """SDK picker assets allowed inside the content fragment.
+
+    Operator 2026-10-23: user scope opts into the header picker, so the
+    fragment carries the picker's own shared assets (its stylesheet, its
+    module, its i18n catalog script) next to the picker div. Anything
+    else script/link-like, or any html/head/body/meta wrapper, still
+    breaks the pure-content fragment contract.
+    """
+    src = node.get("src", "") or ""
+    href = node.get("href", "") or ""
+    ident = node.get("id", "") or ""
+    return (
+        "project-selector" in src
+        or "project-selector" in href
+        or ident.startswith("scitex-i18n-catalog")
+    )
+
+
 def _body_elements(dom):
     """Compare the two genuine content roots, retaining their inner DOM/text."""
     return tuple(
@@ -99,8 +118,15 @@ def test_index_workspace_content_preserves_native_rendering(
         result = {
             "status": response.status_code,
             "content_roots": _body_elements(fragment),
-            "fragment_outer_or_assets": len(
-                fragment.select("html,head,body,script,link,meta")
+            "fragment_outer_or_assets": (
+                len(fragment.select("html,head,body,meta")),
+                len(
+                    [
+                        node
+                        for node in fragment.select("script,link")
+                        if not _picker_asset(node)
+                    ]
+                ),
             ),
             "content_ids": {
                 node["id"] for node in fragment.select("[id]")
@@ -130,7 +156,7 @@ def test_index_workspace_content_preserves_native_rendering(
         expected = {
             "status": 200,
             "content_roots": _body_elements(full),
-            "fragment_outer_or_assets": 0,
+            "fragment_outer_or_assets": (0, 0),
             "content_ids": _CONTENT_IDS,
             "csrf": ([True], [True]),
             "cookies": (secret, secret),
