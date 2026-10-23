@@ -307,7 +307,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- Citation Graph Tab (demoted: no longer the default) -->
+                <!-- Graph Tab (demoted: no longer the default) -->
                 <div id="tab-graph" class="tab-panel" role="tabpanel" aria-labelledby="scholar-tab-graph" tabindex="0">
                     <div class="citation-graph-container">
                         <!-- Input Form -->
@@ -704,6 +704,17 @@
                             <span class="sidebar-section__title">{% trans "Graph Controls" %}</span>
                         </div>
                         <p class="sidebar-section__summary" id="graphStripSummary">{% trans "No graph built yet." %}</p>
+                        <!-- Operator 2026-10-23: no shared status expander
+                             (it duplicated the per-tab status rows). The
+                             graph backend status lives in the Graph tab's
+                             own section; checkServiceHealth keeps rendering
+                             into #serviceStatus here. -->
+                        <div class="status-row">
+                            <span class="status-row__label">{% trans "Citation Graph" %}</span>
+                            <div id="serviceStatus">
+                                <span class="status-indicator status-checking">&#9679; {% trans "Checking..." %}</span>
+                            </div>
+                        </div>
                         <div class="sidebar-section__content"
                              style="font-size: 11px;
                                     color: var(--text-muted)">
@@ -731,33 +742,6 @@
                             Details space, instead of over the canvas. -->
                         <div id="nodeDetailsPanel" class="node-details-panel hidden" role="dialog" aria-live="polite"></div>
                     </div>
-                    <details class="status-expand" open>
-                        <summary class="status-expand__summary" aria-label="{% trans "Service Status" %}">
-                            <span class="status-leds">
-                                <span class="status-led" data-source="crossref"
-                                      data-status="{% if api_available %}ready{% else %}unavailable{% endif %}"
-                                      title="CrossRef API — {% if api_available %}{% trans "Configured" %}{% else %}{% trans "Not configured" %}{% endif %}"></span>
-                                <span class="status-led" data-source="graph" data-status="checking"
-                                      title="{% trans "Citation Graph" %} — {% trans "Checking..." %}"></span>
-                            </span>
-                        </summary>
-                        <div class="status-expand__body">
-                            <div class="status-row">
-                                <span class="status-row__label">{% trans "CrossRef API" %}</span>
-                                {% if api_available %}
-                                    <span class="status-indicator status-healthy">&#9679; {% trans "Configured" %}</span>
-                                {% else %}
-                                    <span class="status-indicator status-warning">&#9679; {% trans "Not configured" %}</span>
-                                {% endif %}
-                            </div>
-                            <div class="status-row">
-                                <span class="status-row__label">{% trans "Citation Graph" %}</span>
-                                <div id="serviceStatus">
-                                    <span class="status-indicator status-checking">&#9679; {% trans "Checking..." %}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </details>
                 </div>
             </aside>
         </div>
