@@ -1,7 +1,8 @@
 {
   "name": "scholar_editor",
   "slug": "scholar",
-  "label": "SciTeX Scholar",
+  "label": "Scholar",
+  "group": "work",
   "pip_package": "scitex-scholar",
   "icon": "fas fa-graduation-cap",
   "subtitle": "Citation-graph explorer and CrossRef paper browser",

@@ -11,8 +11,8 @@ msgstr ""
 "PO-Revision-Date: 2026-09-14 00:00+0900\n"
 "Last-Translator: scitex-scholar <agent@scitex.ai>\n"
 
-msgid "SciTeX Scholar"
-msgstr "SciTeX Scholar"
+msgid "Scholar"
+msgstr "Scholar"
 
 msgid "Search databases"
 msgstr "データベースを検索"

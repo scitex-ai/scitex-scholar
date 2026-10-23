@@ -435,7 +435,7 @@ def index_context(request, current_project=None):
         "api_available": resolved_api is not None,
         "api_url": resolved_api or "Not configured",
         "stx_mount": mount_prefix(request),
-        "app_label": _app_label("SciTeX Scholar"),
+        "app_label": _app_label("Scholar"),
         "app_scope": "user",
         # Operator 2026-10-22: favicon is the SDK SSOT (branding.py +
         # _branding_head.html). No leaf override: the shell falls back to
