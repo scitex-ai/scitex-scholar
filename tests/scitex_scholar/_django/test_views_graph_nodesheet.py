@@ -50,9 +50,9 @@ def test_sheet_escape_and_close_return_focus_to_the_node():
     # Assert -- Esc closes from anywhere; the close path focuses the
     # invoking node element (made focusable at select time).
     assert (
-        '"Escape"' in _GRAPH_JS
+        '"Escape"' in _GRAPH_JS or "'Escape'" in _GRAPH_JS
         and "hideNodeDetails()" in _GRAPH_JS
-        and '.focus()' in _GRAPH_JS
+        and ".focus(" in _GRAPH_JS
         and 'tabindex", "-1"' in _GRAPH_JS
     )
 

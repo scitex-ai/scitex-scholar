@@ -310,51 +310,10 @@
                 <!-- Graph Tab (demoted: no longer the default) -->
                 <div id="tab-graph" class="tab-panel" role="tabpanel" aria-labelledby="scholar-tab-graph" tabindex="0">
                     <div class="citation-graph-container">
-                        <!-- Input Form -->
-                        <div class="graph-card">
-                            <div class="graph-card__header">
-                                <span class="graph-card__title">{% trans "Build Citation Network" %}</span>
-                            </div>
-                            <div class="graph-card__body">
-                                <p class="graph-description">
-                                    {% trans "Start with a DOI. Find one by title, topic, or keywords in Search or your Library, then build an interactive citation graph of related papers." %}
-                                </p>
-                                <form id="graphForm" class="graph-form">
-                                    <div class="form-row">
-                                        <div class="form-group--doi">
-                                            <label class="form-label" for="doiInput">{% trans "DOI" %}</label>
-                                            <div class="input-wrapper">
-                                                <input type="text"
-                                                       id="doiInput"
-                                                       class="form-input"
-                                                       required
-                                                       aria-describedby="graphSeedHelp"
-                                                       placeholder="e.g. 10.1038/s41586-020-2008-3">
-                                                <button type="submit" class="btn-build" id="graphBuildBtn" disabled>{% trans "Build Graph" %}</button>
-                                            </div>
-                                            <small id="graphSeedHelp">{% trans "Paste the DOI for one seed paper; titles and keywords belong in Search." %}</small>
-                                        </div>
-                                        <div class="form-group--options">
-                                            <label class="form-label" for="topN">{% trans "Max papers in graph" %}</label>
-                                            <select id="topN" class="form-select" aria-label="Maximum papers in citation graph">
-                                                <option value="10">10</option>
-                                                <option value="20" selected>20</option>
-                                                <option value="30">30</option>
-                                                <option value="50">50</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                        <!-- Seed from your Library (old-direct parity, slice
-                             3a): the graph builds from a typed DOI above OR
-                             a library paper here. The picker lists library
-                             papers carrying a DOI; clicking one seeds the
-                             build directly (hub _GraphInputHandler).
-                             Populated lazily by citation-graph.js from the
-                             EXISTING /api/library endpoint -- no new
-                             backend. -->
+                        <!-- Operator 2026-10-23: the Graph tab is seed-only.
+                             No DOI typing, no saved-graphs area: one work
+                             (or more) is picked from the seed list and the
+                             graph builds directly from the selection. -->
                         <div class="graph-card">
                             <div class="graph-card__header">
                                 <span class="graph-card__title">{% trans "Seed from your Library" %}</span>
@@ -363,29 +322,6 @@
                                 <div id="graphLibrarySeed" class="graph-library-seed">
                                     <p class="empty-message">{% trans "Loading your library…" %}</p>
                                 </div>
-                            </div>
-                        </div>
-                        <!-- Saved graphs (old-direct unification, slice 9):
-                             hub's graph page saves/loads/deletes graphs; the
-                             leaf backend ships the same endpoints (parity
-                             slice 1) with no UI. Recipes rebuild from the
-                             seed DOI through the existing network endpoint --
-                             no new backend. -->
-                        <div class="graph-card">
-                            <div class="graph-card__header">
-                                <span class="graph-card__title">{% trans "Saved graphs" %}</span>
-                            </div>
-                            <div class="graph-card__body">
-                                <div id="graphSavedBar" class="graph-saved-bar">
-                                    <input type="text"
-                                           id="graphSaveName"
-                                           class="form-input graph-saved-bar__input"
-                                           placeholder="{% trans "Graph name" %}"
-                                           maxlength="200">
-                                    <button type="button" id="graphSaveBtn" class="btn-control-library" disabled>{% trans "Save current graph" %}</button>
-                                </div>
-                                <div id="graphSavedStatus" class="library-io__status" role="status"></div>
-                                <div id="graphSavedList" class="graph-saved-list"></div>
                             </div>
                         </div>
                         <!-- Loading -->

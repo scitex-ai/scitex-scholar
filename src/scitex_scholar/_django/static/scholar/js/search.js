@@ -307,20 +307,21 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /**
-   * Jump to the Citation Graph tab with this paper's DOI prefilled.
-   * Does NOT auto-submit -- the user still presses "Build Graph", so the
-   * action stays explicit rather than surprising.
+   * Operator 2026-10-23 (seed-only Graph tab): the per-result action
+   * jumps to the Graph tab and asks the graph manager to build
+   * directly at the fixed width -- no DOI typing, no prefill-then-submit.
+   * The manager may not be constructed yet, so the DOI rides a one-shot
+   * event the manager consumes on init (same path as a stored seed).
    */
   function buildGraphFromDoi(doi) {
-    const doiInput = document.getElementById("doiInput");
-    if (doiInput && doi) {
-      doiInput.value = doi;
-    }
+    if (!doi) return;
     const graphTab = document.querySelector(
       '.stx-content-tabs__tab[aria-controls="tab-graph"]',
     );
     if (graphTab) graphTab.click();
-    if (doiInput) doiInput.focus();
+    document.dispatchEvent(
+      new CustomEvent("scholar:build-graph", { detail: { doi } }),
+    );
   }
 
   // The flat shape library_save accepts (same rows library_list returns).
