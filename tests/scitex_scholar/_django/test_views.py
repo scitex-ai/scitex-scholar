@@ -114,8 +114,10 @@ def test_index_body_contains_official_favicon_override():
     # Act
     body = resp.content.decode()
     # Assert
-    assert ('scholar/img/scitex-favicon-official.svg' in body)
-    assert 'scitex_sdk/ui/img/scitex-favicon.svg' not in body
+    assert (
+        "scholar/img/scitex-favicon-official.svg" in body,
+        "scitex_sdk/ui/img/scitex-favicon.svg" not in body,
+    ) == (True, True)
 
 
 def test_index_does_not_shadow_shared_favicon_with_inline_icon():

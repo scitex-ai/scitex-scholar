@@ -158,8 +158,7 @@ def test_index_shell_context_renders_picker_with_user_scope(_shell_result):
     # Act
     pickers = html.count("data-stx-project-picker")
     # Assert
-    assert pickers == 1
-    assert 'data-allow-user-scope="true"' in html
+    assert (pickers, 'data-allow-user-scope="true"' in html) == (1, True)
 
 
 def test_authed_header_picker_renders_with_user_scope():
@@ -182,8 +181,7 @@ def test_authed_header_picker_renders_with_user_scope():
     # user as signed-in (same path the shell factory exercises).
     html = tpl.render({"request": RequestFactory().get("/")})
     # Assert
-    assert html.count("data-stx-project-picker") == 1
-    assert 'data-allow-user-scope="true"' in html
+    assert (html.count("data-stx-project-picker"), 'data-allow-user-scope="true"' in html) == (1, True)
 
 
 def test_index_shell_context_forwards_request_to_csrf_processor(_shell_result):

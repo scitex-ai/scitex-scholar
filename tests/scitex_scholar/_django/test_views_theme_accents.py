@@ -33,7 +33,14 @@ def test_accent_hover_is_navy_gold_not_green():
 
 def test_accent_fallback_is_navy_not_bright_blue():
     # Arrange
+    layout = (_CSS / "_layout.css").read_text()
     lib = (_CSS / "_library.css").read_text()
     # Act (no Act step: static text inspection)
     # Assert -- dormant fallback matches the navy base, never sky blue.
-    assert ("var(--accent, #1a2a40)" in lib) and ("#1f6feb" not in lib)
+    # Operator 2026-10-23: the Details selector chips (the only
+    # var(--accent, #1a2a40) in _library.css) are deleted, so the navy
+    # fallback now lives in _layout.css; both sheets stay bright-blue-free.
+    assert (
+        ("var(--accent, #1a2a40)" in layout, "#1f6feb" not in (layout + lib))
+        == (True, True)
+    )
