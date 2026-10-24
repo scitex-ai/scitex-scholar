@@ -7,6 +7,19 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.23.0] - 2026-10-24
+
+Old-direct parity slices 2-3 + CUI storage: the Results header gains the
+Ready -> Searching -> Done pipeline stepper with timer (ported from hub
+`_toolbar-status.ts` onto the leaf fetch lifecycle); the result-count
+dropdown offers 200/500 (backend clamp lifted 100 -> 500, 20 stays
+default). Sources regroup into Local (fast, unlimited, infinity badges)
++ External APIs (per-source 1/s-50/s rate labels, email/rate notice).
+Saved graphs move onto `scitex_dev.store` (declared Schema, file stays
+authoritative with backfill/dual-write; store outage serves the file).
+New `_hook_rules.py` declares scholar's leaf scope (5 rules) with the
+`scitex_dev.hooks` entry point, mirroring scitex-storage.
+
 ## [1.22.0] - 2026-10-24
 
 Old-direct parity slice 1 -- flat Search Details: the nested
