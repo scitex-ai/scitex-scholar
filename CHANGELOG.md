@@ -7,6 +7,13 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.27.0] - 2026-10-26
+
+Operator brief-05 Graph tab: seed-from-works (Search bulk Graph pill +
+Library per-row Graph button, single or multi-seed dispatch) and a Graph
+Library card with full CRUD UI (save/list/rename/delete over
+api/graphs/*). Supersedes the 2026-10-23 seed-only direction.
+
 ## [1.26.0] - 2026-10-25
 
 Operator brief-04 parity: Details columns are the shared scitex-sdk
