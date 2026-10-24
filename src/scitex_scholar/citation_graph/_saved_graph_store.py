@@ -32,9 +32,12 @@ Fields (additive-only; adding one is a schema edit, never a data migration):
 
 from __future__ import annotations
 
+import scitex_logging as _slog
 import socket
 from pathlib import Path
 from typing import Any, Optional
+
+logger = _slog.getLogger(__name__)
 
 STORE_NAME = "scholar_saved_graphs"
 TABLE = "saved_graphs"
@@ -129,11 +132,13 @@ def _root_key(user_root: Path | str) -> str:
     return str(Path(user_root).expanduser().resolve())
 
 
-def save(user_root, graph_id, name, seed_doi, created_by, created_at) -> None:
+def save(
+    user_root, graph_id, name, seed_doi, created_by, created_at, _opener=None
+) -> None:
     """Insert one saved-graph row (caller validated bounds already)."""
     from scitex_dev.store import NEW_RECORD
 
-    store = _open_store()
+    store = (_opener or _open_store)()
     store.put(
         {
             "user_root": _root_key(user_root),
@@ -147,31 +152,30 @@ def save(user_root, graph_id, name, seed_doi, created_by, created_at) -> None:
     )
 
 
-def list_for(user_root) -> list[dict[str, Any]]:
+def list_for(user_root, _opener=None) -> list[dict[str, Any]]:
     """All visible saved graphs for one user root, oldest first."""
-    from scitex_dev.store import Query
+    store = (_opener or _open_store)()
+    key = _root_key(user_root)
+    out = []
+    for row in store.read().rows():
+        values = row.values
+        if values.get("user_root") != key:
+            continue
+        out.append(
+            {
+                "id": values["graph_id"],
+                "name": values["name"],
+                "seed_doi": values["seed_doi"],
+                "created_by": values["created_by"],
+                "created_at": values["created_at"],
+            }
+        )
+    return sorted(out, key=lambda r: r.get("created_at") or "")
 
-    store = _open_store()
-    rows = store.read().search(Query.eq("user_root", _root_key(user_root)))
-    out = [
-        {
-            "id": r["graph_id"],
-            "name": r["name"],
-            "seed_doi": r["seed_doi"],
-            "created_by": r["created_by"],
-            "created_at": r["created_at"],
-        }
-        for r in sorted(rows, key=lambda r: r.get("created_at") or "")
-        if not r.get("hidden")
-    ]
-    return out
 
-
-def rename(user_root, graph_id, name) -> bool:
+def rename(user_root, graph_id, name, _opener=None) -> bool:
     """Rename one row; False when the id is unknown for this user."""
-    from scitex_dev.store import Query
-
-    store = _open_store()
+    store = (_opener or _open_store)()
     key = {"user_root": _root_key(user_root), "graph_id": graph_id}
     rev = store.read().revision(key)
     if rev is None or store.read().is_hidden(key):
@@ -180,9 +184,9 @@ def rename(user_root, graph_id, name) -> bool:
     return True
 
 
-def hide(user_root, graph_id) -> bool:
+def hide(user_root, graph_id, _opener=None) -> bool:
     """Hide (store delete verb) one row; False when unknown for this user."""
-    store = _open_store()
+    store = (_opener or _open_store)()
     key = {"user_root": _root_key(user_root), "graph_id": graph_id}
     rev = store.read().revision(key)
     if rev is None or store.read().is_hidden(key):
@@ -191,13 +195,15 @@ def hide(user_root, graph_id) -> bool:
     return True
 
 
-def backfill_from_file_rows(user_root, file_rows: list[dict[str, Any]]) -> int:
+def backfill_from_file_rows(
+    user_root, file_rows: list[dict[str, Any]], _opener=None
+) -> int:
     """One-way migration: file rows missing from the store get inserted.
 
     Returns the inserted count. Idempotent -- reruns insert nothing.
     """
     try:
-        existing = {g["id"] for g in list_for(user_root)}
+        existing = {g["id"] for g in list_for(user_root, _opener=_opener)}
     except Exception:
         return 0
     n = 0
@@ -213,11 +219,156 @@ def backfill_from_file_rows(user_root, file_rows: list[dict[str, Any]]) -> int:
                 fr.get("seed_doi", ""),
                 fr.get("created_by", "user"),
                 fr.get("created_at", ""),
+                _opener=_opener,
             )
             n += 1
         except Exception:
             continue
     return n
+
+
+# ---------------------------------------------------------------------------
+# CUI-owned CRUD: graphs as package data (operator 2026-10-24).
+#
+# The per-user file stays authoritative; the shared store is the derived
+# mirror. Every mutation lands in the file first, then mirrors best-effort
+# (save -> put, delete -> hide, rename -> put). A store outage never fails
+# the call -- the file is the live path and backfill converges the mirror
+# on the next provisioned read. The _django layer only validates HTTP and
+# forwards; it never touches the file or the store directly.
+# ---------------------------------------------------------------------------
+
+
+def _file_path(user_root: Path | str) -> Path:
+    """Single JSON file holding this user's saved graphs."""
+    return Path(user_root).expanduser().resolve() / "SAVED_GRAPHS" / "saved_graphs.json"
+
+
+def _read_file_rows(user_root: Path | str) -> list:
+    import json as _json
+
+    path = _file_path(user_root)
+    if not path.is_file():
+        return []
+    try:
+        data = _json.loads(path.read_text())
+    except ValueError:
+        return []
+    return data if isinstance(data, list) else []
+
+
+def _write_file_rows(user_root: Path | str, rows: list) -> None:
+    import json as _json
+
+    path = _file_path(user_root)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(_json.dumps(rows))
+
+
+def list_graphs(user_root: Path | str, _opener=None) -> list:
+    """All visible saved graphs for one user root, oldest first.
+
+    File-authoritative with store backfill; a store outage serves the file.
+    The _opener seam (a zero-arg store factory, like the views' _builder
+    seam) is the PA-306-sanctioned injection point for the offline fake.
+    """
+    file_rows = _read_file_rows(user_root)
+    try:
+        if file_rows:
+            backfill_from_file_rows(user_root, file_rows, _opener=_opener)
+        return list_for(user_root, _opener=_opener)
+    except SavedGraphStoreUnavailable:
+        return file_rows
+    except Exception:
+        logger.exception("saved-graphs store read failed; serving file")
+        return file_rows
+
+
+def save_graph(
+    user_root: Path | str,
+    name: str,
+    seed_doi: str,
+    created_by: str = "user",
+    _opener=None,
+) -> dict:
+    """Insert one saved-graph recipe (caller validated bounds already).
+
+    Returns the stored row (server-issued id + created_at). The store
+    mirror is best-effort; only file errors propagate.
+    """
+    import datetime as _dt
+    import uuid as _uuid
+
+    row = {
+        "id": _uuid.uuid4().hex,
+        "name": name,
+        "seed_doi": seed_doi,
+        "created_by": created_by,
+        "created_at": _dt.datetime.now(_dt.timezone.utc).isoformat(),
+    }
+    rows = _read_file_rows(user_root)
+    rows.append(row)
+    _write_file_rows(user_root, rows)
+    try:
+        save(
+            user_root,
+            row["id"],
+            name,
+            seed_doi,
+            created_by,
+            row["created_at"],
+            _opener=_opener,
+        )
+    except SavedGraphStoreUnavailable:
+        logger.debug("saved-graphs store unprovisioned; file kept")
+    except Exception:
+        logger.exception("saved-graphs store mirror failed; file kept")
+    return row
+
+
+def delete_graph(user_root: Path | str, graph_id: str, _opener=None) -> bool:
+    """Delete one saved graph; False when the id is unknown for this user.
+
+    File first, then the store mirror is hidden (the store has no delete
+    verb). Best-effort on the mirror; only file errors propagate.
+    """
+    rows = _read_file_rows(user_root)
+    kept = [r for r in rows if r.get("id") != graph_id]
+    if len(kept) == len(rows):
+        return False
+    _write_file_rows(user_root, kept)
+    try:
+        hide(user_root, graph_id, _opener=_opener)
+    except SavedGraphStoreUnavailable:
+        logger.debug("saved-graphs store unprovisioned; file kept")
+    except Exception:
+        logger.exception("saved-graphs store hide failed; file kept")
+    return True
+
+
+def rename_graph(
+    user_root: Path | str, graph_id: str, name: str, _opener=None
+) -> bool:
+    """Rename one saved graph; False when the id is unknown for this user.
+
+    File first, then the store mirror. Best-effort on the mirror; only
+    file errors propagate.
+    """
+    rows = _read_file_rows(user_root)
+    for row in rows:
+        if row.get("id") == graph_id:
+            row["name"] = name
+            break
+    else:
+        return False
+    _write_file_rows(user_root, rows)
+    try:
+        rename(user_root, graph_id, name, _opener=_opener)
+    except SavedGraphStoreUnavailable:
+        logger.debug("saved-graphs store unprovisioned; file kept")
+    except Exception:
+        logger.exception("saved-graphs store rename failed; file kept")
+    return True
 
 
 # EOF

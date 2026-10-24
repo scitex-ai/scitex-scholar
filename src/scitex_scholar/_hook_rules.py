@@ -65,9 +65,10 @@ def provide() -> list:
             "source; the store has no delete verb (hide only).",
             severity="deny",
             matches=("Bash",),
-            implemented_in="scitex_scholar._django.views "
-            "(_load_saved_graphs/_write_saved_graphs) + "
-            "scitex_scholar.citation_graph._saved_graph_store",
+            implemented_in="scitex_scholar.citation_graph._saved_graph_store "
+            "(list_graphs/save_graph/delete_graph/rename_graph, file first "
+            "then best-effort store mirror) + scitex_scholar._django.views "
+            "(thin graphs_save/graphs_list/graphs_delete/graphs_rename adapters)",
         ),
         _rule(
             id="scholar.search-fails-closed",
