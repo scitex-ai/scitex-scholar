@@ -217,6 +217,83 @@
   padding: 0;
 }
 
+/*
+ * Old-direct parity slice 2: pipeline stepper (Ready -> Searching ->
+ * Done + timer). Ported from hub results-header.css onto the leaf tokens
+ * (--accent instead of workspace green, monotone for the operator rule).
+ */
+.search-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  font-size: 12px;
+  margin-left: auto;
+}
+.stepper-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 600;
+}
+.stepper-text {
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-right: 4px;
+}
+.stepper-circle.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  animation: stepper-pulse 2s ease-in-out infinite;
+}
+.stepper-circle.searching {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  animation: stepper-pulse 1s ease-in-out infinite;
+}
+.stepper-circle.complete {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  opacity: 0.6;
+}
+.stepper-circle.done {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.stepper-line {
+  width: 12px;
+  height: 1px;
+  background: var(--border-default);
+}
+.stepper-line.active {
+  background: var(--accent);
+}
+.stepper-timer {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 11px;
+  margin-left: 8px;
+  font-family: monospace;
+}
+@keyframes stepper-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
 /* Hairline divider between the sort/filter selects and the bulk pills. */
 .search-results-toolbar__sep {
   width: 1px;

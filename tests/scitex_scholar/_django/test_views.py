@@ -2061,6 +2061,31 @@ def _compass_index_body() -> str:
     return views.index(RequestFactory().get("/")).content.decode()
 
 
+def test_search_results_header_carries_pipeline_stepper():
+    # Arrange -- old-direct parity slice 2: Ready -> Searching -> Done +
+    # timer, ported from hub toolbar-status onto the leaf fetch lifecycle.
+    body = _compass_index_body()
+    # Act
+    stepper = 'id="searchStepper"' in body
+    phases = ('id="searchStep1"' in body, 'id="searchStep2"' in body, 'id="searchStep3"' in body)
+    timer = 'id="searchTimer"' in body
+    # Assert
+    assert (stepper, all(phases), timer) == (True, True, True)
+
+
+def test_search_results_dropdown_offers_up_to_500():
+    # Arrange -- operator: no 20-only cap; old-direct renders uncapped.
+    # The leaf offers 200/500 while keeping 20 the default; the CUI
+    # backend clamps 1-500 (views.search).
+    body = _compass_index_body()
+    # Act
+    options = ('value="200"' in body, 'value="500"' in body, 'value="20" selected' in body)
+    js = COMPASS_SEARCH_JS.read_text()
+    lifecycle = ("stepperSearching()" in js, "stepperDone(" in js, "stepperReset()" in js)
+    # Assert
+    assert (all(options), all(lifecycle)) == (True, True)
+
+
 def test_search_is_the_default_selected_tab():
     # Arrange
     body = _compass_index_body()
