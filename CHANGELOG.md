@@ -7,6 +7,14 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.22.0] - 2026-10-24
+
+Old-direct parity slice 1 -- flat Search Details: the nested
+`Details > Databases > +Advanced` card stack is deleted. Sources (11),
+Filters (6), search mode, ignore-cache, and CrossRef status render as flat
+rows under one Search section; control ids and JS wiring unchanged. Served
+from the hub venv by direct template/static sync for the live check.
+
 ## [1.21.0] - 2026-10-23
 
 Seed-only Graph tab: the typed-DOI Build Citation Network card and the
