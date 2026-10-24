@@ -7,6 +7,13 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.27.1] - 2026-10-26
+
+Operator color discipline: no rounded containers — radius removed from
+Library rows/cards/toolbars, the stepper bar, the search queue, and
+graph seed items (buttons, badges, dots, and textarea keep theirs);
+dead .graph-saved-list CSS deleted.
+
 ## [1.27.0] - 2026-10-26
 
 Operator brief-05 Graph tab: seed-from-works (Search bulk Graph pill +

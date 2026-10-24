@@ -21,7 +21,6 @@
   padding: 12px 14px;
   border: 1px solid var(--border-default);
   background: var(--bg-tertiary);
-  border-radius: 4px;
 }
 
 .library-item__main {
@@ -134,7 +133,6 @@
   margin-bottom: 12px;
   border: 1px solid var(--border-default);
   background: var(--bg-tertiary);
-  border-radius: 4px;
 }
 
 .library-io__label {
@@ -204,7 +202,6 @@
   margin-bottom: 12px;
   border: 1px solid var(--border-default);
   background: var(--bg-tertiary);
-  border-radius: 4px;
 }
 
 .library-filter__input {
@@ -297,7 +294,6 @@
   padding: 10px 12px;
   border: 1px solid var(--border-default);
   background: var(--bg-tertiary);
-  border-radius: 4px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -366,7 +362,6 @@
   margin-bottom: 12px;
   border: 1px solid var(--border-default);
   background: var(--bg-tertiary);
-  border-radius: 4px;
 }
 .library-import-preview__entries {
   display: flex;
@@ -403,7 +398,6 @@
   margin-bottom: 12px;
   border: 1px solid var(--border-default);
   background: var(--bg-tertiary);
-  border-radius: 4px;
 }
 
 .library-ext__title {

@@ -2562,6 +2562,40 @@ def test_search_input_button_stack_vertically_on_mobile():
     assert in_mobile and wrapper_rule and button_rule
 
 
+def test_containers_are_square_only_buttons_badges_textareas_rounded():
+    # Arrange -- operator color discipline (no rounded items other than
+    # textarea, button, badge): cards, rows, bars, and strips must not
+    # declare a radius. Buttons keep theirs; badges/chips keep theirs;
+    # the stepper/queue dots and spinner stay circular (functional).
+    import re
+
+    css = "".join(
+        (COMPASS_CSS_DIR / name).read_text()
+        for name in ("_library.css", "_search.css", "_graph.css", "_cards.css")
+    )
+    # Act
+    square = [
+        ".library-item",
+        ".library-io",
+        ".library-filter",
+        ".library-item__details",
+        ".library-import-preview",
+        ".library-ext",
+        ".search-stepper",
+        ".search-queue",
+        ".graph-library-seed__item",
+    ]
+    rounded = [
+        re.search(re.escape(sel) + r"\s*\{[^}]*border-radius", css)
+        for sel in square
+    ]
+    # Assert
+    assert (all(r is None for r in rounded), ".graph-saved-list__item" not in css) == (
+        True,
+        True,
+    )
+
+
 def test_mobile_form_row_stretches_groups_full_width():
     # Arrange
     # Root cause of the 182px-truncated-placeholder defect: `_forms.css` loads
