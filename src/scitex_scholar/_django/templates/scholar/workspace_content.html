@@ -452,53 +452,80 @@
                             </div>
                             <div class="search-advanced__row search-advanced__row--stack">
                                 <span class="form-label" id="searchSourcesLabel">{% trans "Sources" %}</span>
-                                <div class="search-sources-grid" id="searchSourcesGrid" role="group" aria-labelledby="searchSourcesLabel">
-<div class="search-sources-grid" id="searchSourcesGrid" role="group" aria-labelledby="searchSourcesLabel">
-                                            <label class="search-advanced__check" title="{% trans "Crossref database on the SciTeX server — fast, unlimited" %}">
+                                <div class="search-sources-grid search-sources-grid--tiered" id="searchSourcesGrid" role="group" aria-labelledby="searchSourcesLabel">
+<div class="source-tier">
+<p class="source-tier__label">Local (fast, unlimited)</p>
+<label class="search-advanced__check" title="{% trans "Crossref database on the SciTeX server — fast, unlimited" %}">
                                                 <input type="checkbox" class="source-toggle" value="crossref_local" checked>
                                                 Crossref (SciTeX)
+                                            
+                                                <small class="source-rate" title="Rate limit">&#8734;</small>
                                             </label>
-                                            <label class="search-advanced__check" title="{% trans "OpenAlex database on the SciTeX server — fast, unlimited" %}">
+<label class="search-advanced__check" title="{% trans "OpenAlex database on the SciTeX server — fast, unlimited" %}">
                                                 <input type="checkbox" class="source-toggle" value="openalex_local" checked>
                                                 OpenAlex (SciTeX)
+                                            
+                                                <small class="source-rate" title="Rate limit">&#8734;</small>
                                             </label>
-                                            <label class="search-advanced__check" title="{% trans "NCBI PubMed — biomedical literature" %}">
+</div>
+<div class="source-tier">
+<p class="source-tier__label">External APIs (slower, limited results)</p>
+<label class="search-advanced__check" title="{% trans "NCBI PubMed — biomedical literature" %}">
                                                 <input type="checkbox" class="source-toggle" value="pubmed" checked>
                                                 PubMed
+                                            
+                                                <small class="source-rate" title="Rate limit">3/s</small>
                                             </label>
-                                            <label class="search-advanced__check" title="{% trans "arXiv — physics, mathematics, and computer science preprints" %}">
+<label class="search-advanced__check" title="{% trans "arXiv — physics, mathematics, and computer science preprints" %}">
                                                 <input type="checkbox" class="source-toggle" value="arxiv" checked>
                                                 arXiv
+                                            
+                                                <small class="source-rate" title="Rate limit">3/s</small>
                                             </label>
-                                            <label class="search-advanced__check" title="{% trans "Semantic Scholar — AI-powered academic search" %}">
+<label class="search-advanced__check" title="{% trans "Semantic Scholar — AI-powered academic search" %}">
                                                 <input type="checkbox" class="source-toggle" value="semantic" checked>
                                                 Semantic Scholar
+                                            
+                                                <small class="source-rate" title="Rate limit">1/s</small>
                                             </label>
-                                            <label class="search-advanced__check" title="{% trans "Crossref — DOI metadata registry" %}">
+<label class="search-advanced__check" title="{% trans "Crossref — DOI metadata registry" %}">
                                                 <input type="checkbox" class="source-toggle" value="crossref" checked>
                                                 Crossref
+                                            
+                                                <small class="source-rate" title="Rate limit">50/s</small>
                                             </label>
-                                            <label class="search-advanced__check" title="{% trans "OpenAlex — open catalog of scholarly works" %}">
+<label class="search-advanced__check" title="{% trans "OpenAlex — open catalog of scholarly works" %}">
                                                 <input type="checkbox" class="source-toggle" value="openalex" checked>
                                                 OpenAlex
+                                            
+                                                <small class="source-rate" title="Rate limit">10/s</small>
                                             </label>
-                                            <label class="search-advanced__check" title="{% trans "bioRxiv — biology preprint server" %}">
+<label class="search-advanced__check" title="{% trans "bioRxiv — biology preprint server" %}">
                                                 <input type="checkbox" class="source-toggle" value="biorxiv" checked>
                                                 bioRxiv
+                                            
+                                                <small class="source-rate" title="Rate limit">1/s</small>
                                             </label>
-                                            <label class="search-advanced__check" title="{% trans "DOAJ — open-access journals" %}">
+<label class="search-advanced__check" title="{% trans "DOAJ — open-access journals" %}">
                                                 <input type="checkbox" class="source-toggle" value="doaj" checked>
                                                 DOAJ
+                                            
+                                                <small class="source-rate" title="Rate limit">5/s</small>
                                             </label>
-                                            <label class="search-advanced__check" title="{% trans "PLOS — open-access science journals" %}">
+<label class="search-advanced__check" title="{% trans "PLOS — open-access science journals" %}">
                                                 <input type="checkbox" class="source-toggle" value="plos" checked>
                                                 PLOS
+                                            
+                                                <small class="source-rate" title="Rate limit">5/s</small>
                                             </label>
-                                            <label class="search-advanced__check" title="{% trans "PMC — open-access full-text archive" %}">
+<label class="search-advanced__check" title="{% trans "PMC — open-access full-text archive" %}">
                                                 <input type="checkbox" class="source-toggle" value="pmc" checked>
                                                 PMC
+                                            
+                                                <small class="source-rate" title="Rate limit">3/s</small>
                                             </label>
-                                        </div>
+</div>
+<p class="source-notice">Rate limits shown per source. Your email is used for API requests to receive higher rate limits.</p>
                                                                         <p class="search-sources-hint">{% trans "Uncheck sources to narrow the search. All checked searches the default set." %}</p>
                             </div>
                             <div class="search-advanced__row search-advanced__row--stack">
