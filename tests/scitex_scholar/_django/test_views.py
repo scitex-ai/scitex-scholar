@@ -994,7 +994,7 @@ def test_search_serves_cached_result_without_calling_engine():
         "hippocampus",
         views._cache_scope(request),
         mode="parallel",
-        max_results=20,
+        max_results=50,
         sources="",
         filters="",
     )
@@ -1013,7 +1013,7 @@ def test_search_marks_cached_results_as_cached():
         "sharp wave",
         views._cache_scope(request),
         mode="parallel",
-        max_results=20,
+        max_results=50,
         sources="",
         filters="",
     )
@@ -2086,12 +2086,13 @@ def test_search_sources_grouped_in_old_direct_tiers():
 
 
 def test_search_results_dropdown_offers_up_to_500():
-    # Arrange -- operator: no 20-only cap; old-direct renders uncapped.
-    # The leaf offers 200/500 while keeping 20 the default; the CUI
+    # Arrange -- operator brief-04: results must not cap at 20; old-direct
+    # fetches 25-50 per source with no UI cap. The leaf offers 10-500 with
+    # 50 the default (old-direct's most common per-source rate); the CUI
     # backend clamps 1-500 (views.search).
     body = _compass_index_body()
     # Act
-    options = ('value="200"' in body, 'value="500"' in body, 'value="20" selected' in body)
+    options = ('value="200"' in body, 'value="500"' in body, 'value="50" selected' in body)
     js = COMPASS_SEARCH_JS.read_text()
     lifecycle = ("stepperSearching()" in js, "stepperDone(" in js, "stepperReset()" in js)
     # Assert

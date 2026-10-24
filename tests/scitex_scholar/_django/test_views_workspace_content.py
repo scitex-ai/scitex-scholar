@@ -283,3 +283,69 @@ def test_search_js_wires_textarea_enter_and_ctrl_k():
     ).read_text()
     # Assert
     assert ('requestSubmit' in js, 'toLowerCase() === "k"' in js) == (True, True)
+
+
+def test_columns_are_shared_sdk_panes_not_leaf_divs(_private_context):
+    # Arrange -- operator brief-04: the columns ARE the shared scitex-sdk
+    # panes element (data-stx-panes / data-stx-pane + SDK panes.css/js).
+    # layout="app" keeps scholar's desktop geometry; the fragment stays
+    # pure content (no tag-emitted link/script mid-body) and the panes
+    # contract owns the phone tab bar + switching.
+    request = RequestFactory().get("/")
+    # Act
+    html = views.index(request).content.decode()
+    dom = BeautifulSoup(html, "html.parser")
+    wrapper = dom.select_one('[data-stx-panes="scholar"]')
+    main = dom.select_one('main.app-main[data-stx-pane="main"]')
+    details = dom.select_one('aside.app-status-strip[data-stx-pane="details"]')
+    # Assert
+    assert (
+        wrapper is not None and wrapper.get("data-stx-panes-layout") == "app",
+        main is not None and main.parent == wrapper,
+        details is not None and details.parent == wrapper,
+        "panes.css" in html and "panes.js" in html,
+        dom.select_one(".app-container > main") is None,
+    ) == (True, True, True, True, True)
+
+
+def test_search_default_limit_is_fifty(_private_context):
+    # Arrange -- operator brief-04: results must not cap at 20 like the old
+    # leaf default; old-direct fetches 25-50 per source with no UI cap.
+    from django.test import RequestFactory as _RF
+
+    calls = []
+
+    class _Engine:
+        async def search(self, query, **kw):
+            calls.append(kw.get("max_results"))
+            return {"results": [], "metadata": {}}
+
+    # Act
+    views._cache.clear()
+    views._cache_timestamps.clear()
+    resp = views.search(_RF().get("/api/search?q=hippocampus"), _engine=_Engine())
+    # Assert
+    assert resp.status_code == 200 and calls == [50]
+
+
+def test_toolbar_row_controls_share_one_compact_height():
+    # Arrange -- operator brief-04: toolbar buttons are organized — every
+    # control in the toolbar row shares the compact 44px height instead of
+    # the tall query-row token.
+    from pathlib import Path
+
+    # Act
+    css = (
+        Path(views.__file__).parent
+        / "static"
+        / "scholar"
+        / "css"
+        / "_partials"
+        / "_search.css"
+    ).read_text()
+    # Assert
+    assert (
+        ".search-toolbar-row .form-select" in css,
+        ".search-toolbar-row .btn-control-library" in css,
+        "min-height: 44px" in css,
+    ) == (True, True, True)

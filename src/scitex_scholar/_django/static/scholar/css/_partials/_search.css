@@ -221,6 +221,24 @@
   flex: 1;
   min-width: 0;
   padding: 0;
+  align-items: center;
+}
+
+/*
+ * Operator brief-04 (buttons organized): every control in the toolbar
+ * row shares one compact height. The query-row token grew tall for the
+ * textarea; without this scope the selects would tower over the 44px
+ * pills. 44px keeps the touch floor the library controls already use.
+ */
+.search-toolbar-row .form-select,
+.search-toolbar-row .btn-control-library {
+  min-height: 44px;
+}
+
+.search-toolbar-row .search-bulk-bar__select-all {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .search-toolbar-row .search-stepper {

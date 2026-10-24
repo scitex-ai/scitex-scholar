@@ -33,7 +33,7 @@ LOCALE_DIR = ROOT / "src/scitex_scholar/_django/locale/ja/LC_MESSAGES"
 def single_line_trans_ids() -> list:
     t = "\n".join(path.read_text() for path in TEMPLATES)
     t = re.sub(r"\{%\s*comment\s*%\}.*?\{%\s*endcomment\s*%\}", "", t, flags=re.S)
-    return [m.group(1) for m in re.finditer(r'\{%\s*trans\s+"([^"]+)"\s*%\}', t)]
+    return [m.group(1) for m in re.finditer(r'{%\s*trans(?:late)?\s+"([^"]+)"(?:\s+as\s+\w+)?\s*%}', t)]
 
 
 # The three {% blocktrans %} messages, keyed on the EXACT raw block text Django
@@ -105,6 +105,7 @@ JA = {
     # --- Search tab ---
     "Search Papers": "論文を検索",
     "Search syntax help": "検索構文ヘルプ",
+    "Browse": "閲覧",
     "Search Engine Queue Status": "検索エンジンのキューステータス",
     "Active searches": "アクティブな検索",
     "Zoom in": "ズームイン",
