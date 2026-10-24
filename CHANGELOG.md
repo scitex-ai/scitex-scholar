@@ -7,6 +7,13 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.28.0] - 2026-10-26
+
+New CLI verb: scitex-scholar search QUERY (thin adapter over
+ScholarSearchEngine.search, the same CUI api/search forwards to).
+Options: --max-results (default 50), --mode, --json, --dry-run.
+Documented in docs/sphinx/cli.rst.
+
 ## [1.27.3] - 2026-10-26
 
 Details-strip polish: wrapped source rows stay legible in the fixed
