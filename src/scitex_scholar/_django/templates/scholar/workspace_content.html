@@ -81,6 +81,8 @@
                                                 <option value="20" selected>20</option>
                                                 <option value="50">50</option>
                                                 <option value="100">100</option>
+                                                <option value="200">200</option>
+                                                <option value="500">500</option>
                                             </select>
                                         </div>
                                     </div>
@@ -147,6 +149,19 @@
                                     <span class="graph-card__title">
                                         {% trans "Results" %}
                                         <small id="searchStats" class="card-subtitle"></small>
+                                    </span>
+                                    <!-- Old-direct parity slice 2: pipeline
+                                        stepper (Ready -> Searching -> Done +
+                                        timer). Driven by search.js around the
+                                        /api/search fetch; thin interface
+                                        only, no logic leaves the CUI. -->
+                                    <span class="search-stepper" id="searchStepper">
+                                        <span class="stepper-circle active" id="searchStep1">1</span><span class="stepper-text">{% trans "Ready" %}</span>
+                                        <span class="stepper-line" id="searchLine1"></span>
+                                        <span class="stepper-circle" id="searchStep2">2</span><span class="stepper-text" id="searchStepText2">{% trans "Searching" %}</span>
+                                        <span class="stepper-line" id="searchLine2"></span>
+                                        <span class="stepper-circle" id="searchStep3">3</span><span class="stepper-text" id="searchStepText3">{% trans "Done" %}</span>
+                                        <span class="stepper-timer" id="searchTimer"></span>
                                     </span>
                                 </div>
                                 <!-- Declutter (CCT4429): sorter + source filter +

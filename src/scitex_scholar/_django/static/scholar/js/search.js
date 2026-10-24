@@ -170,6 +170,70 @@ document.addEventListener("DOMContentLoaded", () => {
     if (queueTotal) queueTotal.textContent = "…";
     if (queueEngines) queueEngines.replaceChildren();
   }
+  // Old-direct parity slice 2: pipeline stepper state machine (port of
+  // hub _toolbar-status.ts). Ready -> Searching (timer) -> Done (count +
+  // elapsed, auto-reset). Pure interface over the fetch below.
+  let searchStartTime = 0;
+  let timerInterval = null;
+  function stepperEls() {
+    return {
+      step1: document.getElementById("searchStep1"),
+      step2: document.getElementById("searchStep2"),
+      step3: document.getElementById("searchStep3"),
+      line1: document.getElementById("searchLine1"),
+      line2: document.getElementById("searchLine2"),
+      text2: document.getElementById("searchStepText2"),
+      text3: document.getElementById("searchStepText3"),
+      timer: document.getElementById("searchTimer"),
+    };
+  }
+  function stepperSearching() {
+    const e = stepperEls();
+    e.step1.classList.remove("active");
+    e.step1.classList.add("complete");
+    e.step2.classList.add("active", "searching");
+    e.step3.classList.remove("active", "complete", "done");
+    e.line1.classList.add("active");
+    searchStartTime = Date.now();
+    if (timerInterval) clearInterval(timerInterval);
+    if (e.timer) {
+      e.timer.textContent = "0s";
+      timerInterval = setInterval(() => {
+        const el = document.getElementById("searchTimer");
+        if (el) el.textContent = `${Math.floor((Date.now() - searchStartTime) / 1000)}s`;
+      }, 500);
+    }
+  }
+  function stepperDone(count) {
+    const e = stepperEls();
+    const elapsed = Math.floor((Date.now() - searchStartTime) / 1000);
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    if (e.timer) e.timer.textContent = `${elapsed}s`;
+    e.step1.classList.remove("active", "searching");
+    e.step1.classList.add("complete");
+    e.step2.classList.remove("active", "searching");
+    e.step2.classList.add("complete");
+    e.step3.classList.remove("active", "searching");
+    e.step3.classList.add("done");
+    e.line1.classList.add("active");
+    e.line2.classList.add("active");
+    if (e.text3) e.text3.textContent = `Done (${count}, ${elapsed}s)`;
+    setTimeout(stepperReset, 5000);
+  }
+  function stepperReset() {
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    const e = stepperEls();
+    e.step1.classList.remove("complete", "searching", "done");
+    e.step1.classList.add("active");
+    e.step2.classList.remove("active", "complete", "searching", "done");
+    e.step3.classList.remove("active", "complete", "searching", "done");
+    e.line1.classList.remove("active");
+    e.line2.classList.remove("active");
+    if (e.text2) e.text2.textContent = "Searching";
+    if (e.text3) e.text3.textContent = "Done";
+    if (e.timer) e.timer.textContent = "";
+  }
+
   function fillQueue(metadata) {
     const events = (metadata && metadata.engine_events) || [];
     let active = 0;
@@ -979,6 +1043,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Old-direct U2: reveal the queue panel in its searching state.
     if (queuePanel) queuePanel.hidden = false;
     resetQueue();
+    stepperSearching();
 
     try {
       const params = new URLSearchParams({
@@ -1016,13 +1081,16 @@ document.addEventListener("DOMContentLoaded", () => {
           () => form.requestSubmit(),
         );
         if (queuePanel) queuePanel.hidden = true;
+        stepperReset();
         return;
       }
       renderResults(data);
       fillQueue(data.metadata);
+      stepperDone(((data && data.results) || []).length);
     } catch (err) {
       showError(`Search failed: ${err.message}`, () => form.requestSubmit());
       if (queuePanel) queuePanel.hidden = true;
+      stepperReset();
     } finally {
       hide(loading);
     }
