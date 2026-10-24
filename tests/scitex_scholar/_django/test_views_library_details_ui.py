@@ -21,6 +21,7 @@ TEMPLATE = (
 LIBRARY_JS = (
     Path(views.__file__).parent / "static" / "scholar" / "js" / "library.js"
 ).read_text()
+CSS_DIR = Path(views.__file__).parent / "static" / "scholar" / "css" / "_partials"
 
 
 def test_library_filter_row_carries_sort_select():
@@ -71,3 +72,83 @@ def test_library_details_edits_tags_and_notes():
     )
     # Assert
     assert present
+
+
+def test_library_parse_sites_reject_non_json_with_status():
+    # Arrange -- operator 2026-10-22: the Library pane showed a raw
+    # "Unexpected token '<'" when an endpoint answered HTML instead of JSON.
+    # Act
+    guarded = "readJson(resp)" in LIBRARY_JS
+    raw_gone = "await resp.json();" not in LIBRARY_JS
+    # Assert
+    assert (guarded, raw_gone) == (True, True)
+
+
+def test_library_login_redirect_becomes_relogin_prompt():
+    # Arrange -- apps-lead probe 2026-10-22: an expired/missing credential
+    # is 302'd to the hub login page, so the pane gets HTML where JSON was
+    # expected. That shape must prompt re-login, not crash on JSON.parse.
+    # Act
+    detected = (
+        "Session expired. Please log in again." in LIBRARY_JS
+        and "/login/i" in LIBRARY_JS
+        and "content-type" in LIBRARY_JS
+    )
+    # Assert
+    assert detected
+
+
+def test_library_strip_section_mirrors_list_counts():
+    # Arrange -- operator 2026-10-23: the Details strip's Library section
+    # shows the list counts only; the project selection lives in the
+    # header picker, so no scope suffix and no indicator mirroring.
+    # Act
+    counts_only = (
+        'getElementById("libraryStripSummary")' in LIBRARY_JS
+        and "reflectProjectIndicator()" not in LIBRARY_JS
+    )
+    # Assert
+    assert counts_only
+
+
+def test_details_export_select_clamps_to_strip_width():
+    # Arrange -- operator 2026-10-23 Details-tab style: the Export
+    # dropdown overran its narrow strip card (measured live). It must
+    # clamp to the card instead of forcing its min-width.
+    # Act
+    css = (CSS_DIR / "_library.css").read_text()
+    # Assert
+    assert (".library-io__select" in css, "min-width: 0" in css) == (True, True)
+
+
+def test_details_advanced_marker_is_ascii_safe():
+    # Arrange -- the Details Advanced toggle used U+25B8/25BE markers,
+    # which render as tofu boxes on minimal fonts (measured live).
+    # Act
+    css = (CSS_DIR / "_search.css").read_text()
+    # Assert
+    assert ('content: "+ "' in css, "\\25B8" not in css) == (True, True)
+
+
+def test_details_sections_collapse_like_old_direct():
+    # Arrange -- operator 2026-10-23 Details-tab style, old-direct parity:
+    # old-direct's ctrl-sections collapse on header click (chevron).
+    # The strip headers carry the toggle affordance, CSS hides the
+    # collapsed body, and app.js wires click + keyboard.
+    # Act
+    template = (
+        Path(views.__file__).parent
+        / "templates"
+        / "scholar"
+        / "workspace_content.html"
+    ).read_text()
+    sidebar = (CSS_DIR / "_sidebar.css").read_text()
+    app_js = (
+        Path(views.__file__).parent / "static" / "scholar" / "js" / "app.js"
+    ).read_text()
+    # Assert
+    assert (
+        template.count('sidebar-section__header" role="button"') == 3,
+        ".sidebar-section.collapsed > :not(.sidebar-section__header)" in sidebar,
+        "toggleSection" in app_js,
+    ) == (True, True, True)

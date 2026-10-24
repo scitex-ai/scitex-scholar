@@ -62,16 +62,45 @@ function initScholarTabs(root) {
   // leaf-owned classes.
   const tabs = Array.from(root.querySelectorAll(".stx-content-tabs__tab"));
   const panels = root.querySelectorAll(".tab-panel");
+  // Details strip sections, one per tab (operator 2026-10-22): the strip
+  // shows database controls on Search, library ops on Library, and graph
+  // controls + node details on Graph. Each section keeps its own markup;
+  // this sync only toggles visibility from the active tab key.
+  const searchHint = root.querySelector("[data-search-hint]");
+  const libraryHint = root.querySelector("[data-library-hint]");
   const graphHint = root.querySelector("[data-graph-hint]");
 
   function tabKey(tab) {
     return (tab.getAttribute("aria-controls") || "").replace(/^tab-/, "");
   }
 
-  function syncGraphHint(key) {
-    if (!graphHint) return;
-    graphHint.classList.toggle("hidden", key !== "graph");
+  function syncStripHints(key) {
+    if (searchHint) searchHint.classList.toggle("hidden", key !== "search");
+    if (libraryHint) libraryHint.classList.toggle("hidden", key !== "library");
+    if (graphHint) graphHint.classList.toggle("hidden", key !== "graph");
   }
+
+  // Operator 2026-10-23 (old-direct parity): Details sections collapse
+  // like old-direct's ctrl-section -- click (or Enter/Space on) the
+  // header toggles the section, chevron rotates via CSS, aria-expanded
+  // stays in sync. Tab switching (hidden) and collapsing (.collapsed)
+  // are orthogonal states.
+  function toggleSection(header) {
+    const section = header.closest(".sidebar-section");
+    if (!section) return;
+    const collapsed = section.classList.toggle("collapsed");
+    header.setAttribute("aria-expanded", String(!collapsed));
+  }
+
+  root.querySelectorAll(".sidebar-section__header").forEach((header) => {
+    header.addEventListener("click", () => toggleSection(header));
+    header.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        toggleSection(header);
+      }
+    });
+  });
 
   function activateTab(tab, focus) {
     tabs.forEach((t) => {
@@ -88,7 +117,16 @@ function initScholarTabs(root) {
     if (panel) panel.classList.add("active");
 
     if (focus) tab.focus();
-    syncGraphHint(tabKey(tab));
+    syncStripHints(tabKey(tab));
+    // Producer announcement (operator 2026-10-22): consumers that act on
+    // tab-opening (graph health probe, lazy loaders) listen for this
+    // instead of cloning tab-input listeners that miss swipe/arrow/prefill.
+    root.dispatchEvent(
+      new CustomEvent("scholar:tab-activated", {
+        detail: { tab: tabKey(tab) },
+        bubbles: true,
+      }),
+    );
   }
 
   function stepTab(delta, focus) {
@@ -170,11 +208,11 @@ function initScholarTabs(root) {
   }
 
   // Initial state: the default selected tab is Search (see
-  // workspace_content.html), so the graph hint is hidden on load.
+  // workspace_content.html), so only the databases section shows on load.
   const initial = root.querySelector(
     '.stx-content-tabs__tab[aria-selected="true"]',
   );
-  if (initial) syncGraphHint(tabKey(initial));
+  if (initial) syncStripHints(tabKey(initial));
 }
 
 function initScholarRoots() {

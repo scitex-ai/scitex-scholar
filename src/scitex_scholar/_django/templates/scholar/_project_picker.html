@@ -1,0 +1,17 @@
+{% load scitex_project_picker %}{% comment %}
+Scholar project picker — the element the SDK AppHeader slot receives.
+
+Writer-shaped: the picker is server-rendered here (inside the leaf header
+include) and moved into the canonical
+`.stx-app-header__slot--project-selector` slot client-side by
+`scholar/js/header-picker.js`. The tag renders NOTHING unless the request
+is signed in AND the host registered a project provider, so standalone
+serves unchanged markup.
+
+Operator 2026-10-23: user-scoped app opts in via allow_user_scope, so the
+header carries an explicit selector with a "No project selected" user-space
+choice (~/.scitex/scholar standalone, hub user scope mounted) instead of
+the removed Details-strip chips. current_scope ("user"/"project", from
+index_context) is the explicit selection state — an absent selection is
+user scope, never an implied project.
+{% endcomment %}{% scitex_project_picker scope=app_scope current=current_project allow_user_scope=True current_scope=current_scope %}
