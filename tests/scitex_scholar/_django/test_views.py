@@ -2073,6 +2073,18 @@ def test_search_results_header_carries_pipeline_stepper():
     assert (stepper, all(phases), timer) == (True, True, True)
 
 
+def test_search_sources_grouped_in_old_direct_tiers():
+    # Arrange -- old-direct parity slice 3: local unlimited tier +
+    # external tier with per-source rate labels + email/rate notice.
+    body = _compass_index_body()
+    # Act
+    tiers = ("Local (fast, unlimited)" in body, "External APIs (slower, limited results)" in body)
+    rates = ("3/s" in body, "50/s" in body, "10/s" in body)
+    notice = "higher rate limits" in body
+    # Assert
+    assert (all(tiers), all(rates), notice) == (True, True, True)
+
+
 def test_search_results_dropdown_offers_up_to_500():
     # Arrange -- operator: no 20-only cap; old-direct renders uncapped.
     # The leaf offers 200/500 while keeping 20 the default; the CUI

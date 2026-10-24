@@ -218,6 +218,46 @@
 }
 
 /*
+ * Old-direct parity slice 3: tiered Sources (local unlimited + external
+ * with rate labels + email/rate notice). Flat rows under the one Search
+ * section; no card wrapper. Monotone tokens only.
+ */
+.search-sources-grid--tiered {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.source-tier {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.source-tier__label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0;
+}
+.source-rate {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.search-advanced__check .source-rate {
+  padding-left: 8px;
+}
+.source-notice {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/*
  * Old-direct parity slice 2: pipeline stepper (Ready -> Searching ->
  * Done + timer). Ported from hub results-header.css onto the leaf tokens
  * (--accent instead of workspace green, monotone for the operator rule).
