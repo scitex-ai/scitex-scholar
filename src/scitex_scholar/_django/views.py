@@ -3274,20 +3274,51 @@ def _saved_graphs_path(root: Path) -> Path:
 
 
 def _load_saved_graphs(root: Path) -> list:
+    from scitex_scholar.citation_graph._saved_graph_store import (
+        SavedGraphStoreUnavailable,
+        backfill_from_file_rows,
+        list_for,
+    )
+
     path = _saved_graphs_path(root)
-    if not path.is_file():
-        return []
+    file_rows: list = []
+    if path.is_file():
+        try:
+            data = json.loads(path.read_text())
+            file_rows = data if isinstance(data, list) else []
+        except ValueError:
+            file_rows = []
     try:
-        data = json.loads(path.read_text())
-    except ValueError:
-        return []
-    return data if isinstance(data, list) else []
+        if file_rows:
+            backfill_from_file_rows(root, file_rows)
+        return list_for(root)
+    except SavedGraphStoreUnavailable:
+        # Store not provisioned on this host yet (operator/Infra act):
+        # serve the authoritative file. Nothing is lost; backfill runs
+        # on the first provisioned read.
+        return file_rows
+    except Exception:
+        logger.exception("saved-graphs store read failed; serving file")
+        return file_rows
 
 
 def _write_saved_graphs(root: Path, rows: list) -> None:
+    # File stays authoritative: every mutation lands here first, then the
+    # store best-effort (a store outage must never fail the request).
     path = _saved_graphs_path(root)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(rows))
+    try:
+        from scitex_scholar.citation_graph._saved_graph_store import (
+            SavedGraphStoreUnavailable,
+            backfill_from_file_rows,
+        )
+
+        backfill_from_file_rows(root, rows)
+    except SavedGraphStoreUnavailable:
+        pass
+    except Exception:
+        logger.exception("saved-graphs store backfill failed; file kept")
 
 
 @require_POST
