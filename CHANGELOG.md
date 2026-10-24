@@ -7,6 +7,17 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.24.0] - 2026-10-24
+
+Graphs as CUI package data: `citation_graph/_saved_graph_store.py` gains
+`list_graphs`/`save_graph`/`delete_graph`/`rename_graph` (per-user file
+authoritative, `scitex_dev.store` best-effort mirror: put on save, hide on
+delete, put on rename). Fixes `api/graphs/*` delete/rename never reaching
+the store mirror (rows resurrected, renames lost on provisioned hosts) and
+the `Query.eq` drift against scitex-dev 0.62 (store reads now use the
+`rows()` door, like `storage/_library_index`). The Django views are thin
+adapters with an `_opener` injection seam (no mocks).
+
 ## [1.23.0] - 2026-10-24
 
 Old-direct parity slices 2-3 + CUI storage: the Results header gains the
