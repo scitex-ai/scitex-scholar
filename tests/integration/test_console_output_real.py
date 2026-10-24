@@ -9,6 +9,11 @@ import pytest
 
 import scitex_scholar
 
+# Every test in this module spawns a real Python subprocess via _run()
+# (each with up to a 30s timeout), so the module is excluded from the 60s
+# pre-push gate: select with -m "not slow and not integration".
+pytestmark = [pytest.mark.slow, pytest.mark.integration]
+
 
 def _run(tmp_path, code, level="info", after_import=""):
     home = tmp_path / "home"

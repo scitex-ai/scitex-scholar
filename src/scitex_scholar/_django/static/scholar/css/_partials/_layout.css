@@ -12,6 +12,19 @@
   height: calc(100vh - 40px);
 }
 
+/*
+ * Operator 2026-10-25 (brief-04): the columns are the SHARED scitex-sdk
+ * panes element (data-stx-panes / data-stx-pane), not leaf-owned layout
+ * divs. layout="app" keeps scholar's own desktop geometry, so this
+ * wrapper only carries the flex row the old layout had.
+ */
+.app-container > .stx-panes {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
 .app-sidebar {
   width: 240px;
   background: var(--bg-secondary);
@@ -111,6 +124,35 @@
   }
 }
 
+/* Selected-tab legibility guard (operator 2026-10-20/21 + SDK #60 polish):
+ * the SDK content-tabs sheet owns the underline indicator; this rule only
+ * restores the border-bottom the `border-color: transparent` reset would
+ * otherwise clear (cascade order), and brightens the label. No box, no
+ * weight change — underline only, per the UI standard. */
+.stx-content-tabs .stx-content-tabs__tab[aria-selected="true"] {
+  border-radius: 0;
+  color: var(--text-primary, #1a1a1a);
+  border-color: transparent;
+  border-bottom: 2px solid var(--accent, #1a2a40);
+  background: transparent;
+}
+
+/* Old-direct scroll model (operator parity 2026-10-21): the SDK shell
+ * makes `.ws-module-pane` the page scroller, so its own scrollbar gutter
+ * shrinks the header + content 15px off the module edge (measured 1265
+ * vs 1280). Old-direct keeps the outer fixed and scrolls inner panes.
+ * Scholar-scoped: `.app-container` exists only on this leaf's pages, so
+ * the shared sheets are untouched. */
+.ws-module-pane {
+  overflow-y: hidden;
+}
+
+.app-container {
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+}
+
 /* The shared sheet owns the header's phone behaviour (wrap at 600px, touch
  * targets); scholar keeps only its container height fix. */
 @media (max-width: 600px) {
@@ -118,4 +160,18 @@
     height: auto;
     min-height: calc(100dvh - 118px);
   }
+}
+
+/* Operator 2026-10-20: the header version pill reads as loud UI chrome.
+ * Subdue it leaf-side (the shared sheet owns the pill shape): 10px muted
+ * text, no weight, no border. Reversible; hide entirely only if the
+ * operator asks -- the version stays in the DOM for bug reports. */
+.scholar-app-header .stx-app-header__version {
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--text-muted);
+  border: none;
+  background: none;
+  padding: 0;
 }
