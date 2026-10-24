@@ -3264,72 +3264,30 @@ def preferences_sources(request):
 # keeps SavedGraph rows (name + rebuild recipe); the leaf keeps the same
 # shape file-based under the user-scoped root, mirroring saved searches.
 # Reload needs no endpoint: GET api/graph/network?doi=<seed_doi> rebuilds.
+# Graphs are CUI-owned package data (operator 2026-10-24): the file path
+# helper lives in _saved_graph_store._file_path; this module only adapts.
 _MAX_SAVED_GRAPHS = 500
 _MAX_GRAPH_NAME_CHARS = 200
 
 
-def _saved_graphs_path(root: Path) -> Path:
-    """Single JSON file holding this user's saved graphs."""
-    return root / "SAVED_GRAPHS" / "saved_graphs.json"
+def _load_saved_graphs(root: Path, _opener=None) -> list:
+    # Thin adapter: the CUI owns file + store logic (graphs as package
+    # data, operator 2026-10-24); the view only resolves the user root.
+    from scitex_scholar.citation_graph._saved_graph_store import list_graphs
 
-
-def _load_saved_graphs(root: Path) -> list:
-    from scitex_scholar.citation_graph._saved_graph_store import (
-        SavedGraphStoreUnavailable,
-        backfill_from_file_rows,
-        list_for,
-    )
-
-    path = _saved_graphs_path(root)
-    file_rows: list = []
-    if path.is_file():
-        try:
-            data = json.loads(path.read_text())
-            file_rows = data if isinstance(data, list) else []
-        except ValueError:
-            file_rows = []
-    try:
-        if file_rows:
-            backfill_from_file_rows(root, file_rows)
-        return list_for(root)
-    except SavedGraphStoreUnavailable:
-        # Store not provisioned on this host yet (operator/Infra act):
-        # serve the authoritative file. Nothing is lost; backfill runs
-        # on the first provisioned read.
-        return file_rows
-    except Exception:
-        logger.exception("saved-graphs store read failed; serving file")
-        return file_rows
-
-
-def _write_saved_graphs(root: Path, rows: list) -> None:
-    # File stays authoritative: every mutation lands here first, then the
-    # store best-effort (a store outage must never fail the request).
-    path = _saved_graphs_path(root)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(rows))
-    try:
-        from scitex_scholar.citation_graph._saved_graph_store import (
-            SavedGraphStoreUnavailable,
-            backfill_from_file_rows,
-        )
-
-        backfill_from_file_rows(root, rows)
-    except SavedGraphStoreUnavailable:
-        pass
-    except Exception:
-        logger.exception("saved-graphs store backfill failed; file kept")
+    return list_graphs(root, _opener=_opener)
 
 
 @require_POST
-def graphs_save(request):
+def graphs_save(request, _opener=None):
     """Save a named graph rebuild recipe for this user (explicit action).
 
-    Body: {"name": ..., "seed_doi": ...}. Stored file-based under the
-    request's user-scoped root — no shared store, no database. Bodies over
-    256k are refused with 413 before parsing. At most 500 rows per user.
-    Names cap at 200 (hub SavedGraph.name); seed DOIs reuse the 500-char
-    leaf DOI bound. A nameless or seedless row cannot rebuild: 400.
+    Body: {"name": ..., "seed_doi": ...}. Graphs are package data: the CUI
+    keeps the per-user file authoritative and mirrors best-effort into the
+    shared store. Bodies over 256k are refused with 413 before parsing. At
+    most 500 rows per user. Names cap at 200 (hub SavedGraph.name); seed
+    DOIs reuse the 500-char leaf DOI bound. A nameless or seedless row
+    cannot rebuild: 400.
     """
     try:
         payload = _json_body(request)
@@ -3361,19 +3319,16 @@ def graphs_save(request):
             {"error": f"at most {_MAX_SAVED_GRAPHS} saved graphs per user"},
             status=400,
         )
-    import datetime as _dt
-    import uuid as _uuid
+    from scitex_scholar.citation_graph._saved_graph_store import save_graph
 
-    row = {
-        "id": _uuid.uuid4().hex,
-        "name": name,
-        "seed_doi": seed_doi,
-        "created_by": _safe_username(user) if user is not None else "user",
-        "created_at": _dt.datetime.now(_dt.timezone.utc).isoformat(),
-    }
-    rows.append(row)
     try:
-        _write_saved_graphs(root, rows)
+        row = save_graph(
+            root,
+            name,
+            seed_doi,
+            _safe_username(user) if user is not None else "user",
+            _opener=_opener,
+        )
     except OSError as e:
         logger.error(f"graphs save failed: {e}", exc_info=True)
         return JsonResponse({"error": "Save failed. Try again later."}, status=500)
@@ -3383,14 +3338,14 @@ def graphs_save(request):
 
 
 @require_GET
-def graphs_list(request):
+def graphs_list(request, _opener=None):
     """List this user's saved graphs (user-scoped root only)."""
     root = _library_root_for(request)
-    return JsonResponse({"graphs": _load_saved_graphs(root)})
+    return JsonResponse({"graphs": _load_saved_graphs(root, _opener=_opener)})
 
 
 @require_POST
-def graphs_delete(request):
+def graphs_delete(request, _opener=None):
     """Delete one saved graph by id; 404 when unknown. Bodies over 256k are
     refused with 413 before parsing. The success body carries state only."""
     try:
@@ -3405,20 +3360,20 @@ def graphs_delete(request):
     if not graph_id:
         return JsonResponse({"error": "id is required"}, status=400)
     root = _library_root_for(request)
-    rows = _load_saved_graphs(root)
-    kept = [r for r in rows if r.get("id") != graph_id]
-    if len(kept) == len(rows):
-        return JsonResponse({"error": "Unknown id"}, status=404)
+    from scitex_scholar.citation_graph._saved_graph_store import delete_graph
+
     try:
-        _write_saved_graphs(root, kept)
+        known = delete_graph(root, graph_id, _opener=_opener)
     except OSError as e:
         logger.error(f"graphs delete failed: {e}", exc_info=True)
         return JsonResponse({"error": "Delete failed. Try again later."}, status=500)
+    if not known:
+        return JsonResponse({"error": "Unknown id"}, status=404)
     return JsonResponse({"deleted": True})
 
 
 @require_POST
-def graphs_rename(request):
+def graphs_rename(request, _opener=None):
     """Rename one saved graph; 404 when unknown (hub api_rename_graph parity).
 
     Body: {"id": ..., "name": ...}. Names cap at 200 chars like graphs_save.
@@ -3451,18 +3406,15 @@ def graphs_rename(request):
             status=400,
         )
     root = _library_root_for(request)
-    rows = _load_saved_graphs(root)
-    for row in rows:
-        if row.get("id") == graph_id:
-            row["name"] = name
-            break
-    else:
-        return JsonResponse({"error": "Unknown id"}, status=404)
+    from scitex_scholar.citation_graph._saved_graph_store import rename_graph
+
     try:
-        _write_saved_graphs(root, rows)
+        known = rename_graph(root, graph_id, name, _opener=_opener)
     except OSError as e:
         logger.error(f"graphs rename failed: {e}", exc_info=True)
         return JsonResponse({"error": "Rename failed. Try again later."}, status=500)
+    if not known:
+        return JsonResponse({"error": "Unknown id"}, status=404)
     return JsonResponse({"renamed": True, "id": graph_id, "name": name})
 
 

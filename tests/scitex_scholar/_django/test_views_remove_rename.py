@@ -194,3 +194,120 @@ def test_graph_saved_list_carries_rename_action():
     present = 'id="graphSavedList"' not in TEMPLATE
     # Assert
     assert present
+
+
+class _FakeRead:
+    """In-memory stand-in for the scitex_dev.store read handle."""
+
+    def __init__(self, store):
+        self._store = store
+
+    def rows(self, include_hidden=False):
+        del include_hidden  # the real door filters server-side; list filters
+        from types import SimpleNamespace
+
+        return [
+            SimpleNamespace(values=dict(entry["data"]))
+            for entry in self._store._rows.values()
+            if not entry["hidden"]
+        ]
+
+    def revision(self, key):
+        entry = self._store._rows.get((key["user_root"], key["graph_id"]))
+        return None if entry is None else entry["rev"]
+
+    def is_hidden(self, key):
+        entry = self._store._rows.get((key["user_root"], key["graph_id"]))
+        return False if entry is None else entry["hidden"]
+
+
+class _FakeStore:
+    """In-memory stand-in for the provisioned saved-graphs store."""
+
+    def __init__(self):
+        self._rows = {}
+        self.hides = []
+
+    def put(self, data, expected_revision=None):
+        del expected_revision  # revision protocol is the real store's concern
+        key = (data["user_root"], data["graph_id"])
+        if key in self._rows:
+            self._rows[key]["data"].update(data)
+            self._rows[key]["rev"] += 1
+        else:
+            self._rows[key] = {"data": dict(data), "rev": 1, "hidden": False}
+
+    def hide(self, key, expected_revision=None):
+        del expected_revision
+        self.hides.append(dict(key))
+        entry = self._rows.get((key["user_root"], key["graph_id"]))
+        if entry is not None:
+            entry["hidden"] = True
+
+    def read(self):
+        return _FakeRead(self)
+
+
+def _provisioned():
+    """Offline store double (PA-306: passed as a parameter, never patched)."""
+    fake = _FakeStore()
+    return fake, lambda: fake
+
+
+def test_graph_delete_hides_the_store_row(tmp_path):
+    # Arrange -- operator 2026-10-24 (graphs as CUI data): delete must
+    # hide the derived store mirror, or the row resurrects on next read.
+    fake, opener = _provisioned()
+    saved = json.loads(
+        views.graphs_save(
+            _post(
+                "/api/graphs/save",
+                tmp_path,
+                {"name": "Gone", "seed_doi": "10.1/a"},
+            ),
+            _opener=opener,
+        ).content
+    )
+    # Act
+    resp = views.graphs_delete(
+        _post("/api/graphs/delete", tmp_path, {"id": saved["id"]}),
+        _opener=opener,
+    )
+    # Assert
+    listed = json.loads(
+        views.graphs_list(_get("/api/graphs/list", tmp_path), _opener=opener).content
+    )
+    assert (resp.status_code, listed["graphs"], len(fake.hides)) == (200, [], 1)
+
+
+def test_graph_rename_updates_the_store_row(tmp_path):
+    # Arrange -- operator 2026-10-24 (graphs as CUI data): rename must
+    # reach the derived store mirror, or the next read shows the old name.
+    _, opener = _provisioned()
+    saved = json.loads(
+        views.graphs_save(
+            _post(
+                "/api/graphs/save",
+                tmp_path,
+                {"name": "Old name", "seed_doi": "10.1/a"},
+            ),
+            _opener=opener,
+        ).content
+    )
+    # Act
+    resp = views.graphs_rename(
+        _post(
+            "/api/graphs/rename",
+            tmp_path,
+            {"id": saved["id"], "name": "New name"},
+        ),
+        _opener=opener,
+    )
+    # Assert
+    listed = json.loads(
+        views.graphs_list(_get("/api/graphs/list", tmp_path), _opener=opener).content
+    )
+    assert (resp.status_code, [g["name"] for g in listed["graphs"]]) == (
+        200,
+        ["New name"],
+    )
