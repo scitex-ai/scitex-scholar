@@ -26,7 +26,7 @@ execution:
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Collection, Dict, List, Optional, Tuple
 
 import scitex_logging as logging
 
@@ -299,6 +299,29 @@ def build_tiered_engines(
         fallback[name] = engine_cls(email=email)
 
     return primary, fallback
+
+
+def select_sources(
+    primary: Dict[str, Any],
+    fallback: Dict[str, Any],
+    sources: Optional[Collection[str]] = None,
+) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    """Narrow both tiers to the requested source names (old-direct parity).
+
+    The Details column's Sources checkboxes name engines; this is the
+    backend half. Unknown names are dropped -- the view validates against
+    supported engines and refuses them loudly, so by the time a request
+    reaches a pipeline only known names remain. ``None``/empty means no
+    narrowing. Selecting nothing at all yields two empty tiers, and the
+    tier runners' empty-tier fast path returns no papers.
+    """
+    if not sources:
+        return primary, fallback
+    wanted = {name.strip() for name in sources if name and name.strip()}
+    return (
+        {name: engine for name, engine in primary.items() if name in wanted},
+        {name: engine for name, engine in fallback.items() if name in wanted},
+    )
 
 
 def resolve_tier(

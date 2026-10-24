@@ -49,10 +49,10 @@ BLOCKTRANS_MSGIDS = [
     "                                            <code>year:2020-2024</code> bounds the\n"
     "                                            publication year,\n"
     "                                            <code>if:&gt;5</code> filters by impact factor.",
-    "Your papers, stored locally. Use <strong>Enrich</strong>\n"
-    "                                    to fill in metadata (abstract, citations, impact\n"
-    "                                    factor) from the databases, or\n"
-    "                                    <strong>Import</strong> BibTeX and\n"
+    "Your papers, stored locally. Use the per-paper\n"
+    "                                    <strong>Enrich</strong> action to fill in metadata\n"
+    "                                    (abstract, citations, impact factor) from the\n"
+    "                                    databases, or <strong>Import</strong> BibTeX and\n"
     "                                    <strong>Export</strong> your library.",
 ]
 
@@ -91,6 +91,10 @@ JA = {
     "Graph Controls": "グラフ操作",
     "Scroll": "スクロール", "Zoom": "ズーム", "Drag": "ドラッグ", "Pan": "パン",
     "Click": "クリック", "Select node": "ノードを選択",
+    "Databases": "データベース",
+    "No search yet.": "まだ検索していません。",
+    "Library not loaded yet.": "ライブラリはまだ読み込まれていません。",
+    "No graph built yet.": "グラフはまだ作成されていません。",
     # --- Tabs ---
     "Search databases": "データベースを検索",
     "Library": "ライブラリ",
@@ -104,6 +108,8 @@ JA = {
     "Zoom out": "ズームアウト",
     "Download PNG": "PNGをダウンロード",
     "Close": "閉じる",
+    "Add to library": "ライブラリに追加",
+    "Explore from here": "ここから探索",
     "bioRxiv — biology preprint server": "bioRxiv — 生物学プレプリントサーバー",
     "DOAJ — open-access journals": "DOAJ — オープンアクセスジャーナル",
     "PLOS — open-access science journals": "PLOS — オープンアクセス科学ジャーナル",
@@ -335,6 +341,8 @@ JA = {
     "No open-access PDF available": "オープンアクセスのPDFがありません",
     "Paper not found": "論文が見つかりません",
     "Load failed. Try again later.": "読み込みに失敗しました。後でもう一度お試しください。",
+    "Session expired. Please log in again.": "セッションの有効期限が切れました。再度ログインしてください。",
+    "Server returned non-JSON (status %(status)s)": "サーバーがJSON以外を返しました（ステータス%(status)s）。",
     "Download failed. Try again later.": "ダウンロードに失敗しました。後でもう一度お試しください。",
     "Imported %(n)s paper from %(file)s": "%(file)s から %(n)s 件の論文をインポートしました",
     "Imported %(n)s papers from %(file)s": "%(file)s から %(n)s 件の論文をインポートしました",

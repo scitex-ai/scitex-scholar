@@ -109,7 +109,11 @@ def test_retry_buttons_render_in_english():
     # Arrange
     request = RequestFactory().get("/")
     # Act
-    html = render_to_string("scholar/workspace_content.html", {}, request=request)
+    html = render_to_string(
+        "scholar/workspace_content.html",
+        {"app_scope": "user", "current_scope": "user"},
+        request=request,
+    )
     # Assert -- three rendered labels; the ids (...RetryBtn) carry the same
     # substring and the template wraps labels in whitespace, so collapse
     # whitespace first and count the label, not the word.
@@ -125,6 +129,10 @@ def test_retry_buttons_render_in_japanese():
     request = RequestFactory().get("/")
     # Act
     with translation.override("ja"):
-        html = render_to_string("scholar/workspace_content.html", {}, request=request)
+        html = render_to_string(
+            "scholar/workspace_content.html",
+            {"app_scope": "user", "current_scope": "user"},
+            request=request,
+        )
     # Assert
     assert html.count("再試行") == 3

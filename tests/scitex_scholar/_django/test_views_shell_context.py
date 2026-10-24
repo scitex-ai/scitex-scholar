@@ -70,10 +70,10 @@ def _private_context(tmp_path):
 
 @pytest.fixture(
     params=[
-        ("en", "/", "standalone", "SciTeX Scholar"),
-        ("ja", "/", "standalone", "SciTeX Scholar"),
-        ("en", "/apps/scholar/v2/", "hub", "SciTeX Scholar (hub)"),
-        ("ja", "/apps/scholar/v2/", "hub", "SciTeX Scholar (hub)"),
+        ("en", "/", "standalone", "Scholar"),
+        ("ja", "/", "standalone", "Scholar"),
+        ("en", "/apps/scholar/v2/", "hub", "Scholar (hub)"),
+        ("ja", "/apps/scholar/v2/", "hub", "Scholar (hub)"),
     ],
     ids=["en-root", "ja-root", "en-mounted", "ja-mounted"],
 )
@@ -148,13 +148,40 @@ def test_index_shell_context_keeps_explicit_unused_pane(_shell_result, pane):
     assert len(unused) == 1
 
 
-def test_index_shell_context_keeps_user_scope(_shell_result):
-    # Arrange
+def test_index_shell_context_renders_picker_with_user_scope(_shell_result):
+    # Arrange — operator 2026-10-22: the header picker renders in the
+    # shell context (allow_user_scope, "No project selected" for user
+    # space). The tag fail-softs only for genuinely anonymous requests;
+    # the shell test factory carries no user object, which the tag
+    # treats as signed-in.
     html = _shell_result["html"]
     # Act
     pickers = html.count("data-stx-project-picker")
     # Assert
-    assert pickers == 0
+    assert (pickers, 'data-allow-user-scope="true"' in html) == (1, True)
+
+
+def test_authed_header_picker_renders_with_user_scope():
+    # Arrange — the operator-visible contract: a signed-in request gets
+    # exactly one header picker with the user-scope opt-in, so "No
+    # project selected" is a real state, not a missing control.
+    # Verified live against the dev server (authed test-user HTML
+    # carries data-stx-project-picker + data-allow-user-scope="true");
+    # the shell test factory has no pytest-django user fixture, so this
+    # pins the tag contract at the template level instead.
+    from django.template import engines
+    from django.test import RequestFactory
+    django_engine = engines["django"]
+    tpl = django_engine.from_string(
+        '{% load scitex_project_picker %}'
+        "{% scitex_project_picker scope='user' current='' "
+        "allow_user_scope=True current_scope='user' %}"
+    )
+    # Act — no user object on the request: the tag treats a missing
+    # user as signed-in (same path the shell factory exercises).
+    html = tpl.render({"request": RequestFactory().get("/")})
+    # Assert
+    assert (html.count("data-stx-project-picker"), 'data-allow-user-scope="true"' in html) == (1, True)
 
 
 def test_index_shell_context_forwards_request_to_csrf_processor(_shell_result):
@@ -371,21 +398,21 @@ def test_anonymous_leaf_search_reports_required_query(_anonymous_public_results)
 
 @pytest.fixture(
     params=[
-        ("en", "/", "standalone", None, "SciTeX Scholar"),
-        ("ja", "/", "standalone", None, "SciTeX Scholar"),
+        ("en", "/", "standalone", None, "Scholar"),
+        ("ja", "/", "standalone", None, "Scholar"),
         (
             "en",
             "/apps/scholar/v2/",
             "hub",
             "http://127.0.0.1:1",
-            "SciTeX Scholar (hub)",
+            "Scholar (hub)",
         ),
         (
             "ja",
             "/apps/scholar/v2/",
             "hub",
             "http://127.0.0.1:1",
-            "SciTeX Scholar (hub)",
+            "Scholar (hub)",
         ),
     ],
     ids=["en-root", "ja-root", "en-mounted", "ja-mounted"],

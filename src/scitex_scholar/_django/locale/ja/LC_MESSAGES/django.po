@@ -11,8 +11,8 @@ msgstr ""
 "PO-Revision-Date: 2026-09-14 00:00+0900\n"
 "Last-Translator: scitex-scholar <agent@scitex.ai>\n"
 
-msgid "SciTeX Scholar"
-msgstr "SciTeX Scholar"
+msgid "Scholar"
+msgstr "Scholar"
 
 msgid "Search databases"
 msgstr "データベースを検索"
@@ -34,90 +34,6 @@ msgstr "クエリ"
 
 msgid "Results"
 msgstr "結果"
-
-msgid "Advanced"
-msgstr "詳細"
-
-msgid "Search source"
-msgstr "検索ソース"
-
-msgid "All sources (parallel)"
-msgstr "すべてのソース（並列）"
-
-msgid "Single source"
-msgstr "単一ソース"
-
-msgid "Sources"
-msgstr "ソース"
-
-msgid "Crossref database on the SciTeX server — fast, unlimited"
-msgstr "SciTeXサーバー上のCrossrefデータベース — 高速、無制限"
-
-msgid "OpenAlex database on the SciTeX server — fast, unlimited"
-msgstr "SciTeXサーバー上のOpenAlexデータベース — 高速、無制限"
-
-msgid "NCBI PubMed — biomedical literature"
-msgstr "NCBI PubMed — 生物医学文献"
-
-msgid "arXiv — physics, mathematics, and computer science preprints"
-msgstr "arXiv — 物理学・数学・計算機科学のプレプリント"
-
-msgid "Semantic Scholar — AI-powered academic search"
-msgstr "Semantic Scholar — AI駆動の学術検索"
-
-msgid "Crossref — DOI metadata registry"
-msgstr "Crossref — DOIメタデータレジストリ"
-
-msgid "OpenAlex — open catalog of scholarly works"
-msgstr "OpenAlex — 学術成果物のオープンカタログ"
-
-msgid "bioRxiv — biology preprint server"
-msgstr "bioRxiv — 生物学プレプリントサーバー"
-
-msgid "DOAJ — open-access journals"
-msgstr "DOAJ — オープンアクセスジャーナル"
-
-msgid "PLOS — open-access science journals"
-msgstr "PLOS — オープンアクセス科学ジャーナル"
-
-msgid "PMC — open-access full-text archive"
-msgstr "PMC — オープンアクセス全文アーカイブ"
-
-msgid "Uncheck sources to narrow the search. All checked searches the default set."
-msgstr "ソースのチェックを外すと検索範囲が狭まります。すべて選択時はデフォルト設定で検索します。"
-
-msgid "Filters"
-msgstr "絞り込み"
-
-msgid "Year from"
-msgstr "開始年"
-
-msgid "Year to"
-msgstr "終了年"
-
-msgid "Min citations"
-msgstr "最小被引用数"
-
-msgid "Max citations"
-msgstr "最大被引用数"
-
-msgid "Min impact factor"
-msgstr "最小インパクトファクター"
-
-msgid "Max impact factor"
-msgstr "最大インパクトファクター"
-
-msgid "Ignore cache"
-msgstr "キャッシュを無視"
-
-msgid "CrossRef API"
-msgstr "CrossRef API"
-
-msgid "Configured"
-msgstr "設定済み"
-
-msgid "Not configured"
-msgstr "未設定"
 
 msgid "Searching databases... This may take a moment."
 msgstr "データベースを検索中。少し時間がかかる場合があります。"
@@ -203,12 +119,6 @@ msgstr "選択した結果のオープンアクセスPDFをダウンロード"
 msgid "PDFs"
 msgstr "PDF"
 
-msgid "CSV (.csv)"
-msgstr "CSV (.csv)"
-
-msgid "Import BibTeX"
-msgstr "BibTeX をインポート"
-
 msgid "Import preview"
 msgstr "インポートのプレビュー"
 
@@ -220,57 +130,6 @@ msgstr "インポートを実行"
 
 msgid "Cancel"
 msgstr "キャンセル"
-
-msgid "Project"
-msgstr "プロジェクト"
-
-msgid "Zotero"
-msgstr "Zotero"
-
-msgid "Import from your local Zotero database, or download the library as BibTeX for Zotero."
-msgstr "ローカルの Zotero データベースからインポートするか、ライブラリを Zotero 用の BibTeX としてダウンロードできます。"
-
-msgid "Checking..."
-msgstr "確認中…"
-
-msgid "Import source"
-msgstr "インポート元"
-
-msgid "All papers"
-msgstr "すべての論文"
-
-msgid "By collection"
-msgstr "コレクション別"
-
-msgid "By tags"
-msgstr "タグ別"
-
-msgid "Tags, comma-separated"
-msgstr "タグ（カンマ区切り）"
-
-msgid "Import from Zotero"
-msgstr "Zotero からインポート"
-
-msgid "Download BibTeX for Zotero"
-msgstr "Zotero 用に BibTeX をダウンロード"
-
-msgid "Connected Papers"
-msgstr "Connected Papers"
-
-msgid "Import a Connected Papers graph by seed paper."
-msgstr "起点論文から Connected Papers のグラフをインポートします。"
-
-msgid "Find paper IDs at semanticscholar.org"
-msgstr "論文 ID は semanticscholar.org で確認できます"
-
-msgid "Semantic Scholar paper ID"
-msgstr "Semantic Scholar 論文 ID"
-
-msgid "40-char SHA or DOI"
-msgstr "40文字の SHA または DOI"
-
-msgid "Import Graph"
-msgstr "グラフをインポート"
 
 msgid "Filter your library"
 msgstr "ライブラリを絞り込む"
@@ -332,27 +191,6 @@ msgstr "グラフ名"
 msgid "Save current graph"
 msgstr "現在のグラフを保存"
 
-msgid "How It Works"
-msgstr "使い方"
-
-msgid "Bibliographic Coupling"
-msgstr "書誌結合"
-
-msgid "Papers sharing common references"
-msgstr "共通の参考文献を持つ論文"
-
-msgid "Co-citation"
-msgstr "共引用"
-
-msgid "Papers frequently cited together"
-msgstr "共に引用されることの多い論文"
-
-msgid "Direct Citations"
-msgstr "直接引用"
-
-msgid "Papers citing or cited by the seed"
-msgstr "シード論文を引用または被引用する論文"
-
 msgid "Building citation network... This may take a moment."
 msgstr "引用ネットワークを構築中。少し時間がかかる場合があります。"
 
@@ -389,8 +227,161 @@ msgstr "ステータスパネルを展開する"
 msgid "Details"
 msgstr "詳細"
 
+msgid "Databases"
+msgstr "データベース"
+
+msgid "No search yet."
+msgstr "まだ検索していません。"
+
+msgid "Advanced"
+msgstr "詳細"
+
+msgid "Search source"
+msgstr "検索ソース"
+
+msgid "All sources (parallel)"
+msgstr "すべてのソース（並列）"
+
+msgid "Single source"
+msgstr "単一ソース"
+
+msgid "Sources"
+msgstr "ソース"
+
+msgid "Crossref database on the SciTeX server — fast, unlimited"
+msgstr "SciTeXサーバー上のCrossrefデータベース — 高速、無制限"
+
+msgid "OpenAlex database on the SciTeX server — fast, unlimited"
+msgstr "SciTeXサーバー上のOpenAlexデータベース — 高速、無制限"
+
+msgid "NCBI PubMed — biomedical literature"
+msgstr "NCBI PubMed — 生物医学文献"
+
+msgid "arXiv — physics, mathematics, and computer science preprints"
+msgstr "arXiv — 物理学・数学・計算機科学のプレプリント"
+
+msgid "Semantic Scholar — AI-powered academic search"
+msgstr "Semantic Scholar — AI駆動の学術検索"
+
+msgid "Crossref — DOI metadata registry"
+msgstr "Crossref — DOIメタデータレジストリ"
+
+msgid "OpenAlex — open catalog of scholarly works"
+msgstr "OpenAlex — 学術成果物のオープンカタログ"
+
+msgid "bioRxiv — biology preprint server"
+msgstr "bioRxiv — 生物学プレプリントサーバー"
+
+msgid "DOAJ — open-access journals"
+msgstr "DOAJ — オープンアクセスジャーナル"
+
+msgid "PLOS — open-access science journals"
+msgstr "PLOS — オープンアクセス科学ジャーナル"
+
+msgid "PMC — open-access full-text archive"
+msgstr "PMC — オープンアクセス全文アーカイブ"
+
+msgid "Uncheck sources to narrow the search. All checked searches the default set."
+msgstr "ソースのチェックを外すと検索範囲が狭まります。すべて選択時はデフォルト設定で検索します。"
+
+msgid "Filters"
+msgstr "絞り込み"
+
+msgid "Year from"
+msgstr "開始年"
+
+msgid "Year to"
+msgstr "終了年"
+
+msgid "Min citations"
+msgstr "最小被引用数"
+
+msgid "Max citations"
+msgstr "最大被引用数"
+
+msgid "Min impact factor"
+msgstr "最小インパクトファクター"
+
+msgid "Max impact factor"
+msgstr "最大インパクトファクター"
+
+msgid "Ignore cache"
+msgstr "キャッシュを無視"
+
+msgid "CrossRef API"
+msgstr "CrossRef API"
+
+msgid "Configured"
+msgstr "設定済み"
+
+msgid "Not configured"
+msgstr "未設定"
+
+msgid "Library not loaded yet."
+msgstr "ライブラリはまだ読み込まれていません。"
+
+msgid "Project"
+msgstr "プロジェクト"
+
+msgid "CSV (.csv)"
+msgstr "CSV (.csv)"
+
+msgid "Import BibTeX"
+msgstr "BibTeX をインポート"
+
+msgid "Zotero"
+msgstr "Zotero"
+
+msgid "Import from your local Zotero database, or download the library as BibTeX for Zotero."
+msgstr "ローカルの Zotero データベースからインポートするか、ライブラリを Zotero 用の BibTeX としてダウンロードできます。"
+
+msgid "Checking..."
+msgstr "確認中…"
+
+msgid "Import source"
+msgstr "インポート元"
+
+msgid "All papers"
+msgstr "すべての論文"
+
+msgid "By collection"
+msgstr "コレクション別"
+
+msgid "By tags"
+msgstr "タグ別"
+
+msgid "Tags, comma-separated"
+msgstr "タグ（カンマ区切り）"
+
+msgid "Import from Zotero"
+msgstr "Zotero からインポート"
+
+msgid "Download BibTeX for Zotero"
+msgstr "Zotero 用に BibTeX をダウンロード"
+
+msgid "Connected Papers"
+msgstr "Connected Papers"
+
+msgid "Import a Connected Papers graph by seed paper."
+msgstr "起点論文から Connected Papers のグラフをインポートします。"
+
+msgid "Find paper IDs at semanticscholar.org"
+msgstr "論文 ID は semanticscholar.org で確認できます"
+
+msgid "Semantic Scholar paper ID"
+msgstr "Semantic Scholar 論文 ID"
+
+msgid "40-char SHA or DOI"
+msgstr "40文字の SHA または DOI"
+
+msgid "Import Graph"
+msgstr "グラフをインポート"
+
 msgid "Graph Controls"
 msgstr "グラフ操作"
+
+msgid "No graph built yet."
+msgstr "グラフはまだ作成されていません。"
 
 msgid "Scroll"
 msgstr "スクロール"
@@ -419,14 +410,14 @@ msgstr "キーワードで学術データベース（OpenAlex、Crossref、PubMe
 msgid "Query syntax:\n                                            <code>-word</code> excludes a term,\n                                            <code>year:2020-2024</code> bounds the\n                                            publication year,\n                                            <code>if:&gt;5</code> filters by impact factor."
 msgstr "クエリ構文：<code>-word</code> で用語を除外、<code>year:2020-2024</code> で発行年を指定、<code>if:&gt;5</code> でインパクトファクターで絞り込みます。"
 
-msgid "Your papers, stored locally. Use <strong>Enrich</strong>\n                                    to fill in metadata (abstract, citations, impact\n                                    factor) from the databases, or\n                                    <strong>Import</strong> BibTeX and\n                                    <strong>Export</strong> your library."
-msgstr "ローカルに保存された論文です。<strong>補完</strong> でデータベースからメタデータ（抄録、被引用数、インパクトファクター）を入力するか、<strong>インポート</strong> で BibTeX をインポートしてライブラリを<strong>エクスポート</strong>できます。"
+msgid "Your papers, stored locally. Use the per-paper\n                                    <strong>Enrich</strong> action to fill in metadata\n                                    (abstract, citations, impact factor) from the\n                                    databases, or <strong>Import</strong> BibTeX and\n                                    <strong>Export</strong> your library."
+msgstr "ローカルに保存された論文です。各論文の<strong>補完</strong>アクションでデータベースからメタデータ（抄録、被引用数、インパクトファクター）を入力するか、<strong>インポート</strong> で BibTeX をインポートしてライブラリを<strong>エクスポート</strong>できます。"
 
 msgid "CrossRef API not configured"
 msgstr "CrossRef API 未設定"
 
-msgid "The citation graph reads its data from a crossref-local HTTP API; scholar never opens the corpus files itself. No endpoint is configured, so there is nothing to query."
-msgstr "引用グラフは crossref-local HTTP API からデータを取得します。scholar がコーパスファイルを直接開くことはありません。エンドポイントが設定されていないため、問い合わせ先がありません。"
+msgid "The citation graph reads its data from a citation-data HTTP API. No endpoint is configured, so there is nothing to query."
+msgstr "引用グラフは引用データ HTTP API からデータを取得します。エンドポイントが設定されていないため、問い合わせ先がありません。"
 
 msgid "Build citation graph"
 msgstr "引用グラフを構築"
@@ -520,6 +511,12 @@ msgstr "保存済み"
 
 msgid "Save failed"
 msgstr "保存に失敗"
+
+msgid "Add to library"
+msgstr "ライブラリに追加"
+
+msgid "Explore from here"
+msgstr "ここから探索"
 
 msgid "Select results to save."
 msgstr "保存する結果を選択してください。"
@@ -662,6 +659,12 @@ msgstr "論文が見つかりません"
 msgid "Load failed. Try again later."
 msgstr "読み込みに失敗しました。後でもう一度お試しください。"
 
+msgid "Session expired. Please log in again."
+msgstr "セッションの有効期限が切れました。再度ログインしてください。"
+
+msgid "Server returned non-JSON (status %(status)s)"
+msgstr "サーバーがJSON以外を返しました（ステータス%(status)s）。"
+
 msgid "Download failed. Try again later."
 msgstr "ダウンロードに失敗しました。後でもう一度お試しください。"
 
@@ -704,11 +707,11 @@ msgstr "プロジェクト: %(project)s"
 msgid "Citation Graph: limited"
 msgstr "引用グラフ：制限あり"
 
-msgid "The crossref-local endpoint is configured and reachable, but the probe returned no data for the canary paper. Citation graphs may be incomplete."
-msgstr "crossref-local エンドポイントは設定され到達可能ですが、確認用の論文に対するプローブがデータを返さなかったため、引用グラフが不完全な場合があります。"
+msgid "The citation-data endpoint is configured and reachable, but the check returned no data for the sample paper. Citation graphs may be incomplete."
+msgstr "引用データのエンドポイントは設定され到達可能ですが、サンプル論文に対する確認がデータを返さなかったため、引用グラフが不完全な場合があります。"
 
-msgid "Check that the crossref-local endpoint is serving the corpus you expect; the citation graph depends on it."
-msgstr "crossref-local エンドポイントが想定どおりのコーパスを提供しているか確認してください。引用グラフはこのエンドポイントに依存しています。"
+msgid "Check that the citation-data endpoint is serving the corpus you expect; the citation graph depends on it."
+msgstr "引用データのエンドポイントが想定どおりのコーパスを提供しているか確認してください。引用グラフはこのエンドポイントに依存しています。"
 
 msgid "Set %(setting)s to a running crossref-local endpoint (env var of the same name, or the Django setting when scholar is mounted in a host project), then restart the server. Installing the `crossref-local` package supplies a default endpoint, which scholar falls back to when the variable is unset."
 msgstr "%(setting)s に稼働中の crossref-local エンドポイントを設定し（ホストプロジェクトにマウントしている場合は同名の環境変数または Django 設定）、サーバーを再起動してください。`crossref-local` パッケージをインストールするとデフォルトのエンドポイントが用意され、変数が未設定の場合はそちらにフォールバックします。"
@@ -716,8 +719,8 @@ msgstr "%(setting)s に稼働中の crossref-local エンドポイントを設�
 msgid "Citation Graph: not checked"
 msgstr "引用グラフ：未確認"
 
-msgid "A crossref-local endpoint is configured. The graph backend is probed when you open the Citation Graph tab, so a slow or unreachable backend cannot delay the rest of the page."
-msgstr "crossref-local エンドポイントが設定されています。グラフバックエンドの確認は引用グラフタブを開いたときに行われるため、応答の遅いバックエンドや到達不能なバックエンドがページの他の表示を遅らせることはありません。"
+msgid "A citation-data endpoint is configured. The graph backend is checked when you open the Citation Graph tab, so a slow or unreachable service cannot delay the rest of the page."
+msgstr "引用データのエンドポイントが設定されています。グラフバックエンドの確認は引用グラフタブを開いたときに行われるため、応答の遅いサービスや到達不能なサービスがページの他の表示を遅らせることはありません。"
 
 msgid "Open the Citation Graph tab to check it."
 msgstr "引用グラフタブを開いて確認してください。"
@@ -725,8 +728,8 @@ msgstr "引用グラフタブを開いて確認してください。"
 msgid "Citation Graph: unavailable"
 msgstr "引用グラフ：利用不可"
 
-msgid "The crossref-local endpoint is configured but could not be reached right now, so citation graphs cannot be built."
-msgstr "crossref-local エンドポイントは設定されていますが、現在到達できないため、引用グラフを構築できません。"
+msgid "The citation-data endpoint is configured but could not be reached right now, so citation graphs cannot be built."
+msgstr "引用データのエンドポイントは設定されていますが、現在到達できないため、引用グラフを構築できません。"
 
-msgid "Verify the crossref-local service is running and that the endpoint is reachable, then retry."
-msgstr "crossref-local サービスが稼働していることと、エンドポイントに到達できることを確認してから、再試行してください。"
+msgid "The citation service may be temporarily down — wait a moment and retry by opening the Citation Graph tab."
+msgstr "引用サービスが一時的に停止している可能性があります — しばらく待ってから引用グラフタブを開いて再試行してください。"
