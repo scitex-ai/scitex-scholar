@@ -26,6 +26,36 @@
   color: var(--text-primary);
 }
 
+/*
+ * Operator 2026-10-23 (old-direct parity): Details sections collapse
+ * like old-direct's ctrl-section (click the header, chevron rotates).
+ * Collapsing hides everything below the header, never the header itself.
+ * The chevron is pure CSS (no icon font, no new strings): aria-expanded
+ * on the header carries the state.
+ */
+.sidebar-section__chevron {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid var(--text-secondary);
+  transition: transform 0.15s;
+  flex-shrink: 0;
+}
+
+.sidebar-section.collapsed > :not(.sidebar-section__header) {
+  display: none;
+}
+
+.sidebar-section.collapsed .sidebar-section__chevron {
+  transform: rotate(-90deg);
+}
+
+.sidebar-section__header:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
 .sidebar-section__content {
   padding: 12px;
   border-top: 1px solid var(--border-default);
@@ -127,70 +157,9 @@
   align-self: center;
 }
 
-/* LED dots: 6px round marks, one per backend. data-status values mirror
- * the old Sources contract (checking pulses); "limited" is the strip's own
- * addition for configured-but-degraded backends (amber, steady). */
-.status-leds {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.status-led {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--text-muted);
-  display: inline-block;
-}
-
-.status-led[data-status="checking"] {
-  animation: status-led-pulse 1s ease-in-out infinite;
-}
-
-.status-led[data-status="ready"] {
-  background: var(--accent);
-}
-
-.status-led[data-status="limited"] {
-  background: #f59e0b;
-}
-
-.status-led[data-status="unavailable"],
-.status-led[data-status="error"] {
-  background: var(--status-error);
-}
-
-@keyframes status-led-pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.4;
-  }
-}
-
-.status-expand {
-  border-top: 1px solid var(--border-default);
-  padding-top: 8px;
-}
-
-.status-expand__summary {
-  cursor: pointer;
-  list-style: none;
-}
-
-.status-expand__summary::-webkit-details-marker {
-  display: none;
-}
-
-.status-expand__body {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 8px;
-}
+/* Per-tab backend status rows (status-row) live in each tab's own Details
+ * section -- there is no shared status expander (operator 2026-10-23: it
+ * duplicated the per-tab rows). */
 
 .status-row {
   display: flex;
@@ -211,4 +180,69 @@
     border-top: 1px solid var(--border-default);
     order: 3;
   }
+}
+
+/* ── Per-tab Details sections (operator 2026-10-22) ────────────────
+ * Search brings its Databases controls (Advanced), Library its ops, Graph
+ * its controls + node sheet. The strip is 208px: controls go full-width,
+ * multi-column grids collapse to one column, everything else keeps its
+ * own sheet. Monotone + theme tokens only (operator color discipline).
+ */
+.sidebar-section__summary {
+  margin: 0 0 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.status-strip__body .sidebar-section__content {
+  padding: 10px;
+}
+
+.status-strip__body .form-select,
+.status-strip__body .form-input {
+  width: 100%;
+  max-width: 100%;
+}
+
+/*
+ * Operator 2026-10-24 (old-direct parity): label-above-control in the
+ * 208px strip. The Search-source row kept its label beside the select,
+ * squeezing "All sources (parallel)" to "All so". Stacking restores the
+ * full label, old-direct style.
+ */
+.status-strip__body .search-advanced__row {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+}
+
+/*
+ * Brief-04 follow-up: strip controls stay compact. The shared query-row
+ * token grew tall for the textarea; unconstrained, every select and
+ * input in the 208px strip would inherit 84px. 44px matches the
+ * library/toolbars and keeps filter rows aligned, old-direct style.
+ */
+.status-strip__body .form-select,
+.status-strip__body .form-input {
+  min-height: 44px;
+}
+
+.status-strip__body .search-sources-grid,
+.status-strip__body .search-filters-grid {
+  grid-template-columns: 1fr;
+}
+
+.status-strip__body .search-advanced,
+.status-strip__body .library-io,
+.status-strip__body .library-ext {
+  margin: 8px 0 0;
+}
+
+/* The node sheet is an overlay on the canvas; in the strip it is a plain
+ * stacked card under the graph controls. */
+.app-status-strip .node-details-panel {
+  position: static;
+  width: auto;
+  box-shadow: none;
+  margin-top: 8px;
 }
