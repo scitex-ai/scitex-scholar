@@ -23,6 +23,25 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!form) return;
 
   const input = document.getElementById("searchInput");
+  // Old-direct parity 2026-10-24: the query is a textarea. Enter (no
+  // Shift) submits the form; Shift+Enter inserts a newline. Ctrl+K /
+  // Cmd+K (the in-field badge) focuses the box from anywhere.
+  if (input && input.tagName === "TEXTAREA") {
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        form.requestSubmit();
+      }
+    });
+  }
+  document.addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+      const tag = (document.activeElement || {}).tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
+      e.preventDefault();
+      if (input) input.focus();
+    }
+  });
   const maxResults = document.getElementById("searchMaxResults");
   const modeSelect = document.getElementById("searchMode");
   const sourcesGrid = document.getElementById("searchSourcesGrid");

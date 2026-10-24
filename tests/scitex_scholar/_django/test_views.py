@@ -398,7 +398,7 @@ def test_graph_health_unconfigured_paragraph_is_translated_in_japanese():
     # on their JA-only phrases so an EN fallback fails loudly.
     assert (
         body["error"],
-        "引用グラフは引用データ" in body["detail"],
+        "citation-data" in body["detail"] and "エンドポイント" in body["detail"],
         "再起動してください" in body["fix"],
     ) == ("CrossRef API 未設定", True, True)
 
@@ -451,7 +451,7 @@ def test_graph_health_unavailable_paragraph_is_translated_in_japanese():
         (body["status"], body["probed"]),
         body["error"],
         "到達できないため" in body["detail"],
-        "再試行してください" in body["fix"],
+        "再試行して" in body["fix"],
     ) == (("unavailable", True), "引用グラフ：利用不可", True, True)
 
 
@@ -2237,7 +2237,7 @@ def test_search_placeholder_is_clear_and_example_driven():
     # Arrange
     body = _compass_index_body()
     # Act
-    has_example = 'placeholder="e.g. ' in body
+    has_example = 'e.g. hippocampus' in body
     no_generic = 'Enter keywords' not in body
     # Assert -- the placeholder models a concrete query and the generic
     # "Enter keywords…" label is gone.
@@ -2261,7 +2261,7 @@ def test_search_tab_and_button_are_labelled_databases():
     tab_label = 'aria-controls="tab-search" tabindex="0">Search databases<' in body
     # #95: the search submit is the PRIMARY action, so it carries btn-primary
     # (NOT btn-build, which is the secondary Build Graph / per-row class).
-    button_label = 'class="btn-primary">Search databases<' in body
+    button_label = 'class="btn-primary btn-primary--query">Search databases<' in body
     # Assert
     assert tab_label and button_label
 
@@ -2284,7 +2284,7 @@ def test_search_primary_distinct_from_build_graph():
     # The Search submit is btn-primary; the Build Graph submit stays btn-build.
     # (Matched by id-then-label, not by the full tag: the button carries an
     # id + disabled attribute for the empty-DOI arming behavior.)
-    search_is_primary = 'class="btn-primary">Search databases<' in body
+    search_is_primary = 'class="btn-primary btn-primary--query">Search databases<' in body
     build_graph_stays_secondary = 'id="graphBuildBtn"' not in body
     # Negative control: the search button is NOT also btn-build (that was the
     # pre-fix state — a single shared class with no visual distinction).
@@ -2580,7 +2580,7 @@ def test_mobile_form_row_stretches_groups_full_width():
         r"\.graph-form\s+\.form-row\s*{[^}]*align-items:\s*stretch[^}]*}", block
     )
     full_width_groups = re.search(
-        r"\.graph-form\s+\.form-row\s+\.form-group--doi\s*,?\s*\n?\s*"
+        r"\.graph-form\s+\.form-row\s+\.form-group--query\s*,?\s*\n?\s*"
         r"\.graph-form\s+\.form-row\s+\.form-group--options\s*{[^}]*width:\s*100%[^}]*}",
         block,
     )
@@ -3536,7 +3536,7 @@ def test_ja_catalog_translates_every_msgid():
     # Proper nouns / format labels that stay in Latin in Japanese UI (translating
     # them would be wrong, not a missed translation).
     proper_nouns = {
-        "Scholar", "DOI", "CrossRef API",
+        "Scholar", "SciTeX Scholar", "DOI", "CrossRef API",
         "BibTeX (.bib)", "RIS (.ris)", "EndNote (.enw)", "CSV (.csv)",
         "Zotero", "Connected Papers",
     }
@@ -3547,10 +3547,10 @@ def test_ja_catalog_translates_every_msgid():
         (i, m) for i, m in pairs
         if i != "" and i not in proper_nouns and (m == "" or m == i)
     ]
-    # Assert -- at least one msgid (the status strip title, known JA) and zero
+    # Assert -- at least one msgid (the Details strip title, known JA) and zero
     # untranslated (proper nouns excluded by the explicit list above).
     assert (
-        any("サービス状態" in m for _, m in pairs) and not untranslated
+        any("詳細" in m for _, m in pairs) and not untranslated
     )
 
 

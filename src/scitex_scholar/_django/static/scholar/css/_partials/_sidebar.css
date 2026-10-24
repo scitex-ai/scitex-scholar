@@ -204,6 +204,18 @@
   max-width: 100%;
 }
 
+/*
+ * Operator 2026-10-24 (old-direct parity): label-above-control in the
+ * 208px strip. The Search-source row kept its label beside the select,
+ * squeezing "All sources (parallel)" to "All so". Stacking restores the
+ * full label, old-direct style.
+ */
+.status-strip__body .search-advanced__row {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+}
+
 .status-strip__body .search-sources-grid,
 .status-strip__body .search-filters-grid {
   grid-template-columns: 1fr;

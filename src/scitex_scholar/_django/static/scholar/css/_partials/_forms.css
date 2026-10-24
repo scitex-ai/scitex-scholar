@@ -16,11 +16,13 @@
   align-items: flex-end;
 }
 
-.form-group--doi {
+.form-group--query {
   flex: 1;
+  min-width: 0;
 }
 .form-group--options {
   width: 140px;
+  flex-shrink: 0;
 }
 
 .form-label {
@@ -46,8 +48,8 @@
   padding: 10px 12px;
   font-size: 14px;
   /*
-   * Operator 2026-10-23 (old-direct parity): one shared control height —
-   * inputs, selects, and buttons all resolve the same two-line
+   * Operator 2026-10-24 (old-direct parity): one shared control height —
+   * inputs, selects, and buttons all resolve the same
    * --scholar-search-height, so a row's controls align exactly like
    * old-direct's --sch-control-h rule. box-sizing is border-box
    * project-wide (see _base.css reset), so min-height IS the row height.
@@ -83,6 +85,66 @@
 
 .form-input::placeholder {
   color: var(--text-muted);
+}
+
+/*
+ * Operator 2026-10-24 (old-direct parity): the query is a multi-line
+ * textarea, not a single-line input, so long boolean queries stay
+ * visible. textarea does not inherit the body font by default, so it is
+ * set explicitly (same stack, same size as .form-input). The right
+ * padding clears the in-field Ctrl+K badge + ? help below.
+ */
+textarea.form-input--query {
+  font-family: inherit;
+  line-height: 1.5;
+  resize: vertical;
+  padding-right: 96px;
+}
+
+/*
+ * Old-direct in-field tools: the Ctrl+K badge + ? help sit inside the
+ * query textarea's top-right corner (absolute over the padding reserved
+ * above). Square kbd chips (operator color discipline: rounded only for
+ * textarea, button, badge).
+ */
+.query-field {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+}
+
+.query-field .form-input--query {
+  flex: 1;
+  min-width: 0;
+}
+
+.query-field__tools {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.query-shortcut-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 11px;
+  color: var(--text-muted);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+  padding: 1px 6px;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.query-shortcut-hint kbd {
+  font-family: inherit;
+  font-size: 11px;
+  color: var(--text-secondary);
 }
 
 /* ── Buttons ───────────────────────────────────────────────── */
@@ -186,7 +248,7 @@
   .graph-form .form-row {
     align-items: stretch;
   }
-  .graph-form .form-row .form-group--doi,
+  .graph-form .form-row .form-group--query,
   .graph-form .form-row .form-group--options {
     width: 100%;
   }
