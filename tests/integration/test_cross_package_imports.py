@@ -55,6 +55,7 @@ CROSS_PACKAGE_IMPORTS = [
     'scitex_config',
     'scitex_dev',
     'scitex_dev.ecosystem',
+    'scitex_dev.hooks',
     'scitex_dev.store',
     'scitex_dict',
     'scitex_io',

@@ -30,6 +30,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const show = (el) => el && el.classList.remove("hidden");
   const hide = (el) => el && el.classList.add("hidden");
+  // Non-JSON guard (apps-lead probe 2026-10-22: an expired/missing
+  // credential is 302'd to the hub login page, so the pane gets HTML
+  // where JSON was expected). The login-page shape becomes a re-login
+  // prompt; any other non-JSON body keeps its status. Every parse site
+  // below goes through here so a wrong-content response never surfaces
+  // a raw SyntaxError.
+  async function readJson(resp) {
+    const text = await resp.text();
+    let data = null;
+    try {
+      data = JSON.parse(text);
+    } catch (err) {
+      data = null;
+    }
+    if (data !== null) return data;
+    const location = resp.url || "";
+    const contentType = (resp.headers && resp.headers.get("content-type")) || "";
+    const loginShaped =
+      /login/i.test(location) &&
+      (/text\/html/i.test(contentType) || /^\s*</.test(text));
+    if (loginShaped) {
+      throw new Error(scholarT("Session expired. Please log in again."));
+    }
+    throw new Error(
+      scholarT("Server returned non-JSON (status %(status)s)", {
+        status: resp.status,
+      }),
+    );
+  }
   let loaded = false;
   let filterTimer = null;
   // Slice 4b (old-direct unification): the loaded rows stay cached so the
@@ -77,53 +106,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Project sync (parity slice 3c): the header picker navigates with
-  // ?project=<id> (the SDK picker's default contract), so the selection is
-  // readable here with no extra state. Saves elsewhere (search.js) file
-  // into the same selection; the list filters to it server-side.
+  // Project sync: the header picker's ?project=<id> (SDK picker default
+  // contract) is readable here with no extra state. Saves elsewhere
+  // (search.js) file into the same selection; the list filters to it
+  // server-side. Operator 2026-10-23: NO project selector lives in the
+  // Details strip — header picker only — so the chips + indicator that
+  // used to mirror the selection here are deleted.
   function currentProject() {
     try {
       return new URLSearchParams(window.location.search).get("project") || "";
     } catch (e) {
       return "";
-    }
-  }
-
-  // Project chips + sync indicator, from the existing /api/projects
-  // endpoint (the picker's provider contract). Chips navigate with
-  // ?project= so the server resolves and remembers the selection.
-  const projectChipsEl = document.getElementById("libraryProjectChips");
-  const projectCurrentEl = document.getElementById("libraryProjectCurrent");
-  async function loadProjectChips() {
-    if (!projectChipsEl && !projectCurrentEl) return;
-    const current = currentProject();
-    if (projectCurrentEl) {
-      projectCurrentEl.textContent = current
-        ? scholarT("Project: %(project)s", { project: current })
-        : scholarT("All projects");
-    }
-    if (!projectChipsEl || projectChipsEl.dataset.done) return;
-    try {
-      const resp = await fetch(`${STX_MOUNT}/api/projects`);
-      const data = await resp.json();
-      if (!resp.ok) return;
-      projectChipsEl.dataset.done = "1";
-      const all = document.createElement("a");
-      all.className = "library-project__chip" + (current ? "" : " library-project__chip--active");
-      all.href = window.location.pathname;
-      all.textContent = scholarT("All projects");
-      projectChipsEl.appendChild(all);
-      (data.projects || []).forEach((p) => {
-        const chip = document.createElement("a");
-        const id = typeof p === "string" ? p : p.id || "";
-        if (!id) return;
-        chip.className = "library-project__chip" + (id === current ? " library-project__chip--active" : "");
-        chip.href = `${window.location.pathname}?project=${encodeURIComponent(id)}`;
-        chip.textContent = (typeof p === "string" ? p : p.name || p.id) || "";
-        projectChipsEl.appendChild(chip);
-      });
-    } catch (e) {
-      /* chips are progressive enhancement; the list still loads */
     }
   }
 
@@ -214,6 +207,26 @@ document.addEventListener("DOMContentLoaded", () => {
       enrich(paper, enrichBtn, status),
     );
     actions.appendChild(enrichBtn);
+
+    // Brief-05: seed the Citation Graph from this work (Search-tab per-row
+    // parity). Only DOI rows seed; the tab click switches panes and the
+    // one-shot event carries the seed (same path as search.js).
+    if (paper.doi) {
+      const graphBtn = document.createElement("button");
+      graphBtn.type = "button";
+      graphBtn.className = "library-enrich-btn";
+      graphBtn.textContent = scholarT("Graph");
+      graphBtn.addEventListener("click", () => {
+        const graphTab = document.querySelector(
+          '.stx-content-tabs__tab[aria-controls="tab-graph"]',
+        );
+        if (graphTab) graphTab.click();
+        document.dispatchEvent(
+          new CustomEvent("scholar:build-graph", { detail: { doi: paper.doi } }),
+        );
+      });
+      actions.appendChild(graphBtn);
+    }
 
     // Slice 4b: per-row Details toggle -- hub expands a details panel from
     // each library row (status, stars, tags, notes, save).
@@ -382,7 +395,7 @@ document.addEventListener("DOMContentLoaded", () => {
           headers: csrfJsonHeaders(),
           body: JSON.stringify(payload),
         });
-        const data = await resp.json();
+        const data = await readJson(resp);
         if (!resp.ok) throw new Error(data.error || scholarT("Save failed"));
         paper.annotations = data.annotations || {};
         renderBadges(badgesEl, paper);
@@ -416,7 +429,7 @@ document.addEventListener("DOMContentLoaded", () => {
           headers: csrfJsonHeaders(),
           body: JSON.stringify({ library_ids: [paper.paper_id] }),
         });
-        const data = await resp.json();
+        const data = await readJson(resp);
         if (!resp.ok) throw new Error(data.error || scholarT("Download failed"));
         if ((data.downloaded || []).length) {
           pdfMsg.textContent = scholarT("PDF downloaded");
@@ -452,7 +465,7 @@ document.addEventListener("DOMContentLoaded", () => {
           headers: csrfJsonHeaders(),
           body: JSON.stringify({ library_id: paper.paper_id }),
         });
-        const data = await resp.json();
+        const data = await readJson(resp);
         if (!resp.ok) throw new Error(data.error || scholarT("Remove failed"));
         lastRows = lastRows.filter((p) => p.paper_id !== paper.paper_id);
         renderRows();
@@ -478,7 +491,7 @@ document.addEventListener("DOMContentLoaded", () => {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: params.toString(),
       });
-      const data = await resp.json();
+      const data = await readJson(resp);
       if (!resp.ok) throw new Error(data.error || scholarT("Enrichment failed (HTTP %(status)s)", { status: resp.status }));
       // Reflect the fresh metadata on the row without a full reload.
       if (data.abstract_chars) {
@@ -567,7 +580,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ? `${STX_MOUNT}/api/library?${qp.join("&")}`
         : `${STX_MOUNT}/api/library`;
       const resp = await fetch(url);
-      const data = await resp.json();
+      const data = await readJson(resp);
       if (!resp.ok) throw new Error(data.error || `Library load failed (${resp.status})`);
       hide(loadingEl);
       listEl.replaceChildren();
@@ -577,6 +590,14 @@ document.addEventListener("DOMContentLoaded", () => {
         statsEl.textContent = data.filtered
           ? scholarT("%(count)s of %(total)s Papers", { count: n, total: data.total })
           : n + " " + scholarT(n === 1 ? "Paper" : "Papers");
+        // Details strip: the Library section mirrors the list counts.
+        // The project selection itself lives in the header picker
+        // (operator 2026-10-23: no selector in Details), so the strip
+        // carries no project scope suffix.
+        const stripSummary = document.getElementById("libraryStripSummary");
+        if (stripSummary) {
+          stripSummary.textContent = statsEl.textContent;
+        }
       }
       if (!papers.length) {
         listEl.appendChild(emptyState(data));
@@ -701,7 +722,7 @@ document.addEventListener("DOMContentLoaded", () => {
         headers: importHeaders(),
         body: params.toString(),
       });
-      const data = await resp.json();
+      const data = await readJson(resp);
       if (!resp.ok) throw new Error(data.error || `Import failed (${resp.status})`);
       // A dict keyed call, not a template literal: scholarT looks the string
       // up verbatim, so an interpolated literal could never match the
@@ -748,7 +769,7 @@ document.addEventListener("DOMContentLoaded", () => {
           headers: importHeaders(),
           body: params.toString(),
         });
-        const data = await resp.json();
+        const data = await readJson(resp);
         if (!resp.ok) throw new Error(data.error || `Import failed (${resp.status})`);
         pendingImportText = text;
         pendingImportName = file.name;
@@ -940,7 +961,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (libTabBtn) {
     libTabBtn.addEventListener("click", () => {
       if (!loaded) loadLibrary();
-      loadProjectChips();
       checkExtStatuses();
     });
   }
@@ -962,7 +982,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // If the page loads with Library already active (it does not by default), load now.
   if (listPanel.classList.contains("active")) {
     loadLibrary();
-    loadProjectChips();
     checkExtStatuses();
   }
 });

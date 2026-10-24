@@ -42,7 +42,9 @@
   --bg-secondary: #efeeed;
   --bg-tertiary: #e8e7e5;
   --bg-monaco: #fdfcfa;
-  --accent-hover: #059669;
+  /* Operator hue decision 2026-10-20: navy CTA (base #1a2a40), hover
+   * darkened one step. The old green is gone. */
+  --accent-hover: #0f1e33;
   --edge-color: #c0bfbd;
   /*
    * #93: the database-search input is the app's primary control, so it is
@@ -51,12 +53,14 @@
    * NOT primitives/spacing.css, where scitex-ui's --input-height (36px) lives --
    * so referencing --input-height directly would silently fall back to a
    * hardcoded value on the standalone page (the exact "hardcoded cross-app
-   * styling" #93 asks to avoid). The value 48px == scitex-ui's --spacing-xxl
-   * step (3rem) and > the 36px --input-height standard, so it is larger AND
-   * on the shared scale. This is a scholar-owned token, not one of the seven
+   * Operator 2026-10-24 (old-direct parity): the query row is the app's
+   * primary surface — the shared control height matches old-direct's
+   * tall query box (~three text lines), so the textarea, the Search
+   * button, and the Results select align exactly.
+   * This is a scholar-owned token, not one of the seven
    * scitex-ui colours the template must not redeclare (see test_views.py).
    */
-  --scholar-search-height: 48px;
+  --scholar-search-height: 84px;
 }
 
 /*
@@ -69,7 +73,9 @@
   --bg-secondary: #151515;
   --bg-tertiary: #1a1a1a;
   --bg-monaco: #1e1e1e;
-  --accent-hover: #047857;
+  /* Operator hue decision 2026-10-20: gold CTA (base #d4a87a), hover
+   * darkened one step. The old green is gone. */
+  --accent-hover: #b98d5f;
   --edge-color: #3a3a3a;
 }
 
