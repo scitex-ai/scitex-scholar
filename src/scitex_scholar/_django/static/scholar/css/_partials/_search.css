@@ -39,13 +39,12 @@
  * Collapsed by default so the first screen shows a keyword box, not backend
  * API infrastructure. Houses the query-syntax help, the search source (mode),
  * the "Ignore cache" control, and the CrossRef API status.
+ *
+ * Operator 2026-10-24 (old-direct parity, flat Details): the Advanced
+ * <details> card is deleted from the template -- these classes now style
+ * flat rows rendered directly under the section content. No bordered card
+ * wrapper remains; spacing tokens hold the rhythm instead.
  */
-.search-advanced {
-  margin-top: 16px;
-  border: 1px solid var(--border-default);
-  background: var(--bg-tertiary);
-  border-radius: 4px;
-}
 
 .search-advanced__summary {
   cursor: pointer;
