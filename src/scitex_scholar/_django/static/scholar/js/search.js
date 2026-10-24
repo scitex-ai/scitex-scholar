@@ -951,6 +951,26 @@ document.addEventListener("DOMContentLoaded", () => {
   if (enrichSelectedBtn) {
     enrichSelectedBtn.addEventListener("click", enrichSelected);
   }
+  // Brief-05: seed the Citation Graph from checked works. One DOI builds
+  // directly; several build a multi-seed network (api/graph/network/multi,
+  // at most 20 seeds). Rows without a DOI are skipped.
+  const graphSelectedBtn = document.getElementById("searchGraphSelected");
+  function graphSelected() {
+    const dois = selectedPapers()
+      .map((paper) => paper.doi)
+      .filter((doi) => doi);
+    if (!dois.length) {
+      if (bulkStatus) bulkStatus.textContent = scholarT("Select results with a DOI first.");
+      return;
+    }
+    const graphTab = document.querySelector(
+      '.stx-content-tabs__tab[aria-controls="tab-graph"]',
+    );
+    if (graphTab) graphTab.click();
+    const detail = dois.length === 1 ? { doi: dois[0] } : { dois: dois.slice(0, 20) };
+    document.dispatchEvent(new CustomEvent("scholar:build-graph", { detail }));
+  }
+  if (graphSelectedBtn) graphSelectedBtn.addEventListener("click", graphSelected);
   // Slice 11: save-then-download. Search rows are not library papers, so
   // the pill files the selection first (existing save-bulk), then fetches
   // OA PDFs for the filed ids (max 10 per the endpoint cap).

@@ -184,14 +184,14 @@ def test_library_details_carries_remove_action():
     assert present
 
 
-def test_graph_saved_list_carries_rename_action():
-    # Arrange -- operator 2026-10-23 (seed-only tab): the saved-graphs
-    # list is deleted; rename ships as a CRUD row action instead. The
-    # backend endpoint stays and the rename verb is pinned at the API
-    # layer (test_rename_updates_the_recipe_name); the UI asserts its own
-    # absence here so a future re-add of the saved area fails loudly.
+def test_graph_library_carries_load_and_rename_actions():
+    # Arrange -- operator brief-05 (supersedes the 2026-10-23 seed-only
+    # tab): the saved-graphs list is back as the Graph Library card with
+    # full CRUD (Load rebuilds, Rename edits inline, Delete is two-click).
+    # The rename verb stays pinned at the API layer too
+    # (test_rename_updates_the_recipe_name).
     # Act
-    present = 'id="graphSavedList"' not in TEMPLATE
+    present = 'id="graphSavedList"' in TEMPLATE
     # Assert
     assert present
 

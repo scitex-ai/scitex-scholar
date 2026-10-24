@@ -347,6 +347,17 @@ JA = {
     "Rename": "名前を変更",
     "Graph renamed": "グラフ名を変更しました",
     "Rename failed": "名前の変更に失敗しました",
+    # Brief-05: Graph Library card (template strings).
+    "Graph Library": "グラフライブラリ",
+    "Save current graph": "現在のグラフを保存",
+    "Name this network…": "このネットワークに名前を付ける…",
+    "Save graph": "グラフを保存",
+    "Build a citation graph from the selected results": "選択した結果から引用グラフを作成",
+    # Brief-05: Graph Library multi-seed builds, two-click delete,
+    # save-count.
+    "Build a single-seed graph first.": "単一シードのグラフを先に作成してください。",
+    "Confirm delete?": "削除しますか？",
+    "%(n)s saved": "%(n)s 件保存済み",
     # Slice 11 (old-direct unification): OA PDF download.
     "PDFs": "PDF",
     "Download open-access PDFs for the selected results": "選択した結果のオープンアクセスPDFをダウンロード",
@@ -367,6 +378,9 @@ JA = {
     "Saved": "保存済み",
     "Save failed": "保存に失敗",
     "Select results to save.": "保存する結果を選択してください。",
+    # Brief-05: the Graph seed pills render client-side.
+    "Graph": "グラフ",
+    "Select results with a DOI first.": "DOI のある結果を先に選択してください。",
     "Saved %(saved)s of %(total)s": "%(total)s 件中 %(saved)s 件を保存",
     "Enriched %(done)s of %(total)s": "%(total)s 件中 %(done)s 件を補完",
     # --- JS dict, slice 3b (Zotero / Connected Papers import controls) ---

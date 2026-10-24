@@ -168,6 +168,11 @@ e.g. hippocampus -a Smith -ymin 2020 -ymax 2024{% endblocktrans %}"></textarea>
                                     </label>
                                     <button type="button" id="searchSaveSelected" class="btn-control-library">{% trans "Save selected" %}</button>
                                     <button type="button" id="searchEnrichSelected" class="btn-control-library">{% trans "Save & enrich" %}</button>
+                                    <!-- Old-direct parity (brief-05): seed the
+                                         graph tab from checked works --
+                                         single DOI builds directly, several
+                                         build a multi-seed network. -->
+                                    <button type="button" id="searchGraphSelected" class="btn-control-library" title="{% trans "Build a citation graph from the selected results" %}">{% trans "Graph" %}</button>
                                     <!-- Slice 11 (old-direct unification):
                                          hub's header downloads PDFs for
                                          the checked rows (OA only). -->
@@ -358,10 +363,13 @@ e.g. hippocampus -a Smith -ymin 2020 -ymax 2024{% endblocktrans %}"></textarea>
                 <!-- Graph Tab (demoted: no longer the default) -->
                 <div id="tab-graph" class="tab-panel" role="tabpanel" aria-labelledby="scholar-tab-graph" tabindex="0">
                     <div class="citation-graph-container">
-                        <!-- Operator 2026-10-23: the Graph tab is seed-only.
-                             No DOI typing, no saved-graphs area: one work
-                             (or more) is picked from the seed list and the
-                             graph builds directly from the selection. -->
+                        <!-- Operator brief-05: the Graph tab is seed-from-works
+                             plus a Graph Library. Seeds come from the
+                             Search/Library tabs (per-row + bulk actions
+                             dispatch scholar:build-graph); this card only
+                             lists library works with DOIs for direct
+                             seeding. Saved networks live in the Graph
+                             Library card below (api/graphs/* CRUD). -->
                         <div class="graph-card">
                             <div class="graph-card__header">
                                 <span class="graph-card__title">{% trans "Seed from your Library" %}</span>
@@ -370,6 +378,33 @@ e.g. hippocampus -a Smith -ymin 2020 -ymax 2024{% endblocktrans %}"></textarea>
                                 <div id="graphLibrarySeed" class="graph-library-seed">
                                     <p class="empty-message">{% trans "Loading your library…" %}</p>
                                 </div>
+                            </div>
+                        </div>
+                        <!-- Operator brief-05: Graph Library — the saved
+                            citation networks (name + seed + created).
+                            Save captures the current build; Load rebuilds
+                            it; Rename edits inline; Delete is two-click
+                            (arm, then confirm). All verbs are the thin
+                            api/graphs/* CRUD from 1.24.0. -->
+                        <div class="graph-card">
+                            <div class="graph-card__header">
+                                <span class="graph-card__title">{% trans "Graph Library" %}</span>
+                                <small id="graphLibraryCount" class="card-subtitle"></small>
+                            </div>
+                            <div class="graph-card__body">
+                                <div class="library-filter">
+                                    <label class="form-label" for="graphSaveName">{% trans "Save current graph" %}</label>
+                                    <input type="text"
+                                           id="graphSaveName"
+                                           class="form-input library-filter__input"
+                                           placeholder="{% trans "Name this network…" %}"
+                                           autocomplete="off">
+                                    <button type="button"
+                                            id="graphSaveBtn"
+                                            class="btn-control-library">{% trans "Save graph" %}</button>
+                                </div>
+                                <div id="graphLibraryStatus" class="library-io__status" role="status"></div>
+                                <div id="graphSavedList" class="library-list"></div>
                             </div>
                         </div>
                         <!-- Loading -->

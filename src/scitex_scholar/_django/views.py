@@ -559,6 +559,9 @@ def _js_i18n_dict() -> dict:
         "Saving…": _i18n("Saving…"),
         "Saved": _i18n("Saved"),
         "Save failed": _i18n("Save failed"),
+        # Brief-05: the Graph seed pills render client-side -- same rule.
+        "Graph": _i18n("Graph"),
+        "Select results with a DOI first.": _i18n("Select results with a DOI first."),
         # Catch-up: node sheet actions render client-side -- same rule.
         "Add to library": _i18n("Add to library"),
         "Explore from here": _i18n("Explore from here"),
@@ -623,6 +626,11 @@ def _js_i18n_dict() -> dict:
         "Rename": _i18n("Rename"),
         "Graph renamed": _i18n("Graph renamed"),
         "Rename failed": _i18n("Rename failed"),
+        # Brief-05: Graph Library multi-seed builds, two-click delete,
+        # save-count -- same rule.
+        "Build a single-seed graph first.": _i18n("Build a single-seed graph first."),
+        "Confirm delete?": _i18n("Confirm delete?"),
+        "%(n)s saved": _i18n("%(n)s saved"),
         # Search tab slice 11 (old-direct unification): the PDFs bulk
         # pill + Library details download button -- same rule. Server
         # per-item errors render through scholarT too, so they are keys.
