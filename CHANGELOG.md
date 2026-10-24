@@ -7,6 +7,13 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.27.2] - 2026-10-26
+
+Brief-04 follow-up: compact 44px controls outside the tall query row
+(search toolbar selects, Library filter sort select, Details-strip
+controls) so rows align old-direct style. Pinned by
+test_compact_rows_share_one_44px_control_height.
+
 ## [1.27.1] - 2026-10-26
 
 Operator color discipline: no rounded containers — radius removed from
