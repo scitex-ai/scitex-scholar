@@ -5754,3 +5754,18 @@ def test_compact_rows_share_one_44px_control_height():
     )
     # Assert
     assert scoped == (True,) * 5 and floors[0] >= 2 and floors[1] >= 1
+
+
+def test_details_strip_wrapped_rows_stay_legible():
+    # Arrange -- brief-05 Details polish: the 208px strip forces wraps;
+    # checkboxes pin to the first line, rates sit in a fixed right lane.
+    sidebar_css = (COMPASS_CSS_DIR / "_sidebar.css").read_text()
+    # Act
+    pinned = (
+        ".status-strip__body .search-advanced__check" in sidebar_css
+        and "align-items: flex-start" in sidebar_css,
+        ".status-strip__body .source-rate" in sidebar_css
+        and "min-width: 36px" in sidebar_css,
+    )
+    # Assert
+    assert pinned == (True, True)

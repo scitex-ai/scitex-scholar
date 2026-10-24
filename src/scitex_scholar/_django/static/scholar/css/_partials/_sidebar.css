@@ -225,6 +225,35 @@
 .status-strip__body .form-select,
 .status-strip__body .form-input {
   min-height: 44px;
+  text-overflow: ellipsis;
+}
+
+/*
+ * Details strip polish (operator brief-05 follow-up): the 208px strip
+ * forces wraps; keep wrapped rows legible -- checkbox pinned to the
+ * first line, rate right-aligned in a fixed lane, tier labels breathing.
+ * Scoped to the strip; the main-area search form is untouched.
+ */
+.status-strip__body .search-advanced__check {
+  align-items: flex-start;
+}
+.status-strip__body .search-advanced__check input[type="checkbox"] {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.status-strip__body .source-rate {
+  min-width: 36px;
+  text-align: right;
+}
+.status-strip__body .source-tier {
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.status-strip__body .source-tier__label {
+  line-height: 1.5;
+}
+.status-strip__body .search-advanced__row--stack {
+  gap: 10px;
 }
 
 .status-strip__body .search-sources-grid,
