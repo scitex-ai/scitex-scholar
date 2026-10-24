@@ -406,45 +406,39 @@
                         the Details space). Shown only while the Search tab
                         is active; visibility via syncStripHints in app.js.
                         Control ids and wiring unchanged. -->
-                    <div class="sidebar-section" data-search-hint>
+                    <!-- Operator 2026-10-24 (old-direct parity, flat
+                        Details): ONE section, no Databases wrapper, no
+                        Advanced <details>. Sources + Filters + mode +
+                        cache + status render as flat rows directly under
+                        the section header -- theleaf keeps old-direct's
+                        content (11 sources, 6 filters, mode, ignore-cache,
+                        status) with one nest level instead of three.
+                        Control ids and wiring unchanged. -->
+                    <div class="sidebar-section sidebar-section--flat" data-search-hint>
                         <div class="sidebar-section__header" role="button" tabindex="0" aria-expanded="true">
-                            <span class="sidebar-section__title">{% trans "Databases" %}</span>
+                            <span class="sidebar-section__title">{% trans "Search" %}</span>
                             <span class="sidebar-section__chevron" aria-hidden="true"></span>
                         </div>
-                        <div class="sidebar-section__content">
+                        <div class="sidebar-section__content sidebar-section__content--flat">
                             <p class="sidebar-section__summary" id="searchStripSummary">{% trans "No search yet." %}</p>
-                            <details class="search-advanced">
-                                <summary class="search-advanced__summary">{% trans "Advanced" %}</summary>
-                                <div class="search-advanced__body">
-                                    <p class="search-advanced__syntax">
-                                        {% blocktrans %}Query syntax:
-                                        <code>-word</code> excludes a term,
-                                        <code>year:2020-2024</code> bounds the
-                                        publication year,
-                                        <code>if:&gt;5</code> filters by impact factor.{% endblocktrans %}
-                                    </p>
-                                    <div class="search-advanced__row">
-                                        <label class="form-label" for="searchMode">{% trans "Search source" %}</label>
-                                        <select id="searchMode" class="form-select">
-                                            <option value="parallel" selected>{% trans "All sources (parallel)" %}</option>
-                                            <option value="single">{% trans "Single source" %}</option>
-                                        </select>
-                                    </div>
-                                    <!--
-                                        Slice 1 (old-direct unification): the
-                                        Sources grid. Old-direct renders one
-                                        checkbox per source (local corpora
-                                        first, then external APIs) plus an
-                                        ignore-cache toggle; the checked set
-                                        travels as ?sources=a,b,c. All
-                                        checked (or none) keeps the tiered
-                                        default -- the request omits the
-                                        param and behaves exactly as
-                                        before this slice.
-                                    -->
-                                    <div class="search-advanced__row search-advanced__row--stack">
-                                        <span class="form-label" id="searchSourcesLabel">{% trans "Sources" %}</span>
-                                        <div class="search-sources-grid" id="searchSourcesGrid" role="group" aria-labelledby="searchSourcesLabel">
+                            <p class="search-advanced__syntax">
+                                {% blocktrans %}Query syntax:
+                                <code>-word</code> excludes a term,
+                                <code>year:2020-2024</code> bounds the
+                                publication year,
+                                <code>if:&gt;5</code> filters by impact factor.{% endblocktrans %}
+                            </p>
+                            <div class="search-advanced__row">
+                                <label class="form-label" for="searchMode">{% trans "Search source" %}</label>
+                                <select id="searchMode" class="form-select">
+                                    <option value="parallel" selected>{% trans "All sources (parallel)" %}</option>
+                                    <option value="single">{% trans "Single source" %}</option>
+                                </select>
+                            </div>
+                            <div class="search-advanced__row search-advanced__row--stack">
+                                <span class="form-label" id="searchSourcesLabel">{% trans "Sources" %}</span>
+                                <div class="search-sources-grid" id="searchSourcesGrid" role="group" aria-labelledby="searchSourcesLabel">
+<div class="search-sources-grid" id="searchSourcesGrid" role="group" aria-labelledby="searchSourcesLabel">
                                             <label class="search-advanced__check" title="{% trans "Crossref database on the SciTeX server — fast, unlimited" %}">
                                                 <input type="checkbox" class="source-toggle" value="crossref_local" checked>
                                                 Crossref (SciTeX)
@@ -490,21 +484,12 @@
                                                 PMC
                                             </label>
                                         </div>
-                                        <p class="search-sources-hint">{% trans "Uncheck sources to narrow the search. All checked searches the default set." %}</p>
-                                    </div>
-                                    <!--
-                                        Slice 2 (old-direct unification): the
-                                        Filters rows. Old-direct renders
-                                        year/citations/impact-factor range
-                                        sliders feeding hidden inputs; the
-                                        leaf uses native number inputs (no
-                                        slider dependency) with the same
-                                        hub param names. Empty means
-                                        unbounded on that side.
-                                    -->
-                                    <div class="search-advanced__row search-advanced__row--stack">
-                                        <span class="form-label" id="searchFiltersLabel">{% trans "Filters" %}</span>
-                                        <div class="search-filters-grid" role="group" aria-labelledby="searchFiltersLabel">
+                                                                        <p class="search-sources-hint">{% trans "Uncheck sources to narrow the search. All checked searches the default set." %}</p>
+                            </div>
+                            <div class="search-advanced__row search-advanced__row--stack">
+                                <span class="form-label" id="searchFiltersLabel">{% trans "Filters" %}</span>
+                                <div class="search-filters-grid" role="group" aria-labelledby="searchFiltersLabel">
+<div class="search-filters-grid" role="group" aria-labelledby="searchFiltersLabel">
                                             <label class="search-filters-grid__item">
                                                 <span class="search-filters-grid__name">{% trans "Year from" %}</span>
                                                 <input type="number" id="searchYearFrom" class="form-input" min="1000" max="2100" step="1" inputmode="numeric">
@@ -530,23 +515,22 @@
                                                 <input type="number" id="searchMaxImpact" class="form-input" min="0" step="0.1" inputmode="decimal">
                                             </label>
                                         </div>
-                                    </div>
-                                    <div class="search-advanced__row">
-                                        <label class="search-advanced__check">
-                                            <input type="checkbox" id="searchNoCache">
-                                            {% trans "Ignore cache" %}
-                                        </label>
-                                    </div>
-                                    <div class="search-advanced__row search-advanced__api">
-                                        <span class="form-label">{% trans "CrossRef API" %}</span>
-                                        {% if api_available %}
-                                            <span style="color: var(--accent);">&#9679;</span> {% trans "Configured" %}
-                                        {% else %}
-                                            <span style="color: var(--status-error);">&#9679;</span> {% trans "Not configured" %}
-                                        {% endif %}
-                                    </div>
                                 </div>
-                            </details>
+                            </div>
+                            <div class="search-advanced__row">
+                                <label class="search-advanced__check">
+                                    <input type="checkbox" id="searchNoCache">
+                                    {% trans "Ignore cache" %}
+                                </label>
+                            </div>
+                            <div class="search-advanced__row search-advanced__api">
+                                <span class="form-label">{% trans "CrossRef API" %}</span>
+                                {% if api_available %}
+                                    <span style="color: var(--accent);">&#9679;</span> {% trans "Configured" %}
+                                {% else %}
+                                    <span style="color: var(--status-error);">&#9679;</span> {% trans "Not configured" %}
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                     <!-- Library ops: Import / Export, project sync target,

@@ -2084,14 +2084,16 @@ def test_graph_tab_is_not_default_but_still_present():
     assert graph_present and graph_not_default and graph_panel_not_active
 
 
-def test_advanced_section_is_collapsed_by_default():
-    # Arrange
+def test_advanced_section_is_flat_not_a_details_card():
+    # Arrange -- operator 2026-10-24 (old-direct parity, flat Details):
+    # the Advanced <details> card is deleted; sources + filters render
+    # as flat rows directly under the one Search section.
     body = _compass_index_body()
     # Act
-    present = "search-advanced" in body
-    closed_on_load = '<details class="search-advanced">' in body  # no open attr
+    rows_present = "search-advanced__row" in body
+    no_details_card = '<details class="search-advanced">' not in body
     # Assert
-    assert present and closed_on_load
+    assert rows_present and no_details_card
 
 
 def test_advanced_hides_query_syntax_until_requested():
