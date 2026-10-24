@@ -41,6 +41,13 @@
     older releases carry the vetoed boxed + brand-blue look.
     {% endcomment %}
     <link rel="stylesheet" href="{% static 'scitex_sdk/ui/css/app/content-tabs.css' %}">
+    {% comment %}
+    SDK SSoT panes (operator brief-04): the columns are the shared
+    data-stx-panes / data-stx-pane element; this sheet + panes.js own
+    the desktop row contract and the phone tab bar. layout="app" keeps
+    scholar's own desktop geometry (see _layout.css).
+    {% endcomment %}
+    <link rel="stylesheet" href="{% static 'scitex_sdk/ui/css/app/panes.css' %}">
     <link rel="stylesheet" href="{% static 'scholar/css/scholar.css' %}">
 {% elif scholar_asset_stage == "scripts" %}
         <!-- Must load FIRST: declares STX_MOUNT, which every other script uses. -->
@@ -64,5 +71,10 @@
         script, and both run before DOMContentLoaded fires.
         {% endcomment %}
         <script type="module" src="{% static 'scitex_sdk/ui/js/app/app-header.js' %}"></script>
+        {% comment %}
+        SDK SSoT panes companion (operator brief-04): auto-mounts on
+        [data-stx-panes] and owns the phone pane tab bar + switching.
+        {% endcomment %}
+        <script type="module" src="{% static 'scitex_sdk/ui/js/app/panes.js' %}"></script>
         <script type="module" src="{% static 'scholar/js/header-picker.js' %}"></script>
 {% endif %}

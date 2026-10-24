@@ -12,6 +12,19 @@
   height: calc(100vh - 40px);
 }
 
+/*
+ * Operator 2026-10-25 (brief-04): the columns are the SHARED scitex-sdk
+ * panes element (data-stx-panes / data-stx-pane), not leaf-owned layout
+ * divs. layout="app" keeps scholar's own desktop geometry, so this
+ * wrapper only carries the flex row the old layout had.
+ */
+.app-container > .stx-panes {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
 .app-sidebar {
   width: 240px;
   background: var(--bg-secondary);

@@ -14,6 +14,12 @@ msgstr ""
 msgid "SciTeX Scholar"
 msgstr "SciTeX Scholar"
 
+msgid "Browse"
+msgstr "閲覧"
+
+msgid "Details"
+msgstr "詳細"
+
 msgid "Search databases"
 msgstr "データベースを検索"
 
@@ -211,9 +217,6 @@ msgstr "ステータスパネルを折りたたむ"
 
 msgid "Expand status panel"
 msgstr "ステータスパネルを展開する"
-
-msgid "Details"
-msgstr "詳細"
 
 msgid "Search"
 msgstr "検索"

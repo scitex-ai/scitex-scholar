@@ -7,6 +7,14 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.26.0] - 2026-10-25
+
+Operator brief-04 parity: Details columns are the shared scitex-sdk
+panes element (layout="app"); results default 20 -> 50 (old-direct
+fetches 25-50/source, no UI cap); toolbar controls share compact 44px;
+JA catalog extended (Browse, stepper, empty state, tier labels, updated
+graph-health wordings) with translate-as extraction fix.
+
 ## [1.25.0] - 2026-10-24
 
 Old-direct Search parity (operator 2026-10-24 screenshots): the query is a

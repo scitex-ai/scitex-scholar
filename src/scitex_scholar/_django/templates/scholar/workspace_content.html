@@ -18,8 +18,16 @@
             <!-- No left sidebar: even graph interaction hints live in the
                 right-edge Details strip (operator 2026-10-17), so no tab
                 ever renders an empty column. -->
-            <!-- Main Content -->
-            <main class="app-main">
+            <!-- Operator 2026-10-25 (brief-04): the columns ARE the shared
+                scitex-sdk panes element (data-stx-panes / data-stx-pane +
+                SDK panes.css/js, see workspace_assets) — not leaf-owned
+                layout divs, and not the panes template tag either (it
+                emits link/script mid-fragment, which the native-render
+                purity test forbids). layout="app" keeps scholar's own
+                desktop geometry; the panes contract owns the phone tab
+                bar + pane switching. -->
+            <div class="stx-panes" data-stx-panes="scholar" data-stx-panes-layout="app" data-stx-active="main">
+            <main class="app-main" data-stx-pane="main" data-stx-label="{% trans "Browse" %}" data-stx-order="1">
                 <!-- Tab Navigation: Search is the primary, default action.
                     SDK SSoT content-tabs primitive
                     (scitex_sdk/ui/css/app/content-tabs.css, linked in the
@@ -98,8 +106,8 @@ e.g. hippocampus -a Smith -ymin 2020 -ymax 2024{% endblocktrans %}"></textarea>
                                             <label class="form-label" for="searchMaxResults">{% trans "Results" %}</label>
                                             <select id="searchMaxResults" class="form-select">
                                                 <option value="10">10</option>
-                                                <option value="20" selected>20</option>
-                                                <option value="50">50</option>
+                                                <option value="20">20</option>
+                                                <option value="50" selected>50</option>
                                                 <option value="100">100</option>
                                                 <option value="200">200</option>
                                                 <option value="500">500</option>
@@ -433,7 +441,7 @@ e.g. hippocampus -a Smith -ymin 2020 -ymax 2024{% endblocktrans %}"></textarea>
                 with an expandable panel): one dot per backend, the translated
                 detail/fix paragraph inside <details>. Collapsible per the
                 operator layout rule (rightmost column, minimizable). -->
-            <aside class="app-status-strip" data-status-strip>
+            <aside class="app-status-strip" data-status-strip data-stx-pane="details" data-stx-label="{% trans "Details" %}" data-stx-order="2">
                 <button type="button" class="status-strip-toggle" data-status-strip-toggle
                         aria-expanded="true"
                         aria-label="{% trans "Collapse status panel" %}"
@@ -732,7 +740,7 @@ e.g. hippocampus -a Smith -ymin 2020 -ymax 2024{% endblocktrans %}"></textarea>
                             Details space, instead of over the canvas. -->
                         <div id="nodeDetailsPanel" class="node-details-panel hidden" role="dialog" aria-live="polite"></div>
                     </div>
-                </div>
-            </aside>
+                </aside>
+            </div>
         </div>
         <!-- Scripts (order matters: ForceSimulation < GraphRenderer < citation-graph) -->
