@@ -43,6 +43,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const retryBtn = document.getElementById("searchRetryBtn");
   const results = document.getElementById("searchResults");
   const resultsContent = document.getElementById("searchResultsContent");
+  // Pre-search empty state (operator 2026-10-22): hidden on first submit,
+  // never re-shown — zero-result searches use the in-results empty-message.
+  const emptyState = document.getElementById("searchEmptyState");
   const stats = document.getElementById("searchStats");
   const sortSelect = document.getElementById("searchSort");
   const sourceFilter = document.getElementById("searchSourceFilter");
@@ -72,12 +75,34 @@ document.addEventListener("DOMContentLoaded", () => {
     Object.values(doc.syntax || {}).forEach((op) => {
       const dt = document.createElement("dt");
       dt.textContent = [op.short, op.long].filter(Boolean).join(" / ");
+      dt.className = "syntax-help-panel__insert";
+      dt.setAttribute("role", "button");
+      dt.setAttribute("tabindex", "0");
+      dt.addEventListener("click", () => insertSyntaxToken(op.short || op.long));
+      dt.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); insertSyntaxToken(op.short || op.long); }
+      });
       const dd = document.createElement("dd");
       dd.textContent = [op.description, op.include_example || op.example, op.exclude_example]
         .filter(Boolean).join(" — ");
       frag.append(dt, dd);
     });
     return frag;
+  }
+  // Catch-up: old-direct clickable operator chips. Inserts the flag at
+  // the cursor (appending with a space when the box is non-empty).
+  function insertSyntaxToken(token) {
+    if (!token || !input) return;
+    const insert = token.trim() + " ";
+    const start = typeof input.selectionStart === "number" ? input.selectionStart : input.value.length;
+    const end = typeof input.selectionEnd === "number" ? input.selectionEnd : input.value.length;
+    const before = input.value.slice(0, start);
+    const after = input.value.slice(end);
+    const spacer = before && !before.endsWith(" ") ? " " : "";
+    input.value = before + spacer + insert + after;
+    const caret = (before + spacer + insert).length;
+    input.focus();
+    try { input.setSelectionRange(caret, caret); } catch (err) { /* older WebViews */ }
   }
   function renderSyntaxExamples(doc) {
     const frag = document.createDocumentFragment();
@@ -145,6 +170,70 @@ document.addEventListener("DOMContentLoaded", () => {
     if (queueTotal) queueTotal.textContent = "…";
     if (queueEngines) queueEngines.replaceChildren();
   }
+  // Old-direct parity slice 2: pipeline stepper state machine (port of
+  // hub _toolbar-status.ts). Ready -> Searching (timer) -> Done (count +
+  // elapsed, auto-reset). Pure interface over the fetch below.
+  let searchStartTime = 0;
+  let timerInterval = null;
+  function stepperEls() {
+    return {
+      step1: document.getElementById("searchStep1"),
+      step2: document.getElementById("searchStep2"),
+      step3: document.getElementById("searchStep3"),
+      line1: document.getElementById("searchLine1"),
+      line2: document.getElementById("searchLine2"),
+      text2: document.getElementById("searchStepText2"),
+      text3: document.getElementById("searchStepText3"),
+      timer: document.getElementById("searchTimer"),
+    };
+  }
+  function stepperSearching() {
+    const e = stepperEls();
+    e.step1.classList.remove("active");
+    e.step1.classList.add("complete");
+    e.step2.classList.add("active", "searching");
+    e.step3.classList.remove("active", "complete", "done");
+    e.line1.classList.add("active");
+    searchStartTime = Date.now();
+    if (timerInterval) clearInterval(timerInterval);
+    if (e.timer) {
+      e.timer.textContent = "0s";
+      timerInterval = setInterval(() => {
+        const el = document.getElementById("searchTimer");
+        if (el) el.textContent = `${Math.floor((Date.now() - searchStartTime) / 1000)}s`;
+      }, 500);
+    }
+  }
+  function stepperDone(count) {
+    const e = stepperEls();
+    const elapsed = Math.floor((Date.now() - searchStartTime) / 1000);
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    if (e.timer) e.timer.textContent = `${elapsed}s`;
+    e.step1.classList.remove("active", "searching");
+    e.step1.classList.add("complete");
+    e.step2.classList.remove("active", "searching");
+    e.step2.classList.add("complete");
+    e.step3.classList.remove("active", "searching");
+    e.step3.classList.add("done");
+    e.line1.classList.add("active");
+    e.line2.classList.add("active");
+    if (e.text3) e.text3.textContent = `Done (${count}, ${elapsed}s)`;
+    setTimeout(stepperReset, 5000);
+  }
+  function stepperReset() {
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    const e = stepperEls();
+    e.step1.classList.remove("complete", "searching", "done");
+    e.step1.classList.add("active");
+    e.step2.classList.remove("active", "complete", "searching", "done");
+    e.step3.classList.remove("active", "complete", "searching", "done");
+    e.line1.classList.remove("active");
+    e.line2.classList.remove("active");
+    if (e.text2) e.text2.textContent = "Searching";
+    if (e.text3) e.text3.textContent = "Done";
+    if (e.timer) e.timer.textContent = "";
+  }
+
   function fillQueue(metadata) {
     const events = (metadata && metadata.engine_events) || [];
     let active = 0;
@@ -282,20 +371,21 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /**
-   * Jump to the Citation Graph tab with this paper's DOI prefilled.
-   * Does NOT auto-submit -- the user still presses "Build Graph", so the
-   * action stays explicit rather than surprising.
+   * Operator 2026-10-23 (seed-only Graph tab): the per-result action
+   * jumps to the Graph tab and asks the graph manager to build
+   * directly at the fixed width -- no DOI typing, no prefill-then-submit.
+   * The manager may not be constructed yet, so the DOI rides a one-shot
+   * event the manager consumes on init (same path as a stored seed).
    */
   function buildGraphFromDoi(doi) {
-    const doiInput = document.getElementById("doiInput");
-    if (doiInput && doi) {
-      doiInput.value = doi;
-    }
+    if (!doi) return;
     const graphTab = document.querySelector(
       '.stx-content-tabs__tab[aria-controls="tab-graph"]',
     );
     if (graphTab) graphTab.click();
-    if (doiInput) doiInput.focus();
+    document.dispatchEvent(
+      new CustomEvent("scholar:build-graph", { detail: { doi } }),
+    );
   }
 
   // The flat shape library_save accepts (same rows library_list returns).
@@ -706,6 +796,15 @@ document.addEventListener("DOMContentLoaded", () => {
       parts.push(counted.map((name) => `${name} ${counts[name]}`).join(", "));
     }
     stats.textContent = parts.join(" · ");
+    // Details strip (operator 2026-10-22): the Databases section mirrors
+    // the database side of the header meta (tier + per-source counts).
+    // The count already owns the results header; the strip keeps what
+    // that header deliberately omits.
+    const stripSummary = document.getElementById("searchStripSummary");
+    if (stripSummary) {
+      const tail = parts.slice(1);
+      stripSummary.textContent = tail.length ? tail.join(" · ") : parts[0];
+    }
     show(results);
   }
 
@@ -939,10 +1038,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     hide(errorBox);
     hide(results);
+    hide(emptyState);
     show(loading);
     // Old-direct U2: reveal the queue panel in its searching state.
     if (queuePanel) queuePanel.hidden = false;
     resetQueue();
+    stepperSearching();
 
     try {
       const params = new URLSearchParams({
@@ -980,13 +1081,16 @@ document.addEventListener("DOMContentLoaded", () => {
           () => form.requestSubmit(),
         );
         if (queuePanel) queuePanel.hidden = true;
+        stepperReset();
         return;
       }
       renderResults(data);
       fillQueue(data.metadata);
+      stepperDone(((data && data.results) || []).length);
     } catch (err) {
       showError(`Search failed: ${err.message}`, () => form.requestSubmit());
       if (queuePanel) queuePanel.hidden = true;
+      stepperReset();
     } finally {
       hide(loading);
     }

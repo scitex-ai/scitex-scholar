@@ -2,6 +2,7 @@
   "name": "scholar_editor",
   "slug": "scholar",
   "label": "Scholar",
+  "group": "work",
   "pip_package": "scitex-scholar",
   "icon": "fas fa-graduation-cap",
   "subtitle": "Citation-graph explorer and CrossRef paper browser",
@@ -15,7 +16,13 @@
     "Paper summary lookup",
     "Local CrossRef corpus browsing via the crossref-local API"
   ],
-  "allowed_extensions": [".bib", ".csv", ".yaml", ".yml", ".json"],
+  "allowed_extensions": [
+    ".bib",
+    ".csv",
+    ".yaml",
+    ".yml",
+    ".json"
+  ],
   "wip": false,
   "standalone": true,
   "standalone_command": "scitex-scholar gui",
@@ -24,7 +31,10 @@
   "scope": "user",
   "embedded_package": true,
   "dependencies": {
-    "python": ["scitex-scholar", "django"]
+    "python": [
+      "scitex-scholar",
+      "django"
+    ]
   },
   "mount_policy": {
     "login_required": true,
