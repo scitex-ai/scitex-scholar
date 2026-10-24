@@ -207,6 +207,11 @@ scitex-scholar = "scitex_scholar"
 [project.entry-points."scitex_dev.skills"]
 scitex-scholar = "scitex_scholar"
 
+# Leaf scope of the hooks federation: scholar's own agent guardrails,
+# mirroring the scitex-storage provider shape (no privileged position).
+[project.entry-points."scitex_dev.hooks"]
+scitex-scholar = "scitex_scholar._hook_rules:provide"
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/scitex_scholar"]
 
