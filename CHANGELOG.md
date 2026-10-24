@@ -7,6 +7,13 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.27.3] - 2026-10-26
+
+Details-strip polish: wrapped source rows stay legible in the fixed
+208px strip (checkbox pinned to first line, rates in a fixed right
+lane, tier labels breathing, stacked rows gapped). Scoped to the
+strip; main search form untouched.
+
 ## [1.27.2] - 2026-10-26
 
 Brief-04 follow-up: compact 44px controls outside the tall query row
