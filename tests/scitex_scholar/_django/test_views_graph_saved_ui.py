@@ -1,66 +1,113 @@
-"""Slice 9 (old-direct unification): saved-graphs UI on the Graph tab.
+"""Operator brief-05 (supersedes the 2026-10-23 seed-only tab): the Graph
+tab is seed-from-works plus a Graph Library.
 
-Old-direct parity gap, measured 2026-10-19: hub's graph page carries a
-tabs bar with save/load/delete over its saved-graph endpoints while the
-leaf ships the same backend (graphs_save/list/delete, parity slice 1)
-with no UI -- saved graphs are write-only. This slice reflects a saved
-graphs card into the leaf Graph tab over the EXISTING endpoints (no new
-backend): name + save-current, list with load (rebuilds from the recipe
-seed) and delete. The graph JS is a class; the manager owns the wiring.
+Seeds arrive from the Search/Library tabs (per-row + bulk scholar:build-graph
+events, single or multi-seed); the Saved graphs card is back as the Graph
+Library with full CRUD (save/list/rename/delete over api/graphs/*). No
+typed-DOI Build card returns: no id graphForm/doiInput/graphBuildBtn/topN
+anywhere in template or leaf JS.
 """
 
-from pathlib import Path
 
-from scitex_scholar._django import views
-
-TEMPLATE = (
-    Path(views.__file__).parent / "templates" / "scholar" / "workspace_content.html"
-).read_text()
-GRAPH_JS = (
-    Path(views.__file__).parent
-    / "static"
-    / "scholar"
-    / "js"
-    / "graph"
-    / "citation-graph.js"
-).read_text()
-
-
-def test_graph_tab_carries_saved_graphs_card():
-    # Arrange -- hub saves/loads/deletes graphs from the graph page.
-    # Act
-    present = 'id="graphSavedBar"' in TEMPLATE
-    # Assert
-    assert present
-
-
-def test_graph_saved_bar_carries_name_and_save():
+def test_graph_tab_has_no_build_form():
     # Arrange
+    from pathlib import Path
+
+    from scitex_scholar._django import views
+
+    base = Path(views.__file__).parent
     # Act
-    present = 'id="graphSaveName"' in TEMPLATE and 'id="graphSaveBtn"' in TEMPLATE
+    template = (base / "templates" / "scholar" / "workspace_content.html").read_text()
+    leaf_js = (base / "static" / "scholar" / "js" / "graph" / "citation-graph.js").read_text()
     # Assert
-    assert present
+    assert (
+        'id="graphForm"' not in template,
+        'id="doiInput"' not in template,
+        'id="graphBuildBtn"' not in template,
+        'id="topN"' not in template,
+        'id="graphForm"' not in leaf_js,
+    ) == (True,) * 5
 
 
-def test_graph_saved_bar_carries_list():
+def test_graph_tab_has_graph_library_crud_area():
+    # Arrange -- brief-05: the Graph Library card (save row + saved list)
+    # lives in the Graph tab; the leaf JS drives it against api/graphs/*.
+    from pathlib import Path
+
+    from scitex_scholar._django import views
+
+    base = Path(views.__file__).parent
+    # Act
+    template = (base / "templates" / "scholar" / "workspace_content.html").read_text()
+    leaf_js = (base / "static" / "scholar" / "js" / "graph" / "citation-graph.js").read_text()
+    present = (
+        'id="graphSaveName"' in template,
+        'id="graphSaveBtn"' in template,
+        'id="graphSavedList"' in template,
+        'id="graphLibraryStatus"' in template,
+        "api/graphs/save" in leaf_js,
+        "api/graphs/list" in leaf_js,
+        "api/graphs/rename" in leaf_js,
+        "api/graphs/delete" in leaf_js,
+        "api/graph/network/multi" in leaf_js,
+    )
+    # Assert
+    assert present == (True,) * 9
+
+
+def test_graph_tab_seed_list_builds_at_fixed_width():
     # Arrange
+    from pathlib import Path
+
+    from scitex_scholar._django import views
+
+    leaf_js = (
+        Path(views.__file__).parent
+        / "static"
+        / "scholar"
+        / "js"
+        / "graph"
+        / "citation-graph.js"
+    ).read_text()
     # Act
-    present = 'id="graphSavedList"' in TEMPLATE
+    seed_only = (
+        "DEFAULT_TOP_N" in leaf_js,
+        "handleSubmit" not in leaf_js,
+    )
     # Assert
-    assert present
+    assert seed_only == (True, True)
 
 
-def test_graph_js_saves_current_graph():
-    # Arrange -- the manager posts the current seed as a recipe.
+def test_search_bulk_bar_seeds_graph_from_checked_works():
+    # Arrange -- brief-05: the Search bulk bar carries a Graph pill that
+    # dispatches checked DOIs (single or multi-seed) to the Graph tab.
+    from pathlib import Path
+
+    from scitex_scholar._django import views
+
+    base = Path(views.__file__).parent
     # Act
-    present = "/api/graphs/save" in GRAPH_JS
+    template = (base / "templates" / "scholar" / "workspace_content.html").read_text()
+    search_js = (base / "static" / "scholar" / "js" / "search.js").read_text()
     # Assert
-    assert present
+    assert (
+        'id="searchGraphSelected"' in template,
+        "scholar:build-graph" in search_js and "dois" in search_js,
+    ) == (True, True)
 
 
-def test_graph_js_loads_and_deletes_saved_graphs():
-    # Arrange
+def test_library_rows_seed_graph_from_checked_works():
+    # Arrange -- brief-05: Library per-row actions carry a Graph button
+    # for DOI rows (same one-shot dispatch as the Search per-row button).
+    from pathlib import Path
+
+    from scitex_scholar._django import views
+
+    base = Path(views.__file__).parent
     # Act
-    present = "/api/graphs/list" in GRAPH_JS and "/api/graphs/delete" in GRAPH_JS
+    library_js = (base / "static" / "scholar" / "js" / "library.js").read_text()
     # Assert
-    assert present
+    assert ("scholar:build-graph" in library_js, 'aria-controls="tab-graph"' in library_js) == (
+        True,
+        True,
+    )

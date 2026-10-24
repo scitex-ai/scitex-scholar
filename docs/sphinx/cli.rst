@@ -61,6 +61,20 @@ in ``metadata.path.files`` so ``library audit-files`` can verify integrity.
 
 Mutating verbs accept ``--dry-run`` and ``-y/--yes``.
 
+search
+~~~~~~
+
+Search academic databases for papers (thin adapter over
+``ScholarSearchEngine.search``, the same CUI ``api/search`` forwards to).
+
+.. code-block:: bash
+
+   # Keyword search, one line per paper
+   scitex-scholar search "hippocampus -a Smith"
+
+   # Fewer rows, machine-readable
+   scitex-scholar search "graph neural networks" --max-results 20 --json
+
 bibtex
 ~~~~~~
 
