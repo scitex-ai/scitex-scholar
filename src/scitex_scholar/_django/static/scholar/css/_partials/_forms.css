@@ -45,6 +45,15 @@
   color: var(--text-primary);
   padding: 10px 12px;
   font-size: 14px;
+  /*
+   * Operator 2026-10-23 (old-direct parity): one shared control height —
+   * inputs, selects, and buttons all resolve the same two-line
+   * --scholar-search-height, so a row's controls align exactly like
+   * old-direct's --sch-control-h rule. box-sizing is border-box
+   * project-wide (see _base.css reset), so min-height IS the row height.
+   */
+  min-height: var(--scholar-search-height);
+  box-sizing: border-box;
   transition:
     border-color 0.15s,
     box-shadow 0.15s;
@@ -81,6 +90,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  min-height: var(--scholar-search-height);
   padding: 10px 16px;
   background: var(--accent);
   border: none;
@@ -99,16 +109,16 @@
  * #95: the database-search submit is the app's PRIMARY action, distinct from
  * the secondary .btn-build (Build Graph / per-row actions). It carries the
  * scitex-ui --accent token (theme-aware: light + dark both resolve from
- * theme.css) and a 44px touch-target minimum so it reads as primary AND stays
- * tappable on mobile. Same background token as .btn-build so light/dark stay
- * coherent; the distinction is semantic (the class), not a recolour.
+ * theme.css). Operator 2026-10-23: the height is the shared two-line
+ * --scholar-search-height (still above the 44px touch minimum), so the
+ * primary button aligns exactly with its input row, old-direct style.
  */
 .btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 44px;
+  min-height: var(--scholar-search-height);
   padding: 10px 20px;
   background: var(--accent);
   border: none;

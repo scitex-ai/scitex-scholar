@@ -39,13 +39,12 @@
  * Collapsed by default so the first screen shows a keyword box, not backend
  * API infrastructure. Houses the query-syntax help, the search source (mode),
  * the "Ignore cache" control, and the CrossRef API status.
+ *
+ * Operator 2026-10-24 (old-direct parity, flat Details): the Advanced
+ * <details> card is deleted from the template -- these classes now style
+ * flat rows rendered directly under the section content. No bordered card
+ * wrapper remains; spacing tokens hold the rhythm instead.
  */
-.search-advanced {
-  margin-top: 16px;
-  border: 1px solid var(--border-default);
-  background: var(--bg-tertiary);
-  border-radius: 4px;
-}
 
 .search-advanced__summary {
   cursor: pointer;
@@ -56,12 +55,12 @@
   list-style: none;
 }
 .search-advanced__summary::before {
-  content: "\25B8 "; /* ▸ collapsed, ▾ expanded */
+  content: "+ "; /* ASCII-safe collapsed marker (U+25B8 tofu on minimal fonts) */
   display: inline-block;
   transition: transform 0.15s;
 }
 .search-advanced[open] .search-advanced__summary::before {
-  content: "\25BE ";
+  content: "– ";
 }
 .search-advanced__summary::-webkit-details-marker {
   display: none;

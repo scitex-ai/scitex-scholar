@@ -43,6 +43,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const retryBtn = document.getElementById("searchRetryBtn");
   const results = document.getElementById("searchResults");
   const resultsContent = document.getElementById("searchResultsContent");
+  // Pre-search empty state (operator 2026-10-22): hidden on first submit,
+  // never re-shown — zero-result searches use the in-results empty-message.
+  const emptyState = document.getElementById("searchEmptyState");
   const stats = document.getElementById("searchStats");
   const sortSelect = document.getElementById("searchSort");
   const sourceFilter = document.getElementById("searchSourceFilter");
@@ -72,12 +75,34 @@ document.addEventListener("DOMContentLoaded", () => {
     Object.values(doc.syntax || {}).forEach((op) => {
       const dt = document.createElement("dt");
       dt.textContent = [op.short, op.long].filter(Boolean).join(" / ");
+      dt.className = "syntax-help-panel__insert";
+      dt.setAttribute("role", "button");
+      dt.setAttribute("tabindex", "0");
+      dt.addEventListener("click", () => insertSyntaxToken(op.short || op.long));
+      dt.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); insertSyntaxToken(op.short || op.long); }
+      });
       const dd = document.createElement("dd");
       dd.textContent = [op.description, op.include_example || op.example, op.exclude_example]
         .filter(Boolean).join(" — ");
       frag.append(dt, dd);
     });
     return frag;
+  }
+  // Catch-up: old-direct clickable operator chips. Inserts the flag at
+  // the cursor (appending with a space when the box is non-empty).
+  function insertSyntaxToken(token) {
+    if (!token || !input) return;
+    const insert = token.trim() + " ";
+    const start = typeof input.selectionStart === "number" ? input.selectionStart : input.value.length;
+    const end = typeof input.selectionEnd === "number" ? input.selectionEnd : input.value.length;
+    const before = input.value.slice(0, start);
+    const after = input.value.slice(end);
+    const spacer = before && !before.endsWith(" ") ? " " : "";
+    input.value = before + spacer + insert + after;
+    const caret = (before + spacer + insert).length;
+    input.focus();
+    try { input.setSelectionRange(caret, caret); } catch (err) { /* older WebViews */ }
   }
   function renderSyntaxExamples(doc) {
     const frag = document.createDocumentFragment();
@@ -282,20 +307,21 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /**
-   * Jump to the Citation Graph tab with this paper's DOI prefilled.
-   * Does NOT auto-submit -- the user still presses "Build Graph", so the
-   * action stays explicit rather than surprising.
+   * Operator 2026-10-23 (seed-only Graph tab): the per-result action
+   * jumps to the Graph tab and asks the graph manager to build
+   * directly at the fixed width -- no DOI typing, no prefill-then-submit.
+   * The manager may not be constructed yet, so the DOI rides a one-shot
+   * event the manager consumes on init (same path as a stored seed).
    */
   function buildGraphFromDoi(doi) {
-    const doiInput = document.getElementById("doiInput");
-    if (doiInput && doi) {
-      doiInput.value = doi;
-    }
+    if (!doi) return;
     const graphTab = document.querySelector(
       '.stx-content-tabs__tab[aria-controls="tab-graph"]',
     );
     if (graphTab) graphTab.click();
-    if (doiInput) doiInput.focus();
+    document.dispatchEvent(
+      new CustomEvent("scholar:build-graph", { detail: { doi } }),
+    );
   }
 
   // The flat shape library_save accepts (same rows library_list returns).
@@ -706,6 +732,15 @@ document.addEventListener("DOMContentLoaded", () => {
       parts.push(counted.map((name) => `${name} ${counts[name]}`).join(", "));
     }
     stats.textContent = parts.join(" · ");
+    // Details strip (operator 2026-10-22): the Databases section mirrors
+    // the database side of the header meta (tier + per-source counts).
+    // The count already owns the results header; the strip keeps what
+    // that header deliberately omits.
+    const stripSummary = document.getElementById("searchStripSummary");
+    if (stripSummary) {
+      const tail = parts.slice(1);
+      stripSummary.textContent = tail.length ? tail.join(" · ") : parts[0];
+    }
     show(results);
   }
 
@@ -939,6 +974,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     hide(errorBox);
     hide(results);
+    hide(emptyState);
     show(loading);
     // Old-direct U2: reveal the queue panel in its searching state.
     if (queuePanel) queuePanel.hidden = false;

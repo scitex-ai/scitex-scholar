@@ -147,3 +147,12 @@ def test_slice2_js_strings_are_translatable():
     )
     # Assert
     assert present == (True,) * 7
+
+
+def test_search_strip_section_mirrors_database_meta():
+    # Arrange -- operator 2026-10-22: the Details strip's Databases section
+    # mirrors the tier + per-source counts the results header omits.
+    # Act
+    present = 'getElementById("searchStripSummary")' in SEARCH_JS
+    # Assert
+    assert present
