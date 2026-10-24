@@ -5732,3 +5732,25 @@ def test_search_empty_state_visible_before_first_search():
     ).read_text()
     # Assert
     assert present and hidden_on_submit
+
+
+def test_compact_rows_share_one_44px_control_height():
+    # Arrange -- brief-04 follow-up: every control OUTSIDE the tall query
+    # row (search toolbar, library filter, 208px Details strip) shares the
+    # compact 44px floor so rows align old-direct style.
+    search_css = (COMPASS_CSS_DIR / "_search.css").read_text()
+    sidebar_css = (COMPASS_CSS_DIR / "_sidebar.css").read_text()
+    # Act
+    scoped = (
+        ".search-toolbar-row .form-select" in search_css,
+        ".search-toolbar-row .btn-control-library" in search_css,
+        ".library-filter .form-select" in search_css,
+        ".status-strip__body .form-select" in sidebar_css,
+        ".status-strip__body .form-input" in sidebar_css,
+    )
+    floors = (
+        search_css.count("min-height: 44px"),
+        sidebar_css.count("min-height: 44px"),
+    )
+    # Assert
+    assert scoped == (True,) * 5 and floors[0] >= 2 and floors[1] >= 1

@@ -246,6 +246,13 @@
   flex-shrink: 0;
 }
 
+/* Library filter row: the sort select must match the 44px filter input,
+ * not the tall query-row token (same alignment rule as the search
+ * toolbar row above). */
+.library-filter .form-select {
+  min-height: 44px;
+}
+
 /*
  * Declutter (CCT4429): the bulk pills live INSIDE the toolbar row, so this
  * is an inline group, not a second padded strip. The selector stays (the

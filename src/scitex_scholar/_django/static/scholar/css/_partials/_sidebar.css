@@ -216,6 +216,17 @@
   gap: 4px;
 }
 
+/*
+ * Brief-04 follow-up: strip controls stay compact. The shared query-row
+ * token grew tall for the textarea; unconstrained, every select and
+ * input in the 208px strip would inherit 84px. 44px matches the
+ * library/toolbars and keeps filter rows aligned, old-direct style.
+ */
+.status-strip__body .form-select,
+.status-strip__body .form-input {
+  min-height: 44px;
+}
+
 .status-strip__body .search-sources-grid,
 .status-strip__body .search-filters-grid {
   grid-template-columns: 1fr;
