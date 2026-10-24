@@ -205,6 +205,30 @@
 }
 
 /*
+ * Operator 2026-10-24 (old-direct parity): the toolbar + stepper row.
+ * Always visible (pre-search too), like old-direct's action row: bulk
+ * tools left, pipeline stepper right-aligned.
+ */
+.search-toolbar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 4px 2px;
+}
+
+.search-toolbar-row .search-results-toolbar {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+}
+
+.search-toolbar-row .search-stepper {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/*
  * Declutter (CCT4429): the bulk pills live INSIDE the toolbar row, so this
  * is an inline group, not a second padded strip. The selector stays (the
  * slice-2 style pin references it) but carries no strip padding of its own.

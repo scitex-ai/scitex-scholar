@@ -63,15 +63,35 @@
                                     (a separate tab).{% endblocktrans %}
                                 </p>
                                 <form id="searchForm" class="graph-form">
-                                    <div class="form-row">
-                                        <div class="form-group--doi">
+                                    <div class="form-row form-row--query">
+                                        <div class="form-group--query">
                                             <label class="form-label" for="searchInput">{% trans "Query" %}</label>
-                                            <div class="input-wrapper">
-                                                <input type="text"
-                                                       id="searchInput"
-                                                       class="form-input"
-                                                       placeholder="e.g. graph neural networks for molecular property prediction">
-                                                <button type="submit" class="btn-primary">{% trans "Search databases" %}</button>
+                                            <!--
+                                                Old-direct parity: the query
+                                                is a multi-line textarea
+                                                (not a single-line input) so
+                                                long boolean queries stay
+                                                visible. The Ctrl+K badge and
+                                                the `?` help sit inside the
+                                                field, old-direct style; the
+                                                placeholder teaches the
+                                                syntax. Enter (no Shift)
+                                                submits; Shift+Enter adds a
+                                                line (search.js).
+                                            -->
+                                            <div class="input-wrapper input-wrapper--query">
+                                                <span class="query-field">
+                                                    <textarea id="searchInput"
+                                                              class="form-input form-input--query"
+                                                              rows="3"
+                                                              placeholder="{% blocktrans %}Search papers from databases
+e.g. hippocampus -a Smith -ymin 2020 -ymax 2024{% endblocktrans %}"></textarea>
+                                                    <span class="query-field__tools">
+                                                        <span class="query-shortcut-hint"><kbd>Ctrl</kbd>+<kbd>K</kbd></span>
+                                                        <button type="button" id="searchSyntaxToggle" class="syntax-help-toggle" aria-expanded="false" aria-controls="searchSyntaxPanel" title="{% trans "Search syntax help" %}">?</button>
+                                                    </span>
+                                                </span>
+                                                <button type="submit" class="btn-primary btn-primary--query">{% trans "Search databases" %}</button>
                                             </div>
                                         </div>
                                         <div class="form-group--options">
@@ -94,6 +114,73 @@
                                     "Ignore cache" control, and the CrossRef
                                     API status. -->
                             </div>
+                        </div>
+                        <!-- Old-direct parity 2026-10-24: the action toolbar
+                            (sorter, source filter, abstract toggle, export,
+                            bulk pills) + the pipeline stepper live in their
+                            own row ABOVE the results and stay visible
+                            pre-search, like old-direct's toolbar row.
+                            search.js addresses every control by id, so the
+                            relocation changes no wiring. -->
+                        <div class="search-toolbar-row">
+                            <div class="search-results-toolbar">
+                                <select id="searchSort" class="form-select" aria-label="{% trans "Sort by" %}">
+                                    <option value="relevance" selected>{% trans "Relevance" %}</option>
+                                    <option value="year-desc">{% trans "Year (newest)" %}</option>
+                                    <option value="year-asc">{% trans "Year (oldest)" %}</option>
+                                    <option value="title">{% trans "Title (A-Z)" %}</option>
+                                </select>
+                                <select id="searchSourceFilter" class="form-select" aria-label="{% trans "Source" %}">
+                                    <option value="" selected>{% trans "All sources" %}</option>
+                                </select>
+                                <span class="search-results-toolbar__sep" aria-hidden="true"></span>
+                                <!--
+                                    Slice 3 (old-direct unification): the
+                                    results-header tools. Old-direct offers
+                                    an abstract truncated/full toggle, an
+                                    open-selected-URLs button, and an
+                                    export-selected-citations control --
+                                    U4 adds the RIS/EndNote format choice
+                                    (hub bulk shape) to the BibTeX-only
+                                    client Blob path. All client-side over
+                                    the checked rows.
+                                -->
+                                <button type="button" id="searchAbstractToggle" class="btn-control-library" data-mode="truncated" title="{% trans "Toggle abstract display" %}">{% trans "Abstract: truncated" %}</button>
+                                <button type="button" id="searchOpenUrls" class="btn-control-library" title="{% trans "Open selected papers in new tabs" %}">{% trans "Open URLs" %}</button>
+                                <select id="searchExportFormat" class="form-select" aria-label="{% trans "Citation format" %}">
+                                    <option value="bibtex" selected>{% trans "BibTeX (.bib)" %}</option>
+                                    <option value="ris">{% trans "RIS (.ris)" %}</option>
+                                    <option value="endnote">{% trans "EndNote (.enw)" %}</option>
+                                </select>
+                                <button type="button" id="searchExportBibtex" class="btn-control-library" title="{% trans "Download citations for the selected results" %}">{% trans "Export" %}</button>
+                                <div class="search-bulk-bar" id="searchBulkBar">
+                                    <label class="search-bulk-bar__select-all">
+                                        <input type="checkbox" id="searchSelectAll">
+                                        {% trans "Select all" %}
+                                    </label>
+                                    <button type="button" id="searchSaveSelected" class="btn-control-library">{% trans "Save selected" %}</button>
+                                    <button type="button" id="searchEnrichSelected" class="btn-control-library">{% trans "Save & enrich" %}</button>
+                                    <!-- Slice 11 (old-direct unification):
+                                         hub's header downloads PDFs for
+                                         the checked rows (OA only). -->
+                                    <button type="button" id="searchDownloadPdfs" class="btn-control-library" title="{% trans "Download open-access PDFs for the selected results" %}">{% trans "PDFs" %}</button>
+                                    <span id="searchBulkStatus" class="search-bulk-status" role="status"></span>
+                                </div>
+                            </div>
+                            <!-- Old-direct parity slice 2: pipeline stepper
+                                (Ready -> Searching -> Done + timer). Driven
+                                by search.js around the /api/search fetch;
+                                thin interface only, no logic leaves the
+                                CUI. Right-aligned in the toolbar row,
+                                old-direct style. -->
+                            <span class="search-stepper" id="searchStepper">
+                                <span class="stepper-circle active" id="searchStep1">1</span><span class="stepper-text">{% trans "Ready" %}</span>
+                                <span class="stepper-line" id="searchLine1"></span>
+                                <span class="stepper-circle" id="searchStep2">2</span><span class="stepper-text" id="searchStepText2">{% trans "Searching" %}</span>
+                                <span class="stepper-line" id="searchLine2"></span>
+                                <span class="stepper-circle" id="searchStep3">3</span><span class="stepper-text" id="searchStepText3">{% trans "Done" %}</span>
+                                <span class="stepper-timer" id="searchTimer"></span>
+                            </span>
                         </div>
                         <!-- Pre-search empty state (operator 2026-10-22: no dead
                             void below the form). search.js hides it on
@@ -150,68 +237,6 @@
                                         {% trans "Results" %}
                                         <small id="searchStats" class="card-subtitle"></small>
                                     </span>
-                                    <!-- Old-direct parity slice 2: pipeline
-                                        stepper (Ready -> Searching -> Done +
-                                        timer). Driven by search.js around the
-                                        /api/search fetch; thin interface
-                                        only, no logic leaves the CUI. -->
-                                    <span class="search-stepper" id="searchStepper">
-                                        <span class="stepper-circle active" id="searchStep1">1</span><span class="stepper-text">{% trans "Ready" %}</span>
-                                        <span class="stepper-line" id="searchLine1"></span>
-                                        <span class="stepper-circle" id="searchStep2">2</span><span class="stepper-text" id="searchStepText2">{% trans "Searching" %}</span>
-                                        <span class="stepper-line" id="searchLine2"></span>
-                                        <span class="stepper-circle" id="searchStep3">3</span><span class="stepper-text" id="searchStepText3">{% trans "Done" %}</span>
-                                        <span class="stepper-timer" id="searchTimer"></span>
-                                    </span>
-                                </div>
-                                <!-- Declutter (CCT4429): sorter + source filter +
-                                    bulk/pipeline pills share ONE compact row.
-                                    The selects carry aria-labels instead of
-                                    visible text labels; every control keeps
-                                    its id and wiring (slice-2 pins hold). -->
-                                <div class="search-results-toolbar">
-                                    <select id="searchSort" class="form-select" aria-label="{% trans "Sort by" %}">
-                                        <option value="relevance" selected>{% trans "Relevance" %}</option>
-                                        <option value="year-desc">{% trans "Year (newest)" %}</option>
-                                        <option value="year-asc">{% trans "Year (oldest)" %}</option>
-                                        <option value="title">{% trans "Title (A-Z)" %}</option>
-                                    </select>
-                                    <select id="searchSourceFilter" class="form-select" aria-label="{% trans "Source" %}">
-                                        <option value="" selected>{% trans "All sources" %}</option>
-                                    </select>
-                                    <span class="search-results-toolbar__sep" aria-hidden="true"></span>
-                                    <!--
-                                        Slice 3 (old-direct unification): the
-                                        results-header tools. Old-direct offers
-                                        an abstract truncated/full toggle, an
-                                        open-selected-URLs button, and an
-                                        export-selected-citations control --
-                                        U4 adds the RIS/EndNote format choice
-                                        (hub bulk shape) to the BibTeX-only
-                                        client Blob path. All client-side over
-                                        the checked rows.
-                                    -->
-                                    <button type="button" id="searchAbstractToggle" class="btn-control-library" data-mode="truncated" title="{% trans "Toggle abstract display" %}">{% trans "Abstract: truncated" %}</button>
-                                    <button type="button" id="searchOpenUrls" class="btn-control-library" title="{% trans "Open selected papers in new tabs" %}">{% trans "Open URLs" %}</button>
-                                    <select id="searchExportFormat" class="form-select" aria-label="{% trans "Citation format" %}">
-                                        <option value="bibtex" selected>{% trans "BibTeX (.bib)" %}</option>
-                                        <option value="ris">{% trans "RIS (.ris)" %}</option>
-                                        <option value="endnote">{% trans "EndNote (.enw)" %}</option>
-                                    </select>
-                                    <button type="button" id="searchExportBibtex" class="btn-control-library" title="{% trans "Download citations for the selected results" %}">{% trans "Export" %}</button>
-                                    <div class="search-bulk-bar" id="searchBulkBar">
-                                        <label class="search-bulk-bar__select-all">
-                                            <input type="checkbox" id="searchSelectAll">
-                                            {% trans "Select all" %}
-                                        </label>
-                                        <button type="button" id="searchSaveSelected" class="btn-control-library">{% trans "Save selected" %}</button>
-                                        <button type="button" id="searchEnrichSelected" class="btn-control-library">{% trans "Save & enrich" %}</button>
-                                        <!-- Slice 11 (old-direct unification):
-                                             hub's header downloads PDFs for
-                                             the checked rows (OA only). -->
-                                        <button type="button" id="searchDownloadPdfs" class="btn-control-library" title="{% trans "Download open-access PDFs for the selected results" %}">{% trans "PDFs" %}</button>
-                                        <span id="searchBulkStatus" class="search-bulk-status" role="status"></span>
-                                    </div>
                                 </div>
                                 <div class="graph-card__body" id="searchResultsContent"></div>
                             </div>
@@ -462,7 +487,7 @@
                                                 <small class="source-rate" title="Rate limit">&#8734;</small>
                                             </label>
 <label class="search-advanced__check" title="{% trans "OpenAlex database on the SciTeX server — fast, unlimited" %}">
-                                                <input type="checkbox" class="source-toggle" value="openalex_local" checked>
+                                                <input type="checkbox" class="source-toggle" value="openalex_local">
                                                 OpenAlex (SciTeX)
                                             
                                                 <small class="source-rate" title="Rate limit">&#8734;</small>
@@ -471,62 +496,62 @@
 <div class="source-tier">
 <p class="source-tier__label">External APIs (slower, limited results)</p>
 <label class="search-advanced__check" title="{% trans "NCBI PubMed — biomedical literature" %}">
-                                                <input type="checkbox" class="source-toggle" value="pubmed" checked>
+                                                <input type="checkbox" class="source-toggle" value="pubmed">
                                                 PubMed
                                             
                                                 <small class="source-rate" title="Rate limit">3/s</small>
                                             </label>
 <label class="search-advanced__check" title="{% trans "arXiv — physics, mathematics, and computer science preprints" %}">
-                                                <input type="checkbox" class="source-toggle" value="arxiv" checked>
+                                                <input type="checkbox" class="source-toggle" value="arxiv">
                                                 arXiv
                                             
                                                 <small class="source-rate" title="Rate limit">3/s</small>
                                             </label>
 <label class="search-advanced__check" title="{% trans "Semantic Scholar — AI-powered academic search" %}">
-                                                <input type="checkbox" class="source-toggle" value="semantic" checked>
+                                                <input type="checkbox" class="source-toggle" value="semantic">
                                                 Semantic Scholar
                                             
                                                 <small class="source-rate" title="Rate limit">1/s</small>
                                             </label>
 <label class="search-advanced__check" title="{% trans "Crossref — DOI metadata registry" %}">
-                                                <input type="checkbox" class="source-toggle" value="crossref" checked>
+                                                <input type="checkbox" class="source-toggle" value="crossref">
                                                 Crossref
                                             
                                                 <small class="source-rate" title="Rate limit">50/s</small>
                                             </label>
 <label class="search-advanced__check" title="{% trans "OpenAlex — open catalog of scholarly works" %}">
-                                                <input type="checkbox" class="source-toggle" value="openalex" checked>
+                                                <input type="checkbox" class="source-toggle" value="openalex">
                                                 OpenAlex
                                             
                                                 <small class="source-rate" title="Rate limit">10/s</small>
                                             </label>
 <label class="search-advanced__check" title="{% trans "bioRxiv — biology preprint server" %}">
-                                                <input type="checkbox" class="source-toggle" value="biorxiv" checked>
+                                                <input type="checkbox" class="source-toggle" value="biorxiv">
                                                 bioRxiv
                                             
                                                 <small class="source-rate" title="Rate limit">1/s</small>
                                             </label>
 <label class="search-advanced__check" title="{% trans "DOAJ — open-access journals" %}">
-                                                <input type="checkbox" class="source-toggle" value="doaj" checked>
+                                                <input type="checkbox" class="source-toggle" value="doaj">
                                                 DOAJ
                                             
                                                 <small class="source-rate" title="Rate limit">5/s</small>
                                             </label>
 <label class="search-advanced__check" title="{% trans "PLOS — open-access science journals" %}">
-                                                <input type="checkbox" class="source-toggle" value="plos" checked>
+                                                <input type="checkbox" class="source-toggle" value="plos">
                                                 PLOS
                                             
                                                 <small class="source-rate" title="Rate limit">5/s</small>
                                             </label>
 <label class="search-advanced__check" title="{% trans "PMC — open-access full-text archive" %}">
-                                                <input type="checkbox" class="source-toggle" value="pmc" checked>
+                                                <input type="checkbox" class="source-toggle" value="pmc">
                                                 PMC
                                             
                                                 <small class="source-rate" title="Rate limit">3/s</small>
                                             </label>
 </div>
 <p class="source-notice">Rate limits shown per source. Your email is used for API requests to receive higher rate limits.</p>
-                                                                        <p class="search-sources-hint">{% trans "Uncheck sources to narrow the search. All checked searches the default set." %}</p>
+                                                                        <p class="search-sources-hint">{% trans "Crossref (SciTeX) is checked by default — fast, unlimited. Check more sources to widen the search." %}</p>
                             </div>
                             <div class="search-advanced__row search-advanced__row--stack">
                                 <span class="form-label" id="searchFiltersLabel">{% trans "Filters" %}</span>

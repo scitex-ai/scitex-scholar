@@ -53,13 +53,14 @@
    * NOT primitives/spacing.css, where scitex-ui's --input-height (36px) lives --
    * so referencing --input-height directly would silently fall back to a
    * hardcoded value on the standalone page (the exact "hardcoded cross-app
-   * styling" #93 asks to avoid). Operator 2026-10-23: two-line
-   * activation height, shared by inputs, selects, and buttons (one height
-   * per row, old-direct parity). 52px clears the 44px touch minimum.
+   * Operator 2026-10-24 (old-direct parity): the query row is the app's
+   * primary surface — the shared control height matches old-direct's
+   * tall query box (~three text lines), so the textarea, the Search
+   * button, and the Results select align exactly.
    * This is a scholar-owned token, not one of the seven
    * scitex-ui colours the template must not redeclare (see test_views.py).
    */
-  --scholar-search-height: 52px;
+  --scholar-search-height: 84px;
 }
 
 /*

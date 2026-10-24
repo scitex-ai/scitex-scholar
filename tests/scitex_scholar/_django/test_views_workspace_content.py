@@ -204,3 +204,82 @@ def test_details_strip_sections_hold_their_tabs_controls(_private_context):
     )
     # Assert
     assert (placed, shown) == (True, True)
+
+
+def test_search_query_is_a_multiline_textarea_with_in_field_help(
+    _private_context,
+):
+    # Arrange -- operator 2026-10-24 (old-direct parity): the query is a
+    # multi-line textarea with a syntax-teaching placeholder, and the
+    # Ctrl+K badge + ? help sit inside the field.
+    request = RequestFactory().get("/")
+    # Act
+    dom = BeautifulSoup(views.index(request).content.decode(), "html.parser")
+    box = dom.select_one("#searchInput")
+    tools = dom.select_one(".query-field__tools")
+    # Assert
+    assert (
+        box is not None and box.name == "textarea" and box.get("rows") == "3",
+        "hippocampus" in (box.get("placeholder", "") if box else ""),
+        tools is not None and tools.select_one("#searchSyntaxToggle") is not None,
+        "Ctrl" in (tools.get_text() if tools else ""),
+    ) == (True, True, True, True)
+
+
+def test_toolbar_row_and_stepper_live_above_the_results(_private_context):
+    # Arrange -- operator 2026-10-24 (old-direct parity): the action
+    # toolbar + pipeline stepper stay visible pre-search in their own row,
+    # not hidden inside the results card.
+    request = RequestFactory().get("/")
+    # Act
+    html = views.index(request).content.decode()
+    order = (
+        html.index('class="search-toolbar-row"'),
+        html.index('id="searchStepper"'),
+        html.index('id="searchEmptyState"'),
+        html.index('id="searchResults"'),
+        html.index('id="searchResultsContent"'),
+    )
+    # Assert
+    assert (
+        order[0] < order[1] < order[2] < order[3] < order[4]
+    ) == True
+
+
+def test_source_defaults_match_old_direct(_private_context):
+    # Arrange -- operator 2026-10-24 (old-direct parity): only the fast
+    # local Crossref (SciTeX) source is checked; external APIs are opt-in.
+    request = RequestFactory().get("/")
+    # Act
+    dom = BeautifulSoup(views.index(request).content.decode(), "html.parser")
+    checked = {
+        box.get("value"): box.has_attr("checked")
+        for box in dom.select("input.source-toggle")
+    }
+    # Assert
+    assert checked == {
+        "crossref_local": True,
+        "openalex_local": False,
+        "pubmed": False,
+        "arxiv": False,
+        "semantic": False,
+        "crossref": False,
+        "openalex": False,
+        "biorxiv": False,
+        "doaj": False,
+        "plos": False,
+        "pmc": False,
+    }
+
+
+def test_search_js_wires_textarea_enter_and_ctrl_k():
+    # Arrange -- operator 2026-10-24 (old-direct parity): Enter submits
+    # the textarea query, Ctrl+K/Cmd+K focuses it from anywhere.
+    from pathlib import Path
+
+    # Act
+    js = (
+        Path(views.__file__).parent / "static" / "scholar" / "js" / "search.js"
+    ).read_text()
+    # Assert
+    assert ('requestSubmit' in js, 'toLowerCase() === "k"' in js) == (True, True)
