@@ -39,13 +39,12 @@
  * Collapsed by default so the first screen shows a keyword box, not backend
  * API infrastructure. Houses the query-syntax help, the search source (mode),
  * the "Ignore cache" control, and the CrossRef API status.
+ *
+ * Operator 2026-10-24 (old-direct parity, flat Details): the Advanced
+ * <details> card is deleted from the template -- these classes now style
+ * flat rows rendered directly under the section content. No bordered card
+ * wrapper remains; spacing tokens hold the rhythm instead.
  */
-.search-advanced {
-  margin-top: 16px;
-  border: 1px solid var(--border-default);
-  background: var(--bg-tertiary);
-  border-radius: 4px;
-}
 
 .search-advanced__summary {
   cursor: pointer;
@@ -56,12 +55,12 @@
   list-style: none;
 }
 .search-advanced__summary::before {
-  content: "\25B8 "; /* ▸ collapsed, ▾ expanded */
+  content: "+ "; /* ASCII-safe collapsed marker (U+25B8 tofu on minimal fonts) */
   display: inline-block;
   transition: transform 0.15s;
 }
 .search-advanced[open] .search-advanced__summary::before {
-  content: "\25BE ";
+  content: "– ";
 }
 .search-advanced__summary::-webkit-details-marker {
   display: none;
@@ -206,6 +205,48 @@
 }
 
 /*
+ * Operator 2026-10-24 (old-direct parity): the toolbar + stepper row.
+ * Always visible (pre-search too), like old-direct's action row: bulk
+ * tools left, pipeline stepper right-aligned.
+ */
+.search-toolbar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 4px 2px;
+}
+
+.search-toolbar-row .search-results-toolbar {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  align-items: center;
+}
+
+/*
+ * Operator brief-04 (buttons organized): every control in the toolbar
+ * row shares one compact height. The query-row token grew tall for the
+ * textarea; without this scope the selects would tower over the 44px
+ * pills. 44px keeps the touch floor the library controls already use.
+ */
+.search-toolbar-row .form-select,
+.search-toolbar-row .btn-control-library {
+  min-height: 44px;
+}
+
+.search-toolbar-row .search-bulk-bar__select-all {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.search-toolbar-row .search-stepper {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/*
  * Declutter (CCT4429): the bulk pills live INSIDE the toolbar row, so this
  * is an inline group, not a second padded strip. The selector stays (the
  * slice-2 style pin references it) but carries no strip padding of its own.
@@ -216,6 +257,123 @@
   gap: 8px;
   flex-wrap: wrap;
   padding: 0;
+}
+
+/*
+ * Old-direct parity slice 3: tiered Sources (local unlimited + external
+ * with rate labels + email/rate notice). Flat rows under the one Search
+ * section; no card wrapper. Monotone tokens only.
+ */
+.search-sources-grid--tiered {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.source-tier {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.source-tier__label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0;
+}
+.source-rate {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.search-advanced__check .source-rate {
+  padding-left: 8px;
+}
+.source-notice {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/*
+ * Old-direct parity slice 2: pipeline stepper (Ready -> Searching ->
+ * Done + timer). Ported from hub results-header.css onto the leaf tokens
+ * (--accent instead of workspace green, monotone for the operator rule).
+ */
+.search-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  font-size: 12px;
+  margin-left: auto;
+}
+.stepper-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 600;
+}
+.stepper-text {
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-right: 4px;
+}
+.stepper-circle.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  animation: stepper-pulse 2s ease-in-out infinite;
+}
+.stepper-circle.searching {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  animation: stepper-pulse 1s ease-in-out infinite;
+}
+.stepper-circle.complete {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  opacity: 0.6;
+}
+.stepper-circle.done {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.stepper-line {
+  width: 12px;
+  height: 1px;
+  background: var(--border-default);
+}
+.stepper-line.active {
+  background: var(--accent);
+}
+.stepper-timer {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 11px;
+  margin-left: 8px;
+  font-family: monospace;
+}
+@keyframes stepper-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
 }
 
 /* Hairline divider between the sort/filter selects and the bulk pills. */
