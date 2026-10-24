@@ -268,9 +268,8 @@ def _not_configured_payload() -> dict:
     return {
         "error": _i18n("CrossRef API not configured"),
         "detail": _i18n(
-            "The citation graph reads its data from a crossref-local HTTP API; "
-            "scholar never opens the corpus files itself. No endpoint is "
-            "configured, so there is nothing to query."
+            "The citation graph reads its data from a citation-data HTTP API. "
+            "No endpoint is configured, so there is nothing to query."
         ),
         "fix": _i18n(
             "Set %(setting)s to a running crossref-local endpoint (env var of "
@@ -436,13 +435,16 @@ def index_context(request, current_project=None):
         "api_available": resolved_api is not None,
         "api_url": resolved_api or "Not configured",
         "stx_mount": mount_prefix(request),
-        "app_label": _app_label("SciTeX Scholar"),
+        "app_label": _app_label("Scholar"),
         "app_scope": "user",
-        # Operator 2026-10-20: the official SciTeX mark (white snake on
-        # navy), like production -- not the SDK default green snake. The
-        # shared branding partial honours this context var, so the leaf
-        # supplies its own file rather than shadowing the partial.
-        "favicon_href": _static_url("scholar/pwa/favicon-32.png"),
+        # Operator 2026-10-23: the tab icon is the official mark (white
+        # snake on navy), no dev/prod switching. The installed SDK SSOT
+        # (0.3.12) still serves the retired green snake; the official mark
+        # exists only in SDK develop (unreleased). SUNSET: drop this
+        # override + the file once the installed SDK serves the official
+        # mark, and pin that SDK floor in pyproject.toml. Provenance: byte
+        # copy of SDK develop's scitex-favicon.svg (same snake artwork).
+        "favicon_href": _static_url("scholar/img/scitex-favicon-official.svg"),
         "current_project": current_project,
         "current_scope": current_scope,
         # i18n (operator directive 2026-09-14): the whole page flips via
@@ -480,9 +482,10 @@ def index(request):
     """Serve the Scholar SPA shell page.
 
     `favicon_href` carries the official SciTeX mark (white snake on navy,
-    operator 2026-10-20, like production): the shared branding partial
-    honours the var, so the leaf supplies its own file through the
-    contract rather than shadowing the partial with an inline icon.
+    operator 2026-10-23): the shared branding partial honours the var, so
+    the leaf supplies its own file through the contract rather than
+    shadowing the partial with an inline icon. SUNSET: drop the override
+    once the installed SDK SSOT serves the official mark.
     """
     html = render_to_string(
         "scholar/scholar.html",
@@ -556,6 +559,9 @@ def _js_i18n_dict() -> dict:
         "Saving…": _i18n("Saving…"),
         "Saved": _i18n("Saved"),
         "Save failed": _i18n("Save failed"),
+        # Catch-up: node sheet actions render client-side -- same rule.
+        "Add to library": _i18n("Add to library"),
+        "Explore from here": _i18n("Explore from here"),
         "Select results to save.": _i18n("Select results to save."),
         "Saved %(saved)s of %(total)s": _i18n("Saved %(saved)s of %(total)s"),
         "Enriched %(done)s of %(total)s": _i18n("Enriched %(done)s of %(total)s"),
@@ -629,6 +635,17 @@ def _js_i18n_dict() -> dict:
         "No open-access PDF available": _i18n("No open-access PDF available"),
         "Paper not found": _i18n("Paper not found"),
         "Load failed. Try again later.": _i18n("Load failed. Try again later."),
+        # Library pane hardening (apps-lead probe 2026-10-22): an
+        # expired/missing credential is 302'd to the hub login page, so
+        # the pane gets HTML where JSON was expected. The client turns
+        # that shape into a re-login prompt, not a SyntaxError; other
+        # non-JSON bodies keep the status-surfaced error.
+        "Session expired. Please log in again.": _i18n(
+            "Session expired. Please log in again."
+        ),
+        "Server returned non-JSON (status %(status)s)": _i18n(
+            "Server returned non-JSON (status %(status)s)"
+        ),
         "Download failed. Try again later.": _i18n("Download failed. Try again later."),
         # Old-direct U7: the node sheet close button renders client-side,
         # so it MUST be a key here (same catalog-visibility rule).
@@ -1067,9 +1084,9 @@ def graph_health(request):
                 "probed": False,
                 "error": _i18n("Citation Graph: not checked"),
                 "detail": _i18n(
-                    "A crossref-local endpoint is configured. The graph backend "
-                    "is probed when you open the Citation Graph tab, so a slow "
-                    "or unreachable backend cannot delay the rest of the page."
+                    "A citation-data endpoint is configured. The graph backend "
+                    "is checked when you open the Citation Graph tab, so a slow "
+                    "or unreachable service cannot delay the rest of the page."
                 ),
                 "fix": _i18n("Open the Citation Graph tab to check it."),
             }
@@ -1095,12 +1112,12 @@ def graph_health(request):
                 "probed": True,
                 "error": _i18n("Citation Graph: unavailable"),
                 "detail": _i18n(
-                    "The crossref-local endpoint is configured but could not "
+                    "The citation-data endpoint is configured but could not "
                     "be reached right now, so citation graphs cannot be built."
                 ),
                 "fix": _i18n(
-                    "Verify the crossref-local service is running and that "
-                    "the endpoint is reachable, then retry."
+                    "The citation service may be temporarily down — wait a "
+                    "moment and retry by opening the Citation Graph tab."
                 ),
             }
         )
@@ -1117,12 +1134,12 @@ def _degraded_payload() -> dict:
         "status": "degraded",
         "error": _i18n("Citation Graph: limited"),
         "detail": _i18n(
-            "The crossref-local endpoint is configured and reachable, but the "
-            "probe returned no data for the canary paper. Citation graphs may "
+            "The citation-data endpoint is configured and reachable, but the "
+            "check returned no data for the sample paper. Citation graphs may "
             "be incomplete."
         ),
         "fix": _i18n(
-            "Check that the crossref-local endpoint is serving the corpus you "
+            "Check that the citation-data endpoint is serving the corpus you "
             "expect; the citation graph depends on it."
         ),
     }
@@ -1171,8 +1188,8 @@ def search(request, _engine=None):
         )
 
     try:
-        max_results = int(request.GET.get("max_results", 20))
-        max_results = max(1, min(100, max_results))
+        max_results = int(request.GET.get("max_results", 50))
+        max_results = max(1, min(500, max_results))
     except ValueError:
         return JsonResponse(
             {"error": "max_results must be an integer"}, status=400
@@ -1362,7 +1379,7 @@ def search_syntax_help(request):
             "query_parameters": {
                 "q": "Search query with optional command syntax (required)",
                 "sources": "Comma-separated list of sources to search (optional)",
-                "max_results": "Maximum results per source, 1-100 (default: 20)",
+                "max_results": "Maximum results per source, 1-500 (default: 50)",
                 "format": "'full' or 'compact' response format (default: full)",
             },
         }
@@ -1626,12 +1643,25 @@ def _assert_safe_project_name(project: str) -> str:
     Reserved store names (MASTER, downloads, ...) are refused too: they are
     real directories under the root but never projects, and the picker
     filter excludes them for the same reason.
+
+    The SDK header picker navigates with ``?project=<owner>/<slug>`` (the
+    provider id contract), so a value carrying exactly one ``owner/``
+    prefix is accepted by filtering on its last component -- the slug is
+    the filing directory, the owner is identity context, not a path.
+    Anything else with a separator still fails closed.
     """
     from scitex_scholar.storage._project_reconcile import RESERVED_LIBRARY_DIRS
 
     if not isinstance(project, str):
         raise ValueError("unsafe project name: not a string")
-    if not project or "/" in project or "\\" in project or "\x00" in project:
+    if "\\" in project or "\x00" in project:
+        raise ValueError("unsafe project name: not a single path component")
+    # Accept the SDK picker id form ``owner/slug``: the slug (last
+    # component) is the filing directory. Deeper paths stay refused.
+    parts = project.split("/")
+    if len(parts) == 2 and all(parts):
+        project = parts[1]
+    elif not project or "/" in project:
         raise ValueError("unsafe project name: not a single path component")
     if project in (".", ".."):
         raise ValueError("unsafe project name: traversal token")
@@ -3234,41 +3264,30 @@ def preferences_sources(request):
 # keeps SavedGraph rows (name + rebuild recipe); the leaf keeps the same
 # shape file-based under the user-scoped root, mirroring saved searches.
 # Reload needs no endpoint: GET api/graph/network?doi=<seed_doi> rebuilds.
+# Graphs are CUI-owned package data (operator 2026-10-24): the file path
+# helper lives in _saved_graph_store._file_path; this module only adapts.
 _MAX_SAVED_GRAPHS = 500
 _MAX_GRAPH_NAME_CHARS = 200
 
 
-def _saved_graphs_path(root: Path) -> Path:
-    """Single JSON file holding this user's saved graphs."""
-    return root / "SAVED_GRAPHS" / "saved_graphs.json"
+def _load_saved_graphs(root: Path, _opener=None) -> list:
+    # Thin adapter: the CUI owns file + store logic (graphs as package
+    # data, operator 2026-10-24); the view only resolves the user root.
+    from scitex_scholar.citation_graph._saved_graph_store import list_graphs
 
-
-def _load_saved_graphs(root: Path) -> list:
-    path = _saved_graphs_path(root)
-    if not path.is_file():
-        return []
-    try:
-        data = json.loads(path.read_text())
-    except ValueError:
-        return []
-    return data if isinstance(data, list) else []
-
-
-def _write_saved_graphs(root: Path, rows: list) -> None:
-    path = _saved_graphs_path(root)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(rows))
+    return list_graphs(root, _opener=_opener)
 
 
 @require_POST
-def graphs_save(request):
+def graphs_save(request, _opener=None):
     """Save a named graph rebuild recipe for this user (explicit action).
 
-    Body: {"name": ..., "seed_doi": ...}. Stored file-based under the
-    request's user-scoped root — no shared store, no database. Bodies over
-    256k are refused with 413 before parsing. At most 500 rows per user.
-    Names cap at 200 (hub SavedGraph.name); seed DOIs reuse the 500-char
-    leaf DOI bound. A nameless or seedless row cannot rebuild: 400.
+    Body: {"name": ..., "seed_doi": ...}. Graphs are package data: the CUI
+    keeps the per-user file authoritative and mirrors best-effort into the
+    shared store. Bodies over 256k are refused with 413 before parsing. At
+    most 500 rows per user. Names cap at 200 (hub SavedGraph.name); seed
+    DOIs reuse the 500-char leaf DOI bound. A nameless or seedless row
+    cannot rebuild: 400.
     """
     try:
         payload = _json_body(request)
@@ -3300,19 +3319,16 @@ def graphs_save(request):
             {"error": f"at most {_MAX_SAVED_GRAPHS} saved graphs per user"},
             status=400,
         )
-    import datetime as _dt
-    import uuid as _uuid
+    from scitex_scholar.citation_graph._saved_graph_store import save_graph
 
-    row = {
-        "id": _uuid.uuid4().hex,
-        "name": name,
-        "seed_doi": seed_doi,
-        "created_by": _safe_username(user) if user is not None else "user",
-        "created_at": _dt.datetime.now(_dt.timezone.utc).isoformat(),
-    }
-    rows.append(row)
     try:
-        _write_saved_graphs(root, rows)
+        row = save_graph(
+            root,
+            name,
+            seed_doi,
+            _safe_username(user) if user is not None else "user",
+            _opener=_opener,
+        )
     except OSError as e:
         logger.error(f"graphs save failed: {e}", exc_info=True)
         return JsonResponse({"error": "Save failed. Try again later."}, status=500)
@@ -3322,14 +3338,14 @@ def graphs_save(request):
 
 
 @require_GET
-def graphs_list(request):
+def graphs_list(request, _opener=None):
     """List this user's saved graphs (user-scoped root only)."""
     root = _library_root_for(request)
-    return JsonResponse({"graphs": _load_saved_graphs(root)})
+    return JsonResponse({"graphs": _load_saved_graphs(root, _opener=_opener)})
 
 
 @require_POST
-def graphs_delete(request):
+def graphs_delete(request, _opener=None):
     """Delete one saved graph by id; 404 when unknown. Bodies over 256k are
     refused with 413 before parsing. The success body carries state only."""
     try:
@@ -3344,20 +3360,20 @@ def graphs_delete(request):
     if not graph_id:
         return JsonResponse({"error": "id is required"}, status=400)
     root = _library_root_for(request)
-    rows = _load_saved_graphs(root)
-    kept = [r for r in rows if r.get("id") != graph_id]
-    if len(kept) == len(rows):
-        return JsonResponse({"error": "Unknown id"}, status=404)
+    from scitex_scholar.citation_graph._saved_graph_store import delete_graph
+
     try:
-        _write_saved_graphs(root, kept)
+        known = delete_graph(root, graph_id, _opener=_opener)
     except OSError as e:
         logger.error(f"graphs delete failed: {e}", exc_info=True)
         return JsonResponse({"error": "Delete failed. Try again later."}, status=500)
+    if not known:
+        return JsonResponse({"error": "Unknown id"}, status=404)
     return JsonResponse({"deleted": True})
 
 
 @require_POST
-def graphs_rename(request):
+def graphs_rename(request, _opener=None):
     """Rename one saved graph; 404 when unknown (hub api_rename_graph parity).
 
     Body: {"id": ..., "name": ...}. Names cap at 200 chars like graphs_save.
@@ -3390,18 +3406,15 @@ def graphs_rename(request):
             status=400,
         )
     root = _library_root_for(request)
-    rows = _load_saved_graphs(root)
-    for row in rows:
-        if row.get("id") == graph_id:
-            row["name"] = name
-            break
-    else:
-        return JsonResponse({"error": "Unknown id"}, status=404)
+    from scitex_scholar.citation_graph._saved_graph_store import rename_graph
+
     try:
-        _write_saved_graphs(root, rows)
+        known = rename_graph(root, graph_id, name, _opener=_opener)
     except OSError as e:
         logger.error(f"graphs rename failed: {e}", exc_info=True)
         return JsonResponse({"error": "Rename failed. Try again later."}, status=500)
+    if not known:
+        return JsonResponse({"error": "Unknown id"}, status=404)
     return JsonResponse({"renamed": True, "id": graph_id, "name": name})
 
 

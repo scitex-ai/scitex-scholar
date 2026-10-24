@@ -33,7 +33,7 @@ LOCALE_DIR = ROOT / "src/scitex_scholar/_django/locale/ja/LC_MESSAGES"
 def single_line_trans_ids() -> list:
     t = "\n".join(path.read_text() for path in TEMPLATES)
     t = re.sub(r"\{%\s*comment\s*%\}.*?\{%\s*endcomment\s*%\}", "", t, flags=re.S)
-    return [m.group(1) for m in re.finditer(r'\{%\s*trans\s+"([^"]+)"\s*%\}', t)]
+    return [m.group(1) for m in re.finditer(r'{%\s*trans(?:late)?\s+"([^"]+)"(?:\s+as\s+\w+)?\s*%}', t)]
 
 
 # The three {% blocktrans %} messages, keyed on the EXACT raw block text Django
@@ -49,11 +49,14 @@ BLOCKTRANS_MSGIDS = [
     "                                            <code>year:2020-2024</code> bounds the\n"
     "                                            publication year,\n"
     "                                            <code>if:&gt;5</code> filters by impact factor.",
-    "Your papers, stored locally. Use <strong>Enrich</strong>\n"
-    "                                    to fill in metadata (abstract, citations, impact\n"
-    "                                    factor) from the databases, or\n"
-    "                                    <strong>Import</strong> BibTeX and\n"
+    "Your papers, stored locally. Use the per-paper\n"
+    "                                    <strong>Enrich</strong> action to fill in metadata\n"
+    "                                    (abstract, citations, impact factor) from the\n"
+    "                                    databases, or <strong>Import</strong> BibTeX and\n"
     "                                    <strong>Export</strong> your library.",
+    # Operator 2026-10-24 (old-direct parity): the query textarea
+    # placeholder (two lines, raw newline — attribute context).
+    "Search papers from databases\ne.g. hippocampus -a Smith -ymin 2020 -ymax 2024",
 ]
 
 
@@ -91,6 +94,10 @@ JA = {
     "Graph Controls": "グラフ操作",
     "Scroll": "スクロール", "Zoom": "ズーム", "Drag": "ドラッグ", "Pan": "パン",
     "Click": "クリック", "Select node": "ノードを選択",
+    "Databases": "データベース",
+    "No search yet.": "まだ検索していません。",
+    "Library not loaded yet.": "ライブラリはまだ読み込まれていません。",
+    "No graph built yet.": "グラフはまだ作成されていません。",
     # --- Tabs ---
     "Search databases": "データベースを検索",
     "Library": "ライブラリ",
@@ -98,12 +105,15 @@ JA = {
     # --- Search tab ---
     "Search Papers": "論文を検索",
     "Search syntax help": "検索構文ヘルプ",
+    "Browse": "閲覧",
     "Search Engine Queue Status": "検索エンジンのキューステータス",
     "Active searches": "アクティブな検索",
     "Zoom in": "ズームイン",
     "Zoom out": "ズームアウト",
     "Download PNG": "PNGをダウンロード",
     "Close": "閉じる",
+    "Add to library": "ライブラリに追加",
+    "Explore from here": "ここから探索",
     "bioRxiv — biology preprint server": "bioRxiv — 生物学プレプリントサーバー",
     "DOAJ — open-access journals": "DOAJ — オープンアクセスジャーナル",
     "PLOS — open-access science journals": "PLOS — オープンアクセス科学ジャーナル",
@@ -213,6 +223,14 @@ JA = {
     "Select all": "すべて選択",
     "Save selected": "選択を保存",
     "Save & enrich": "保存して補完",
+    # Operator 2026-10-24 (old-direct parity): stepper + empty state.
+    "Ready": "準備完了",
+    "Searching": "検索中",
+    "Done": "完了",
+    "Search": "検索",
+    "Run a search to see results": "検索を実行して結果を表示",
+    "Enter a query above — papers from OpenAlex, Crossref, PubMed and more will appear here.":
+        "上にクエリを入力してください — OpenAlex、Crossref、PubMedなどの論文がここに表示されます。",
     # --- JS dict (views._js_i18n_dict) ---
     "Build citation graph": "引用グラフを構築",
     "Enrich": "補完",
@@ -241,6 +259,8 @@ JA = {
     # Slice 1 (old-direct unification): the Sources grid titles, hint, and
     # the selected-sources header label.
     "Sources": "ソース",
+    "Local (fast, unlimited)": "ローカル（高速・無制限）",
+    "External APIs (slower, limited results)": "外部API（低速・件数制限あり）",
     "Crossref database on the SciTeX server — fast, unlimited":
         "SciTeXサーバー上のCrossrefデータベース — 高速、無制限",
     "OpenAlex database on the SciTeX server — fast, unlimited":
@@ -251,8 +271,10 @@ JA = {
     "Semantic Scholar — AI-powered academic search": "Semantic Scholar — AI駆動の学術検索",
     "Crossref — DOI metadata registry": "Crossref — DOIメタデータレジストリ",
     "OpenAlex — open catalog of scholarly works": "OpenAlex — 学術成果物のオープンカタログ",
-    "Uncheck sources to narrow the search. All checked searches the default set.":
-        "ソースのチェックを外すと検索範囲が狭まります。すべて選択時はデフォルト設定で検索します。",
+    "Crossref (SciTeX) is checked by default — fast, unlimited. Check more sources to widen the search.":
+        "Crossref (SciTeX) はデフォルトで選択されています — 高速・無制限。検索範囲を広げるには他のソースも選択してください。",
+    "Search papers from databases\ne.g. hippocampus -a Smith -ymin 2020 -ymax 2024":
+        "データベースから論文を検索\ne.g. hippocampus -a Smith -ymin 2020 -ymax 2024",
     "Selected sources": "選択したソース",
     # Slice 2 (old-direct unification): the Filters grid labels.
     "Filters": "絞り込み",
@@ -335,6 +357,8 @@ JA = {
     "No open-access PDF available": "オープンアクセスのPDFがありません",
     "Paper not found": "論文が見つかりません",
     "Load failed. Try again later.": "読み込みに失敗しました。後でもう一度お試しください。",
+    "Session expired. Please log in again.": "セッションの有効期限が切れました。再度ログインしてください。",
+    "Server returned non-JSON (status %(status)s)": "サーバーがJSON以外を返しました（ステータス%(status)s）。",
     "Download failed. Try again later.": "ダウンロードに失敗しました。後でもう一度お試しください。",
     "Imported %(n)s paper from %(file)s": "%(file)s から %(n)s 件の論文をインポートしました",
     "Imported %(n)s papers from %(file)s": "%(file)s から %(n)s 件の論文をインポートしました",
@@ -363,25 +387,25 @@ JA = {
     # --- Service Status sidebar paragraph (graph_health / _not_configured_payload /
     # _degraded_payload error+detail+fix; operator screenshot 2026-10-16) ---
     "CrossRef API not configured": "CrossRef API 未設定",
-    "The citation graph reads its data from a crossref-local HTTP API; scholar never opens the corpus files itself. No endpoint is configured, so there is nothing to query.":
-        "引用グラフは crossref-local HTTP API からデータを取得します。scholar がコーパスファイルを直接開くことはありません。エンドポイントが設定されていないため、問い合わせ先がありません。",
+    "The citation graph reads its data from a citation-data HTTP API. No endpoint is configured, so there is nothing to query.":
+        "引用グラフは citation-data HTTP API からデータを取得します。エンドポイントが設定されていないため、問い合わせ先がありません.",
     "Set %(setting)s to a running crossref-local endpoint (env var of the same name, or the Django setting when scholar is mounted in a host project), then restart the server. Installing the `crossref-local` package supplies a default endpoint, which scholar falls back to when the variable is unset.":
         "%(setting)s に稼働中の crossref-local エンドポイントを設定し（ホストプロジェクトにマウントしている場合は同名の環境変数または Django 設定）、サーバーを再起動してください。`crossref-local` パッケージをインストールするとデフォルトのエンドポイントが用意され、変数が未設定の場合はそちらにフォールバックします。",
     "Citation Graph: not checked": "引用グラフ：未確認",
-    "A crossref-local endpoint is configured. The graph backend is probed when you open the Citation Graph tab, so a slow or unreachable backend cannot delay the rest of the page.":
-        "crossref-local エンドポイントが設定されています。グラフバックエンドの確認は引用グラフタブを開いたときに行われるため、応答の遅いバックエンドや到達不能なバックエンドがページの他の表示を遅らせることはありません。",
+    "A citation-data endpoint is configured. The graph backend is checked when you open the Citation Graph tab, so a slow or unreachable service cannot delay the rest of the page.":
+        "citation-data エンドポイントが設定されています。グラフバックエンドの確認は引用グラフタブを開いたときに行われるため、応答の遅いサービスや到達不能なサービスがページの他の表示を遅らせることはありません。",
     "Open the Citation Graph tab to check it.":
         "引用グラフタブを開いて確認してください。",
     "Citation Graph: unavailable": "引用グラフ：利用不可",
-    "The crossref-local endpoint is configured but could not be reached right now, so citation graphs cannot be built.":
-        "crossref-local エンドポイントは設定されていますが、現在到達できないため、引用グラフを構築できません。",
-    "Verify the crossref-local service is running and that the endpoint is reachable, then retry.":
-        "crossref-local サービスが稼働していることと、エンドポイントに到達できることを確認してから、再試行してください。",
+    "The citation-data endpoint is configured but could not be reached right now, so citation graphs cannot be built.":
+        "citation-data エンドポイントは設定されていますが、現在到達できないため、引用グラフを構築できません。",
+    "The citation service may be temporarily down — wait a moment and retry by opening the Citation Graph tab.":
+        "引用サービスが一時的に停止している可能性があります — しばらく待ってから引用グラフタブを開いて再試行してください。",
     "Citation Graph: limited": "引用グラフ：制限あり",
-    "The crossref-local endpoint is configured and reachable, but the probe returned no data for the canary paper. Citation graphs may be incomplete.":
-        "crossref-local エンドポイントは設定され到達可能ですが、確認用の論文に対するプローブがデータを返さなかったため、引用グラフが不完全な場合があります。",
-    "Check that the crossref-local endpoint is serving the corpus you expect; the citation graph depends on it.":
-        "crossref-local エンドポイントが想定どおりのコーパスを提供しているか確認してください。引用グラフはこのエンドポイントに依存しています。",
+    "The citation-data endpoint is configured and reachable, but the check returned no data for the sample paper. Citation graphs may be incomplete.":
+        "citation-data エンドポイントは設定され到達可能ですが、サンプル論文に対する確認でデータを返さなかったため、引用グラフが不完全な場合があります。",
+    "Check that the citation-data endpoint is serving the corpus you expect; the citation graph depends on it.":
+        "citation-data エンドポイントが想定どおりのコーパスを提供しているか確認してください。引用グラフはこのエンドポイントに依存しています。",
 }
 
 

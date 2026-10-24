@@ -36,45 +36,42 @@ SEARCH_JS = (
 ).read_text()
 
 
-def test_user_header_keeps_picker_suppressed():
-    """User scope never opts into the picker (tested page contract).
+PICKER_TEMPLATE = (
+    Path(views.__file__).parent
+    / "templates"
+    / "scholar"
+    / "_project_picker.html"
+).read_text()
 
-    Scholar is user-scoped; the SDK picker renders for project scope only.
-    Standalone project selection travels through the Library chips'
-    ?project= navigation, which the server resolves and remembers.
+
+def test_user_header_opts_into_picker():
+    """User scope opts into the header picker (tested page contract).
+
+    Scholar is user-scoped; the SDK picker tag renders for project scope
+    unless the app opts in. Operator 2026-10-23: the header carries an
+    explicit selector with a user-space choice, replacing the removed
+    Details-strip chips — so the picker template passes allow_user_scope
+    with the explicit current_scope state.
     """
     # Arrange
     # Act
-    opted = "allow_user_scope" in TEMPLATE
+    opted = ("allow_user_scope=True" in PICKER_TEMPLATE, "current_scope" in PICKER_TEMPLATE)
     # Assert
-    assert not opted
+    assert opted == (True, True)
 
 
-def test_library_chips_navigate_with_project_query():
-    """Chips select via the picker's ?project= contract, no new backend."""
+def test_library_details_carry_no_project_selector():
+    """No project selector lives in the Library Details strip.
+
+    Operator 2026-10-23: the header picker is the single selection
+    control. The Details chips + current-project indicator are deleted;
+    the list still follows the header picker's ?project= server-side.
+    """
     # Arrange
     # Act
-    wired = ("?project=" in LIBRARY_JS, "/api/projects" in LIBRARY_JS)
+    gone = ('id="libraryProjectChips"' not in TEMPLATE, 'id="libraryProjectCurrent"' not in TEMPLATE)
     # Assert
-    assert wired == (True, True)
-
-
-def test_library_tab_carries_project_chips():
-    """The Library tab filters by project; old-direct scopes the view."""
-    # Arrange
-    # Act
-    present = 'id="libraryProjectChips"' in TEMPLATE
-    # Assert
-    assert present
-
-
-def test_library_tab_carries_current_project_indicator():
-    """The Library tab says which project the view is synced to."""
-    # Arrange
-    # Act
-    present = 'id="libraryProjectCurrent"' in TEMPLATE
-    # Assert
-    assert present
+    assert gone == (True, True)
 
 
 def test_library_js_reads_project_selection():
@@ -93,15 +90,6 @@ def test_search_js_sends_project_on_save():
     sends = ("project" in SEARCH_JS, "savePayload" in SEARCH_JS)
     # Assert
     assert sends == (True, True)
-
-
-def test_project_strings_are_translated_labels():
-    """Project UI copy is {% trans %} labels, not English literals (JA rule)."""
-    # Arrange
-    # Act
-    labelled = ('{% trans "Project" %}' in TEMPLATE,)
-    # Assert
-    assert labelled == (True,)
 
 
 def test_index_context_reports_user_scope_without_project(tmp_path):
@@ -320,3 +308,40 @@ def test_library_save_bulk_files_each_into_project(tmp_path):
         filed = [(tmp_path / "projA" / f"PIDB{i}").is_symlink() for i in (1, 2)]
         # Assert
         assert (len(data["saved"]), filed) == (2, [True, True])
+
+
+def test_library_strip_has_no_orphan_separators():
+    # Arrange -- operator 2026-10-22 (screenshot loop): lone '|' dividers
+    # after Export and after the project indicator read as broken flex.
+    # The rows below are flex-wrapped with gap, so separators have no job.
+    # Act
+    orphan_free = 'class="library-io__sep"' not in TEMPLATE
+    # Assert
+    assert orphan_free
+
+
+def test_library_export_select_fits_longest_option():
+    # Arrange -- operator 2026-10-22 (screenshot loop): the select clipped
+    # 'BibTeX (.bib' with no closing paren (160px cap). The strip rule
+    # drops the cap and floors the width. Operator 2026-10-23: an 11em
+    # floor overran the narrow strip card (min-width beats max-width, so
+    # the card overflowed); the flex-basis 8em floor keeps the no-cap
+    # intent at a width the strip fits.
+    # Act
+    css = (
+        Path(views.__file__).parent
+        / "static" / "scholar" / "css" / "_partials" / "_library.css"
+    ).read_text()
+    fits = "flex: 1 1 8em" in css and "max-width: 160px" not in css
+    # Assert
+    assert fits
+
+
+def test_library_intro_names_the_per_paper_enrich_action():
+    # Arrange -- operator 2026-10-22 (screenshot loop): the intro said
+    # 'Use Enrich' with no Enrich control in view. Enrich IS per-row
+    # (library.js enrich button); the copy must say per-paper.
+    # Act
+    names_action = "per-paper" in TEMPLATE and "Enrich" in TEMPLATE
+    # Assert
+    assert names_action
