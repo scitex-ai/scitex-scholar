@@ -233,11 +233,17 @@ msgstr "単一ソース"
 msgid "Sources"
 msgstr "ソース"
 
+msgid "Local (fast, unlimited)"
+msgstr "ローカル（高速・無制限）"
+
 msgid "Crossref database on the SciTeX server — fast, unlimited"
 msgstr "SciTeXサーバー上のCrossrefデータベース — 高速、無制限"
 
 msgid "OpenAlex database on the SciTeX server — fast, unlimited"
 msgstr "SciTeXサーバー上のOpenAlexデータベース — 高速、無制限"
+
+msgid "External APIs (slower, limited results)"
+msgstr "外部API（低速・件数制限あり）"
 
 msgid "NCBI PubMed — biomedical literature"
 msgstr "NCBI PubMed — 生物医学文献"

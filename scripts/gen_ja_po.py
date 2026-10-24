@@ -258,6 +258,8 @@ JA = {
     # Slice 1 (old-direct unification): the Sources grid titles, hint, and
     # the selected-sources header label.
     "Sources": "ソース",
+    "Local (fast, unlimited)": "ローカル（高速・無制限）",
+    "External APIs (slower, limited results)": "外部API（低速・件数制限あり）",
     "Crossref database on the SciTeX server — fast, unlimited":
         "SciTeXサーバー上のCrossrefデータベース — 高速、無制限",
     "OpenAlex database on the SciTeX server — fast, unlimited":
