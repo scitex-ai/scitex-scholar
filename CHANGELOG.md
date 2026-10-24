@@ -7,6 +7,15 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.25.0] - 2026-10-24
+
+Old-direct Search parity (operator 2026-10-24 screenshots): the query is a
+multi-line textarea with a syntax-teaching placeholder and in-field
+Ctrl+K + `?` help (Enter submits, Ctrl+K focuses); the shared control
+height matches old-direct's tall query box; the action toolbar + pipeline
+stepper stay visible pre-search; Details defaults to old-direct (only
+Crossref (SciTeX) checked). JA catalog regenerated.
+
 ## [1.24.0] - 2026-10-24
 
 Graphs as CUI package data: `citation_graph/_saved_graph_store.py` gains
