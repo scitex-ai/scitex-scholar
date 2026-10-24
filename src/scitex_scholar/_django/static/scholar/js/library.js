@@ -208,6 +208,26 @@ document.addEventListener("DOMContentLoaded", () => {
     );
     actions.appendChild(enrichBtn);
 
+    // Brief-05: seed the Citation Graph from this work (Search-tab per-row
+    // parity). Only DOI rows seed; the tab click switches panes and the
+    // one-shot event carries the seed (same path as search.js).
+    if (paper.doi) {
+      const graphBtn = document.createElement("button");
+      graphBtn.type = "button";
+      graphBtn.className = "library-enrich-btn";
+      graphBtn.textContent = scholarT("Graph");
+      graphBtn.addEventListener("click", () => {
+        const graphTab = document.querySelector(
+          '.stx-content-tabs__tab[aria-controls="tab-graph"]',
+        );
+        if (graphTab) graphTab.click();
+        document.dispatchEvent(
+          new CustomEvent("scholar:build-graph", { detail: { doi: paper.doi } }),
+        );
+      });
+      actions.appendChild(graphBtn);
+    }
+
     // Slice 4b: per-row Details toggle -- hub expands a details panel from
     // each library row (status, stars, tags, notes, save).
     const detailsToggle = document.createElement("button");

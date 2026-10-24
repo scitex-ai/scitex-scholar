@@ -17,9 +17,6 @@ msgstr "SciTeX Scholar"
 msgid "Browse"
 msgstr "閲覧"
 
-msgid "Details"
-msgstr "詳細"
-
 msgid "Search databases"
 msgstr "データベースを検索"
 
@@ -100,6 +97,12 @@ msgstr "選択を保存"
 
 msgid "Save & enrich"
 msgstr "保存して補完"
+
+msgid "Build a citation graph from the selected results"
+msgstr "選択した結果から引用グラフを作成"
+
+msgid "Graph"
+msgstr "グラフ"
 
 msgid "Download open-access PDFs for the selected results"
 msgstr "選択した結果のオープンアクセスPDFをダウンロード"
@@ -185,6 +188,18 @@ msgstr "ライブラリからシードを選択"
 msgid "Loading your library…"
 msgstr "ライブラリを読み込み中…"
 
+msgid "Graph Library"
+msgstr "グラフライブラリ"
+
+msgid "Save current graph"
+msgstr "現在のグラフを保存"
+
+msgid "Name this network…"
+msgstr "このネットワークに名前を付ける…"
+
+msgid "Save graph"
+msgstr "グラフを保存"
+
 msgid "Building citation network... This may take a moment."
 msgstr "引用ネットワークを構築中。少し時間がかかる場合があります。"
 
@@ -211,6 +226,9 @@ msgstr "PNGをダウンロード"
 
 msgid "Related Papers"
 msgstr "関連論文"
+
+msgid "Details"
+msgstr "詳細"
 
 msgid "Collapse status panel"
 msgstr "ステータスパネルを折りたたむ"
@@ -506,6 +524,9 @@ msgstr "保存済み"
 msgid "Save failed"
 msgstr "保存に失敗"
 
+msgid "Select results with a DOI first."
+msgstr "DOI のある結果を先に選択してください。"
+
 msgid "Add to library"
 msgstr "ライブラリに追加"
 
@@ -631,6 +652,15 @@ msgstr "グラフ名を変更しました"
 
 msgid "Rename failed"
 msgstr "名前の変更に失敗しました"
+
+msgid "Build a single-seed graph first."
+msgstr "単一シードのグラフを先に作成してください。"
+
+msgid "Confirm delete?"
+msgstr "削除しますか？"
+
+msgid "%(n)s saved"
+msgstr "%(n)s 件保存済み"
 
 msgid "Download PDF"
 msgstr "PDFをダウンロード"

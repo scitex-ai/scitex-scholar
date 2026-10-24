@@ -34,14 +34,21 @@ class CitationGraphManager {
 
   init() {
     this.bindEvents();
-    // Operator 2026-10-23 (seed-only tab): cross-tab seed requests from
-    // Search results arrive as one-shot scholar:build-graph events and
-    // build directly at the fixed width.
+    // Operator 2026-10-23: cross-tab seed requests from Search results
+    // arrive as one-shot scholar:build-graph events and build directly
+    // at the fixed width. Brief-05: the event also carries { dois: [] }
+    // for multi-seed networks (bulk Graph pill in Search).
     document.addEventListener("scholar:build-graph", (event) => {
+      const dois = event.detail?.dois;
+      if (Array.isArray(dois) && dois.length) {
+        this.buildGraphMulti(dois.filter((d) => d).slice(0, 20));
+        return;
+      }
       const doi = event.detail?.doi;
       if (!doi) return;
       this.buildGraph(doi, CitationGraphManager.DEFAULT_TOP_N);
     });
+    this.bindGraphLibrary();
     // CONFIGURATION ONLY on the initial-load path: no network call, so an
     // unconfigured or unreachable optional backend cannot delay the page or
     // emit a failing same-origin request. The live probe runs when the user
@@ -63,8 +70,9 @@ class CitationGraphManager {
       this.checkServiceHealth(true);
       // Slice 3a (old-direct parity): the library-seed picker loads with
       // the same laziness -- no /api/library request for users who never
-      // open the graph tab.
+      // open the graph tab. The Graph Library list loads alongside it.
       this.loadLibrarySeed();
+      this.loadSavedGraphs();
     });
   }
 
@@ -260,6 +268,257 @@ class CitationGraphManager {
       this.showError(err.message || "An error occurred", true);
     } finally {
       this.showLoading(false);
+    }
+  }
+
+  // Brief-05: multi-seed network from checked Search works
+  // (api/graph/network/multi, at most 20 seeds). Saves capture the
+  // primary seed only -- the save button stays armed for single-seed
+  // builds (see bindGraphLibrary).
+  async buildGraphMulti(dois) {
+    this.lastBuild = { dois: dois.slice(), topN: null };
+    this.showLoading(true);
+    this.hideError();
+
+    try {
+      const url =
+        `${STX_MOUNT}/api/graph/network/multi?dois=` +
+        dois.map(encodeURIComponent).join(",") +
+        "&num_related_per_doi=20";
+      const resp = await fetch(url);
+      if (!resp.ok) {
+        const err = await resp.json();
+        throw new Error(err.error || "Failed to build network");
+      }
+
+      const data = await resp.json();
+      this.currentData = data;
+      this.renderGraph(data);
+      this.renderRelatedFromGraph(CitationGraphManager.DEFAULT_TOP_N);
+    } catch (err) {
+      this.showError(err.message || "An error occurred", true);
+    } finally {
+      this.showLoading(false);
+    }
+  }
+
+  // Brief-05: Graph Library CRUD over the thin api/graphs/* endpoints
+  // (1.24.0). The file stays authoritative server-side; the store is
+  // the derived mirror -- the client only ever sees merged rows.
+  csrfJsonHeaders() {
+    const csrfInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
+    const headers = { "Content-Type": "application/json" };
+    if (csrfInput && csrfInput.value) headers["X-CSRFToken"] = csrfInput.value;
+    return headers;
+  }
+
+  setLibraryStatus(msg, isErr) {
+    const el = document.getElementById("graphLibraryStatus");
+    if (!el) return;
+    el.textContent = msg || "";
+    el.classList.toggle("library-io__status--error", !!isErr);
+  }
+
+  bindGraphLibrary() {
+    const saveBtn = document.getElementById("graphSaveBtn");
+    if (saveBtn) saveBtn.addEventListener("click", () => this.saveCurrentGraph());
+    const nameInput = document.getElementById("graphSaveName");
+    if (nameInput) {
+      nameInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          this.saveCurrentGraph();
+        }
+      });
+    }
+  }
+
+  async loadSavedGraphs() {
+    const list = document.getElementById("graphSavedList");
+    const count = document.getElementById("graphLibraryCount");
+    if (!list) return;
+    try {
+      const resp = await fetch(STX_MOUNT + "/api/graphs/list");
+      if (!resp.ok) throw new Error("Failed");
+      const data = await resp.json();
+      this.renderSavedGraphs(data.graphs || []);
+      if (count) {
+        const n = (data.graphs || []).length;
+        count.textContent = n ? scholarT("%(n)s saved", { n }) : "";
+      }
+    } catch {
+      list.innerHTML =
+        '<p class="empty-message">' +
+        this.esc(scholarT("Service unavailable")) +
+        "</p>";
+    }
+  }
+
+  renderSavedGraphs(graphs) {
+    const list = document.getElementById("graphSavedList");
+    if (!list) return;
+    if (!graphs.length) {
+      list.innerHTML =
+        '<p class="empty-message">' +
+        this.esc(scholarT("No saved graphs yet.")) +
+        "</p>";
+      return;
+    }
+    list.replaceChildren();
+    graphs.forEach((g) => {
+      const item = document.createElement("div");
+      item.className = "library-item";
+
+      const main = document.createElement("div");
+      main.className = "library-item__main";
+      const title = document.createElement("div");
+      title.className = "library-item__title";
+      title.textContent = g.name || scholarT("Untitled");
+      main.appendChild(title);
+      const meta = document.createElement("div");
+      meta.className = "library-item__meta";
+      const seed = document.createElement("span");
+      seed.textContent = g.seed_doi || "";
+      meta.appendChild(seed);
+      if (g.created_at) {
+        const when = document.createElement("span");
+        when.textContent = String(g.created_at).slice(0, 10);
+        meta.appendChild(when);
+      }
+      main.appendChild(meta);
+      item.appendChild(main);
+
+      const actions = document.createElement("div");
+      actions.className = "library-item__actions";
+      const loadBtn = document.createElement("button");
+      loadBtn.type = "button";
+      loadBtn.className = "btn-control-library";
+      loadBtn.textContent = scholarT("Load");
+      loadBtn.addEventListener("click", () => {
+        if (g.seed_doi) this.buildGraph(g.seed_doi, CitationGraphManager.DEFAULT_TOP_N);
+      });
+      actions.appendChild(loadBtn);
+      const renameBtn = document.createElement("button");
+      renameBtn.type = "button";
+      renameBtn.className = "btn-control-library";
+      renameBtn.textContent = scholarT("Rename");
+      renameBtn.addEventListener("click", () => this.startRename(item, g));
+      actions.appendChild(renameBtn);
+      const deleteBtn = document.createElement("button");
+      deleteBtn.type = "button";
+      deleteBtn.className = "btn-control-library";
+      deleteBtn.textContent = scholarT("Delete");
+      deleteBtn.addEventListener("click", () => this.armDelete(deleteBtn, g));
+      actions.appendChild(deleteBtn);
+      item.appendChild(actions);
+
+      list.appendChild(item);
+    });
+  }
+
+  async saveCurrentGraph() {
+    const nameInput = document.getElementById("graphSaveName");
+    const name = (nameInput ? nameInput.value : "").trim();
+    if (!name) {
+      this.setLibraryStatus(scholarT("Name the graph and build it first."), true);
+      return;
+    }
+    const seed = this.lastBuild && this.lastBuild.doi;
+    if (!seed) {
+      this.setLibraryStatus(scholarT("Build a single-seed graph first."), true);
+      return;
+    }
+    try {
+      const resp = await fetch(STX_MOUNT + "/api/graphs/save", {
+        method: "POST",
+        headers: this.csrfJsonHeaders(),
+        body: JSON.stringify({ name, seed_doi: seed }),
+      });
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.error || "Failed");
+      if (nameInput) nameInput.value = "";
+      this.setLibraryStatus(scholarT("Graph saved"), false);
+      await this.loadSavedGraphs();
+    } catch (err) {
+      this.setLibraryStatus(err.message || scholarT("Save failed"), true);
+    }
+  }
+
+  startRename(item, g) {
+    const title = item.querySelector(".library-item__title");
+    if (!title || item.querySelector(".graph-rename-input")) return;
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "form-input graph-rename-input";
+    input.value = g.name || "";
+    input.setAttribute("aria-label", scholarT("Rename"));
+    title.replaceChildren(input);
+    input.focus();
+    input.select();
+    const commit = async (saveIt) => {
+      const next = input.value.trim();
+      title.textContent = saveIt && next ? next : g.name || scholarT("Untitled");
+      if (!saveIt || !next || next === g.name) return;
+      try {
+        const resp = await fetch(STX_MOUNT + "/api/graphs/rename", {
+          method: "POST",
+          headers: this.csrfJsonHeaders(),
+          body: JSON.stringify({ id: g.id, name: next }),
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || "Failed");
+        g.name = next;
+        title.textContent = next;
+        this.setLibraryStatus(scholarT("Graph renamed"), false);
+      } catch (err) {
+        this.setLibraryStatus(err.message || scholarT("Save failed"), true);
+      }
+    };
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        commit(true);
+      } else if (e.key === "Escape") {
+        commit(false);
+      }
+    });
+    input.addEventListener("blur", () => commit(true));
+  }
+
+  armDelete(deleteBtn, g) {
+    if (deleteBtn.dataset.armed === "1") {
+      this.deleteSavedGraph(g, deleteBtn);
+      return;
+    }
+    deleteBtn.dataset.armed = "1";
+    deleteBtn.textContent = scholarT("Confirm delete?");
+    const disarm = () => {
+      deleteBtn.dataset.armed = "";
+      deleteBtn.textContent = scholarT("Delete");
+    };
+    deleteBtn.addEventListener("blur", disarm, { once: true });
+    setTimeout(() => {
+      if (deleteBtn.dataset.armed === "1") disarm();
+    }, 4000);
+  }
+
+  async deleteSavedGraph(g, deleteBtn) {
+    try {
+      const resp = await fetch(STX_MOUNT + "/api/graphs/delete", {
+        method: "POST",
+        headers: this.csrfJsonHeaders(),
+        body: JSON.stringify({ id: g.id }),
+      });
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.error || "Failed");
+      this.setLibraryStatus(scholarT("Graph deleted"), false);
+      await this.loadSavedGraphs();
+    } catch (err) {
+      this.setLibraryStatus(err.message || scholarT("Save failed"), true);
+      if (deleteBtn) {
+        deleteBtn.dataset.armed = "";
+        deleteBtn.textContent = scholarT("Delete");
+      }
     }
   }
 
