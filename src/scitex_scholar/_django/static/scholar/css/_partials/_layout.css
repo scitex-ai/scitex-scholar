@@ -91,7 +91,7 @@
   }
   /*
    * #93: the search input is now larger, so on a 390px viewport the
-   * input + "Search databases" button + results select no longer fit in one
+   * input + "Search" button + results select no longer fit in one
    * row and the button was clipped at the right edge. Stack the form groups
    * vertically and let the flex input shrink below its intrinsic width so the
    * row never overflows horizontally.
@@ -104,7 +104,7 @@
   .input-wrapper {
     width: 100%;
     /*
-     * The input + "Search databases" button share a flex row on desktop.
+     * The input + "Search" button share a flex row on desktop.
      * On a 390px viewport that row leaves the input only ~182px wide with
      * its placeholder visibly truncated. Stack the wrapper vertically so the
      * input gets the full card width and the button sits below it at full

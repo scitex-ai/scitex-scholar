@@ -2245,24 +2245,24 @@ def test_search_placeholder_is_clear_and_example_driven():
     assert has_example and no_generic
 
 
-# --- item 116/115/114: "Search" must say WHERE it searches ------------------
+# --- operator 2026-10-26: tab + button read "Search" ---------------------------
 #
-# Compass 2026-09-10: a bare "Search" label does not tell a researcher whether
-# they are querying the external databases or their own library -- and the
-# library does not exist yet. The tab and the submit button now read
-# "Search databases" and the description names the external databases and
-# contrasts them with the Library tab.
+# Operator feedback batch 2026-10-26 explicitly renames "Search databases" to
+# "Search" (old-direct parity: hub tab short label + submit button both read
+# "Search"). This SUPERSEDES the compass 2026-09-10 item 116/115/114 decision
+# that introduced "Search databases" — the WHERE-clarity now lives in the
+# description paragraph (external databases vs Library), not the labels.
 # ---------------------------------------------------------------------------
 
 
-def test_search_tab_and_button_are_labelled_databases():
+def test_search_tab_and_button_are_labelled_search():
     # Arrange
     body = _compass_index_body()
     # Act
-    tab_label = 'aria-controls="tab-search" tabindex="0">Search databases<' in body
+    tab_label = 'aria-controls="tab-search" tabindex="0">Search<' in body
     # #95: the search submit is the PRIMARY action, so it carries btn-primary
     # (NOT btn-build, which is the secondary Build Graph / per-row class).
-    button_label = 'class="btn-primary btn-primary--query">Search databases<' in body
+    button_label = 'class="btn-primary btn-primary--query">Search<' in body
     # Assert
     assert tab_label and button_label
 
@@ -2285,11 +2285,11 @@ def test_search_primary_distinct_from_build_graph():
     # The Search submit is btn-primary; the Build Graph submit stays btn-build.
     # (Matched by id-then-label, not by the full tag: the button carries an
     # id + disabled attribute for the empty-DOI arming behavior.)
-    search_is_primary = 'class="btn-primary btn-primary--query">Search databases<' in body
+    search_is_primary = 'class="btn-primary btn-primary--query">Search<' in body
     build_graph_stays_secondary = 'id="graphBuildBtn"' not in body
     # Negative control: the search button is NOT also btn-build (that was the
     # pre-fix state — a single shared class with no visual distinction).
-    search_not_btn_build = 'class="btn-build">Search databases<' not in body
+    search_not_btn_build = 'class="btn-build">Search<' not in body
     # Assert
     assert search_is_primary and build_graph_stays_secondary and search_not_btn_build
 
@@ -2537,7 +2537,7 @@ def test_search_form_row_stacks_on_mobile():
 
 def test_search_input_button_stack_vertically_on_mobile():
     # Arrange
-    # The input + "Search databases" button share a flex ROW inside
+    # The input + "Search" button share a flex ROW inside
     # .input-wrapper. On a 390px viewport that row leaves the input only
     # ~182px wide with its placeholder truncated. Below the breakpoint the
     # wrapper must stack vertically (input full-width, button full-width under

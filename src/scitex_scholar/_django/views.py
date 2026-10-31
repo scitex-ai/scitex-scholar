@@ -542,6 +542,11 @@ def _js_i18n_dict() -> dict:
         "%(count)s of %(total)s Papers": _i18n("%(count)s of %(total)s Papers"),
         # Search tab: the empty result state was an English literal in search.js.
         "No papers matched this query.": _i18n("No papers matched this query."),
+        # Operator 2026-10-26: missing-corpus warning (sources_unavailable).
+        # Same catalog rule -- the JS renders it client-side.
+        "%(names)s unavailable on this server — check more sources to widen the search.": _i18n(
+            "%(names)s unavailable on this server — check more sources to widen the search."
+        ),
         # Search tab: which tier answered (local NAS corpora vs online fallback).
         "Local corpus (NAS)": _i18n("Local corpus (NAS)"),
         "Online fallback": _i18n("Online fallback"),
@@ -1175,7 +1180,7 @@ def _strip_markup_from_search_abstracts(result: dict) -> None:
 
 
 @require_GET
-def search(request, _engine=None):
+def search(request, _engine=None, _corpora_available=None):
     """Search academic databases through the package's ScholarSearchEngine.
 
     Thin HTTP adapter: query parsing, engine selection and result
@@ -1184,7 +1189,9 @@ def search(request, _engine=None):
 
     `_engine` is a test-injection seam: the collaborator is a PARAMETER, not a
     monkeypatch (PA-306), exactly as `library_enrich(_pipeline=)` is. Django
-    routes call it with only `request`.
+    routes call it with only `request`. `_corpora_available` is the same seam
+    for the missing-corpus flag: None means this install's real
+    `available_local_corpora()`.
     """
     query = request.GET.get("q", "").strip()
     if not query:
@@ -1214,6 +1221,9 @@ def search(request, _engine=None):
     # keeps the tiered default. The raw string rides the cache key so two
     # different selections never share a cached result set.
     from scitex_scholar.search_engines._source_tiers import normalize_sources
+    from scitex_scholar.search_engines._source_tiers import (
+        unavailable_local_sources,
+    )
 
     sources_raw = (request.GET.get("sources", "") or "").strip()
     if len(sources_raw) > _MAX_SOURCES_CHARS:
@@ -1276,6 +1286,20 @@ def search(request, _engine=None):
         result["metadata"]["engine_events"] = list(engine_events.values())
         if sources:
             result["metadata"]["sources_selected"] = sources
+            # Operator 2026-10-26 ("Search databases is not functioning"):
+            # an explicit local-corpus selection on a host without that
+            # corpus returns 200 + zero results, which the tab renders as
+            # "No papers matched this query." -- indistinguishable from a
+            # genuine empty search. Name the missing corpora so the tab can
+            # say so instead of implying nothing matched.
+            if not result.get("results") and not result.get("metadata", {}).get(
+                "total_results"
+            ):
+                missing = unavailable_local_sources(
+                    sources, available=_corpora_available
+                )
+                if missing:
+                    result["metadata"]["sources_unavailable"] = missing
         _cache_set(cache_key, result)
         return JsonResponse(result)
 

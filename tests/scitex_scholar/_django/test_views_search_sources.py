@@ -7,6 +7,11 @@ hub spellings map to canonical engine names, unknown names degrade to the
 tiered default (never a 400), the selection rides the cache key, and the
 echo lands in response metadata. Engines are injected fakes (PA-306).
 
+Operator 2026-10-26 ("Search databases is not functioning"): an explicit
+local-corpus selection on a host without that corpus returned 200 + zero
+results, rendered as "No papers matched this query." The view now names
+the missing corpora (``sources_unavailable``) and the tab says so.
+
 House rule STX-TQ007: one assertion per pin -- multi-part outcomes ride
 a single tuple comparison.
 """
@@ -176,5 +181,42 @@ def test_sources_grid_offers_pmc_checkbox():
     # selectable in the grid (hub old-direct source now in leaf).
     # Act
     present = 'value="pmc"' in TEMPLATE
+    # Assert
+    assert present
+
+
+def test_search_flags_unavailable_local_sources_on_empty_results():
+    # Arrange -- corpus-absent host: the default explicit selection finds
+    # nothing, so the response must name the missing corpus (operator
+    # 2026-10-26: silent empty rendered as "no match" reads as broken).
+    # The corpus set is a PARAMETER (_corpora_available), not a monkeypatch
+    # (PA-306).
+    request = RequestFactory().get("/api/search?q=hippocampus&sources=crossref_local")
+    # Act
+    resp = views.search(
+        request, _engine=_RecordingEngine(), _corpora_available=set()
+    )
+    # Assert
+    assert json.loads(resp.content)["metadata"]["sources_unavailable"] == [
+        "CrossRefLocal"
+    ]
+
+
+def test_search_omits_flag_when_local_corpus_is_installed():
+    # Arrange -- same explicit selection on a host WITH the corpus: no
+    # missing-corpus flag, even though the fake finds nothing.
+    request = RequestFactory().get("/api/search?q=hippocampus&sources=crossref_local")
+    # Act
+    resp = views.search(
+        request, _engine=_RecordingEngine(), _corpora_available={"crossref"}
+    )
+    # Assert
+    assert "sources_unavailable" not in json.loads(resp.content)["metadata"]
+
+
+def test_search_js_warns_about_unavailable_sources():
+    # Arrange
+    # Act
+    present = "sources_unavailable" in SEARCH_JS
     # Assert
     assert present

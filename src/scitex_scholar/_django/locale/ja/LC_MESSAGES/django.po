@@ -17,9 +17,6 @@ msgstr "SciTeX Scholar"
 msgid "Browse"
 msgstr "閲覧"
 
-msgid "Search databases"
-msgstr "データベースを検索"
-
 msgid "Library"
 msgstr "ライブラリ"
 
@@ -496,6 +493,9 @@ msgstr "%(total)s 件中 %(count)s 件の論文"
 
 msgid "No papers matched this query."
 msgstr "このクエリに一致する論文はありませんでした。"
+
+msgid "%(names)s unavailable on this server — check more sources to widen the search."
+msgstr "%(names)s はこのサーバーで利用できません — ソースを追加して検索を広げてください。"
 
 msgid "Local corpus (NAS)"
 msgstr "ローカルコーパス（NAS）"
