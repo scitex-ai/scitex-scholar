@@ -3690,6 +3690,72 @@ def test_standalone_provider_hides_symlinked_entries(tmp_path):
     assert [project["id"] for project in payload["projects"]] == ["Alpha"]
 
 
+def test_scoped_view_standalone_get_keeps_legacy_keys(tmp_path):
+    # Arrange -- SDK 0.3.16 scoped view on an unscoped local provider must
+    # answer the legacy byte-compatible shape (PR #90 host adoption).
+    (tmp_path / "Alpha").mkdir()
+    request = RequestFactory().get("/api/projects")
+    # Act
+    with _project_root_env(tmp_path), override_settings(SCITEX_PROJECT_PROVIDER=""):
+        payload = json.loads(views.project_scope(request).content)
+    # Assert
+    assert set(payload) == {"projects", "current", "allow_user_scope"}
+
+
+def test_scoped_view_standalone_get_disallows_user_scope(tmp_path):
+    # Arrange -- the standalone local provider offers no tagged scope.
+    (tmp_path / "Alpha").mkdir()
+    request = RequestFactory().get("/api/projects")
+    # Act
+    with _project_root_env(tmp_path), override_settings(SCITEX_PROJECT_PROVIDER=""):
+        payload = json.loads(views.project_scope(request).content)
+    # Assert
+    assert payload["allow_user_scope"] is False
+
+
+def test_scoped_view_legacy_post_id_still_remembers(tmp_path):
+    # Arrange -- legacy POST {id} keeps working under the scoped view.
+    (tmp_path / "Alpha").mkdir()
+    request = RequestFactory().post(
+        "/api/projects", data=json.dumps({"id": "Alpha"}), content_type="application/json"
+    )
+    # Act
+    with _project_root_env(tmp_path), override_settings(SCITEX_PROJECT_PROVIDER=""):
+        response = views.project_scope(request)
+    # Assert
+    assert (response.status_code, json.loads(response.content)) == (
+        200,
+        {"current": "Alpha"},
+    )
+
+
+def test_scoped_view_tagged_user_scope_refused_standalone(tmp_path):
+    # Arrange -- an unscoped provider must refuse the tagged All selection.
+    (tmp_path / "Alpha").mkdir()
+    request = RequestFactory().post(
+        "/api/projects",
+        data=json.dumps({"scope": "user", "id": None}),
+        content_type="application/json",
+    )
+    # Act
+    with _project_root_env(tmp_path), override_settings(SCITEX_PROJECT_PROVIDER=""):
+        response = views.project_scope(request)
+    # Assert
+    assert response.status_code == 403
+
+
+def test_local_provider_keeps_user_scope_available(tmp_path):
+    # Arrange -- Scholar never disables All; the hook stays dormant
+    # standalone and the host provider owns it when mounted.
+    # Act
+    with _project_root_env(tmp_path), override_settings(SCITEX_PROJECT_PROVIDER=""):
+        reason = views.ScholarLocalProjectProvider(tmp_path).user_scope_disabled_reason(
+            RequestFactory().get("/api/projects")
+        )
+    # Assert
+    assert reason is None
+
+
 @contextlib.contextmanager
 def _scitex_dir_env(root: Path):
     """Point SCITEX_DIR at a temp root and clear the Scholar overrides.

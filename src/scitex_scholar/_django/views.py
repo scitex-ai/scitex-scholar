@@ -72,8 +72,8 @@ try:
     from scitex_sdk.ui.project_scope import (
         LocalProjectProvider,
         host_project_provider,
-        project_listing_view,
         resolve_project,
+        scoped_project_listing_view,
     )
 except ImportError as exc:  # scitex-sdk absent -- the [all]-gated GUI capability only
     raise ImportError(
@@ -387,6 +387,20 @@ class ScholarLocalProjectProvider(LocalProjectProvider):
         ]
 
 
+    def user_scope_disabled_reason(self, request=None):
+        """All stays available in Scholar: no reason to disable user scope.
+
+        The SDK's scoped listing view (0.3.16, PR #90) consults this
+        optional hook only on a scoped provider. This hook is dormant
+        standalone -- the local provider is unscoped, so the view answers
+        the legacy shape (``allow_user_scope: false``, no tagged scope)
+        and never calls it. It becomes live when mounted, because
+        ``_project_provider`` delegates to the host provider there and the
+        view consults the HOST provider's hook, not this one.
+        """
+        return None
+
+
 def _project_provider(request):
     """Use the mounted host provider, or scitex-sdk's local provider standalone."""
     return host_project_provider() or ScholarLocalProjectProvider(
@@ -394,10 +408,14 @@ def _project_provider(request):
     )
 
 
-# Shared scitex-sdk GET-list / POST-remember endpoint. The provider factory is
-# request-time so mounted hosts remain authoritative for permissions and
-# project identity; Scholar contains no Hub model or authorization logic.
-project_scope = project_listing_view(_project_provider)
+# Shared scitex-sdk GET-list / POST-remember endpoint (SDK 0.3.16 scoped view,
+# PR #90). The provider factory is request-time so mounted hosts remain
+# authoritative for permissions and project identity; Scholar contains no Hub
+# model or authorization logic. The scoped view guarantees the legacy
+# byte-compatible shape when the resolved provider is unscoped (standalone
+# local provider: no current_scope, legacy POST {id} only), and adds the
+# tagged {scope, id} contract when mounted behind a scoped host provider.
+project_scope = scoped_project_listing_view(_project_provider)
 
 
 def _leaf_identity() -> dict:
