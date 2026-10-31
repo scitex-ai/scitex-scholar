@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CLI Reference &mdash; SciTeX Scholar v1.19.0</title>
+  <title>CLI Reference &mdash; SciTeX Scholar v1.28.0</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=54b9a5ca"></script>
+      <script src="_static/documentation_options.js?v=1226abbd"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -66,6 +66,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">CLI Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#top-level-groups">Top-level groups</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#paper">paper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#search">search</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#bibtex">bibtex</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#mcp">mcp</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pdf">pdf</a></li>
@@ -555,6 +556,18 @@ immutable canonical record). Supplementary files land as
 <code class="docutils literal notranslate"><span class="pre">additional-&lt;original_name&gt;</span></code>. Each file is recorded with role + SHA-256
 in <code class="docutils literal notranslate"><span class="pre">metadata.path.files</span></code> so <code class="docutils literal notranslate"><span class="pre">library</span> <span class="pre">audit-files</span></code> can verify integrity.</p>
 <p>Mutating verbs accept <code class="docutils literal notranslate"><span class="pre">--dry-run</span></code> and <code class="docutils literal notranslate"><span class="pre">-y/--yes</span></code>.</p>
+</section>
+<section id="search">
+<h3>search<a class="headerlink" href="#search" title="Link to this heading"></a></h3>
+<p>Search academic databases for papers (thin adapter over
+<code class="docutils literal notranslate"><span class="pre">ScholarSearchEngine.search</span></code>, the same CUI <code class="docutils literal notranslate"><span class="pre">api/search</span></code> forwards to).</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Keyword search, one line per paper</span>
+scitex-scholar<span class="w"> </span>search<span class="w"> </span><span class="s2">"hippocampus -a Smith"</span>
+
+<span class="c1"># Fewer rows, machine-readable</span>
+scitex-scholar<span class="w"> </span>search<span class="w"> </span><span class="s2">"graph neural networks"</span><span class="w"> </span>--max-results<span class="w"> </span><span class="m">20</span><span class="w"> </span>--json
+</pre></div>
+</div>
 </section>
 <section id="bibtex">
 <h3>bibtex<a class="headerlink" href="#bibtex" title="Link to this heading"></a></h3>
