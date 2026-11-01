@@ -653,6 +653,8 @@ def _js_i18n_dict() -> dict:
         # Brief-05: Graph Library multi-seed builds, two-click delete,
         # save-count -- same rule.
         "Build a single-seed graph first.": _i18n("Build a single-seed graph first."),
+        "Build a graph first.": _i18n("Build a graph first."),
+        "Select between 1 and 20 works with DOIs.": _i18n("Select between 1 and 20 works with DOIs."),
         "Confirm delete?": _i18n("Confirm delete?"),
         "%(n)s saved": _i18n("%(n)s saved"),
         # Search tab slice 11 (old-direct unification): the PDFs bulk

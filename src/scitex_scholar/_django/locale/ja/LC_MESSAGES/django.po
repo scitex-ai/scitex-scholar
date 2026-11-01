@@ -760,3 +760,9 @@ msgstr "citation-data エンドポイントは設定されていますが、現�
 
 msgid "The citation service may be temporarily down — wait a moment and retry by opening the Citation Graph tab."
 msgstr "引用サービスが一時的に停止している可能性があります — しばらく待ってから引用グラフタブを開いて再試行してください。"
+
+msgid "Build a graph first."
+msgstr "先にグラフを作成してください。"
+
+msgid "Select between 1 and 20 works with DOIs."
+msgstr "DOI を持つ文献を 1 ～ 20 件選択してください。"
