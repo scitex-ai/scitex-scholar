@@ -36,10 +36,11 @@ import scitex_logging as slogging
 try:
     from django.apps import apps as _django_apps
     from django.conf import settings as django_settings
-    from django.core.exceptions import ImproperlyConfigured
+    from django.core.exceptions import ImproperlyConfigured, PermissionDenied
     from django.http import HttpResponse, JsonResponse
     from django.template.loader import render_to_string
     from django.templatetags.static import static as _static_url
+    from django.utils.module_loading import import_string
     from django.utils.translation import gettext as _i18n  # noqa: N816  (JS string dict)
     from django.views.decorators.http import (
         require_GET,
@@ -652,6 +653,8 @@ def _js_i18n_dict() -> dict:
         # Brief-05: Graph Library multi-seed builds, two-click delete,
         # save-count -- same rule.
         "Build a single-seed graph first.": _i18n("Build a single-seed graph first."),
+        "Build a graph first.": _i18n("Build a graph first."),
+        "Select between 1 and 20 works with DOIs.": _i18n("Select between 1 and 20 works with DOIs."),
         "Confirm delete?": _i18n("Confirm delete?"),
         "%(n)s saved": _i18n("%(n)s saved"),
         # Search tab slice 11 (old-direct unification): the PDFs bulk
@@ -1619,19 +1622,30 @@ def _safe_username(user) -> str:
     return name or "user"
 
 
-def _mounted_user_root(user) -> Path:
+def _mounted_user_root(user, request=None) -> Path:
     """Per-request-user library root for a MOUNTED (hub) deployment.
 
     The hub runs one server process (a service account), so the process-global
     home library must NOT be shared across authenticated users. Scope each user
-    to their own directory. The base is set by the host via
-    SCITEX_SCHOLAR_MOUNTED_LIBRARY_BASE (the explicit integration seam the hub
-    configures); a safe default keeps it contained if unset.
+    to their own directory. An explicit mounted-base administrator override
+    wins; otherwise the host user-home capability supplies the durable user
+    home. The older service-home layout remains a compatibility fallback.
     """
     base = os.environ.get("SCITEX_SCHOLAR_MOUNTED_LIBRARY_BASE")
-    if not base:
-        base = str(Path.home() / ".scitex" / "scholar" / "mounted")
-    return Path(base) / _safe_username(user)
+    if base:
+        return Path(base) / _safe_username(user)
+    provider = getattr(django_settings, "SCITEX_USER_HOME_PROVIDER", None)
+    if provider:
+        provider = import_string(provider) if isinstance(provider, str) else provider
+        home = provider(request)
+        if home is None or not Path(home).is_absolute():
+            raise PermissionDenied("User storage is unavailable")
+        home = Path(home).resolve()
+        library = (home / ".scitex" / "scholar" / "library").resolve()
+        if not library.is_relative_to(home):
+            raise PermissionDenied("User storage is unavailable")
+        return library
+    return Path.home() / ".scitex" / "scholar" / "mounted" / _safe_username(user)
 
 
 def _library_root_for(request) -> Path:
@@ -1659,7 +1673,7 @@ def _library_root_for(request) -> Path:
     if callable(is_anon):
         is_anon = is_anon()
     if user is not None and getattr(user, "is_authenticated", False) and not is_anon:
-        return _mounted_user_root(user)
+        return _mounted_user_root(user, request=request)
     return _library_root()
 
 
@@ -3335,7 +3349,8 @@ def _load_saved_graphs(root: Path, _opener=None) -> list:
 def graphs_save(request, _opener=None):
     """Save a named graph rebuild recipe for this user (explicit action).
 
-    Body: {"name": ..., "seed_doi": ...}. Graphs are package data: the CUI
+    Body: {"name": ..., "seed_dois": [...], "top_n": 20}; legacy seed_doi is accepted.
+    Graphs are package data: the CUI
     keeps the per-user file authoritative and mirrors best-effort into the
     shared store. Bodies over 256k are refused with 413 before parsing. At
     most 500 rows per user. Names cap at 200 (hub SavedGraph.name); seed
@@ -3350,38 +3365,40 @@ def graphs_save(request, _opener=None):
         return JsonResponse({"error": "Invalid JSON body"}, status=400)
     except TypeError:
         return JsonResponse({"error": "Invalid JSON body"}, status=400)
-    name = (payload.get("name") or "").strip()
-    seed_doi = (payload.get("seed_doi") or "").strip()
-    if not name or not seed_doi:
-        return JsonResponse({"error": "name and seed_doi are required"}, status=400)
+    if not isinstance(payload, dict):
+        return JsonResponse({"error": "Body must be an object"}, status=400)
+    name = payload.get("name")
+    seeds = payload.get("seed_dois")
+    if seeds is None:
+        seeds = [payload.get("seed_doi")]
+    if not isinstance(name, str) or not name.strip():
+        return JsonResponse({"error": "name is required"}, status=400)
+    name = name.strip()
     if len(name) > _MAX_GRAPH_NAME_CHARS:
-        return JsonResponse(
-            {"error": f"name must be at most {_MAX_GRAPH_NAME_CHARS} characters"},
-            status=400,
-        )
-    if len(seed_doi) > _MAX_DOI_CHARS:
-        return JsonResponse(
-            {"error": f"seed_doi must be at most {_MAX_DOI_CHARS} characters"},
-            status=400,
-        )
+        return JsonResponse({"error": "name is too long"}, status=400)
+    if not isinstance(seeds, list) or not 1 <= len(seeds) <= _MAX_GRAPH_SEEDS:
+        return JsonResponse({"error": "seed_dois must contain 1 to 20 DOIs"}, status=400)
+    if any(not isinstance(seed, str) or not seed.strip() or len(seed) > _MAX_DOI_CHARS for seed in seeds):
+        return JsonResponse({"error": "Each seed DOI must contain 1 to 500 characters"}, status=400)
+    seeds = list(dict.fromkeys(seed.strip() for seed in seeds))
+    top_n = payload.get("top_n", 20)
+    if type(top_n) is not int or not 1 <= top_n <= 50:
+        return JsonResponse({"error": "top_n must be an integer from 1 to 50"}, status=400)
     user = getattr(request, "user", None)
     root = _library_root_for(request)
-    rows = _load_saved_graphs(root)
-    if len(rows) >= _MAX_SAVED_GRAPHS:
-        return JsonResponse(
-            {"error": f"at most {_MAX_SAVED_GRAPHS} saved graphs per user"},
-            status=400,
-        )
     from scitex_scholar.citation_graph._saved_graph_store import save_graph
 
     try:
         row = save_graph(
             root,
             name,
-            seed_doi,
+            seeds[0],
             _safe_username(user) if user is not None else "user",
             _opener=_opener,
+            seed_dois=seeds, top_n=top_n, max_graphs=_MAX_SAVED_GRAPHS,
         )
+    except ValueError:
+        return JsonResponse({"error": "Saved graph library limit reached"}, status=400)
     except OSError as e:
         logger.error(f"graphs save failed: {e}", exc_info=True)
         return JsonResponse({"error": "Save failed. Try again later."}, status=500)
@@ -3409,8 +3426,10 @@ def graphs_delete(request, _opener=None):
         return JsonResponse({"error": "Invalid JSON body"}, status=400)
     except TypeError:
         return JsonResponse({"error": "Invalid JSON body"}, status=400)
+    if not isinstance(payload, dict):
+        return JsonResponse({"error": "Body must be an object"}, status=400)
     graph_id = payload.get("id")
-    if not graph_id:
+    if not isinstance(graph_id, str) or not graph_id:
         return JsonResponse({"error": "id is required"}, status=400)
     root = _library_root_for(request)
     from scitex_scholar.citation_graph._saved_graph_store import delete_graph
@@ -3448,9 +3467,10 @@ def graphs_rename(request, _opener=None):
     if not isinstance(payload, dict):
         return JsonResponse({"error": "Body must be an object"}, status=400)
     graph_id = payload.get("id")
-    if not graph_id:
+    if not isinstance(graph_id, str) or not graph_id:
         return JsonResponse({"error": "id is required"}, status=400)
-    name = (payload.get("name") or "").strip()
+    raw_name = payload.get("name")
+    name = raw_name.strip() if isinstance(raw_name, str) else ""
     if not name:
         return JsonResponse({"error": "name is required"}, status=400)
     if len(name) > _MAX_GRAPH_NAME_CHARS:

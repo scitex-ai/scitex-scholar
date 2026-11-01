@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "scitex-scholar"
-version = "1.29.0"
+version = "1.29.1"
 description = "Scientific paper search, enrichment, download, and management for the SciTeX ecosystem"
 readme = "README.md"
 license = "AGPL-3.0-only"
@@ -76,7 +76,7 @@ dependencies = [
     # `impact_factor/jcr/*` import it on the path a plain `pip install
     # scitex-scholar` exercises. `sql-manager` + `sqlalchemy` were the
     # previous JCR backend and are gone with it.
-    "scitex-dev>=0.30.0",
+    "scitex-dev>=0.62.6",
     "tenacity>=8.0.0",
     "tqdm>=4.64.0",
     # ------------------------------------------------------------------
@@ -117,7 +117,7 @@ dependencies = [
 # (playwright is a core dep); `[server]`'s aiohttp/scitex-dev lines were
 # core-redundant. Surviving feature pins live FLAT in `[all]` below.
 dev = [
-    "scitex-dev>=0.30.0",
+    "scitex-dev>=0.62.6",
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
     "numpy>=1.21.0",
