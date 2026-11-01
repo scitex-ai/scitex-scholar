@@ -24,7 +24,7 @@ _SCRIPT_NAMES = (
 )
 # Operator 2026-10-23 (seed-only Graph tab): the typed-DOI form is
 # deleted, so graphForm is no longer a native-rendered id. The seed list
-# (graphLibrarySeed) + canvas + saved-entity CRUD live in the Graph JS.
+# is now in Search/Library; canvas + saved-entity CRUD live in Graph JS.
 _CONTENT_IDS = {
     "searchForm", "tab-search", "tab-library", "libraryImportFile",
     "libraryImportBtn", "libraryExportBtn", "tab-graph",
@@ -248,6 +248,18 @@ def test_toolbar_row_and_stepper_live_above_the_results(_private_context):
     assert (
         order[0] < order[1] < order[2] < order[3] < order[4]
     ) == True
+
+
+def test_library_offers_explicit_graph_selection_and_graph_has_no_duplicate_list(_private_context):
+    dom = BeautifulSoup(views.index(RequestFactory().get("/")).content.decode(), "html.parser")
+    library = dom.select_one("#tab-library")
+    assert library.select_one("#librarySelectAll").has_attr("disabled")
+    assert library.select_one("#libraryGraphSelected").has_attr("disabled")
+    graph = dom.select_one("#tab-graph")
+    assert graph.select_one("#graphLibrarySeed") is None
+    assert {node["data-scholar-seed-tab"] for node in graph.select("#graphSeedGuidance button")} == {"search", "library"}
+    descendants = list(graph.descendants)
+    assert descendants.index(graph.select_one("#graphCanvas")) < descendants.index(graph.select_one("#graphSavedList"))
 
 
 def test_source_defaults_match_old_direct(_private_context):

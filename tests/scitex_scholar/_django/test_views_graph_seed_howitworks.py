@@ -1,19 +1,8 @@
-"""Slice 3a (CCT4130 slice-3 graph reflection): library seed.
+"""Graph seeds come from Search/Library selection, without a duplicate list.
 
-Old-direct parity gap, measured 2026-10-17: the leaf Citation Graph tab
-takes a typed DOI only, while old-direct pairs the seed form with a
-seed-from-library picker that lists library papers carrying a DOI and
-builds the graph on click (hub _GraphInputHandler: "Build graph
-directly from library-selected DOI"). Backend-availability surfacing is
-already present (status strip LEDs + /api/graph/health probe in
-citation-graph.js), so this slice is pure reflection over the EXISTING
-backend: no new endpoints.
-
-NOTE (operator 2026-10-22, screenshot loop): the How-It-Works explainer
-that rode along with this slice is REMOVED -- static explainer copy the
-operator judged clutter. Its pin
-(test_graph_tab_carries_how_it_works) is deleted, not skipped; the
-seed picker below is this file's surviving contract.
+The old optional graphLibrarySeed helper remains guarded for embedders that
+still mount it; its source checks below do not claim the canonical template
+renders that list. The native DOM contract now checks compact tab guidance.
 """
 
 from pathlib import Path
@@ -33,16 +22,17 @@ GRAPH_JS = (
 ).read_text()
 
 
-def test_graph_tab_carries_library_seed_picker():
-    """The seed form offers library papers with a DOI, not typing only."""
+def test_graph_tab_guides_selection_in_search_and_library_without_repeating_list():
+    """Selected works come from their own tabs; Graph owns visualization."""
     # Arrange
     # Act
     picker = (
-        'id="graphLibrarySeed"' in TEMPLATE,
-        '{% trans "Seed from your Library" %}' in TEMPLATE,
+        'id="graphLibrarySeed"' not in TEMPLATE,
+        'data-scholar-seed-tab="search"' in TEMPLATE,
+        'data-scholar-seed-tab="library"' in TEMPLATE,
     )
     # Assert
-    assert picker == (True, True)
+    assert picker == (True, True, True)
 
 
 def test_graph_js_loads_seed_from_existing_library_endpoint():
