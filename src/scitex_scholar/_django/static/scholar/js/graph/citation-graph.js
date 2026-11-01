@@ -18,6 +18,7 @@ class CitationGraphManager {
     this.selectedNode = null;
     // Error fallback (UX standard): the build the error box retries.
     this.lastBuild = null;
+    this.lastSuccessfulBuild = null;
     // Set once the Citation Graph tab has asked the backend (see
     // bindLazyHealthProbe) so the live probe runs at most once per page.
     this.probed = false;
@@ -41,7 +42,7 @@ class CitationGraphManager {
     document.addEventListener("scholar:build-graph", (event) => {
       const dois = event.detail?.dois;
       if (Array.isArray(dois) && dois.length) {
-        this.buildGraphMulti(dois.filter((d) => d).slice(0, 20));
+        this.buildGraphMulti(dois);
         return;
       }
       const doi = event.detail?.doi;
@@ -111,7 +112,7 @@ class CitationGraphManager {
     const retryBtn = document.getElementById("graphRetryBtn");
     if (retryBtn) {
       retryBtn.addEventListener("click", () => {
-        if (this.lastBuild) this.buildGraph(this.lastBuild.doi, this.lastBuild.topN);
+        if (this.lastBuild) this.loadGraphRecipe(this.lastBuild);
       });
     }
   }
@@ -248,7 +249,8 @@ class CitationGraphManager {
   }
 
   async buildGraph(doi, topN) {
-    this.lastBuild = { doi, topN };
+    const recipe = { doi, topN };
+    this.lastBuild = recipe;
     this.showLoading(true);
     this.hideError();
 
@@ -261,6 +263,7 @@ class CitationGraphManager {
       }
 
       const data = await resp.json();
+      this.lastSuccessfulBuild = recipe;
       this.currentData = data;
       this.renderGraph(data);
       this.renderRelatedFromGraph(topN);
@@ -273,10 +276,15 @@ class CitationGraphManager {
 
   // Brief-05: multi-seed network from checked Search works
   // (api/graph/network/multi, at most 20 seeds). Saves capture the
-  // primary seed only -- the save button stays armed for single-seed
-  // builds (see bindGraphLibrary).
-  async buildGraphMulti(dois) {
-    this.lastBuild = { dois: dois.slice(), topN: null };
+  // complete seed set and graph width are retained for saving/reloading.
+  async buildGraphMulti(dois, topN = 20) {
+    dois = [...new Set(dois.filter((doi) => typeof doi === "string").map((doi) => doi.trim()).filter(Boolean))];
+    if (!dois.length || dois.length > 20) {
+      this.showError(scholarT("Select between 1 and 20 works with DOIs."), false);
+      return;
+    }
+    const recipe = { dois: dois.slice(), topN };
+    this.lastBuild = recipe;
     this.showLoading(true);
     this.hideError();
 
@@ -284,7 +292,7 @@ class CitationGraphManager {
       const url =
         `${STX_MOUNT}/api/graph/network/multi?dois=` +
         dois.map(encodeURIComponent).join(",") +
-        "&num_related_per_doi=20";
+        `&num_related_per_doi=${topN}`;
       const resp = await fetch(url);
       if (!resp.ok) {
         const err = await resp.json();
@@ -292,6 +300,7 @@ class CitationGraphManager {
       }
 
       const data = await resp.json();
+      this.lastSuccessfulBuild = recipe;
       this.currentData = data;
       this.renderGraph(data);
       this.renderRelatedFromGraph(CitationGraphManager.DEFAULT_TOP_N);
@@ -378,7 +387,7 @@ class CitationGraphManager {
       const meta = document.createElement("div");
       meta.className = "library-item__meta";
       const seed = document.createElement("span");
-      seed.textContent = g.seed_doi || "";
+      seed.textContent = (g.seed_dois || [g.seed_doi]).filter(Boolean).join(" · ");
       meta.appendChild(seed);
       if (g.created_at) {
         const when = document.createElement("span");
@@ -395,7 +404,10 @@ class CitationGraphManager {
       loadBtn.className = "btn-control-library";
       loadBtn.textContent = scholarT("Load");
       loadBtn.addEventListener("click", () => {
-        if (g.seed_doi) this.buildGraph(g.seed_doi, CitationGraphManager.DEFAULT_TOP_N);
+        this.loadGraphRecipe({
+          dois: g.seed_dois || [g.seed_doi],
+          topN: g.top_n || CitationGraphManager.DEFAULT_TOP_N,
+        });
       });
       actions.appendChild(loadBtn);
       const renameBtn = document.createElement("button");
@@ -416,6 +428,12 @@ class CitationGraphManager {
     });
   }
 
+  loadGraphRecipe(recipe) {
+    const seeds = recipe.dois || [recipe.doi];
+    if (seeds.length > 1) return this.buildGraphMulti(seeds, recipe.topN);
+    return this.buildGraph(seeds[0], recipe.topN);
+  }
+
   async saveCurrentGraph() {
     const nameInput = document.getElementById("graphSaveName");
     const name = (nameInput ? nameInput.value : "").trim();
@@ -423,16 +441,19 @@ class CitationGraphManager {
       this.setLibraryStatus(scholarT("Name the graph and build it first."), true);
       return;
     }
-    const seed = this.lastBuild && this.lastBuild.doi;
-    if (!seed) {
-      this.setLibraryStatus(scholarT("Build a single-seed graph first."), true);
+    const recipe = this.lastSuccessfulBuild;
+    if (!recipe) {
+      this.setLibraryStatus(scholarT("Build a graph first."), true);
       return;
     }
     try {
       const resp = await fetch(STX_MOUNT + "/api/graphs/save", {
         method: "POST",
         headers: this.csrfJsonHeaders(),
-        body: JSON.stringify({ name, seed_doi: seed }),
+        body: JSON.stringify({
+          name, seed_dois: recipe.dois || [recipe.doi],
+          top_n: recipe.topN || CitationGraphManager.DEFAULT_TOP_N,
+        }),
       });
       const data = await resp.json();
       if (!resp.ok) throw new Error(data.error || "Failed");

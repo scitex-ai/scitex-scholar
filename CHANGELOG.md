@@ -7,6 +7,8 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.29.1] - 2026-11-01
+
 - Add explicit local Crossref search pages with provider totals, continuation
   offsets, and Load more. Page requests remain bounded while total access is
   no longer capped at 1000. Counts identify source matches before filters and
@@ -19,6 +21,13 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   are disabled until applicable works are selected.
 - Label the current result request size honestly and version updated search
   assets for ordinary reloads.
+
+Graph Library keeps its per-user JSON file authoritative even when the optional
+shared mirror is stale or read-only. Lock and atomically replace graph recipes,
+retain legacy database-only recipes, and use the actual shared-store read API.
+Save/load all DOI seeds and graph width for multi-paper networks. Mounted hosts
+can provide an authorized user-home capability for durable `.scitex/scholar/library`
+persistence; existing explicit root/base overrides remain supported.
 
 ## [1.29.0] - 2026-11-01
 

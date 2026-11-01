@@ -1,23 +1,28 @@
-"""Saved-graph store CUI: schema declares, file stays authoritative.
+"""Graph persistence against real files and a private PostgreSQL cluster."""
 
-One assertion per test (STX-TQ007): tuple compares.
-"""
+from __future__ import annotations
 
-from scitex_scholar.citation_graph import _saved_graph_store as m
+import json
+from concurrent.futures import ProcessPoolExecutor
+
+import pytest
+
+from scitex_scholar.citation_graph import _saved_graph_store as graphs
 
 
 def test_store_declares_schema_with_user_root_and_graph_id_identity():
     # Arrange
-    schema = m.schema()
+    schema = graphs.schema()
     # Act
     identity = sorted(schema.identity_fields)
     # Assert
-    assert (schema.name, identity) == (m.TABLE, ["graph_id", "user_root"])
+    assert (schema.name, identity) == (graphs.TABLE, ["graph_id", "user_root"])
 
 
 def test_hook_rules_declare_five_scholar_scope_rules():
     # Arrange
     from scitex_scholar._hook_rules import provide
+
     # Act
     ids = sorted(r.id for r in provide())
     # Assert
@@ -33,6 +38,7 @@ def test_hook_rules_declare_five_scholar_scope_rules():
 def test_hooks_entry_point_registered_in_pyproject():
     # Arrange
     from pathlib import Path
+
     # Act
     pyproject = (Path(__file__).parents[3] / "pyproject.toml").read_text()
     # Assert
@@ -42,141 +48,281 @@ def test_hooks_entry_point_registered_in_pyproject():
     ) == (True, True)
 
 
-class _FakeRead:
-    """In-memory stand-in for the scitex_dev.store read handle."""
+@pytest.fixture(scope="module")
+def graph_cluster():
+    """Own a throwaway server; never use the fleet's production/shared store."""
+    from scitex_dev.store.testing import ephemeral_cluster_dsn
 
-    def __init__(self, store):
-        self._store = store
-
-    def rows(self, include_hidden=False):
-        del include_hidden  # the real door filters server-side; list filters
-        from types import SimpleNamespace
-
-        return [
-            SimpleNamespace(values=dict(entry["data"]))
-            for entry in self._store._rows.values()
-            if not entry["hidden"]
-        ]
-
-    def revision(self, key):
-        entry = self._store._rows.get((key["user_root"], key["graph_id"]))
-        return None if entry is None else entry["rev"]
-
-    def is_hidden(self, key):
-        entry = self._store._rows.get((key["user_root"], key["graph_id"]))
-        return False if entry is None else entry["hidden"]
+    with ephemeral_cluster_dsn() as dsn:
+        yield dsn
 
 
-class _FakeStore:
-    """In-memory stand-in for the provisioned saved-graphs store."""
+@pytest.fixture
+def graph_store(graph_cluster):
+    from scitex_dev.store import Store, StoreTarget, WriterPolicy
+    from scitex_dev.store.testing import ephemeral_schema
 
-    def __init__(self):
-        self._rows = {}
-        self.puts = []
-        self.hides = []
-
-    def put(self, data, expected_revision=None):
-        del expected_revision  # revision protocol is the real store's concern
-        self.puts.append(dict(data))
-        key = (data["user_root"], data["graph_id"])
-        if key in self._rows:
-            self._rows[key]["data"].update(data)
-            self._rows[key]["rev"] += 1
-        else:
-            self._rows[key] = {"data": dict(data), "rev": 1, "hidden": False}
-
-    def hide(self, key, expected_revision=None):
-        del expected_revision
-        self.hides.append(dict(key))
-        entry = self._rows.get((key["user_root"], key["graph_id"]))
-        if entry is not None:
-            entry["hidden"] = True
-
-    def read(self):
-        return _FakeRead(self)
+    with ephemeral_schema(graph_cluster, prefix="scholar_graph") as dsn:
+        store = Store(
+            StoreTarget.postgres(dsn, pkg="scholar", name=graphs.STORE_NAME),
+            graphs.schema(),
+            node="test",
+            writer_policy=WriterPolicy.MULTI_WRITER,
+        )
+        try:
+            yield store, dsn
+        finally:
+            store.close()
 
 
-def _provisioned():
-    """Offline store double (PA-306: passed as a parameter, never patched)."""
-    fake = _FakeStore()
-    return fake, lambda: fake
-
-
-def test_save_graph_writes_file_and_mirrors_store(tmp_path):
-    # Arrange
-    fake, opener = _provisioned()
-    # Act
-    row = m.save_graph(tmp_path, "Graph", "10.1/x", "alice", _opener=opener)
+def test_file_authority_survives_a_stale_readable_readonly_mirror(
+    tmp_path, graph_store
+):
+    # Arrange -- import a genuine legacy DB-only graph, then make that mirror read-only.
+    store, _ = graph_store
+    opener = lambda: store
+    graphs.save(tmp_path, "legacy", "Old", "10.1/old", "owner", "now", _opener=opener)
+    imported = graphs.list_graphs(tmp_path, _opener=opener)
+    store._connection.execute("SET default_transaction_read_only=on")
+    # Act -- all lifecycle changes must remain visible despite rejected mirror writes.
+    graphs.rename_graph(tmp_path, "legacy", "Renamed", _opener=opener)
+    renamed = graphs.list_graphs(tmp_path, _opener=opener)
+    added = graphs.save_graph(tmp_path, "New", "10.1/new", _opener=opener)
+    graphs.delete_graph(tmp_path, "legacy", _opener=opener)
+    visible = graphs.list_graphs(tmp_path, _opener=opener)
+    mirror = graphs.list_for(tmp_path, _opener=opener)
     # Assert
-    assert (
-        m._read_file_rows(tmp_path),
-        [put["graph_id"] for put in fake.puts],
-        (row["name"], row["seed_doi"], row["created_by"], bool(row["id"])),
-    ) == ([row], [row["id"]], ("Graph", "10.1/x", "alice", True))
-
-
-def test_delete_graph_removes_file_row_and_hides_store_row(tmp_path):
-    # Arrange
-    fake, opener = _provisioned()
-    row = m.save_graph(tmp_path, "Graph", "10.1/x", _opener=opener)
-    # Act
-    known = m.delete_graph(tmp_path, row["id"], _opener=opener)
-    # Assert
-    assert (
-        known,
-        m._read_file_rows(tmp_path),
-        fake.hides,
-        m.list_graphs(tmp_path, _opener=opener),
-    ) == (
-        True,
-        [],
-        [{"user_root": m._root_key(tmp_path), "graph_id": row["id"]}],
-        [],
+    assert (imported[0]["id"], renamed[0]["name"], visible, mirror[0]["name"]) == (
+        "legacy",
+        "Renamed",
+        [added],
+        "Old",
     )
 
 
-def test_delete_graph_unknown_id_changes_nothing(tmp_path):
+def test_an_existing_empty_file_never_resurrects_legacy_mirror_rows(
+    tmp_path, graph_store
+):
     # Arrange
-    fake, opener = _provisioned()
-    row = m.save_graph(tmp_path, "Graph", "10.1/x", _opener=opener)
-    # Act
-    known = m.delete_graph(tmp_path, "nope", _opener=opener)
-    # Assert
-    assert (known, m._read_file_rows(tmp_path), fake.hides) == (
-        False,
-        [row],
-        [],
+    store, _ = graph_store
+    graphs.save(
+        tmp_path, "old", "Old", "10.1/old", "owner", "now", _opener=lambda: store
     )
-
-
-def test_rename_graph_updates_file_and_store(tmp_path):
-    # Arrange
-    _, opener = _provisioned()
-    row = m.save_graph(tmp_path, "Old", "10.1/x", _opener=opener)
+    graphs._write_file_rows(tmp_path, [])
     # Act
-    known = m.rename_graph(tmp_path, row["id"], "New", _opener=opener)
+    result = graphs.list_graphs(tmp_path, _opener=lambda: store)
+    # Assert
+    assert result == []
+
+
+def test_multi_seed_recipe_and_user_isolation_roundtrip(tmp_path, graph_store):
+    # Arrange
+    store, _ = graph_store
+    owner = tmp_path / "owner"
+    other = tmp_path / "other"
+    # Act
+    row = graphs.save_graph(
+        owner,
+        "Pair",
+        "10.1/a",
+        seed_dois=["10.1/a", "10.1/b"],
+        top_n=7,
+        _opener=lambda: store,
+    )
+    result = graphs.list_graphs(owner, _opener=lambda: store)
+    # Assert
+    assert (result, graphs.list_graphs(other, _opener=lambda: store)) == ([row], [])
+
+
+def test_failed_atomic_serialization_preserves_previous_library(tmp_path):
+    # Arrange
+    rows = [{"id": "original", "name": "Keep"}]
+    graphs._write_file_rows(tmp_path, rows)
+    # Act
+    failed = False
+    try:
+        graphs._write_file_rows(tmp_path, [{"bad": {object()}}])
+    except TypeError:
+        failed = True
     # Assert
     assert (
-        known,
-        m._read_file_rows(tmp_path)[0]["name"],
-        m.list_graphs(tmp_path, _opener=opener)[0]["name"],
-    ) == (True, "New", "New")
+        failed,
+        graphs._read_file_rows(tmp_path),
+        list(graphs._file_path(tmp_path).parent.glob(".saved-graphs-*")),
+    ) == (True, rows, [])
 
 
-def test_rename_graph_unknown_id_returns_false(tmp_path):
+def test_corrupt_library_is_never_silently_replaced(tmp_path):
     # Arrange
-    fake, opener = _provisioned()
+    path = graphs._file_path(tmp_path)
+    path.parent.mkdir(parents=True)
+    path.write_text("{broken")
     # Act
-    known = m.rename_graph(tmp_path, "nope", "New", _opener=opener)
+    failed = False
+    try:
+        graphs.save_graph(tmp_path, "New", "10.1/new")
+    except graphs.SavedGraphFileError:
+        failed = True
     # Assert
-    assert (known, fake.puts, m._read_file_rows(tmp_path)) == (False, [], [])
+    assert (failed, path.read_text()) == (True, "{broken")
 
 
-def test_store_outage_writes_file_and_serves_it(tmp_path):
-    # Arrange -- this host's store is unprovisioned for the test PGUSER, so
-    # the real opener raises SavedGraphStoreUnavailable: the live outage
-    # path, no patching needed.
+def _append_graph(args):
+    from scitex_dev.store import Store, StoreTarget, WriterPolicy
+
+    root, dsn, index = args
+    store = Store(
+        StoreTarget.postgres(dsn, pkg="scholar", name=graphs.STORE_NAME),
+        graphs.schema(),
+        node=str(index),
+        writer_policy=WriterPolicy.MULTI_WRITER,
+    )
+    try:
+        return graphs.save_graph(
+            root, str(index), f"10.1/{index}", _opener=lambda: store
+        )["id"]
+    finally:
+        store.close()
+
+
+def test_concurrent_processes_do_not_lose_saved_graphs(tmp_path, graph_store):
+    # Arrange
+    _, dsn = graph_store
+    graphs._write_file_rows(tmp_path, [])
     # Act
-    row = m.save_graph(tmp_path, "Graph", "10.1/x")
+    with ProcessPoolExecutor(max_workers=4) as pool:
+        ids = list(
+            pool.map(_append_graph, [(str(tmp_path), dsn, i) for i in range(12)])
+        )
+    rows = json.loads(graphs._file_path(tmp_path).read_text())
     # Assert
-    assert (m.list_graphs(tmp_path), row["name"]) == ([row], "Graph")
+    assert {row["id"] for row in rows} == set(ids)
+
+
+@pytest.fixture
+def graph_http():
+    """Real Django HTTP adapters with no project model or external network service."""
+    from django.conf import settings
+
+    if not settings.configured:
+        settings.configure(
+            SECRET_KEY="graph-tests-only", DEFAULT_CHARSET="utf-8", INSTALLED_APPS=[]
+        )
+    from scitex_scholar._django import views
+    from django.test import RequestFactory
+
+    return views, RequestFactory()
+
+
+def test_http_multi_seed_graph_lifecycle_is_user_scoped(
+    tmp_path, graph_store, graph_http
+):
+    # Arrange
+    views, factory = graph_http
+    store, _ = graph_store
+    owner = tmp_path / "owner"
+    other = tmp_path / "other"
+    request = factory.post(
+        "/api/graphs/save",
+        data=json.dumps(
+            {"name": "Pair", "seed_dois": ["10.1/a", "10.1/b"], "top_n": 9}
+        ),
+        content_type="application/json",
+    )
+    request.scholar_library_root = owner
+    # Act
+    saved = views.graphs_save(request, _opener=lambda: store)
+    graph_id = json.loads(saved.content)["id"]
+    rename = factory.post(
+        "/api/graphs/rename",
+        data=json.dumps({"id": graph_id, "name": "Renamed"}),
+        content_type="application/json",
+    )
+    rename.scholar_library_root = other
+    denied = views.graphs_rename(rename, _opener=lambda: store)
+    listing = factory.get("/api/graphs/list")
+    listing.scholar_library_root = owner
+    row = json.loads(views.graphs_list(listing, _opener=lambda: store).content)[
+        "graphs"
+    ][0]
+    delete = factory.post(
+        "/api/graphs/delete",
+        data=json.dumps({"id": graph_id}),
+        content_type="application/json",
+    )
+    delete.scholar_library_root = owner
+    removed = views.graphs_delete(delete, _opener=lambda: store)
+    # Assert
+    assert (
+        saved.status_code,
+        row["name"],
+        row["seed_dois"],
+        row["top_n"],
+        denied.status_code,
+        removed.status_code,
+        graphs._read_file_rows(owner),
+    ) == (200, "Pair", ["10.1/a", "10.1/b"], 9, 404, 200, [])
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        [],
+        {"name": 12, "seed_doi": "10.1/a"},
+        {"name": "x", "seed_dois": "bad"},
+        {"name": "x", "seed_dois": [1]},
+        {"name": "x", "seed_doi": "10.1/a", "top_n": True},
+    ],
+)
+def test_invalid_graph_bodies_return_400_without_touching_storage(
+    tmp_path, graph_http, payload
+):
+    # Arrange
+    views, factory = graph_http
+    request = factory.post(
+        "/api/graphs/save", data=json.dumps(payload), content_type="application/json"
+    )
+    request.scholar_library_root = tmp_path
+    # Act
+    result = views.graphs_save(request)
+    # Assert
+    assert (result.status_code, graphs._file_path(tmp_path).exists()) == (400, False)
+
+
+def test_user_home_capability_places_graphs_in_the_user_home(tmp_path, graph_http):
+    # Arrange
+    from types import SimpleNamespace
+    from django.test import override_settings
+
+    views, factory = graph_http
+    request = factory.get("/api/graphs/list?project=someone/else")
+    request.user = SimpleNamespace(
+        username="owner", is_authenticated=True, is_anonymous=False
+    )
+
+    def home_provider(req):
+        return tmp_path / req.user.username
+
+    # Act
+    with override_settings(SCITEX_USER_HOME_PROVIDER=home_provider):
+        root = views._library_root_for(request)
+    # Assert
+    assert root == tmp_path / "owner/.scitex/scholar/library"
+
+
+def test_graph_file_cannot_escape_the_user_library_through_a_symlink(tmp_path):
+    # Arrange
+    root, outside = tmp_path / "owner", tmp_path / "other"
+    root.mkdir()
+    outside.mkdir()
+    protected = outside / "saved_graphs.json"
+    protected.write_text("[]")
+    (root / "SAVED_GRAPHS").symlink_to(outside, target_is_directory=True)
+    # Act
+    failed = False
+    try:
+        graphs.save_graph(root, "Forbidden", "10.1/x")
+    except graphs.SavedGraphFileError:
+        failed = True
+    # Assert
+    assert (failed, protected.read_text()) == (True, "[]")
