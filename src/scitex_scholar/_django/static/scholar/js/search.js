@@ -168,6 +168,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // selection, keyed by DOI-or-title so re-sorts keep the checked rows.
   let lastPapers = [];
   const selected = new Set();
+  const GRAPH_SEED_LIMIT = 20;
+  let graphSelectionError = false;
   let bulkBusy = false;
   let pageState = null;
   let pageBusy = false;
@@ -611,8 +613,16 @@ document.addEventListener("DOMContentLoaded", () => {
         if (button) button.disabled = bulkBusy || papers.length === 0;
       });
     const graphButton = document.getElementById("searchGraphSelected");
+    const seedCount = selectedGraphDois().length;
     if (graphButton) {
-      graphButton.disabled = bulkBusy || !papers.some((paper) => paper.doi);
+      graphButton.disabled = bulkBusy || seedCount === 0 || seedCount > GRAPH_SEED_LIMIT;
+    }
+    if (seedCount > GRAPH_SEED_LIMIT) {
+      graphSelectionError = true;
+      if (bulkStatus) bulkStatus.textContent = scholarT("Select at most %(n)s distinct DOIs for one graph.", { n: GRAPH_SEED_LIMIT });
+    } else if (graphSelectionError) {
+      graphSelectionError = false;
+      if (bulkStatus) bulkStatus.textContent = "";
     }
     if (!selectAll) return;
     const visible = viewPapers().map(({ paper, index }) =>
@@ -1029,19 +1039,26 @@ document.addEventListener("DOMContentLoaded", () => {
   // directly; several build a multi-seed network (api/graph/network/multi,
   // at most 20 seeds). Rows without a DOI are skipped.
   const graphSelectedBtn = document.getElementById("searchGraphSelected");
+  function selectedGraphDois() {
+    return Array.from(new Set(selectedPapers().map((paper) =>
+      String(paper.doi || "").trim().replace(/^https?:\/\/(?:dx\.)?doi\.org\//i, "").replace(/^doi:\s*/i, "").toLowerCase(),
+    ).filter((doi) => /^10\.\d{4,9}\/\S+$/i.test(doi))));
+  }
   function graphSelected() {
-    const dois = selectedPapers()
-      .map((paper) => paper.doi)
-      .filter((doi) => doi);
+    const dois = selectedGraphDois();
     if (!dois.length) {
       if (bulkStatus) bulkStatus.textContent = scholarT("Select results with a DOI first.");
+      return;
+    }
+    if (dois.length > GRAPH_SEED_LIMIT) {
+      if (bulkStatus) bulkStatus.textContent = scholarT("Select at most %(n)s distinct DOIs for one graph.", { n: GRAPH_SEED_LIMIT });
       return;
     }
     const graphTab = document.querySelector(
       '.stx-content-tabs__tab[aria-controls="tab-graph"]',
     );
     if (graphTab) graphTab.click();
-    const detail = dois.length === 1 ? { doi: dois[0] } : { dois: dois.slice(0, 20) };
+    const detail = dois.length === 1 ? { doi: dois[0] } : { dois };
     document.dispatchEvent(new CustomEvent("scholar:build-graph", { detail }));
   }
   if (graphSelectedBtn) graphSelectedBtn.addEventListener("click", graphSelected);

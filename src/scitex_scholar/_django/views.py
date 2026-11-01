@@ -719,6 +719,9 @@ def _js_i18n_dict() -> dict:
         "%(n)s papers loaded": _i18n("%(n)s papers loaded"),
         "Load more": _i18n("Load more"),
         "All source pages scanned": _i18n("All source pages scanned"),
+        "%(n)s graph seeds selected": _i18n("%(n)s graph seeds selected"),
+        "Select at most %(n)s distinct DOIs for one graph.": _i18n("Select at most %(n)s distinct DOIs for one graph."),
+        "Select %(title)s for a citation graph": _i18n("Select %(title)s for a citation graph"),
         "No papers on the loaded pages pass these filters.": _i18n("No papers on the loaded pages pass these filters."),
     }
 

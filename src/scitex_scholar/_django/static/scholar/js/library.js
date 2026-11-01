@@ -65,6 +65,53 @@ document.addEventListener("DOMContentLoaded", () => {
   // sort select re-renders client-side (hub sorts the list from its toolbar).
   let lastRows = [];
   const sortEl = document.getElementById("librarySort");
+  const selectedSeeds = new Set();
+  const selectAllSeeds = document.getElementById("librarySelectAll");
+  const graphSelectedButton = document.getElementById("libraryGraphSelected");
+  const seedStatus = document.getElementById("librarySelectionStatus");
+  const GRAPH_SEED_LIMIT = 20;
+
+  function seedDoi(paper) {
+    const doi = String(paper.doi || "").trim().replace(/^https?:\/\/(?:dx\.)?doi\.org\//i, "").replace(/^doi:\s*/i, "");
+    return /^10\.\d{4,9}\/\S+$/i.test(doi) ? doi.toLowerCase() : "";
+  }
+
+  function seedKey(paper) {
+    return paper.paper_id || seedDoi(paper);
+  }
+
+  function selectedDois() {
+    return Array.from(new Set(lastRows.filter((paper) => selectedSeeds.has(seedKey(paper))).map(seedDoi).filter(Boolean)));
+  }
+
+  function syncSeedSelection() {
+    const dois = selectedDois();
+    const available = lastRows.filter(seedDoi);
+    if (graphSelectedButton) graphSelectedButton.disabled = dois.length === 0 || dois.length > GRAPH_SEED_LIMIT;
+    if (selectAllSeeds) {
+      selectAllSeeds.disabled = available.length === 0;
+      selectAllSeeds.checked = available.length > 0 && available.every((paper) => selectedSeeds.has(seedKey(paper)));
+      selectAllSeeds.indeterminate = dois.length > 0 && !selectAllSeeds.checked;
+    }
+    if (seedStatus) seedStatus.textContent = dois.length > GRAPH_SEED_LIMIT
+      ? scholarT("Select at most %(n)s distinct DOIs for one graph.", { n: GRAPH_SEED_LIMIT })
+      : scholarT("%(n)s graph seeds selected", { n: dois.length });
+  }
+
+  if (selectAllSeeds) selectAllSeeds.addEventListener("change", () => {
+    lastRows.filter(seedDoi).forEach((paper) => {
+      if (selectAllSeeds.checked) selectedSeeds.add(seedKey(paper));
+      else selectedSeeds.delete(seedKey(paper));
+    });
+    renderRows();
+  });
+  if (graphSelectedButton) graphSelectedButton.addEventListener("click", () => {
+    const dois = selectedDois();
+    if (!dois.length || dois.length > GRAPH_SEED_LIMIT) return;
+    document.getElementById("scholar-tab-graph")?.click();
+    document.dispatchEvent(new CustomEvent("scholar:build-graph", { detail: dois.length === 1 ? { doi: dois[0] } : { dois } }));
+  });
+  syncSeedSelection();
 
   function annotationOf(paper) {
     return (paper && paper.annotations) || {};
@@ -98,6 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!listEl) return;
     listEl.replaceChildren();
     sortedRows().forEach((p) => listEl.appendChild(makeRow(p)));
+    syncSeedSelection();
   }
 
   if (sortEl) {
@@ -133,6 +181,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const item = document.createElement("div");
     item.className = "library-item";
     item.dataset.paperId = paper.paper_id || "";
+    const select = document.createElement("input");
+    select.type = "checkbox";
+    select.className = "library-item__select";
+    select.disabled = !seedDoi(paper);
+    select.checked = selectedSeeds.has(seedKey(paper));
+    select.setAttribute("aria-label", scholarT("Select %(title)s for a citation graph", { title: paper.title || paper.paper_id || "Untitled" }));
+    select.addEventListener("change", () => {
+      if (select.checked) selectedSeeds.add(seedKey(paper));
+      else selectedSeeds.delete(seedKey(paper));
+      syncSeedSelection();
+    });
+    item.appendChild(select);
 
     const main = document.createElement("div");
     main.className = "library-item__main";
@@ -154,11 +214,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     if (bits.length) main.appendChild(meta);
 
-    if (paper.doi) {
+    if (seedDoi(paper)) {
       const doi = document.createElement("div");
       doi.className = "library-item__meta";
       const link = document.createElement("a");
-      link.href = `https://doi.org/${paper.doi}`;
+      link.href = `https://doi.org/${seedDoi(paper)}`;
       link.target = "_blank";
       link.rel = "noopener noreferrer";
       link.textContent = paper.doi;
@@ -211,7 +271,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Brief-05: seed the Citation Graph from this work (Search-tab per-row
     // parity). Only DOI rows seed; the tab click switches panes and the
     // one-shot event carries the seed (same path as search.js).
-    if (paper.doi) {
+    if (seedDoi(paper)) {
       const graphBtn = document.createElement("button");
       graphBtn.type = "button";
       graphBtn.className = "library-enrich-btn";
@@ -222,7 +282,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
         if (graphTab) graphTab.click();
         document.dispatchEvent(
-          new CustomEvent("scholar:build-graph", { detail: { doi: paper.doi } }),
+          new CustomEvent("scholar:build-graph", { detail: { doi: seedDoi(paper) } }),
         );
       });
       actions.appendChild(graphBtn);
@@ -585,6 +645,9 @@ document.addEventListener("DOMContentLoaded", () => {
       hide(loadingEl);
       listEl.replaceChildren();
       const papers = data.papers || [];
+      lastRows = papers;
+      const availableKeys = new Set(papers.map(seedKey));
+      selectedSeeds.forEach((key) => { if (!availableKeys.has(key)) selectedSeeds.delete(key); });
       if (statsEl) {
         const n = papers.length;
         statsEl.textContent = data.filtered
@@ -606,6 +669,7 @@ document.addEventListener("DOMContentLoaded", () => {
         renderRows();
       }
       loaded = true;
+      syncSeedSelection();
     } catch (err) {
       hide(loadingEl);
       errorMsgEl.textContent = String(err.message || err);

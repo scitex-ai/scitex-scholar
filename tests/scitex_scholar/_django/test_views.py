@@ -4493,19 +4493,19 @@ def test_graph_initial_state_explains_seed_and_library_workflow():
     # Arrange
     html = views.index(RequestFactory().get("/")).content.decode()
     # Act -- operator 2026-10-23 seed-only: no DOI typing, no max-papers.
-    expected = ["Seed from your Library"]
+    expected = ["Seed from work(s) selected in", 'data-scholar-seed-tab="search"', 'data-scholar-seed-tab="library"']
     dropped = ["Start with a DOI", "Max papers in graph", 'id="doiInput"']
     # Assert
     assert all(text in html for text in expected) and all(text not in html for text in dropped)
 
 
-def test_graph_tab_carries_seed_list_not_doi_form():
+def test_graph_tab_uses_search_library_selection_without_a_duplicate_seed_list():
     # Arrange -- operator 2026-10-23 seed-only: DOI input deleted.
     html = views.index(RequestFactory().get("/")).content.decode()
     # Act
-    seed_only = ('id="graphLibrarySeed"' in html, 'id="doiInput"' not in html)
+    seed_only = ('id="graphSeedGuidance"' in html, 'id="graphLibrarySeed"' not in html, 'id="doiInput"' not in html)
     # Assert
-    assert seed_only == (True, True)
+    assert seed_only == (True, True, True)
 
 
 def test_graph_width_is_a_fixed_constant():
