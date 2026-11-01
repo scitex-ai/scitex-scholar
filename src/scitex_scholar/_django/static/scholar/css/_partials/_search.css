@@ -217,6 +217,15 @@
   padding: 4px 2px;
 }
 
+.search-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border-top: 1px solid var(--border-default);
+}
+
 .search-toolbar-row .search-results-toolbar {
   flex: 1;
   min-width: 0;

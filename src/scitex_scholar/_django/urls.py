@@ -26,6 +26,7 @@ urlpatterns = [
     path("api/projects", views.project_scope, name="project_scope"),
     path("api/health", views.health, name="health"),
     path("api/search", views.search, name="search"),
+    path("api/search/page", views.search_page, name="search_page"),
     path("api/search/syntax-help", views.search_syntax_help, name="search_syntax_help"),
     path("api/graph/network", views.graph_network, name="graph_network"),
     path("api/graph/network/multi", views.graph_network_multi, name="graph_network_multi"),

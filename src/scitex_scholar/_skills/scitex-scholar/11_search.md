@@ -56,3 +56,26 @@ scitex scholar openalex-scitex  search "seizure forecasting" --limit 10
 ```
 
 See [crossref-local](../../crossref-local/SKILL.md) and [openalex-local](../../openalex-local/SKILL.md) skills.
+
+## GUI / Python local Crossref pages
+
+With only **Crossref (SciTeX)** selected, GUI Search uses `api/search/page` and
+**Load more**. Its source count precedes filters/deduplication; do not describe it
+as the count of matching filtered papers. Online/multiple-source search remains
+bounded and has no global total.
+
+```python
+from scitex_scholar import ScholarSearchEngine
+
+engine = ScholarSearchEngine()
+import asyncio
+page = asyncio.run(engine.search_page("hippocampus", offset=1000, page_size=50))
+next_offset = page["metadata"]["pagination"]["next_offset"]
+```
+
+There is no total-result cap on this local page route. Each request is limited
+to 1–1000 source records; follow the returned offset explicitly rather than
+starting an automatic all-corpus download. See [page semantics](../../../../docs/gui/search-pages.md)
+and `tests/scitex_scholar/_django/test_search_pages.py` for the source-backed
+contract. This does not claim all-results virtualization or bounded browser
+memory across arbitrarily many loaded pages.

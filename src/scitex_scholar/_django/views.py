@@ -714,6 +714,12 @@ def _js_i18n_dict() -> dict:
         # Error fallback (UX standard): the retry buttons on all three
         # surfaces and the graph seed picker render client-side.
         "Retry": _i18n("Retry"),
+        "%(n)s Crossref source matches before filters and deduplication": _i18n("%(n)s Crossref source matches before filters and deduplication"),
+        "Bounded search; no global total": _i18n("Bounded search; no global total"),
+        "%(n)s papers loaded": _i18n("%(n)s papers loaded"),
+        "Load more": _i18n("Load more"),
+        "All source pages scanned": _i18n("All source pages scanned"),
+        "No papers on the loaded pages pass these filters.": _i18n("No papers on the loaded pages pass these filters."),
     }
 
 
@@ -1327,6 +1333,39 @@ def search(request, _engine=None, _corpora_available=None):
     except Exception as e:
         logger.error(f"Search failed for {query!r}: {e}", exc_info=True)
         return JsonResponse({"error": "Search failed. Try again later."}, status=500)
+
+
+@require_GET
+def search_page(request, _engine=None):
+    """Explicit local Crossref pagination; the existing list endpoint is intact."""
+    query = request.GET.get("q", "").strip()
+    if not query or len(query) > _MAX_QUERY_CHARS:
+        return JsonResponse({"error": f"q must contain 1 to {_MAX_QUERY_CHARS} characters"}, status=400)
+    if request.GET.get("sources") not in ("crossref_local", "CrossRefLocal"):
+        return JsonResponse({"error": "Paged search requires Crossref (SciTeX) as the only source"}, status=400)
+    try:
+        offset = int(request.GET.get("offset", "0"))
+        page_size = int(request.GET.get("page_size", "50"))
+        if offset < 0 or not 1 <= page_size <= 1000:
+            raise ValueError
+    except ValueError:
+        return JsonResponse({"error": "offset must be non-negative and page_size must be 1 to 1000"}, status=400)
+    filters, error = _parse_range_filters(request.GET)
+    if error:
+        return JsonResponse({"error": error}, status=400)
+    from scitex_scholar.search_engines._crossref_pages import UnsupportedPageFilter
+
+    try:
+        result = asyncio.run((_engine or _get_search_engine()).search_page(
+            query, offset=offset, page_size=page_size, filters=filters,
+        ))
+        _strip_markup_from_search_abstracts(result)
+        return JsonResponse(result)
+    except UnsupportedPageFilter as error:
+        return JsonResponse({"error": str(error)}, status=400)
+    except Exception:
+        logger.error("Paged local Crossref search failed", exc_info=True)
+        return JsonResponse({"error": "Local Crossref page could not be loaded. Try again."}, status=503)
 
 
 @require_GET

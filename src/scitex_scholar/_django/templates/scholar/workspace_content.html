@@ -90,7 +90,7 @@ e.g. hippocampus -a Smith -ymin 2020 -ymax 2024{% endblocktrans %}"></textarea>
                                             </div>
                                         </div>
                                         <div class="form-group--options">
-                                            <label class="form-label" for="searchMaxResults">{% trans "Results per search" %}</label>
+                                            <label class="form-label" for="searchMaxResults">{% trans "Results per request" %}</label>
                                             <select id="searchMaxResults" class="form-select">
                                                 <option value="10">10</option>
                                                 <option value="20">20</option>
@@ -230,6 +230,10 @@ e.g. hippocampus -a Smith -ymin 2020 -ymax 2024{% endblocktrans %}"></textarea>
                                     </span>
                                 </div>
                                 <div class="graph-card__body" id="searchResultsContent"></div>
+                                <div id="searchPagination" class="search-pagination hidden">
+                                    <span id="searchPaginationStatus" role="status"></span>
+                                    <button type="button" id="searchLoadMore" class="btn-control-library">{% trans "Load more" %}</button>
+                                </div>
                             </div>
                         </div>
                     </div>

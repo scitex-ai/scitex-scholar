@@ -52,6 +52,10 @@ Literature management spans many tools and APIs: searching databases, resolving 
 - **Highlight** each sentence of a PDF by rhetorical role — claim, method, limitation, supportive citation, contradicting citation — via Claude
 - **Automate** the same operations from the CLI, a Python API, or the SciTeX MCP server
 
+For local Crossref GUI paging beyond the former 1000-result ceiling, see
+[Search page semantics and limits](docs/gui/search-pages.md). Online and
+multiple-source searches retain their bounded list behavior.
+
 ## Demo
 
 ```mermaid

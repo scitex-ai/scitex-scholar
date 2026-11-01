@@ -7,13 +7,18 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+- Add explicit local Crossref search pages with provider totals, continuation
+  offsets, and Load more. Page requests remain bounded while total access is
+  no longer capped at 1000. Counts identify source matches before filters and
+  deduplication; online/multi-source search retains its bounded list contract.
+
 - Remove redundant Search/Library card titles and the duplicate search-help
   trigger; keep one functional in-field help control.
 - Keep sorting and collapsible source/filter options in the shared Details pane,
   freeing the main toolbar for actions on selected papers. Selection actions
   are disabled until applicable works are selected.
 - Label the current result request size honestly and version updated search
-  assets for ordinary reloads. Search pagination beyond 1000 remains pending.
+  assets for ordinary reloads.
 
 ## [1.29.0] - 2026-11-01
 
