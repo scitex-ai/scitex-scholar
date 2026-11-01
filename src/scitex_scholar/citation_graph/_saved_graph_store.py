@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Saved citation-graph recipes, kept in the shared store.
+"""User-file citation-graph recipes, with an optional shared-store mirror.
 
 Thin CUI module: the ``api/graphs/*`` views in ``_django/views.py`` delegate
 here; the views stay HTTP adapters (validation + status codes) with no store
@@ -7,14 +7,12 @@ logic of their own.
 
 WHERE THE ROWS LIVE
 -------------------
-:mod:`scitex_dev.store` -- the fleet's shared storage primitive, resolved by
-``host_store()`` to this host's PostgreSQL. This module declares a
-:class:`~scitex_dev.store.Schema` and calls the primitive directly.
-
-The JSON file (``SAVED_GRAPHS/saved_graphs.json`` under the user root) stays
-authoritative for migration: first read-through backfills the store, so a
-pre-store library loses nothing. The store has no delete verb -- deletes
-HIDE the row, keeping history (store guarantee, README of scitex_dev.store).
+The JSON file (``SAVED_GRAPHS/saved_graphs.json`` under the user library)
+is authoritative once present, including an empty file. Missing files may
+import legacy database-only recipes once. :mod:`scitex_dev.store` provides
+an optional derived PostgreSQL mirror; its failures never replace user data.
+Deleting a recipe removes it from the user file and best-effort HIDES the
+mirror row, preserving that store's history.
 
 ``user_root`` is part of the record IDENTITY, not an ambient parameter. One
 store serves every user on the host, so two users holding the same graph id
@@ -25,7 +23,9 @@ Fields (additive-only; adding one is a schema edit, never a data migration):
     user_root    TEXT     resolved absolute path of the user root
     graph_id     TEXT     the server-issued id (stable handle)
     name         TEXT     user label (200 chars, hub SavedGraph.name bound)
-    seed_doi     TEXT     rebuild seed (500 chars, leaf DOI bound)
+    seed_doi     TEXT     legacy primary rebuild seed
+    seed_dois    JSON     full selected seed set
+    top_n        INTEGER  saved graph width
     created_by   TEXT     safe username at save time
     created_at   TEXT     ISO-8601 UTC at save time
 """
