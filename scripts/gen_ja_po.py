@@ -99,7 +99,6 @@ JA = {
     "Library not loaded yet.": "ライブラリはまだ読み込まれていません。",
     "No graph built yet.": "グラフはまだ作成されていません。",
     # --- Tabs ---
-    "Search databases": "データベースを検索",
     "Library": "ライブラリ",
     "Citation Graph": "引用グラフ",
     # --- Search tab ---
@@ -254,6 +253,7 @@ JA = {
     "No papers match the current filters.": "現在の絞り込み条件に一致する論文はありません。",
     "%(count)s of %(total)s Papers": "%(total)s 件中 %(count)s 件の論文",
     "No papers matched this query.": "このクエリに一致する論文はありませんでした。",
+    "%(names)s unavailable on this server — check more sources to widen the search.": "%(names)s はこのサーバーで利用できません — ソースを追加して検索を広げてください。",
     "Local corpus (NAS)": "ローカルコーパス（NAS）",
     "Online fallback": "オンラインへのフォールバック",
     # Slice 1 (old-direct unification): the Sources grid titles, hint, and

@@ -104,6 +104,29 @@ def available_local_corpora() -> set:
     return available
 
 
+def unavailable_local_sources(selected, available=None):
+    """Canonical selected names whose local corpus is not installed here.
+
+    ``selected`` is anything ``normalize_sources`` accepts; the return is
+    the subset naming a ``LOCAL_CORPUS_SOURCES`` engine whose corpora are
+    all absent from ``available`` (default: this install's
+    ``available_local_corpora``). Online engines are never reported -- they
+    fail per-request, not per-install. The ``available`` parameter is the
+    injection seam (mirrors ``LocalCorpusSearchEngine``): production passes
+    nothing, a test drives the corpus-absent path without patching imports.
+    """
+    wanted = normalize_sources(selected)
+    if not wanted:
+        return []
+    avail = set(available) if available is not None else available_local_corpora()
+    return [
+        name
+        for name in wanted
+        if name in LOCAL_CORPUS_SOURCES
+        and not set(LOCAL_CORPUS_SOURCES[name]) & avail
+    ]
+
+
 class CorpusUnavailable(RuntimeError):
     """A configured local corpus cannot be queried in this installation."""
 

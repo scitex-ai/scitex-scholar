@@ -7,6 +7,17 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.28.1] - 2026-11-01
+
+Patch: project picker adopts the SDK scoped project listing view
+(0.3.16, PR #90; legacy byte-compat standalone,
+user_scope_disabled_reason=None on ScholarLocalProjectProvider).
+Search tab renamed "Search databases" -> "Search" (old-direct
+parity, JA catalog recompiled); Search API emits
+metadata.sources_unavailable and the tab renders an
+"unavailable on this server" notice instead of a bare
+"No papers matched" when the default corpus is absent.
+
 ## [1.28.0] - 2026-10-26
 
 New CLI verb: scitex-scholar search QUERY (thin adapter over

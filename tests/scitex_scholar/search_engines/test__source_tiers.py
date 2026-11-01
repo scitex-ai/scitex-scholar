@@ -533,3 +533,14 @@ def test_absent_selection_keeps_tiered_behaviour(pipeline_cls):
     out = _run(pipeline.search_async(query="hippocampus"))
     # Assert
     assert out["metadata"]["source_tier"] == "primary"
+
+
+def test_unavailable_local_sources_reports_absent_corpora():
+    # Arrange -- the tab's default selection names CrossRefLocal; online
+    # engines are never reported (they fail per-request, not per-install).
+    # Act
+    missing = tiers.unavailable_local_sources(
+        ["CrossRefLocal", "PubMed"], available=set()
+    )
+    # Assert
+    assert missing == ["CrossRefLocal"]

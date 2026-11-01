@@ -775,10 +775,17 @@ document.addEventListener("DOMContentLoaded", () => {
     resultsContent.replaceChildren();
 
     const visible = viewPapers();
+    const metadata = data.metadata || {};
     if (!visible.length) {
       const empty = document.createElement("div");
       empty.className = "empty-message";
-      empty.textContent = scholarT("No papers matched this query.");
+      // Operator 2026-10-26: an explicit local-corpus selection on a host
+      // without that corpus is not "no match" -- say which corpus is
+      // missing so the user checks more sources instead of rephrasing.
+      const unavailable = metadata.sources_unavailable || [];
+      empty.textContent = unavailable.length
+        ? scholarT("%(names)s unavailable on this server — check more sources to widen the search.", { names: unavailable.join(", ") })
+        : scholarT("No papers matched this query.");
       resultsContent.appendChild(empty);
     } else {
       visible.forEach(({ paper, index }) =>
@@ -787,7 +794,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     syncSelectAll();
 
-    const metadata = data.metadata || {};
     // Declutter (CCT4429): header meta is count + corpus tier only. The
     // cached flag and the search mode already have visible owners (the
     // request path and the Advanced block's source control); repeating them
