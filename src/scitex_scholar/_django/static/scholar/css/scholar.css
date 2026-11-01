@@ -6,9 +6,9 @@
  * here in cascade order (tokens first, visibility helpers last).
  */
 
-@import url("_partials/_base.css");
+@import url("_partials/_base.css?v=04fbccf491ea");
 @import url("_partials/_layout.css?v=7666868da892");
-@import url("_partials/_sidebar.css?v=72d3394d73ba");
+@import url("_partials/_sidebar.css?v=6c9f7cb3bf84");
 @import url("_partials/_cards.css");
 @import url("_partials/_forms.css");
 @import url("_partials/_graph.css");

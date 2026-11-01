@@ -216,7 +216,7 @@
 /*
  * Brief-04 follow-up: strip controls stay compact. The shared query-row
  * token grew tall for the textarea; unconstrained, every select and
- * input in the Details pane would inherit 84px. 44px matches the
+ * input in the Details pane would inherit 85px. 44px matches the
  * library/toolbars and keeps filter rows aligned, old-direct style.
  */
 .status-strip__body .form-select,
