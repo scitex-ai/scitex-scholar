@@ -7,6 +7,8 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+- Remove the leaf version-badge typography/color override; the shared SDK header owns its appearance.
+
 ## [1.29.1] - 2026-11-01
 
 - Opt into the shared SDK main-details desktop layout: 320px Details default,
