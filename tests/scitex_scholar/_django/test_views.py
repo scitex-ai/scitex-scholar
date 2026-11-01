@@ -937,6 +937,24 @@ def test_search_rejects_non_integer_max_results():
     assert resp.status_code == 400
 
 
+def test_search_clamps_max_results_to_1000():
+    # Arrange — operator 2026-10-22 ("Results ... To unlimited"): the
+    # leaf no longer caps at 500; the server-side safety bound is 1000
+    # (per-engine fan-out stays bounded on throttled external APIs).
+    seen = {}
+
+    class _StubEngine:
+        async def search(self, query, mode=None, max_results=20, sources=None, filters=None, on_progress=None):
+            seen["max_results"] = max_results
+            return {"results": [], "metadata": {}}
+
+    request = RequestFactory().get("/api/search?q=hippocampus&max_results=5000&no_cache=true")
+    # Act
+    views.search(request, _engine=_StubEngine())
+    # Assert
+    assert seen["max_results"] == 1000
+
+
 def test_search_rejects_unknown_mode():
     # Arrange
     rf = RequestFactory()
@@ -2085,14 +2103,16 @@ def test_search_sources_grouped_in_old_direct_tiers():
     assert (all(tiers), all(rates), notice) == (True, True, True)
 
 
-def test_search_results_dropdown_offers_up_to_500():
-    # Arrange -- operator brief-04: results must not cap at 20; old-direct
-    # fetches 25-50 per source with no UI cap. The leaf offers 10-500 with
-    # 50 the default (old-direct's most common per-source rate); the CUI
-    # backend clamps 1-500 (views.search).
+def test_search_results_dropdown_offers_up_to_1000():
+    # Arrange -- operator 2026-10-22 ("Results ... To unlimited"): the leaf
+    # no longer caps at 500; the dropdown offers 10-1000 with 50 the
+    # default, and the CUI backend clamps 1-1000 (views.search).
     body = _compass_index_body()
-    # Act
-    options = ('value="200"' in body, 'value="500"' in body, 'value="50" selected' in body)
+    # Act — scope to the RESULTS select: value="1000" also appears in the
+    # unrelated AI auto-accept interval select, so a body-wide check is
+    # vacuous for this option.
+    select = body.split('id="searchMaxResults"')[1].split("</select>")[0]
+    options = ('value="200"' in select, 'value="500"' in select, 'value="1000"' in select, 'value="50" selected' in select)
     js = COMPASS_SEARCH_JS.read_text()
     lifecycle = ("stepperSearching()" in js, "stepperDone(" in js, "stepperReset()" in js)
     # Assert
