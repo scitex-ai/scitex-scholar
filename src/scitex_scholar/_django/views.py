@@ -1903,7 +1903,7 @@ def library_list(request):
         # A filter that escapes the library root fails closed, like the
         # filing path. The message is fixed; the value is never echoed.
         try:
-            _assert_safe_project_name(project)
+            project = _assert_safe_project_name(project)
         except ValueError as e:
             return JsonResponse({"error": str(e)}, status=400)
         # The filter names a FILING location: it narrows only when that

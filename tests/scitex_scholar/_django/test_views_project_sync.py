@@ -345,3 +345,25 @@ def test_library_intro_names_the_per_paper_enrich_action():
     names_action = "per-paper" in TEMPLATE and "Enrich" in TEMPLATE
     # Assert
     assert names_action
+
+
+def test_owner_slug_library_filter_uses_filing_slug_and_all_scope_keeps_every_row(tmp_path):
+    """The SDK's owner/slug id must narrow the real per-project membership."""
+    with _library_env(tmp_path):
+        from scitex_scholar.storage._project_reconcile import add_project_to_master
+
+        _seed_library(tmp_path, paper_id="PID1", doi="10.1234/scoped-one", title="One")
+        _seed_library(tmp_path, paper_id="PID2", doi="10.1234/scoped-two", title="Two")
+        for project, paper_id in (("projA", "PID1"), ("projB", "PID2")):
+            folder = tmp_path / project
+            folder.mkdir()
+            (folder / paper_id).symlink_to(f"../MASTER/{paper_id}")
+            add_project_to_master(tmp_path, paper_id, project)
+        factory = RequestFactory()
+        selected = _json.loads(views.library_list(factory.get("/api/library", {"project": "alice/projA"})).content)
+        all_projects = _json.loads(views.library_list(factory.get("/api/library")).content)
+
+        assert {paper["paper_id"] for paper in selected["papers"]} == {"PID1"}
+        assert selected["filtered"] is True
+        assert {paper["paper_id"] for paper in all_projects["papers"]} == {"PID1", "PID2"}
+        assert all_projects["filtered"] is False
