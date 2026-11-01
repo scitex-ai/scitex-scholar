@@ -7,8 +7,8 @@
  */
 
 @import url("_partials/_base.css");
-@import url("_partials/_layout.css");
-@import url("_partials/_sidebar.css");
+@import url("_partials/_layout.css?v=7666868da892");
+@import url("_partials/_sidebar.css?v=72d3394d73ba");
 @import url("_partials/_cards.css");
 @import url("_partials/_forms.css");
 @import url("_partials/_graph.css");

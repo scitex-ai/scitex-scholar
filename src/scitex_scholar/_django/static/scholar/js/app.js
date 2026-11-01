@@ -204,6 +204,7 @@ function initScholarTabs(root) {
   if (strip && stripToggle) {
     stripToggle.addEventListener("click", () => {
       const collapsed = strip.classList.toggle("status-strip--collapsed");
+      strip.toggleAttribute("data-stx-pane-collapsed", collapsed);
       stripToggle.setAttribute("aria-expanded", String(!collapsed));
       stripToggle.setAttribute(
         "aria-label",

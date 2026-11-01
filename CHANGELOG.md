@@ -9,6 +9,13 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [1.29.1] - 2026-11-01
 
+- Opt into the shared SDK main-details desktop layout: 320px Details default,
+  responsive phone panes, and preserved host-restored inline widths through
+  collapse/expansion. Remove Scholar's competing 208px/flex column geometry.
+- Use the SDK app_static content-hash helper for active CSS/JavaScript URLs,
+  including the graph client. This source preview requires the SDK
+  main-details layout addition before a public Scholar release.
+
 - Add Library work selection and Graph selected, preserving selection while
   sorting. Both Search and Library accept 1–20 distinct valid DOI seeds and
   refuse larger selections explicitly instead of silently truncating them.
