@@ -304,7 +304,7 @@ def test_search_js_wires_textarea_enter_and_ctrl_k():
 def test_columns_are_shared_sdk_panes_not_leaf_divs(_private_context):
     # Arrange -- operator brief-04: the columns ARE the shared scitex-sdk
     # panes element (data-stx-panes / data-stx-pane + SDK panes.css/js).
-    # layout="app" keeps scholar's desktop geometry; the fragment stays
+    # layout="main-details" uses the SDK desktop grid; the fragment stays
     # pure content (no tag-emitted link/script mid-body) and the panes
     # contract owns the phone tab bar + switching.
     request = RequestFactory().get("/")
@@ -316,7 +316,7 @@ def test_columns_are_shared_sdk_panes_not_leaf_divs(_private_context):
     details = dom.select_one('aside.app-status-strip[data-stx-pane="details"]')
     # Assert
     assert (
-        wrapper is not None and wrapper.get("data-stx-panes-layout") == "app",
+        wrapper is not None and wrapper.get("data-stx-panes-layout") == "main-details",
         main is not None and main.parent == wrapper,
         details is not None and details.parent == wrapper,
         "panes.css" in html and "panes.js" in html,

@@ -102,7 +102,6 @@
  * through theme-aware tokens, so the strip renders in light AND dark.
  */
 .app-status-strip {
-  width: 208px;
   flex-shrink: 0;
   background: var(--bg-secondary);
   border-left: 1px solid var(--border-default);
@@ -144,7 +143,6 @@
 }
 
 .app-status-strip.status-strip--collapsed {
-  width: auto;
   padding: 12px 8px;
   align-items: center;
 }
@@ -173,9 +171,8 @@
   color: var(--text-secondary);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 640px) {
   .app-status-strip {
-    width: 100%;
     border-left: none;
     border-top: 1px solid var(--border-default);
     order: 3;
@@ -184,7 +181,7 @@
 
 /* ── Per-tab Details sections (operator 2026-10-22) ────────────────
  * Search brings its Databases controls (Advanced), Library its ops, Graph
- * its controls + node sheet. The strip is 208px: controls go full-width,
+ * its controls + node sheet. The strip is shared: controls go full-width,
  * multi-column grids collapse to one column, everything else keeps its
  * own sheet. Monotone + theme tokens only (operator color discipline).
  */
@@ -206,7 +203,7 @@
 
 /*
  * Operator 2026-10-24 (old-direct parity): label-above-control in the
- * 208px strip. The Search-source row kept its label beside the select,
+ * Details pane. The Search-source row kept its label beside the select,
  * squeezing "All sources (parallel)" to "All so". Stacking restores the
  * full label, old-direct style.
  */
@@ -219,7 +216,7 @@
 /*
  * Brief-04 follow-up: strip controls stay compact. The shared query-row
  * token grew tall for the textarea; unconstrained, every select and
- * input in the 208px strip would inherit 84px. 44px matches the
+ * input in the Details pane would inherit 85px. 44px matches the
  * library/toolbars and keeps filter rows aligned, old-direct style.
  */
 .status-strip__body .form-select,
@@ -229,7 +226,7 @@
 }
 
 /*
- * Details strip polish (operator brief-05 follow-up): the 208px strip
+ * Details strip polish (operator brief-05 follow-up): the Details pane
  * forces wraps; keep wrapped rows legible -- checkbox pinned to the
  * first line, rate right-aligned in a fixed lane, tier labels breathing.
  * Scoped to the strip; the main-area search form is untouched.

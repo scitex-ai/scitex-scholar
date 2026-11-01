@@ -15,11 +15,10 @@
 /*
  * Operator 2026-10-25 (brief-04): the columns are the SHARED scitex-sdk
  * panes element (data-stx-panes / data-stx-pane), not leaf-owned layout
- * divs. layout="app" keeps scholar's own desktop geometry, so this
- * wrapper only carries the flex row the old layout had.
+ * divs. The SDK main-details layout owns desktop columns and its
+ * responsive single-pane mode; this wrapper only fills the app shell.
  */
 .app-container > .stx-panes {
-  display: flex;
   flex: 1;
   min-width: 0;
   min-height: 0;
