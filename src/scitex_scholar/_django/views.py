@@ -1222,7 +1222,10 @@ def search(request, _engine=None, _corpora_available=None):
 
     try:
         max_results = int(request.GET.get("max_results", 50))
-        max_results = max(1, min(500, max_results))
+        # Operator 2026-10-22 ("Results ... To unlimited"): the 500 cap is
+        # lifted to 1000. Per-engine fan-out derives from this bound, so a
+        # fully unbounded value would stall throttled external APIs.
+        max_results = max(1, min(1000, max_results))
     except ValueError:
         return JsonResponse(
             {"error": "max_results must be an integer"}, status=400
@@ -1429,7 +1432,7 @@ def search_syntax_help(request):
             "query_parameters": {
                 "q": "Search query with optional command syntax (required)",
                 "sources": "Comma-separated list of sources to search (optional)",
-                "max_results": "Maximum results per source, 1-500 (default: 50)",
+                "max_results": "Maximum results per source, 1-1000 (default: 50)",
                 "format": "'full' or 'compact' response format (default: full)",
             },
         }

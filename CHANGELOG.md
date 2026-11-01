@@ -7,6 +7,14 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.29.0] - 2026-11-01
+
+Operator 2026-10-22 checklist ("Results ... To unlimited"): the
+results cap rises 500 -> 1000 across the Search tab dropdown, the
+`search` API clamp, and the CLI `--max-results` range (default stays
+50). Fully unbounded stays out: per-engine fan-out derives from this
+bound and throttled external sources (1-3/s) would stall.
+
 ## [1.28.1] - 2026-11-01
 
 Patch: project picker adopts the SDK scoped project listing view

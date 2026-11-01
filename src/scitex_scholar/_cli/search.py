@@ -22,7 +22,7 @@ import click
 from ._scaffolding import CONTEXT_SETTINGS, spec_command_kwargs
 
 _DEFAULT_MAX_RESULTS = 50
-_MAX_RESULTS_CAP = 500
+_MAX_RESULTS_CAP = 1000
 
 
 def _format_row(index: int, paper: dict) -> str:
@@ -52,7 +52,7 @@ def _format_row(index: int, paper: dict) -> str:
     type=click.IntRange(1, _MAX_RESULTS_CAP),
     default=_DEFAULT_MAX_RESULTS,
     show_default=True,
-    help="Maximum papers to return (backend clamps 1-500).",
+    help="Maximum papers to return (backend clamps 1-1000).",
 )
 @click.option(
     "--mode",
