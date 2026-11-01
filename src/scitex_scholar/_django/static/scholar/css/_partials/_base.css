@@ -60,7 +60,7 @@
    * This is a scholar-owned token, not one of the seven
    * scitex-ui colours the template must not redeclare (see test_views.py).
    */
-  --scholar-search-height: 84px;
+  --scholar-search-height: 85px;
 }
 
 /*
