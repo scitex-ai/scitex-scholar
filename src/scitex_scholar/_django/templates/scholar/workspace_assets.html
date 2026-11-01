@@ -48,7 +48,7 @@
     scholar's own desktop geometry (see _layout.css).
     {% endcomment %}
     <link rel="stylesheet" href="{% static 'scitex_sdk/ui/css/app/panes.css' %}">
-    <link rel="stylesheet" href="{% static 'scholar/css/scholar.css' %}">
+    <link rel="stylesheet" href="{% static 'scholar/css/scholar.css' %}?v=b613b85923e9">
 {% elif scholar_asset_stage == "scripts" %}
         <!-- Must load FIRST: declares STX_MOUNT, which every other script uses. -->
                 <!-- i18n: the JS-only strings, translated server-side for the current
@@ -60,7 +60,7 @@
         {{ scholar_i18n|json_script:"SCHOLAR_I18N" }}
         <script src="{% static 'scholar/js/stx-mount.js' %}"></script>
         <script type="module" src="{% static 'scholar/js/app.js' %}"></script>
-<script src="{% static 'scholar/js/search.js' %}"></script>
+<script src="{% static 'scholar/js/search.js' %}?v=b2088a2f9bc2"></script>
         <script src="{% static 'scholar/js/library.js' %}"></script>
         <script src="{% static 'scholar/js/graph/ForceSimulation.js' %}"></script>
         <script src="{% static 'scholar/js/graph/GraphRenderer.js' %}"></script>

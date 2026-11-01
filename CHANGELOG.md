@@ -7,6 +7,14 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+- Remove redundant Search/Library card titles and the duplicate search-help
+  trigger; keep one functional in-field help control.
+- Keep sorting and collapsible source/filter options in the shared Details pane,
+  freeing the main toolbar for actions on selected papers. Selection actions
+  are disabled until applicable works are selected.
+- Label the current result request size honestly and version updated search
+  assets for ordinary reloads. Search pagination beyond 1000 remains pending.
+
 ## [1.29.0] - 2026-11-01
 
 Operator 2026-10-22 checklist ("Results ... To unlimited"): the

@@ -168,6 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // selection, keyed by DOI-or-title so re-sorts keep the checked rows.
   let lastPapers = [];
   const selected = new Set();
+  let bulkBusy = false;
 
   // Enrichment fans one request per paper; cap the pipeline pill so one
   // click cannot queue hundreds of sequential enrichment runs.
@@ -598,6 +599,15 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function syncSelectAll() {
+    const papers = selectedPapers();
+    [saveSelectedBtn, enrichSelectedBtn, openUrlsBtn, exportBibtexBtn, downloadPdfsBtn]
+      .forEach((button) => {
+        if (button) button.disabled = bulkBusy || papers.length === 0;
+      });
+    const graphButton = document.getElementById("searchGraphSelected");
+    if (graphButton) {
+      graphButton.disabled = bulkBusy || !papers.some((paper) => paper.doi);
+    }
     if (!selectAll) return;
     const visible = viewPapers().map(({ paper, index }) =>
       paperKey(paper, index),
@@ -840,9 +850,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function setBulkBusy(btn, busy) {
-    [saveSelectedBtn, enrichSelectedBtn].forEach((b) => {
-      if (b) b.disabled = busy;
-    });
+    bulkBusy = busy;
+    syncSelectAll();
     if (btn && busy && !btn.dataset.label) {
       btn.dataset.label = btn.textContent;
       btn.textContent = scholarT("Saving…");
@@ -1140,4 +1149,5 @@ document.addEventListener("DOMContentLoaded", () => {
       hide(loading);
     }
   });
+  syncSelectAll();
 });

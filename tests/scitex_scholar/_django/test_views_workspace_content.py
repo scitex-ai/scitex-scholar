@@ -1,6 +1,7 @@
 """New native-index/fragment controls using the genuine private request fixture."""
 
 import re
+from urllib.parse import urlsplit
 
 import pytest
 from bs4 import BeautifulSoup, Comment
@@ -143,11 +144,11 @@ def test_index_workspace_content_preserves_native_rendering(
             "library_text": fragment.select_one('[aria-controls="tab-library"]').get_text(),
             "shell_content_panes": len(full.select("main#main-content.ws-module-pane")),
             "scripts": tuple(
-                node["src"] for node in full.select("script[src]")
+                urlsplit(node["src"]).path for node in full.select("script[src]")
                 if node["src"].startswith("/static/scholar/")
             ),
             "stylesheets": [
-                node["href"] for node in full.select('link[rel="stylesheet"]')
+                urlsplit(node["href"]).path for node in full.select('link[rel="stylesheet"]')
                 if node["href"].startswith("/static/scholar/")
             ],
             "mounts": [node["content"] for node in full.select('meta[name="stx-mount"]')],
@@ -224,6 +225,9 @@ def test_search_query_is_a_multiline_textarea_with_in_field_help(
         tools is not None and tools.select_one("#searchSyntaxToggle") is not None,
         "Ctrl" in (tools.get_text() if tools else ""),
     ) == (True, True, True, True)
+    # There must be one help trigger: duplicate IDs bind the header copy and
+    # leave the visible in-field control inert.
+    assert len(dom.select("#searchSyntaxToggle")) == 1
 
 
 def test_toolbar_row_and_stepper_live_above_the_results(_private_context):

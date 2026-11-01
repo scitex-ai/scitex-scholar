@@ -45,19 +45,6 @@
                     <div class="citation-graph-container">
                         <!-- Input Form -->
                         <div class="graph-card">
-                            <div class="graph-card__header">
-                                <span class="graph-card__title">{% trans "Search Papers" %}</span>
-                                <!--
-                                    Old-direct U1: the `?` syntax-help
-                                    affordance. Toggles the panel below,
-                                    populated from GET api/search/syntax-help
-                                    by search.js (STX_MOUNT-joined). The
-                                    button is a bare `?` so it needs no
-                                    translation; the panel heading reuses the
-                                    single "Search syntax help" msgid.
-                                -->
-                                <button type="button" id="searchSyntaxToggle" class="syntax-help-toggle" aria-expanded="false" aria-controls="searchSyntaxPanel" title="{% trans "Search syntax help" %}">?</button>
-                            </div>
                             <div id="searchSyntaxPanel" class="syntax-help-panel" hidden>
                                 <h3 class="syntax-help-panel__title">{% trans "Search syntax help" %}</h3>
                                 <dl id="searchSyntaxList" class="syntax-help-panel__list"></dl>
@@ -103,7 +90,7 @@ e.g. hippocampus -a Smith -ymin 2020 -ymax 2024{% endblocktrans %}"></textarea>
                                             </div>
                                         </div>
                                         <div class="form-group--options">
-                                            <label class="form-label" for="searchMaxResults">{% trans "Results" %}</label>
+                                            <label class="form-label" for="searchMaxResults">{% trans "Results per search" %}</label>
                                             <select id="searchMaxResults" class="form-select">
                                                 <option value="10">10</option>
                                                 <option value="20">20</option>
@@ -133,16 +120,6 @@ e.g. hippocampus -a Smith -ymin 2020 -ymax 2024{% endblocktrans %}"></textarea>
                             relocation changes no wiring. -->
                         <div class="search-toolbar-row">
                             <div class="search-results-toolbar">
-                                <select id="searchSort" class="form-select" aria-label="{% trans "Sort by" %}">
-                                    <option value="relevance" selected>{% trans "Relevance" %}</option>
-                                    <option value="year-desc">{% trans "Year (newest)" %}</option>
-                                    <option value="year-asc">{% trans "Year (oldest)" %}</option>
-                                    <option value="title">{% trans "Title (A-Z)" %}</option>
-                                </select>
-                                <select id="searchSourceFilter" class="form-select" aria-label="{% trans "Source" %}">
-                                    <option value="" selected>{% trans "All sources" %}</option>
-                                </select>
-                                <span class="search-results-toolbar__sep" aria-hidden="true"></span>
                                 <!--
                                     Slice 3 (old-direct unification): the
                                     results-header tools. Old-direct offers
@@ -265,7 +242,6 @@ e.g. hippocampus -a Smith -ymin 2020 -ymax 2024{% endblocktrans %}"></textarea>
                     <div class="citation-graph-container">
                         <div class="graph-card">
                             <div class="graph-card__header">
-                                <span class="graph-card__title">{% trans "Library" %}</span>
                                 <small id="libraryStats" class="card-subtitle"></small>
                             </div>
                             <div class="graph-card__body">
@@ -490,20 +466,9 @@ e.g. hippocampus -a Smith -ymin 2020 -ymax 2024{% endblocktrans %}"></textarea>
                         the Details space). Shown only while the Search tab
                         is active; visibility via syncStripHints in app.js.
                         Control ids and wiring unchanged. -->
-                    <!-- Operator 2026-10-24 (old-direct parity, flat
-                        Details): ONE section, no Databases wrapper, no
-                        Advanced <details>. Sources + Filters + mode +
-                        cache + status render as flat rows directly under
-                        the section header -- theleaf keeps old-direct's
-                        content (11 sources, 6 filters, mode, ignore-cache,
-                        status) with one nest level instead of three.
-                        Control ids and wiring unchanged. -->
-                    <div class="sidebar-section sidebar-section--flat" data-search-hint>
-                        <div class="sidebar-section__header" role="button" tabindex="0" aria-expanded="true">
-                            <span class="sidebar-section__title">{% trans "Search" %}</span>
-                            <span class="sidebar-section__chevron" aria-hidden="true"></span>
-                        </div>
-                        <div class="sidebar-section__content sidebar-section__content--flat">
+                    <!-- Old-direct-style option groups share the SDK Details
+                         pane. No extra Search accordion wraps those groups. -->
+                    <div data-search-hint>
                             <p class="sidebar-section__summary" id="searchStripSummary">{% trans "No search yet." %}</p>
                             <p class="search-advanced__syntax">
                                 {% blocktrans %}Query syntax:
@@ -512,6 +477,18 @@ e.g. hippocampus -a Smith -ymin 2020 -ymax 2024{% endblocktrans %}"></textarea>
                                 publication year,
                                 <code>if:&gt;5</code> filters by impact factor.{% endblocktrans %}
                             </p>
+                            <details class="search-options-group">
+                                <summary>{% trans "Sorters" %}</summary>
+                                <select id="searchSort" class="form-select" aria-label="{% trans "Sort by" %}">
+                                    <option value="relevance" selected>{% trans "Relevance" %}</option>
+                                    <option value="year-desc">{% trans "Year (newest)" %}</option>
+                                    <option value="year-asc">{% trans "Year (oldest)" %}</option>
+                                    <option value="title">{% trans "Title (A-Z)" %}</option>
+                                </select>
+                                <select id="searchSourceFilter" class="form-select" aria-label="{% trans "Source" %}">
+                                    <option value="" selected>{% trans "All sources" %}</option>
+                                </select>
+                            </details>
                             <div class="search-advanced__row">
                                 <label class="form-label" for="searchMode">{% trans "Search source" %}</label>
                                 <select id="searchMode" class="form-select" title="{% trans "All sources (parallel)" %}">
@@ -519,18 +496,18 @@ e.g. hippocampus -a Smith -ymin 2020 -ymax 2024{% endblocktrans %}"></textarea>
                                     <option value="single">{% trans "Single source" %}</option>
                                 </select>
                             </div>
-                            <div class="search-advanced__row search-advanced__row--stack">
-                                <span class="form-label" id="searchSourcesLabel">{% trans "Sources" %}</span>
+                            <details class="search-options-group">
+                                <summary id="searchSourcesLabel">{% trans "Sources" %}</summary>
                                 <div class="search-sources-grid search-sources-grid--tiered" id="searchSourcesGrid" role="group" aria-labelledby="searchSourcesLabel">
 <div class="source-tier">
-<p class="source-tier__label">{% trans "Local (fast, unlimited)" %}</p>
-<label class="search-advanced__check" title="{% trans "Crossref database on the SciTeX server — fast, unlimited" %}">
+<p class="source-tier__label">{% trans "Local (fast)" %}</p>
+<label class="search-advanced__check" title="{% trans "Crossref database on the SciTeX server — fast" %}">
                                                 <input type="checkbox" class="source-toggle" value="crossref_local" checked>
                                                 Crossref (SciTeX)
                                             
                                                 <small class="source-rate" title="Rate limit">&#8734;</small>
                                             </label>
-<label class="search-advanced__check" title="{% trans "OpenAlex database on the SciTeX server — fast, unlimited" %}">
+<label class="search-advanced__check" title="{% trans "OpenAlex database on the SciTeX server — fast" %}">
                                                 <input type="checkbox" class="source-toggle" value="openalex_local">
                                                 OpenAlex (SciTeX)
                                             
@@ -595,10 +572,10 @@ e.g. hippocampus -a Smith -ymin 2020 -ymax 2024{% endblocktrans %}"></textarea>
                                             </label>
 </div>
 <p class="source-notice">Rate limits shown per source. Your email is used for API requests to receive higher rate limits.</p>
-                                                                        <p class="search-sources-hint">{% trans "Crossref (SciTeX) is checked by default — fast, unlimited. Check more sources to widen the search." %}</p>
-                            </div>
-                            <div class="search-advanced__row search-advanced__row--stack">
-                                <span class="form-label" id="searchFiltersLabel">{% trans "Filters" %}</span>
+                                                                        <p class="search-sources-hint">{% trans "Crossref (SciTeX) is checked by default — fast. Check more sources to widen the search." %}</p>
+                            </details>
+                            <details class="search-options-group">
+                                <summary id="searchFiltersLabel">{% trans "Filters" %}</summary>
                                 <div class="search-filters-grid" role="group" aria-labelledby="searchFiltersLabel">
 <div class="search-filters-grid" role="group" aria-labelledby="searchFiltersLabel">
                                             <label class="search-filters-grid__item">
@@ -627,7 +604,7 @@ e.g. hippocampus -a Smith -ymin 2020 -ymax 2024{% endblocktrans %}"></textarea>
                                             </label>
                                         </div>
                                 </div>
-                            </div>
+                            </details>
                             <div class="search-advanced__row">
                                 <label class="search-advanced__check">
                                     <input type="checkbox" id="searchNoCache">
@@ -642,7 +619,6 @@ e.g. hippocampus -a Smith -ymin 2020 -ymax 2024{% endblocktrans %}"></textarea>
                                     <span style="color: var(--status-error);">&#9679;</span> {% trans "Not configured" %}
                                 {% endif %}
                             </div>
-                        </div>
                     </div>
                     <!-- Library ops: Import / Export, project sync target,
                         Zotero, Connected Papers (operator 2026-10-22: the
