@@ -7,6 +7,15 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.29.1] - 2026-11-01
+
+Graph Library keeps its per-user JSON file authoritative even when the optional
+shared mirror is stale or read-only. Lock and atomically replace graph recipes,
+retain legacy database-only recipes, and use the actual shared-store read API.
+Save/load all DOI seeds and graph width for multi-paper networks. Mounted hosts
+can provide an authorized user-home capability for durable `.scitex/scholar/library`
+persistence; existing explicit root/base overrides remain supported.
+
 ## [1.29.0] - 2026-11-01
 
 Operator 2026-10-22 checklist ("Results ... To unlimited"): the
