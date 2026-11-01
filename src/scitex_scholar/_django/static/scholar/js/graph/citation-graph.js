@@ -313,7 +313,7 @@ class CitationGraphManager {
 
   // Brief-05: Graph Library CRUD over the thin api/graphs/* endpoints
   // (1.24.0). The file stays authoritative server-side; the store is
-  // the derived mirror -- the client only ever sees merged rows.
+  // a derived mirror; the client receives the authoritative user-file rows.
   csrfJsonHeaders() {
     const csrfInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
     const headers = { "Content-Type": "application/json" };
@@ -975,18 +975,6 @@ class CitationGraphManager {
     img.src = url;
   }
 
-  /**
-   * Slice 9 (old-direct unification): saved graphs. Hub's graph page
-   * saves/loads/deletes graphs; the leaf backend ships the same endpoints
-   * (parity slice 1) with no UI. Recipes rebuild from the seed DOI through
-   * the existing network build -- no new backend.
-   */
-  csrfJsonHeaders() {
-    const csrfInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
-    const headers = { "Content-Type": "application/json" };
-    if (csrfInput && csrfInput.value) headers["X-CSRFToken"] = csrfInput.value;
-    return headers;
-  }
 
   esc(text) {
     const d = document.createElement("div");

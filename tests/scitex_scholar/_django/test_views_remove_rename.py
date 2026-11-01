@@ -11,6 +11,7 @@ recipe name (400 empty/overlong, 404 unknown). Library roots bind via
 """
 
 import json
+import pytest
 from pathlib import Path
 
 from django.test import RequestFactory
@@ -196,68 +197,33 @@ def test_graph_library_carries_load_and_rename_actions():
     assert present
 
 
-class _FakeRead:
-    """In-memory stand-in for the scitex_dev.store read handle."""
+@pytest.fixture(scope="module")
+def graph_mirror():
+    """A genuine provisioned Store in a private, automatically removed PostgreSQL."""
+    from scitex_dev.store import Store, StoreTarget, WriterPolicy
+    from scitex_dev.store.testing import ephemeral_cluster_dsn, ephemeral_schema
+    from scitex_scholar.citation_graph._saved_graph_store import schema, STORE_NAME
 
-    def __init__(self, store):
-        self._store = store
-
-    def rows(self, include_hidden=False):
-        del include_hidden  # the real door filters server-side; list filters
-        from types import SimpleNamespace
-
-        return [
-            SimpleNamespace(values=dict(entry["data"]))
-            for entry in self._store._rows.values()
-            if not entry["hidden"]
-        ]
-
-    def revision(self, key):
-        entry = self._store._rows.get((key["user_root"], key["graph_id"]))
-        return None if entry is None else entry["rev"]
-
-    def is_hidden(self, key):
-        entry = self._store._rows.get((key["user_root"], key["graph_id"]))
-        return False if entry is None else entry["hidden"]
+    with (
+        ephemeral_cluster_dsn() as dsn,
+        ephemeral_schema(dsn, prefix="graph_http") as target,
+    ):
+        store = Store(
+            StoreTarget.postgres(target, pkg="scholar", name=STORE_NAME),
+            schema(),
+            node="http-tests",
+            writer_policy=WriterPolicy.MULTI_WRITER,
+        )
+        try:
+            yield store
+        finally:
+            store.close()
 
 
-class _FakeStore:
-    """In-memory stand-in for the provisioned saved-graphs store."""
-
-    def __init__(self):
-        self._rows = {}
-        self.hides = []
-
-    def put(self, data, expected_revision=None):
-        del expected_revision  # revision protocol is the real store's concern
-        key = (data["user_root"], data["graph_id"])
-        if key in self._rows:
-            self._rows[key]["data"].update(data)
-            self._rows[key]["rev"] += 1
-        else:
-            self._rows[key] = {"data": dict(data), "rev": 1, "hidden": False}
-
-    def hide(self, key, expected_revision=None):
-        del expected_revision
-        self.hides.append(dict(key))
-        entry = self._rows.get((key["user_root"], key["graph_id"]))
-        if entry is not None:
-            entry["hidden"] = True
-
-    def read(self):
-        return _FakeRead(self)
-
-
-def _provisioned():
-    """Offline store double (PA-306: passed as a parameter, never patched)."""
-    fake = _FakeStore()
-    return fake, lambda: fake
-
-
-def test_graph_delete_hides_the_store_row(tmp_path):
+def test_graph_delete_hides_the_store_row(tmp_path, graph_mirror):
     # Arrange -- operator 2026-10-24 (graphs as CUI data): delete must
     # hide the derived store mirror, or the row resurrects on next read.
-    fake, opener = _provisioned()
+    opener = lambda: graph_mirror
     saved = json.loads(
         views.graphs_save(
             _post(
@@ -277,13 +243,18 @@ def test_graph_delete_hides_the_store_row(tmp_path):
     listed = json.loads(
         views.graphs_list(_get("/api/graphs/list", tmp_path), _opener=opener).content
     )
-    assert (resp.status_code, listed["graphs"], len(fake.hides)) == (200, [], 1)
+    key = {"user_root": str(tmp_path.resolve()), "graph_id": saved["id"]}
+    assert (resp.status_code, listed["graphs"], graph_mirror.is_hidden(key)) == (
+        200,
+        [],
+        True,
+    )
 
 
-def test_graph_rename_updates_the_store_row(tmp_path):
+def test_graph_rename_updates_the_store_row(tmp_path, graph_mirror):
     # Arrange -- operator 2026-10-24 (graphs as CUI data): rename must
     # reach the derived store mirror, or the next read shows the old name.
-    _, opener = _provisioned()
+    opener = lambda: graph_mirror
     saved = json.loads(
         views.graphs_save(
             _post(
@@ -307,7 +278,13 @@ def test_graph_rename_updates_the_store_row(tmp_path):
     listed = json.loads(
         views.graphs_list(_get("/api/graphs/list", tmp_path), _opener=opener).content
     )
-    assert (resp.status_code, [g["name"] for g in listed["graphs"]]) == (
+    key = {"user_root": str(tmp_path.resolve()), "graph_id": saved["id"]}
+    assert (
+        resp.status_code,
+        [g["name"] for g in listed["graphs"]],
+        graph_mirror.get(key).values["name"],
+    ) == (
         200,
         ["New name"],
+        "New name",
     )
