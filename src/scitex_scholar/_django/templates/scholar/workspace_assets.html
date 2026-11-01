@@ -1,4 +1,4 @@
-{% load static %}
+{% load static scitex_static %}
 {% if scholar_asset_stage == "head" %}
         {% comment %}
         scitex-sdk's `stx-mount` contract: the server declares where this app
@@ -32,7 +32,7 @@
     <link rel="manifest" href="{% static 'scholar/pwa/manifest.json' %}">
     <meta name="theme-color" content="#0d0d0d">
     <link rel="apple-touch-icon" href="{% static 'scholar/pwa/apple-touch-icon.png' %}">
-    <link rel="stylesheet" href="{% static 'scitex_sdk/ui/css/app/app-header.css' %}">
+    <link rel="stylesheet" href="{% app_static 'scitex_sdk/ui/css/app/app-header.css' %}">
     {% comment %}
     SDK SSoT content-tabs primitive (operator UI standard, card
     scholar-ui-standard-tabs-colors-20261016): the shared sheet owns the
@@ -40,15 +40,15 @@
     scitex-sdk>=0.3.9 -- underline-only selected tab (navy/gold, SDK #60);
     older releases carry the vetoed boxed + brand-blue look.
     {% endcomment %}
-    <link rel="stylesheet" href="{% static 'scitex_sdk/ui/css/app/content-tabs.css' %}">
+    <link rel="stylesheet" href="{% app_static 'scitex_sdk/ui/css/app/content-tabs.css' %}">
     {% comment %}
     SDK SSoT panes (operator brief-04): the columns are the shared
     data-stx-panes / data-stx-pane element; this sheet + panes.js own
     the desktop row contract and the phone tab bar. layout="app" keeps
     scholar's own desktop geometry (see _layout.css).
     {% endcomment %}
-    <link rel="stylesheet" href="{% static 'scitex_sdk/ui/css/app/panes.css' %}">
-    <link rel="stylesheet" href="{% static 'scholar/css/scholar.css' %}?v=433d51457646">
+    <link rel="stylesheet" href="{% app_static 'scitex_sdk/ui/css/app/panes.css' %}">
+    <link rel="stylesheet" href="{% app_static 'scholar/css/scholar.css' %}">
 {% elif scholar_asset_stage == "scripts" %}
         <!-- Must load FIRST: declares STX_MOUNT, which every other script uses. -->
                 <!-- i18n: the JS-only strings, translated server-side for the current
@@ -58,23 +58,23 @@
              whole page flips together, so there is never an EN/JA mix. -->
         <!-- json_script, not a plain variable: autoescape turns " into &quot;, which a script body never decodes. -->
         {{ scholar_i18n|json_script:"SCHOLAR_I18N" }}
-        <script src="{% static 'scholar/js/stx-mount.js' %}"></script>
-        <script type="module" src="{% static 'scholar/js/app.js' %}?v=cc2a3ad5b294"></script>
-<script src="{% static 'scholar/js/search.js' %}?v=06b2d31c6b2c"></script>
-        <script src="{% static 'scholar/js/library.js' %}?v=7506eade943e"></script>
-        <script src="{% static 'scholar/js/graph/ForceSimulation.js' %}"></script>
-        <script src="{% static 'scholar/js/graph/GraphRenderer.js' %}"></script>
-        <script src="{% static 'scholar/js/graph/citation-graph.js' %}"></script>
+        <script src="{% app_static 'scholar/js/stx-mount.js' %}"></script>
+        <script type="module" src="{% app_static 'scholar/js/app.js' %}"></script>
+<script src="{% app_static 'scholar/js/search.js' %}"></script>
+        <script src="{% app_static 'scholar/js/library.js' %}"></script>
+        <script src="{% app_static 'scholar/js/graph/ForceSimulation.js' %}"></script>
+        <script src="{% app_static 'scholar/js/graph/GraphRenderer.js' %}"></script>
+        <script src="{% app_static 'scholar/js/graph/citation-graph.js' %}"></script>
         {% comment %}
         Shared AppHeader mount + picker placement. Deferred modules run in
         document order, so the mount client registers before this placement
         script, and both run before DOMContentLoaded fires.
         {% endcomment %}
-        <script type="module" src="{% static 'scitex_sdk/ui/js/app/app-header.js' %}"></script>
+        <script type="module" src="{% app_static 'scitex_sdk/ui/js/app/app-header.js' %}"></script>
         {% comment %}
         SDK SSoT panes companion (operator brief-04): auto-mounts on
         [data-stx-panes] and owns the phone pane tab bar + switching.
         {% endcomment %}
-        <script type="module" src="{% static 'scitex_sdk/ui/js/app/panes.js' %}"></script>
-        <script type="module" src="{% static 'scholar/js/header-picker.js' %}"></script>
+        <script type="module" src="{% app_static 'scitex_sdk/ui/js/app/panes.js' %}"></script>
+        <script type="module" src="{% app_static 'scholar/js/header-picker.js' %}"></script>
 {% endif %}
