@@ -79,3 +79,12 @@ starting an automatic all-corpus download. See [page semantics](../../../../docs
 and `tests/scitex_scholar/_django/test_search_pages.py` for the source-backed
 contract. This does not claim all-results virtualization or bounded browser
 memory across arbitrarily many loaded pages.
+
+## Seeding citation graphs
+
+Select works in Search or Library, then choose **Graph** / **Graph selected**.
+Library selection survives sorting. A graph accepts 1–20 distinct valid DOIs;
+larger selections are refused with a visible message, not silently truncated.
+The Citation Graph tab offers links back to those selection tabs and puts its
+visualization above the saved Graph Library. Selecting works does not itself
+save papers or graphs.

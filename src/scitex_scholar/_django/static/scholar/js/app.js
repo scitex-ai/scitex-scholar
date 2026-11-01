@@ -137,6 +137,13 @@ function initScholarTabs(root) {
     if (next) activateTab(next, focus);
   }
 
+  root.querySelectorAll("[data-scholar-seed-tab]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const target = tabs.find((tab) => tabKey(tab) === button.dataset.scholarSeedTab);
+      if (target) activateTab(target, true);
+    });
+  });
+
   tabs.forEach((tab) => {
     tab.addEventListener("click", () => activateTab(tab, false));
     // Roving tabindex: ArrowLeft/ArrowRight move selection AND focus, per
