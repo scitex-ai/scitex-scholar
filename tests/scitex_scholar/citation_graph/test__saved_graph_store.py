@@ -326,3 +326,95 @@ def test_graph_file_cannot_escape_the_user_library_through_a_symlink(tmp_path):
         failed = True
     # Assert
     assert (failed, protected.read_text()) == (True, "[]")
+
+
+@pytest.mark.parametrize("home", [None, "relative-home"])
+def test_configured_user_home_capability_never_falls_back_when_refused(
+    graph_http, home
+):
+    # Arrange
+    from types import SimpleNamespace
+    from django.core.exceptions import PermissionDenied
+    from django.test import override_settings
+
+    views, factory = graph_http
+    request = factory.get("/api/graphs/list")
+    request.user = SimpleNamespace(
+        username="owner", is_authenticated=True, is_anonymous=False
+    )
+    # Act
+    refused = False
+    with override_settings(SCITEX_USER_HOME_PROVIDER=lambda req: home):
+        try:
+            views._library_root_for(request)
+        except PermissionDenied:
+            refused = True
+    # Assert
+    assert refused is True
+
+
+def test_user_home_library_symlink_cannot_escape_the_authorized_home(
+    tmp_path, graph_http
+):
+    # Arrange
+    from types import SimpleNamespace
+    from django.core.exceptions import PermissionDenied
+    from django.test import override_settings
+
+    views, factory = graph_http
+    owner, outside = tmp_path / "owner", tmp_path / "other"
+    owner.mkdir()
+    outside.mkdir()
+    (owner / ".scitex").symlink_to(outside, target_is_directory=True)
+    request = factory.get("/api/graphs/list")
+    request.user = SimpleNamespace(
+        username="owner", is_authenticated=True, is_anonymous=False
+    )
+    # Act
+    refused = False
+    with override_settings(SCITEX_USER_HOME_PROVIDER=lambda req: owner):
+        try:
+            views._library_root_for(request)
+        except PermissionDenied:
+            refused = True
+    # Assert
+    assert refused is True
+
+
+def test_provider_bound_graph_persists_across_requests_and_project_changes(
+    tmp_path, graph_http, graph_store
+):
+    # Arrange
+    from types import SimpleNamespace
+    from django.test import override_settings
+
+    views, factory = graph_http
+    store, _ = graph_store
+    owner = SimpleNamespace(username="owner", is_authenticated=True, is_anonymous=False)
+    save = factory.post(
+        "/api/graphs/save?project=owner/first",
+        data=json.dumps({"name": "Durable", "seed_dois": ["10.1/a", "10.1/b"]}),
+        content_type="application/json",
+    )
+    save.user = owner
+    listing = factory.get("/api/graphs/list?project=owner/second")
+    listing.user = owner
+    # Act
+    with override_settings(
+        SCITEX_USER_HOME_PROVIDER=lambda req: tmp_path / req.user.username
+    ):
+        result = views.graphs_save(save, _opener=lambda: store)
+        rows = json.loads(views.graphs_list(listing, _opener=lambda: store).content)[
+            "graphs"
+        ]
+    file_rows = json.loads(
+        (
+            tmp_path / "owner/.scitex/scholar/library/SAVED_GRAPHS/saved_graphs.json"
+        ).read_text()
+    )
+    # Assert
+    assert (result.status_code, rows, rows[0]["seed_dois"]) == (
+        200,
+        file_rows,
+        ["10.1/a", "10.1/b"],
+    )
