@@ -7,6 +7,8 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+- Escape plain bibliographic text for BibTeX/LaTeX exactly once, preserving identifiers, URLs and non-TeX exports. Limit abstracts before encoding so escape commands remain complete; actual MNIST bibliography now typesets its journal ampersand.
+
 - Add an explicit, dry-run-first MNIST showcase Library adapter with four primary-source-verified references, no-overwrite Paper/PaperIO admission and additive project links. Preserve existing user metadata, links and bibliographies; no automatic GET seeding, network, model run or derived-store write.
 
 ## [1.29.1] - 2026-11-02
