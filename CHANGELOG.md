@@ -7,6 +7,11 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+- Keep the shared SDK Details pane while grouping Sources, Sorters and Filters
+  like the reference UI. Add stable citation/impact-factor sorting of loaded
+  results, preserve work selection and provider relevance order, and reset
+  paired search bounds without triggering another search.
+
 ## [1.29.1] - 2026-11-02
 
 - Require SDK 0.3.17 for the declared user/project scope capability contract in

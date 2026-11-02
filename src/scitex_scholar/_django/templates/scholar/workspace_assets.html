@@ -49,6 +49,7 @@
     {% endcomment %}
     <link rel="stylesheet" href="{% app_static 'scitex_sdk/ui/css/app/panes.css' %}">
     <link rel="stylesheet" href="{% app_static 'scholar/css/scholar.css' %}">
+    <link rel="stylesheet" href="{% app_static 'scholar/css/search-details.css' %}">
 {% elif scholar_asset_stage == "scripts" %}
         <!-- Must load FIRST: declares STX_MOUNT, which every other script uses. -->
                 <!-- i18n: the JS-only strings, translated server-side for the current
@@ -60,6 +61,7 @@
         {{ scholar_i18n|json_script:"SCHOLAR_I18N" }}
         <script src="{% app_static 'scholar/js/stx-mount.js' %}"></script>
         <script type="module" src="{% app_static 'scholar/js/app.js' %}"></script>
+<script src="{% app_static 'scholar/js/search-order.js' %}"></script>
 <script src="{% app_static 'scholar/js/search.js' %}"></script>
         <script src="{% app_static 'scholar/js/library.js' %}"></script>
         <script src="{% app_static 'scholar/js/graph/ForceSimulation.js' %}"></script>

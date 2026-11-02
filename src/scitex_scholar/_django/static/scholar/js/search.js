@@ -562,19 +562,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (source) {
       papers = papers.filter(({ paper }) => (paper.source || "") === source);
     }
-    if (order === "year-desc" || order === "year-asc") {
-      const dir = order === "year-desc" ? -1 : 1;
-      papers = papers
-        .slice()
-        .sort((a, b) => ((a.paper.year || 0) - (b.paper.year || 0)) * dir);
-    } else if (order === "title") {
-      papers = papers
-        .slice()
-        .sort((a, b) =>
-          String(a.paper.title || "").localeCompare(String(b.paper.title || "")),
-        );
-    }
-    return papers;
+    return window.ScholarSearchOrder.sortEntries(papers, order);
   }
 
   function refreshSourceOptions() {
@@ -998,16 +986,39 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  if (sortSelect) {
-    sortSelect.addEventListener("change", () => {
-      resultsContent.replaceChildren();
-      const visible = viewPapers();
-      visible.forEach(({ paper, index }) =>
-        resultsContent.appendChild(renderPaper(paper, index)),
-      );
-      syncSelectAll();
+  const sortButtons = document.querySelectorAll("[data-search-sort]");
+  function syncSortButtons() {
+    sortButtons.forEach((button) => {
+      const direction = window.ScholarSearchOrder.direction(sortSelect.value, button.dataset.searchSort);
+      button.setAttribute("aria-pressed", String(direction !== "none"));
+      button.dataset.direction = direction;
+      button.querySelector("[data-sort-indicator]").textContent = direction === "asc" ? "↑" : direction === "desc" ? "↓" : "↕";
+      const label = button.querySelector("span").textContent;
+      button.setAttribute("aria-label", `${label}: ${direction === "asc" ? button.dataset.labelAscending : direction === "desc" ? button.dataset.labelDescending : button.dataset.labelUnsorted}`);
     });
   }
+  function refreshLoadedResults() {
+    resultsContent.replaceChildren();
+    viewPapers().forEach(({ paper, index }) => resultsContent.appendChild(renderPaper(paper, index)));
+    syncSelectAll();
+  }
+  if (sortSelect) {
+    sortSelect.addEventListener("change", () => { syncSortButtons(); refreshLoadedResults(); });
+    sortButtons.forEach((button) => button.addEventListener("click", () => {
+      sortSelect.value = window.ScholarSearchOrder.nextOrder(sortSelect.value, button.dataset.searchSort);
+      sortSelect.dispatchEvent(new Event("change"));
+    }));
+    document.getElementById("searchResetSort")?.addEventListener("click", () => {
+      sortSelect.value = "relevance";
+      sortSelect.dispatchEvent(new Event("change"));
+    });
+    syncSortButtons();
+  }
+  document.getElementById("searchResetFilters")?.addEventListener("click", () => {
+    Object.values(filterInputs).forEach((input) => { if (input) input.value = ""; });
+    if (sourceFilter) sourceFilter.value = "";
+    refreshLoadedResults();
+  });
   if (sourceFilter) {
     sourceFilter.addEventListener("change", () => {
       resultsContent.replaceChildren();
