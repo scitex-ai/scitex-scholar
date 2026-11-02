@@ -1,6 +1,7 @@
 """New native-index/fragment controls using the genuine private request fixture."""
 
 import re
+from urllib.parse import urlsplit
 
 import pytest
 from bs4 import BeautifulSoup, Comment
@@ -23,7 +24,7 @@ _SCRIPT_NAMES = (
 )
 # Operator 2026-10-23 (seed-only Graph tab): the typed-DOI form is
 # deleted, so graphForm is no longer a native-rendered id. The seed list
-# (graphLibrarySeed) + canvas + saved-entity CRUD live in the Graph JS.
+# is now in Search/Library; canvas + saved-entity CRUD live in Graph JS.
 _CONTENT_IDS = {
     "searchForm", "tab-search", "tab-library", "libraryImportFile",
     "libraryImportBtn", "libraryExportBtn", "tab-graph",
@@ -143,11 +144,11 @@ def test_index_workspace_content_preserves_native_rendering(
             "library_text": fragment.select_one('[aria-controls="tab-library"]').get_text(),
             "shell_content_panes": len(full.select("main#main-content.ws-module-pane")),
             "scripts": tuple(
-                node["src"] for node in full.select("script[src]")
+                urlsplit(node["src"]).path for node in full.select("script[src]")
                 if node["src"].startswith("/static/scholar/")
             ),
             "stylesheets": [
-                node["href"] for node in full.select('link[rel="stylesheet"]')
+                urlsplit(node["href"]).path for node in full.select('link[rel="stylesheet"]')
                 if node["href"].startswith("/static/scholar/")
             ],
             "mounts": [node["content"] for node in full.select('meta[name="stx-mount"]')],
@@ -226,6 +227,15 @@ def test_search_query_is_a_multiline_textarea_with_in_field_help(
     ) == (True, True, True, True)
 
 
+def test_query_help_trigger_id_is_unique(_private_context):
+    # Arrange — a duplicate ID would bind the hidden control instead.
+    request = RequestFactory().get("/")
+    # Act
+    dom = BeautifulSoup(views.index(request).content.decode(), "html.parser")
+    # Assert
+    assert len(dom.select("#searchSyntaxToggle")) == 1
+
+
 def test_toolbar_row_and_stepper_live_above_the_results(_private_context):
     # Arrange -- operator 2026-10-24 (old-direct parity): the action
     # toolbar + pipeline stepper stay visible pre-search in their own row,
@@ -244,6 +254,39 @@ def test_toolbar_row_and_stepper_live_above_the_results(_private_context):
     assert (
         order[0] < order[1] < order[2] < order[3] < order[4]
     ) == True
+
+
+def test_library_graph_selection_starts_disabled(_private_context):
+    # Arrange
+    request = RequestFactory().get("/")
+    # Act
+    dom = BeautifulSoup(views.index(request).content.decode(), "html.parser")
+    library = dom.select_one("#tab-library")
+    # Assert
+    assert (library.select_one("#librarySelectAll").has_attr("disabled"),
+            library.select_one("#libraryGraphSelected").has_attr("disabled")) == (True, True)
+
+
+def test_graph_seed_guidance_replaces_the_duplicate_list(_private_context):
+    # Arrange
+    request = RequestFactory().get("/")
+    # Act
+    dom = BeautifulSoup(views.index(request).content.decode(), "html.parser")
+    graph = dom.select_one("#tab-graph")
+    # Assert
+    assert (graph.select_one("#graphLibrarySeed"),
+            {node["data-scholar-seed-tab"] for node in graph.select("#graphSeedGuidance button")}) == (None, {"search", "library"})
+
+
+def test_graph_visualization_precedes_its_saved_library(_private_context):
+    # Arrange
+    request = RequestFactory().get("/")
+    # Act
+    dom = BeautifulSoup(views.index(request).content.decode(), "html.parser")
+    graph = dom.select_one("#tab-graph")
+    descendants = list(graph.descendants)
+    # Assert
+    assert descendants.index(graph.select_one("#graphCanvas")) < descendants.index(graph.select_one("#graphSavedList"))
 
 
 def test_source_defaults_match_old_direct(_private_context):
@@ -288,7 +331,7 @@ def test_search_js_wires_textarea_enter_and_ctrl_k():
 def test_columns_are_shared_sdk_panes_not_leaf_divs(_private_context):
     # Arrange -- operator brief-04: the columns ARE the shared scitex-sdk
     # panes element (data-stx-panes / data-stx-pane + SDK panes.css/js).
-    # layout="app" keeps scholar's desktop geometry; the fragment stays
+    # layout="main-details" uses the SDK desktop grid; the fragment stays
     # pure content (no tag-emitted link/script mid-body) and the panes
     # contract owns the phone tab bar + switching.
     request = RequestFactory().get("/")
@@ -300,7 +343,7 @@ def test_columns_are_shared_sdk_panes_not_leaf_divs(_private_context):
     details = dom.select_one('aside.app-status-strip[data-stx-pane="details"]')
     # Assert
     assert (
-        wrapper is not None and wrapper.get("data-stx-panes-layout") == "app",
+        wrapper is not None and wrapper.get("data-stx-panes-layout") == "main-details",
         main is not None and main.parent == wrapper,
         details is not None and details.parent == wrapper,
         "panes.css" in html and "panes.js" in html,

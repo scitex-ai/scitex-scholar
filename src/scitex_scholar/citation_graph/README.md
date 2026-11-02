@@ -34,8 +34,9 @@ summary = builder.get_paper_summary("10.1038/s41586-020-2008-3")
 citation_graph/
 ├── __init__.py          # Package exports
 ├── builder.py           # CitationGraphBuilder (main interface)
-├── database.py          # Database queries and connection management
+├── database_http.py     # crossref-local HTTP metadata/graph client
 ├── models.py            # Data models (PaperNode, CitationEdge, CitationGraph)
+├── _saved_graph_store.py # User graph recipes + optional derived store mirror
 └── README.md            # This file
 ```
 
@@ -123,3 +124,30 @@ Two behavioural notes that follow from the HTTP boundary:
 - Co-citation: Small, H. (1973). Co-citation in the scientific literature. *J. Am. Soc. Inf. Sci.*
 - Bibliographic coupling: Kessler, M. M. (1963). Bibliographic coupling. *American Documentation*
 - Connected Papers (inspiration): https://www.connectedpapers.com/
+
+
+## Graph Library
+
+The Citation Graph tab builds networks from works selected in Search or Library.
+Its Graph Library saves named recipes, including all seed DOIs (up to 20) and
+the graph width. Load rebuilds the network from those seeds; Rename and Delete
+operate on the saved recipe, without changing papers in the scholarly library.
+Legacy single-`seed_doi` recipes remain loadable.
+
+Recipes live in `SAVED_GRAPHS/saved_graphs.json` under the user's Scholar library.
+Standalone defaults to `~/.scitex/scholar/library`. A mounted host may supply the
+request-aware `SCITEX_USER_HOME_PROVIDER`; the leaf then uses that authorized
+home's `.scitex/scholar/library`. Explicit trusted request roots and the existing
+`SCITEX_SCHOLAR_MOUNTED_LIBRARY_BASE` administrator override take precedence.
+The provider owns user authorization; the leaf imports no Hub models and does
+not derive a home from a client-supplied project or path.
+
+The user file is authoritative, including an empty library. Updates hold a
+cross-process file lock and replace a same-directory temporary file atomically;
+invalid existing JSON is reported rather than discarded. A missing file may
+import legacy database-only recipes once. The shared store is a best-effort
+mirror: stale or read-only database rows cannot hide recent file saves or bring
+back deleted recipes. New optional mirror fields need the normal authorized
+store-schema provisioning; requests keep their file persistence when that
+mirror is unavailable. The mirror uses the public `scitex_dev.store.Store`
+`rows`, `revision`, and `is_hidden` methods.

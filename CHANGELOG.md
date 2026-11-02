@@ -7,6 +7,50 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.29.1] - 2026-11-02
+
+- Require SDK 0.3.17 for the declared user/project scope capability contract in
+  GUI and development installs. The shared SDK owns version-badge appearance;
+  remove the leaf typography/color override.
+
+- Opt into the shared SDK main-details desktop layout: 320px Details default,
+  responsive phone panes, and preserved host-restored inline widths through
+  collapse/expansion. Remove Scholar's competing 208px/flex column geometry.
+- Use the SDK app_static content-hash helper for active CSS/JavaScript URLs,
+  including the graph client. The required shared layout and scope contracts
+  are available in the published SDK 0.3.17.
+
+- Add Library work selection and Graph selected, preserving selection while
+  sorting. Both Search and Library accept 1–20 distinct valid DOI seeds and
+  refuse larger selections explicitly instead of silently truncating them.
+- Keep Graph focused on its visualization, with compact links to select works
+  in Search or Library and the saved Graph Library below the visualization.
+
+- Add explicit local Crossref search pages with provider totals, continuation
+  offsets, and Load more. Page requests remain bounded while total access is
+  no longer capped at 1000. Counts identify source matches before filters and
+  deduplication; online/multi-source search retains its bounded list contract.
+
+- Remove redundant Search/Library card titles and the duplicate search-help
+  trigger; keep one functional in-field help control.
+- Keep sorting and collapsible source/filter options in the shared Details pane,
+  freeing the main toolbar for actions on selected papers. Selection actions
+  are disabled until applicable works are selected.
+- Label the current result request size honestly and version updated search
+  assets for ordinary reloads.
+
+Graph Library keeps its per-user JSON file authoritative even when the optional
+shared mirror is stale or read-only. Lock and atomically replace graph recipes,
+retain legacy database-only recipes, and use the actual shared-store read API.
+Save/load all DOI seeds and graph width for multi-paper networks. Mounted hosts
+can provide an authorized user-home capability for durable `.scitex/scholar/library`
+persistence; existing explicit root/base overrides remain supported.
+
+- Keep release checks aligned with current behavior: follow content-versioned
+  stylesheet imports, test actual collapsible controls and source labels, and
+  exercise real local pagination through correctly owned test modules. Document
+  bounded multi-source searches and saved graph recipes without snapshot claims.
+
 ## [1.29.0] - 2026-11-01
 
 Operator 2026-10-22 checklist ("Results ... To unlimited"): the

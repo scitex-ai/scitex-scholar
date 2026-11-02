@@ -17,6 +17,7 @@ projects + ?project= filter, save-to-project filing. No new stores.
 import json as _json
 from pathlib import Path
 
+import pytest
 from django.test import RequestFactory
 
 from scitex_scholar._django import views
@@ -345,3 +346,36 @@ def test_library_intro_names_the_per_paper_enrich_action():
     names_action = "per-paper" in TEMPLATE and "Enrich" in TEMPLATE
     # Assert
     assert names_action
+
+
+@pytest.fixture
+def two_project_library(tmp_path):
+    from scitex_scholar.storage._project_reconcile import add_project_to_master
+
+    with _library_env(tmp_path):
+        _seed_library(tmp_path, paper_id="PID1", doi="10.1234/scoped-one", title="One")
+        _seed_library(tmp_path, paper_id="PID2", doi="10.1234/scoped-two", title="Two")
+        for project, paper_id in (("projA", "PID1"), ("projB", "PID2")):
+            folder = tmp_path / project
+            folder.mkdir()
+            (folder / paper_id).symlink_to(f"../MASTER/{paper_id}")
+            add_project_to_master(tmp_path, paper_id, project)
+        yield RequestFactory()
+
+
+def test_owner_slug_filter_reads_only_its_filing_membership(two_project_library):
+    # Arrange
+    request = two_project_library.get("/api/library", {"project": "alice/projA"})
+    # Act
+    selected = _json.loads(views.library_list(request).content)
+    # Assert
+    assert ({paper["paper_id"] for paper in selected["papers"]}, selected["filtered"]) == ({"PID1"}, True)
+
+
+def test_all_projects_scope_retains_each_membership(two_project_library):
+    # Arrange
+    request = two_project_library.get("/api/library")
+    # Act
+    result = _json.loads(views.library_list(request).content)
+    # Assert
+    assert ({paper["paper_id"] for paper in result["papers"]}, result["filtered"]) == ({"PID1", "PID2"}, False)

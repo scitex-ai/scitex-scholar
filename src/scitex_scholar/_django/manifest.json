@@ -44,5 +44,9 @@
       "working_dir_param": "working_dir",
       "path_params": []
     }
+  },
+  "scope_capabilities": {
+    "user": true,
+    "project": true
   }
 }

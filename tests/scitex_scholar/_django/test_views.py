@@ -30,6 +30,7 @@ import json
 import os
 import re
 from pathlib import Path
+from urllib.parse import unquote, urlsplit
 
 import pytest
 import scitex_sdk.ui
@@ -684,13 +685,7 @@ def test_header_links_sdk_ssot_stylesheet():
 
 
 def test_header_does_not_redefine_the_row():
-    """Scholar carries no BARE .stx-app-header rules: the shared sheet owns shape.
-
-    One deliberate exception (operator 2026-10-20): the version pill may be
-    subdued through a `.scholar-app-header`-SCOPED rule only
-    (test_header_version_is_subdued_by_leaf_rule pins it). A bare
-    `.stx-app-header...` rule would fork the shared row and is still banned.
-    """
+    """The SDK owns the shared header appearance."""
     # Arrange
     layout = (
         Path(views.__file__).parent
@@ -1353,13 +1348,16 @@ def _resolve_css(entry: Path, _seen: set | None = None) -> str:
     """
     seen = _seen if _seen is not None else set()
     entry = entry.resolve()
-    if entry in seen or not entry.exists():
+    if entry in seen:
         return ""
     seen.add(entry)
     text = entry.read_text()
     parts = [text]
     for href in _IMPORT_RE.findall(text):
-        parts.append(_resolve_css(entry.parent / href, seen))
+        parsed = urlsplit(href)
+        if parsed.scheme or parsed.netloc:
+            continue  # Remote fonts cannot declare this local page's theme tokens.
+        parts.append(_resolve_css(entry.parent / unquote(parsed.path), seen))
     return "\n".join(parts)
 
 
@@ -2096,7 +2094,7 @@ def test_search_sources_grouped_in_old_direct_tiers():
     # external tier with per-source rate labels + email/rate notice.
     body = _compass_index_body()
     # Act
-    tiers = ("Local (fast, unlimited)" in body, "External APIs (slower, limited results)" in body)
+    tiers = ("Local (fast)" in body, "External APIs (slower, limited results)" in body)
     rates = ("3/s" in body, "50/s" in body, "10/s" in body)
     notice = "higher rate limits" in body
     # Assert
@@ -4493,19 +4491,19 @@ def test_graph_initial_state_explains_seed_and_library_workflow():
     # Arrange
     html = views.index(RequestFactory().get("/")).content.decode()
     # Act -- operator 2026-10-23 seed-only: no DOI typing, no max-papers.
-    expected = ["Seed from your Library"]
+    expected = ["Seed from work(s) selected in", 'data-scholar-seed-tab="search"', 'data-scholar-seed-tab="library"']
     dropped = ["Start with a DOI", "Max papers in graph", 'id="doiInput"']
     # Assert
     assert all(text in html for text in expected) and all(text not in html for text in dropped)
 
 
-def test_graph_tab_carries_seed_list_not_doi_form():
+def test_graph_tab_uses_search_library_selection_without_a_duplicate_seed_list():
     # Arrange -- operator 2026-10-23 seed-only: DOI input deleted.
     html = views.index(RequestFactory().get("/")).content.decode()
     # Act
-    seed_only = ('id="graphLibrarySeed"' in html, 'id="doiInput"' not in html)
+    seed_only = ('id="graphSeedGuidance"' in html, 'id="graphLibrarySeed"' not in html, 'id="doiInput"' not in html)
     # Assert
-    assert seed_only == (True, True)
+    assert seed_only == (True, True, True)
 
 
 def test_graph_width_is_a_fixed_constant():
@@ -5402,7 +5400,7 @@ def test_library_save_bulk_saved_entries_do_not_leak_server_path(tmp_path):
 
 # New Library command controls; all existing source above is retained exactly.
 from django.contrib.auth import get_user_model
-from tests.scitex_scholar._django.test_views_shell_context import _private_context
+from tests.scitex_scholar._django.test_views_shell_context import _private_context as _private_context
 
 
 def _command_library_request(root, user, query="", **query_hints):

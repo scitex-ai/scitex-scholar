@@ -124,3 +124,26 @@ The pipeline skips the browser/download stack, runs metadata
 enrichment from the DOI, copies each file under its role-prefixed name
 into the primary store, and (for `--pdf-main`) checks the PDF's page-1 DOI
 against the metadata to catch silent swaps.
+
+
+## Citation Graph Library
+
+The Graph Library stores graph recipes separately from papers, at
+`<user-library>/SAVED_GRAPHS/saved_graphs.json`. Standalone defaults to
+`~/.scitex/scholar/library`; mounted hosts can provide the authenticated user's
+home through `SCITEX_USER_HOME_PROVIDER`, yielding that same user-home layout.
+Trusted request roots and the existing mounted-base administrator override
+remain supported. A project selector never chooses the user library root.
+
+Use `api/graphs/save` with `name`, `seed_dois` (1–20 DOI strings), and optional
+`top_n` (1–50, default 20); legacy `seed_doi` remains accepted. List uses
+`api/graphs/list`, rename posts `id`/`name` to `api/graphs/rename`, and delete
+posts `id` to `api/graphs/delete`. Mounted mutations retain the host's session
+and CSRF protections. Load rebuilds the graph; it is a recipe rather than a
+frozen network snapshot.
+
+The user file is authoritative and atomic. Do not clear it to repair a stale
+shared mirror: an empty file is a deliberate empty library. Invalid JSON fails
+without replacing the original. Missing files may import existing database-only
+recipes; mirror provisioning uses the authorized operator path, not an API
+request or a broad database grant.

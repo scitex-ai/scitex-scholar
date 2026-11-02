@@ -168,6 +168,15 @@ document.addEventListener("DOMContentLoaded", () => {
   // selection, keyed by DOI-or-title so re-sorts keep the checked rows.
   let lastPapers = [];
   const selected = new Set();
+  const GRAPH_SEED_LIMIT = 20;
+  let graphSelectionError = false;
+  let bulkBusy = false;
+  let pageState = null;
+  let pageBusy = false;
+  let searchRequestId = 0;
+  const paginationPanel = document.getElementById("searchPagination");
+  const paginationStatus = document.getElementById("searchPaginationStatus");
+  const loadMoreButton = document.getElementById("searchLoadMore");
 
   // Enrichment fans one request per paper; cap the pipeline pill so one
   // click cannot queue hundreds of sequential enrichment runs.
@@ -598,6 +607,23 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function syncSelectAll() {
+    const papers = selectedPapers();
+    [saveSelectedBtn, enrichSelectedBtn, openUrlsBtn, exportBibtexBtn, downloadPdfsBtn]
+      .forEach((button) => {
+        if (button) button.disabled = bulkBusy || papers.length === 0;
+      });
+    const graphButton = document.getElementById("searchGraphSelected");
+    const seedCount = selectedGraphDois().length;
+    if (graphButton) {
+      graphButton.disabled = bulkBusy || seedCount === 0 || seedCount > GRAPH_SEED_LIMIT;
+    }
+    if (seedCount > GRAPH_SEED_LIMIT) {
+      graphSelectionError = true;
+      if (bulkStatus) bulkStatus.textContent = scholarT("Select at most %(n)s distinct DOIs for one graph.", { n: GRAPH_SEED_LIMIT });
+    } else if (graphSelectionError) {
+      graphSelectionError = false;
+      if (bulkStatus) bulkStatus.textContent = "";
+    }
     if (!selectAll) return;
     const visible = viewPapers().map(({ paper, index }) =>
       paperKey(paper, index),
@@ -767,10 +793,18 @@ document.addEventListener("DOMContentLoaded", () => {
     URL.revokeObjectURL(url);
   }
 
-  function renderResults(data) {
-    const papers = data.results || [];
-    lastPapers = papers;
-    selected.clear();
+  function renderResults(data, append = false) {
+    if (append) {
+      const seen = new Set(lastPapers.map(paperKey));
+      (data.results || []).forEach((paper) => {
+        const key = paperKey(paper, lastPapers.length);
+        if (!seen.has(key)) { lastPapers.push(paper); seen.add(key); }
+      });
+    } else {
+      lastPapers = data.results || [];
+      selected.clear();
+    }
+    const papers = lastPapers;
     refreshSourceOptions();
     resultsContent.replaceChildren();
 
@@ -783,7 +817,9 @@ document.addEventListener("DOMContentLoaded", () => {
       // without that corpus is not "no match" -- say which corpus is
       // missing so the user checks more sources instead of rephrasing.
       const unavailable = metadata.sources_unavailable || [];
-      empty.textContent = unavailable.length
+      empty.textContent = metadata.pagination && metadata.pagination.total > 0
+        ? scholarT("No papers on the loaded pages pass these filters.")
+        : unavailable.length
         ? scholarT("%(names)s unavailable on this server — check more sources to widen the search.", { names: unavailable.join(", ") })
         : scholarT("No papers matched this query.");
       resultsContent.appendChild(empty);
@@ -799,6 +835,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // request path and the Advanced block's source control); repeating them
     // here is the clutter the operator flagged.
     const parts = [`${papers.length} paper${papers.length === 1 ? "" : "s"}`];
+    const pagination = metadata.pagination;
+    if (pagination) {
+      parts.push(scholarT("%(n)s Crossref source matches before filters and deduplication", { n: pagination.total.toLocaleString() }));
+    } else {
+      parts.push(scholarT("Bounded search; no global total"));
+    }
     // READINESS: which corpus answered. The configured policy is local-first,
     // and the user (and a bug report) must be able to see when the network was
     // actually needed -- a silent fallback is indistinguishable from a local
@@ -815,7 +857,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     const counts = metadata.engine_counts || {};
     const counted = Object.keys(counts);
-    if (counted.length) {
+    if (counted.length && !pagination) {
       // Per-source options are corpus proper nouns and stay as-is (same
       // convention as the source filter's dynamically built options).
       parts.push(counted.map((name) => `${name} ${counts[name]}`).join(", "));
@@ -831,7 +873,44 @@ document.addEventListener("DOMContentLoaded", () => {
       stripSummary.textContent = tail.length ? tail.join(" · ") : parts[0];
     }
     show(results);
+    if (paginationPanel) {
+      paginationPanel.classList.toggle("hidden", !pagination);
+      if (pagination) {
+        if (paginationStatus) paginationStatus.textContent = scholarT("%(n)s papers loaded", { n: papers.length });
+        if (loadMoreButton) {
+          loadMoreButton.disabled = pageBusy || !pagination.has_more;
+          loadMoreButton.textContent = pagination.has_more ? scholarT("Load more") : scholarT("All source pages scanned");
+        }
+      }
+    }
   }
+
+  async function loadMore() {
+    if (!pageState || pageBusy || pageState.nextOffset == null) return;
+    const requestId = searchRequestId;
+    pageBusy = true;
+    if (loadMoreButton) loadMoreButton.disabled = true;
+    hide(errorBox);
+    try {
+      const params = new URLSearchParams(pageState.params);
+      params.set("offset", String(pageState.nextOffset));
+      const response = await fetch(`${STX_MOUNT}/api/search/page?${params}`);
+      const data = await response.json();
+      if (requestId !== searchRequestId) return;
+      if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
+      pageState.nextOffset = data.metadata.pagination.next_offset;
+      pageBusy = false;
+      renderResults(data, true);
+    } catch (error) {
+      if (requestId === searchRequestId) showError(`Search page failed: ${error.message}`, loadMore);
+    } finally {
+      if (requestId === searchRequestId) {
+        pageBusy = false;
+        if (loadMoreButton) loadMoreButton.disabled = pageState.nextOffset == null;
+      }
+    }
+  }
+  if (loadMoreButton) loadMoreButton.addEventListener("click", loadMore);
 
   function selectedPapers() {
     return lastPapers.filter((paper, index) =>
@@ -840,9 +919,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function setBulkBusy(btn, busy) {
-    [saveSelectedBtn, enrichSelectedBtn].forEach((b) => {
-      if (b) b.disabled = busy;
-    });
+    bulkBusy = busy;
+    syncSelectAll();
     if (btn && busy && !btn.dataset.label) {
       btn.dataset.label = btn.textContent;
       btn.textContent = scholarT("Saving…");
@@ -961,19 +1039,26 @@ document.addEventListener("DOMContentLoaded", () => {
   // directly; several build a multi-seed network (api/graph/network/multi,
   // at most 20 seeds). Rows without a DOI are skipped.
   const graphSelectedBtn = document.getElementById("searchGraphSelected");
+  function selectedGraphDois() {
+    return Array.from(new Set(selectedPapers().map((paper) =>
+      String(paper.doi || "").trim().replace(/^https?:\/\/(?:dx\.)?doi\.org\//i, "").replace(/^doi:\s*/i, "").toLowerCase(),
+    ).filter((doi) => /^10\.\d{4,9}\/\S+$/i.test(doi))));
+  }
   function graphSelected() {
-    const dois = selectedPapers()
-      .map((paper) => paper.doi)
-      .filter((doi) => doi);
+    const dois = selectedGraphDois();
     if (!dois.length) {
       if (bulkStatus) bulkStatus.textContent = scholarT("Select results with a DOI first.");
+      return;
+    }
+    if (dois.length > GRAPH_SEED_LIMIT) {
+      if (bulkStatus) bulkStatus.textContent = scholarT("Select at most %(n)s distinct DOIs for one graph.", { n: GRAPH_SEED_LIMIT });
       return;
     }
     const graphTab = document.querySelector(
       '.stx-content-tabs__tab[aria-controls="tab-graph"]',
     );
     if (graphTab) graphTab.click();
-    const detail = dois.length === 1 ? { doi: dois[0] } : { dois: dois.slice(0, 20) };
+    const detail = dois.length === 1 ? { doi: dois[0] } : { dois };
     document.dispatchEvent(new CustomEvent("scholar:build-graph", { detail }));
   }
   if (graphSelectedBtn) graphSelectedBtn.addEventListener("click", graphSelected);
@@ -1080,6 +1165,10 @@ document.addEventListener("DOMContentLoaded", () => {
       showError("Enter a search query.");
       return;
     }
+    const requestId = ++searchRequestId;
+    pageState = null;
+    pageBusy = false;
+    hide(paginationPanel);
 
     hide(errorBox);
     hide(results);
@@ -1117,8 +1206,15 @@ document.addEventListener("DOMContentLoaded", () => {
         if (el && el.value.trim() !== "") params.set(name, el.value.trim());
       });
       if (noCache && noCache.checked) params.set("no_cache", "true");
-      const response = await fetch(`${STX_MOUNT}/api/search?${params}`);
+      const isLocalPage = params.get("sources") === "crossref_local";
+      if (isLocalPage) {
+        params.set("page_size", maxResults.value);
+        params.set("offset", "0");
+        params.delete("max_results");
+      }
+      const response = await fetch(`${STX_MOUNT}/api/search${isLocalPage ? "/page" : ""}?${params}`);
       const data = await response.json();
+      if (requestId !== searchRequestId) return;
 
       if (!response.ok) {
         showError(
@@ -1129,15 +1225,22 @@ document.addEventListener("DOMContentLoaded", () => {
         stepperReset();
         return;
       }
+      if (isLocalPage) pageState = { params: params.toString(), nextOffset: data.metadata.pagination.next_offset };
       renderResults(data);
-      fillQueue(data.metadata);
+      if (isLocalPage) {
+        if (queuePanel) queuePanel.hidden = true;
+      } else {
+        fillQueue(data.metadata);
+      }
       stepperDone(((data && data.results) || []).length);
     } catch (err) {
+      if (requestId !== searchRequestId) return;
       showError(`Search failed: ${err.message}`, () => form.requestSubmit());
       if (queuePanel) queuePanel.hidden = true;
       stepperReset();
     } finally {
-      hide(loading);
+      if (requestId === searchRequestId) hide(loading);
     }
   });
+  syncSelectAll();
 });

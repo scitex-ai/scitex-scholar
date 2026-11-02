@@ -217,6 +217,15 @@
   padding: 4px 2px;
 }
 
+.search-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border-top: 1px solid var(--border-default);
+}
+
 .search-toolbar-row .search-results-toolbar {
   flex: 1;
   min-width: 0;
@@ -244,6 +253,30 @@
 .search-toolbar-row .search-stepper {
   margin-left: auto;
   flex-shrink: 0;
+}
+
+/* Old-direct keeps sorting beside the other search options, leaving the
+ * main toolbar for actions on the selected works. */
+.search-options-group {
+  margin-block: 8px;
+  border: 1px solid var(--border-default);
+}
+
+.search-options-group > summary {
+  padding: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.search-options-group > .form-select {
+  display: block;
+  width: calc(100% - 20px);
+  margin: 0 10px 10px;
+  min-height: 44px;
+}
+
+.search-options-group > :not(summary) {
+  margin-inline: 10px;
 }
 
 /* Library filter row: the sort select must match the 44px filter input,
