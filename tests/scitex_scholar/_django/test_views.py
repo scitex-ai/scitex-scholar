@@ -2153,13 +2153,30 @@ def test_advanced_section_is_flat_not_a_details_card():
 
 
 def test_advanced_hides_query_syntax_until_requested():
-    # Arrange
+    # Arrange -- the existing in-field help owns syntax, not duplicate prose
+    # inside the Sources group. The endpoint's operator data has its own tests.
+    from html.parser import HTMLParser
+
+    class HelpControls(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.controls = {}
+
+        def handle_starttag(self, tag, attrs):
+            attrs = dict(attrs)
+            if attrs.get("id") in {"searchSyntaxPanel", "searchSyntaxToggle"}:
+                self.controls[attrs["id"]] = attrs
+
     body = _compass_index_body()
     # Act
-    syntax_block = "search-advanced__syntax" in body
-    impact_factor_syntax = "if:&gt;5" in body  # escaped in the template
+    parser = HelpControls()
+    parser.feed(body)
+    panel = parser.controls["searchSyntaxPanel"]
+    toggle = parser.controls["searchSyntaxToggle"]
     # Assert
-    assert syntax_block and impact_factor_syntax
+    assert "hidden" in panel
+    assert toggle["aria-expanded"] == "false"
+    assert toggle["aria-controls"] == panel["id"]
 
 
 def test_ignore_cache_and_source_are_wired_to_the_api():
