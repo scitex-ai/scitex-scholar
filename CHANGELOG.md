@@ -16,6 +16,7 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   like the reference UI. Add stable citation/impact-factor sorting of loaded
   results, preserve work selection and provider relevance order, and reset
   paired search bounds without triggering another search.
+- Add an explicit, dry-run-first MNIST showcase Library adapter with four primary-source-verified references, no-overwrite Paper/PaperIO admission and additive project links. Preserve existing user metadata, links and bibliographies; no automatic GET seeding, network, model run or derived-store write.
 
 ## [1.29.1] - 2026-11-02
 
