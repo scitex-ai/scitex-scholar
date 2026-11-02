@@ -38,3 +38,8 @@ for (const value of invalid) {
  for (const direction of ['asc','desc'])assert.deepEqual(Array.from(order.sortEntries(rows,`impact-${direction}`),e=>e.index),[1,0]);
 }
 console.log('Loaded-result sorting, missing values, stable ties, cycles and input immutability passed');
+
+assert.deepEqual(Array.from(order.sourceNames({source_engines:['CrossRefLocal','PubMed','CrossRefLocal'],source:'PubMed'})), ['CrossRefLocal','PubMed']);
+assert.deepEqual(Array.from(order.sourceNames({source:'Legacy source'})), ['Legacy source']);
+assert.deepEqual(Array.from(order.sourceNames({source_engines:[null,7,' ', ' PubMed ']})), ['PubMed']);
+assert.deepEqual(Array.from(order.sourceNames({})), []);

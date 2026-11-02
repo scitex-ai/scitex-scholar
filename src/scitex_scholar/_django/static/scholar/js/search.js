@@ -487,7 +487,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const bits = [formatAuthors(paper)];
     if (paper.year) bits.push(String(paper.year));
     if (paper.journal) bits.push(paper.journal);
-    if (paper.source) bits.push(paper.source);
+    const sourceNames = window.ScholarSearchOrder.sourceNames(paper);
+    if (sourceNames.length) bits.push(sourceNames.join(", "));
     bits.forEach((text) => {
       const span = document.createElement("span");
       span.textContent = text;
@@ -560,7 +561,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const order = sortSelect ? sortSelect.value : "relevance";
     let papers = lastPapers.map((paper, index) => ({ paper, index }));
     if (source) {
-      papers = papers.filter(({ paper }) => (paper.source || "") === source);
+      papers = papers.filter(({ paper }) => window.ScholarSearchOrder.sourceNames(paper).includes(source));
     }
     return window.ScholarSearchOrder.sortEntries(papers, order);
   }
@@ -575,8 +576,9 @@ document.addEventListener("DOMContentLoaded", () => {
       staticAll && staticAll.textContent ? staticAll.textContent : "All sources";
     const sources = [];
     lastPapers.forEach((paper) => {
-      const source = paper.source || "";
-      if (source && !sources.includes(source)) sources.push(source);
+      window.ScholarSearchOrder.sourceNames(paper).forEach((source) => {
+        if (!sources.includes(source)) sources.push(source);
+      });
     });
     sourceFilter.replaceChildren();
     const all = document.createElement("option");

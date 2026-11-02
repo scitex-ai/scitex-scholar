@@ -20,6 +20,11 @@
     const number = Number(value);
     return Number.isFinite(number) && number >= 0 ? number : null;
   }
+  function sourceNames(paper) {
+    const values = Array.isArray(paper.source_engines) ? paper.source_engines.slice() : [];
+    if (typeof paper.source === "string") values.push(paper.source);
+    return [...new Set(values.filter((value) => typeof value === "string" && value.trim()).map((value) => value.trim()))];
+  }
   function sortEntries(entries, order) {
     if (order === "relevance") return entries.slice();
     if (order === "title") return entries.slice().sort((a, b) =>
@@ -34,5 +39,5 @@
       return (av - bv) * sign || a.index - b.index;
     });
   }
-  root.ScholarSearchOrder = Object.freeze({ nextOrder, direction, sortEntries });
+  root.ScholarSearchOrder = Object.freeze({ nextOrder, direction, sortEntries, sourceNames });
 })(globalThis);
