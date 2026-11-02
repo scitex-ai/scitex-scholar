@@ -331,3 +331,7 @@ the umbrella with `pip install scitex[scholar]` to use as
 <p align="center">
   <a href="https://scitex.ai" target="_blank"><img src="docs/scitex-icon-navy-inverted.png" alt="SciTeX" width="40"/></a>
 </p>
+
+For an explicit, additive starting Library for the worked MNIST project, see
+[the MNIST showcase guide](docs/mnist-showcase.md). It preserves user data and
+does not run models or populate apps automatically.
