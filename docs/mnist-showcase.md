@@ -64,7 +64,8 @@ validate those computations. Read the selected project's `provenance.yaml`
 and claims status for its actual scientific evidence.
 
 `mnist_reference_bibtex()` exports the **same catalog** through Scholar's
-existing formatter. A consumer may explicitly add it as a separate bibliography;
+existing formatter, which escapes plain bibliographic text for TeX while
+preserving identifiers and URLs. A consumer may explicitly add it as a separate bibliography;
 the helper never overwrites the project's consumer-owned Writer bibliography
 or imports its placeholder `10.1234/...` citations as research. It does not
 fabricate Stats observations, FigRecipe recipes, Writer manuscripts or Journal
