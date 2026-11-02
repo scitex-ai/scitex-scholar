@@ -5,7 +5,7 @@ from django.template import Context, Engine
 
 
 def _details():
-    root = Path(__file__).resolve().parents[3]
+    root = Path(__file__).resolve().parents[4]
     template = (root / "src/scitex_scholar/_django/templates/scholar/workspace_content.html").read_text()
     start = template.index("<div data-search-hint>")
     end = template.index("<!-- Library ops:", start)

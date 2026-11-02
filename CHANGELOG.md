@@ -7,6 +7,11 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+- Add an accessible selected-paper Library reader in the shared SDK Details
+  pane with full stored metadata/abstract, truthful missing states and explicit
+  citation copying. Preserve selection through sorting and clear filtered-out
+  papers. Keep annotations/actions explicit and honor their hidden state.
+
 - Keep the shared SDK Details pane while grouping Sources, Sorters and Filters
   like the reference UI. Add stable citation/impact-factor sorting of loaded
   results, preserve work selection and provider relevance order, and reset

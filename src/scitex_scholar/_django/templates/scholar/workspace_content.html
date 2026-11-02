@@ -588,8 +588,34 @@ e.g. hippocampus -a Smith -ymin 2020 -ymax 2024{% endblocktrans %}"></textarea>
                         list, filter, and import preview stay in the main
                         area. Control ids and wiring unchanged. -->
                     <div class="sidebar-section hidden" data-library-hint>
+                        <section id="libraryPaperDetails" class="library-paper-reader" tabindex="-1"
+                            aria-label="{% trans "Selected paper" %}"
+                            data-missing="{% trans "Not recorded" %}"
+                            data-no-abstract="{% trans "No abstract is stored for this paper." %}"
+                            data-copy-success="{% trans "Citation copied." %}"
+                            data-copy-failure="{% trans "Citation could not be copied. Try again." %}"
+                            data-notes-label="{% trans "Notes and actions" %}">
+                            <p id="libraryReaderEmpty">{% trans "Select a paper to view its details." %}</p>
+                            <div id="libraryReaderContent" hidden>
+                                <div class="library-paper-reader__header">
+                                    <h3 id="libraryReaderTitle"></h3>
+                                    <button type="button" id="libraryReaderClose" class="btn-control-library" aria-label="{% trans "Close paper details" %}">&times;</button>
+                                </div>
+                                <dl class="library-paper-reader__metadata">
+                                    <dt>{% trans "Authors" %}</dt><dd id="libraryReaderAuthors"></dd>
+                                    <dt>{% trans "Publication" %}</dt><dd id="libraryReaderPublication"></dd>
+                                    <dt>{% trans "Citations" %}</dt><dd id="libraryReaderCitations"></dd>
+                                    <dt>DOI</dt><dd id="libraryReaderDoi"></dd>
+                                </dl>
+                                <h4>{% trans "Abstract" %}</h4>
+                                <p id="libraryReaderAbstract" class="library-paper-reader__abstract"></p>
+                                <button type="button" id="libraryReaderCopyCitation" class="btn-control-library">{% trans "Copy BibTeX citation" %}</button>
+                                <p id="libraryReaderStatus" role="status"></p>
+                            </div>
+                        </section>
+
                         <div class="sidebar-section__header" role="button" tabindex="0" aria-expanded="true">
-                            <span class="sidebar-section__title">{% trans "Library" %}</span>
+                            <span class="sidebar-section__title">{% trans "Library tools" %}</span>
                             <span class="sidebar-section__chevron" aria-hidden="true"></span>
                         </div>
                         <div class="sidebar-section__content">

@@ -5,7 +5,7 @@ import subprocess
 
 def test_loaded_search_sorting_preserves_identity_and_missing_values():
     # Arrange
-    root = Path(__file__).resolve().parents[3]
+    root = Path(__file__).resolve().parents[4]
     script = root / "tests/integration/scholar/_django/search_order.cjs"
     helper = root / "src/scitex_scholar/_django/static/scholar/js/search-order.js"
     # Act

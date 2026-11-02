@@ -56,7 +56,7 @@ For local Crossref GUI paging beyond the former 1000-result ceiling, see
 [Search page semantics and limits](docs/gui/search-pages.md). Online and
 multiple-source searches retain their bounded list behavior.
 [Details controls and loaded-result sorting](docs/gui/details-pane.md) describes
-search sorting, source selection and filter reset without a new search.
+search sorting, source selection, filter reset and the selected-paper Library reader.
 [Graph Library persistence and limits](docs/gui/graph-library.md) describes saved
 recipes and per-user storage.
 
@@ -91,7 +91,7 @@ uv pip install "scitex-scholar[all]"
 | Install | Contents |
 |---|---|
 | `pip install scitex-scholar` | core: search, enrich, library (Playwright browser automation included) |
-| `pip install "scitex-scholar[all]"` | everything: GUI server (django / scitex-app / scitex-ui), MCP server (fastmcp), PDF text extraction (pdfplumber), XLSX export (openpyxl), library watcher (watchdog), provenance hashing (scitex-clew) |
+| `pip install "scitex-scholar[all]"` | everything: GUI server (Django / scitex-sdk), MCP server (fastmcp), PDF text extraction (pdfplumber), XLSX export (openpyxl), library watcher (watchdog), provenance hashing (scitex-clew) |
 
 </details>
 

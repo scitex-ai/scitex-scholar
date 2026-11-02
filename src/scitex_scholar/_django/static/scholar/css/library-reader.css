@@ -1,0 +1,21 @@
+/* Selected library metadata lives in the existing SDK Details pane. */
+.library-paper-reader { min-width: 0; padding-bottom: 12px; border-bottom: 1px solid var(--border-default); }
+.library-paper-reader__header { display: flex; align-items: flex-start; gap: 8px; }
+.library-paper-reader__header h3 { margin: 0; font-size: 15px; line-height: 1.5; overflow-wrap: anywhere; flex: 1; }
+.library-paper-reader__header button { min-width: 44px; min-height: 44px; }
+.library-paper-reader__metadata { margin-block: 12px; }
+.library-paper-reader__metadata dt { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
+.library-paper-reader__metadata dd { margin: 0; overflow-wrap: anywhere; }
+.library-paper-reader__abstract { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.6; }
+.library-paper-reader h4 { margin-bottom: 6px; font-size: 12px; }
+.library-item__reader-trigger { display: block; width: 100%; min-height: 44px; background: none; border: 0; padding: 0; color: var(--text-primary); text-align: left; cursor: pointer; }
+.library-item__reader-trigger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.library-item[data-reader-active="true"] { box-shadow: inset 3px 0 var(--accent); }
+#libraryReaderContent[hidden], #libraryReaderEmpty[hidden] { display: none; }
+/* The annotation editor is opened explicitly; its flex rule must not undo
+ * native hidden state. These controls retain their existing save/confirm flow. */
+.library-item__details[hidden] { display: none; }
+@media (max-width: 768px) {
+  /* A desktop width flex-basis becomes height in the phone column. */
+  .app-status-strip .library-io__select { flex-basis: auto; min-height: 44px; }
+}

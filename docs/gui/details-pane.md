@@ -25,3 +25,22 @@ selection. Existing server validation remains authoritative for submitted ranges
 Source evidence: `workspace_content.html`, `search.js`, `search-order.js` and
 `search-details.css` under `src/scitex_scholar/_django/`. New assets use the SDK
 `app_static` helper; no manual cache-version string is needed.
+
+## Library paper reader
+
+Activate a library paper's title or Details button to show its stored title,
+full author list, publication, citation count, DOI and abstract in the same SDK
+Details pane. Keyboard activation works too; on phones the SDK switches to its
+Details view. Reading a paper does not change citation-graph work selection.
+
+Missing metadata is labelled as not recorded, and a missing abstract is stated
+explicitly; a recorded zero citation count remains zero. Paper-supplied text is
+inserted as text, not markup. Metadata reflects the currently loaded library
+response, without an enrichment request or inferred abstract.
+
+Copy BibTeX citation uses the existing per-paper citation GET endpoint and the
+browser clipboard after an explicit click. Closing or filtering away the paper
+clears the reader; sorting preserves the same selected paper. The separate
+Notes and actions control opens the existing annotation/PDF/removal editor.
+Reading and copying do not invoke those save, download or remove operations.
+The existing confirmations and backend validation remain unchanged.

@@ -31,6 +31,7 @@ _CONTENT_IDS = {
     "searchSort", "searchSourceFilter", "searchBulkBar", "searchSelectAll",
     "searchSaveSelected", "searchEnrichSelected", "searchBulkStatus",
     "searchStripSummary", "libraryStripSummary", "graphStripSummary",
+    "libraryPaperDetails", "libraryReaderEmpty", "libraryReaderContent", "libraryReaderTitle",
 }
 
 
@@ -168,7 +169,7 @@ def test_index_workspace_content_preserves_native_rendering(
             "library_text": {"en": "Library", "ja": "ライブラリ"}[language],
             "shell_content_panes": 1,
             "scripts": tuple("/static/scholar/js/" + name for name in _SCRIPT_NAMES),
-            "stylesheets": ["/static/scholar/css/scholar.css", "/static/scholar/css/search-details.css"],
+            "stylesheets": ["/static/scholar/css/scholar.css", "/static/scholar/css/search-details.css", "/static/scholar/css/library-reader.css"],
             "mounts": [path.rstrip("/")],
             "pwa": ["/static/scholar/pwa/manifest.json"],
             "project_scope": ("Alpha", "user"),

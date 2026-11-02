@@ -836,3 +836,55 @@ msgstr "フィルターをリセット"
 #: templates/scholar/workspace_content.html
 msgid "Ranges apply to the next search."
 msgstr "範囲は次の検索に適用されます。"
+
+#: templates/scholar/workspace_content.html
+msgid "Selected paper"
+msgstr "選択した論文"
+
+#: templates/scholar/workspace_content.html
+msgid "Not recorded"
+msgstr "記録されていません"
+
+#: templates/scholar/workspace_content.html
+msgid "No abstract is stored for this paper."
+msgstr "この論文の要旨は保存されていません。"
+
+#: templates/scholar/workspace_content.html
+msgid "Citation copied."
+msgstr "引用をコピーしました。"
+
+#: templates/scholar/workspace_content.html
+msgid "Citation could not be copied. Try again."
+msgstr "引用をコピーできませんでした。もう一度お試しください。"
+
+#: templates/scholar/workspace_content.html
+msgid "Notes and actions"
+msgstr "メモと操作"
+
+#: templates/scholar/workspace_content.html
+msgid "Select a paper to view its details."
+msgstr "論文を選択すると詳細が表示されます。"
+
+#: templates/scholar/workspace_content.html
+msgid "Close paper details"
+msgstr "論文の詳細を閉じる"
+
+#: templates/scholar/workspace_content.html
+msgid "Authors"
+msgstr "著者"
+
+#: templates/scholar/workspace_content.html
+msgid "Publication"
+msgstr "出版情報"
+
+#: templates/scholar/workspace_content.html
+msgid "Abstract"
+msgstr "要旨"
+
+#: templates/scholar/workspace_content.html
+msgid "Copy BibTeX citation"
+msgstr "BibTeX形式の引用をコピー"
+
+#: templates/scholar/workspace_content.html
+msgid "Library tools"
+msgstr "ライブラリの操作"
