@@ -225,8 +225,14 @@ def test_search_query_is_a_multiline_textarea_with_in_field_help(
         tools is not None and tools.select_one("#searchSyntaxToggle") is not None,
         "Ctrl" in (tools.get_text() if tools else ""),
     ) == (True, True, True, True)
-    # There must be one help trigger: duplicate IDs bind the header copy and
-    # leave the visible in-field control inert.
+
+
+def test_query_help_trigger_id_is_unique(_private_context):
+    # Arrange — a duplicate ID would bind the hidden control instead.
+    request = RequestFactory().get("/")
+    # Act
+    dom = BeautifulSoup(views.index(request).content.decode(), "html.parser")
+    # Assert
     assert len(dom.select("#searchSyntaxToggle")) == 1
 
 
@@ -250,15 +256,36 @@ def test_toolbar_row_and_stepper_live_above_the_results(_private_context):
     ) == True
 
 
-def test_library_offers_explicit_graph_selection_and_graph_has_no_duplicate_list(_private_context):
-    dom = BeautifulSoup(views.index(RequestFactory().get("/")).content.decode(), "html.parser")
+def test_library_graph_selection_starts_disabled(_private_context):
+    # Arrange
+    request = RequestFactory().get("/")
+    # Act
+    dom = BeautifulSoup(views.index(request).content.decode(), "html.parser")
     library = dom.select_one("#tab-library")
-    assert library.select_one("#librarySelectAll").has_attr("disabled")
-    assert library.select_one("#libraryGraphSelected").has_attr("disabled")
+    # Assert
+    assert (library.select_one("#librarySelectAll").has_attr("disabled"),
+            library.select_one("#libraryGraphSelected").has_attr("disabled")) == (True, True)
+
+
+def test_graph_seed_guidance_replaces_the_duplicate_list(_private_context):
+    # Arrange
+    request = RequestFactory().get("/")
+    # Act
+    dom = BeautifulSoup(views.index(request).content.decode(), "html.parser")
     graph = dom.select_one("#tab-graph")
-    assert graph.select_one("#graphLibrarySeed") is None
-    assert {node["data-scholar-seed-tab"] for node in graph.select("#graphSeedGuidance button")} == {"search", "library"}
+    # Assert
+    assert (graph.select_one("#graphLibrarySeed"),
+            {node["data-scholar-seed-tab"] for node in graph.select("#graphSeedGuidance button")}) == (None, {"search", "library"})
+
+
+def test_graph_visualization_precedes_its_saved_library(_private_context):
+    # Arrange
+    request = RequestFactory().get("/")
+    # Act
+    dom = BeautifulSoup(views.index(request).content.decode(), "html.parser")
+    graph = dom.select_one("#tab-graph")
     descendants = list(graph.descendants)
+    # Assert
     assert descendants.index(graph.select_one("#graphCanvas")) < descendants.index(graph.select_one("#graphSavedList"))
 
 

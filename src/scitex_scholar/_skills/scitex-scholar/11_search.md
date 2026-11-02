@@ -75,9 +75,11 @@ next_offset = page["metadata"]["pagination"]["next_offset"]
 
 There is no total-result cap on this local page route. Each request is limited
 to 1–1000 source records; follow the returned offset explicitly rather than
-starting an automatic all-corpus download. See [page semantics](../../../../docs/gui/search-pages.md)
-and `tests/scitex_scholar/_django/test_search_pages.py` for the source-backed
-contract. This does not claim all-results virtualization or bounded browser
+starting an automatic all-corpus download. See the installed
+[page provider](../../search_engines/_crossref_pages.py) and checkout document
+`docs/gui/search-pages.md`. Regression coverage for this contract lives in
+`tests/scitex_scholar/search_engines/test__crossref_pages.py` and
+`tests/scitex_scholar/_django/test_views_search_pages.py`. This does not claim all-results virtualization or bounded browser
 memory across arbitrarily many loaded pages.
 
 ## Seeding citation graphs
@@ -88,3 +90,12 @@ larger selections are refused with a visible message, not silently truncated.
 The Citation Graph tab offers links back to those selection tabs and puts its
 visualization above the saved Graph Library. Selecting works does not itself
 save papers or graphs.
+
+Graph Library saves rebuild recipes (the seed DOI list and `top_n`), not frozen
+node/edge/layout snapshots. Loading uses the current configured citation
+backend. Mounted files live in the host-provided user's
+`.scitex/scholar/library/SAVED_GRAPHS/saved_graphs.json`; existing empty files
+remain authoritative over stale mirror rows. See
+the installed [persistence implementation](../../citation_graph/_saved_graph_store.py)
+and checkout document `docs/gui/graph-library.md` for provider precedence, legacy
+migration, and the fact that listing can maintain its mirror.

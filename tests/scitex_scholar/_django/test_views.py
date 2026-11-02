@@ -30,6 +30,7 @@ import json
 import os
 import re
 from pathlib import Path
+from urllib.parse import unquote, urlsplit
 
 import pytest
 import scitex_sdk.ui
@@ -1347,13 +1348,16 @@ def _resolve_css(entry: Path, _seen: set | None = None) -> str:
     """
     seen = _seen if _seen is not None else set()
     entry = entry.resolve()
-    if entry in seen or not entry.exists():
+    if entry in seen:
         return ""
     seen.add(entry)
     text = entry.read_text()
     parts = [text]
     for href in _IMPORT_RE.findall(text):
-        parts.append(_resolve_css(entry.parent / href, seen))
+        parsed = urlsplit(href)
+        if parsed.scheme or parsed.netloc:
+            continue  # Remote fonts cannot declare this local page's theme tokens.
+        parts.append(_resolve_css(entry.parent / unquote(parsed.path), seen))
     return "\n".join(parts)
 
 
@@ -2090,7 +2094,7 @@ def test_search_sources_grouped_in_old_direct_tiers():
     # external tier with per-source rate labels + email/rate notice.
     body = _compass_index_body()
     # Act
-    tiers = ("Local (fast, unlimited)" in body, "External APIs (slower, limited results)" in body)
+    tiers = ("Local (fast)" in body, "External APIs (slower, limited results)" in body)
     rates = ("3/s" in body, "50/s" in body, "10/s" in body)
     notice = "higher rate limits" in body
     # Assert
@@ -5396,7 +5400,7 @@ def test_library_save_bulk_saved_entries_do_not_leak_server_path(tmp_path):
 
 # New Library command controls; all existing source above is retained exactly.
 from django.contrib.auth import get_user_model
-from tests.scitex_scholar._django.test_views_shell_context import _private_context
+from tests.scitex_scholar._django.test_views_shell_context import _private_context as _private_context
 
 
 def _command_library_request(root, user, query="", **query_hints):

@@ -55,6 +55,8 @@ Literature management spans many tools and APIs: searching databases, resolving 
 For local Crossref GUI paging beyond the former 1000-result ceiling, see
 [Search page semantics and limits](docs/gui/search-pages.md). Online and
 multiple-source searches retain their bounded list behavior.
+[Graph Library persistence and limits](docs/gui/graph-library.md) describes saved
+recipes and per-user storage.
 
 ## Demo
 

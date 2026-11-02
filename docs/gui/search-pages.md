@@ -30,7 +30,8 @@ the existing bounded search and show that no global total is available.
   deduplicated by DOI/title; this is not a snapshot or an all-results export.
   Repeated loading can still grow browser memory; no virtualization claim is made.
 
-Regression evidence lives in `tests/scitex_scholar/_django/test_search_pages.py`:
+Regression evidence lives in `tests/scitex_scholar/search_engines/test__crossref_pages.py` and
+`tests/scitex_scholar/_django/test_views_search_pages.py`:
 an owned SQLite FTS corpus with 1055 records exercises offset 1000, continuation,
 exhaustion, filtered-empty pages, query filters, and API validation. An actual
 configured-provider check on compute-03 also returned records at offset 1000.

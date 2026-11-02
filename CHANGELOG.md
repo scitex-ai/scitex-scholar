@@ -7,16 +7,18 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-- Remove the leaf version-badge typography/color override; the shared SDK header owns its appearance.
+## [1.29.1] - 2026-11-02
 
-## [1.29.1] - 2026-11-01
+- Require SDK 0.3.17 for the declared user/project scope capability contract in
+  GUI and development installs. The shared SDK owns version-badge appearance;
+  remove the leaf typography/color override.
 
 - Opt into the shared SDK main-details desktop layout: 320px Details default,
   responsive phone panes, and preserved host-restored inline widths through
   collapse/expansion. Remove Scholar's competing 208px/flex column geometry.
 - Use the SDK app_static content-hash helper for active CSS/JavaScript URLs,
-  including the graph client. This source preview requires the SDK
-  main-details layout addition before a public Scholar release.
+  including the graph client. The required shared layout and scope contracts
+  are available in the published SDK 0.3.17.
 
 - Add Library work selection and Graph selected, preserving selection while
   sorting. Both Search and Library accept 1–20 distinct valid DOI seeds and
@@ -43,6 +45,11 @@ retain legacy database-only recipes, and use the actual shared-store read API.
 Save/load all DOI seeds and graph width for multi-paper networks. Mounted hosts
 can provide an authorized user-home capability for durable `.scitex/scholar/library`
 persistence; existing explicit root/base overrides remain supported.
+
+- Keep release checks aligned with current behavior: follow content-versioned
+  stylesheet imports, test actual collapsible controls and source labels, and
+  exercise real local pagination through correctly owned test modules. Document
+  bounded multi-source searches and saved graph recipes without snapshot claims.
 
 ## [1.29.0] - 2026-11-01
 

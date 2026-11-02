@@ -1,7 +1,7 @@
 """Run the real Library client in Chromium against an owned in-memory fixture.
 
 No host, credentials, network, library writes, or graph build are used. Example:
-python tests/browser/library_graph_selection.py --browser /path/to/chrome
+python tests/integration/library_graph_selection.py --browser /path/to/chrome
 """
 from __future__ import annotations
 

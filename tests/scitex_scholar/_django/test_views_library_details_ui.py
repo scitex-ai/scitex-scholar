@@ -135,7 +135,8 @@ def test_details_sections_collapse_like_old_direct():
     # old-direct's ctrl-sections collapse on header click (chevron).
     # The strip headers carry the toggle affordance, CSS hides the
     # collapsed body, and app.js wires click + keyboard.
-    # Act
+    from bs4 import BeautifulSoup
+
     template = (
         Path(views.__file__).parent
         / "templates"
@@ -146,9 +147,14 @@ def test_details_sections_collapse_like_old_direct():
     app_js = (
         Path(views.__file__).parent / "static" / "scholar" / "js" / "app.js"
     ).read_text()
+    # Act
+    dom = BeautifulSoup(template, "html.parser")
+    headers = [dom.select_one(f"[data-{tab}-hint] > .sidebar-section__header") for tab in ("library", "graph")]
     # Assert
     assert (
-        template.count('sidebar-section__header" role="button"') == 3,
+        all(header is not None and header.get("role") == "button"
+            and header.get("tabindex") == "0" and header.get("aria-expanded") == "true"
+            for header in headers),
         ".sidebar-section.collapsed > :not(.sidebar-section__header)" in sidebar,
         "toggleSection" in app_js,
     ) == (True, True, True)
