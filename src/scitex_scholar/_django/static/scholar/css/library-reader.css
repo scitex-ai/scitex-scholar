@@ -1,8 +1,9 @@
 /* Selected library metadata lives in the existing SDK Details pane. */
 .library-paper-reader { min-width: 0; padding-bottom: 12px; border-bottom: 1px solid var(--border-default); }
 .library-paper-reader__header { display: flex; align-items: flex-start; gap: 8px; }
-.library-paper-reader__header h3 { margin: 0; font-size: 15px; line-height: 1.5; overflow-wrap: anywhere; flex: 1; }
-.library-paper-reader__header button { min-width: 44px; min-height: 44px; }
+.library-paper-reader__header h3 { margin: 0; font-size: 15px; line-height: 1.5; overflow-wrap: anywhere; flex: 1; min-width: 0; }
+/* Phone-wide form-button rules must not squeeze the adjacent paper title. */
+#libraryReaderClose { flex: 0 0 44px; width: 44px; min-width: 44px; max-width: 44px; min-height: 44px; }
 .library-paper-reader__metadata { margin-block: 12px; }
 .library-paper-reader__metadata dt { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
 .library-paper-reader__metadata dd { margin: 0; overflow-wrap: anywhere; }
