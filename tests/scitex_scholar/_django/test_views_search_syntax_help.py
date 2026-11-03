@@ -68,10 +68,18 @@ def test_search_syntax_help_route_is_flat_and_registered():
     assert (len(match), match[0].callback) == (1, views.search_syntax_help)
 
 
-def test_search_header_carries_syntax_help_affordance():
+def test_query_field_carries_one_syntax_help_affordance():
     # Arrange
+    from bs4 import BeautifulSoup
+
     request = RequestFactory().get("/")
     # Act
     body = views.index(request).content.decode()
-    # Assert -- the `?` toggle wired to the new endpoint (CHANGE).
-    assert 'id="searchSyntaxToggle"' in body and "api/search/syntax-help" in body
+    dom = BeautifulSoup(body, "html.parser")
+    triggers = dom.select("#searchSyntaxToggle")
+    # Assert — one visible-field trigger controls an existing help panel.
+    assert (
+        len(triggers) == 1
+        and triggers[0].find_parent(class_="query-field__tools") is not None
+        and dom.find(id=triggers[0]["aria-controls"]) is not None
+    )

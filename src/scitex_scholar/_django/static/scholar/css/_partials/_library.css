@@ -21,7 +21,6 @@
   padding: 12px 14px;
   border: 1px solid var(--border-default);
   background: var(--bg-tertiary);
-  border-radius: 4px;
 }
 
 .library-item__main {
@@ -134,7 +133,6 @@
   margin-bottom: 12px;
   border: 1px solid var(--border-default);
   background: var(--bg-tertiary);
-  border-radius: 4px;
 }
 
 .library-io__label {
@@ -144,7 +142,10 @@
 }
 
 .library-io__select {
-  max-width: 160px;
+  flex: 1 1 8em;
+  min-width: 0;
+  max-width: 100%;
+  width: auto;
 }
 
 .btn-control-library {
@@ -201,7 +202,6 @@
   margin-bottom: 12px;
   border: 1px solid var(--border-default);
   background: var(--bg-tertiary);
-  border-radius: 4px;
 }
 
 .library-filter__input {
@@ -236,30 +236,10 @@
  * Same surface as the Import/Export row and filter bar so the three read
  * as one toolbar family; title/hint/status are quiet secondary text and
  * the controls reuse .library-io__* and .btn-control-library. Tokens only.
- * Parity slice 3c: project-sync row (sync target + filter chips) and
- * per-row filed-project chips. Chips are links (navigation), so they read
- * as controls, not badges; the --active chip names the current sync target.
+ * Operator 2026-10-23: the Details-strip project selector chips are
+ * deleted (header picker only). Per-row filed-project chips stay: they
+ * display where a paper is filed, not a selection control.
  */
-.library-project {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.library-project__current {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-secondary);
-}
-
-.library-project__chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
 .library-project__chip {
   display: inline-block;
   padding: 2px 10px;
@@ -269,12 +249,6 @@
   border: 1px solid var(--border-default);
   background: var(--bg-tertiary);
   border-radius: 999px;
-}
-
-.library-project__chip--active {
-  color: var(--text-on-accent, #fff);
-  background: var(--accent, #1f6feb);
-  border-color: var(--accent, #1f6feb);
 }
 
 .library-project__chip--static {
@@ -320,7 +294,6 @@
   padding: 10px 12px;
   border: 1px solid var(--border-default);
   background: var(--bg-tertiary);
-  border-radius: 4px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -389,7 +362,6 @@
   margin-bottom: 12px;
   border: 1px solid var(--border-default);
   background: var(--bg-tertiary);
-  border-radius: 4px;
 }
 .library-import-preview__entries {
   display: flex;
@@ -426,7 +398,6 @@
   margin-bottom: 12px;
   border: 1px solid var(--border-default);
   background: var(--bg-tertiary);
-  border-radius: 4px;
 }
 
 .library-ext__title {

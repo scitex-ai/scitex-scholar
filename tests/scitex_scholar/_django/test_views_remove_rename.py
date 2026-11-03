@@ -11,6 +11,7 @@ recipe name (400 empty/overlong, 404 unknown). Library roots bind via
 """
 
 import json
+import pytest
 from pathlib import Path
 
 from django.test import RequestFactory
@@ -184,9 +185,106 @@ def test_library_details_carries_remove_action():
     assert present
 
 
-def test_graph_saved_list_carries_rename_action():
-    # Arrange -- hub renames saved graphs from the graph page.
+def test_graph_library_carries_load_and_rename_actions():
+    # Arrange -- operator brief-05 (supersedes the 2026-10-23 seed-only
+    # tab): the saved-graphs list is back as the Graph Library card with
+    # full CRUD (Load rebuilds, Rename edits inline, Delete is two-click).
+    # The rename verb stays pinned at the API layer too
+    # (test_rename_updates_the_recipe_name).
     # Act
-    present = "/api/graphs/rename" in GRAPH_JS
+    present = 'id="graphSavedList"' in TEMPLATE
     # Assert
     assert present
+
+
+@pytest.fixture(scope="module")
+def graph_mirror():
+    """A genuine provisioned Store in a private, automatically removed PostgreSQL."""
+    from scitex_dev.store import Store, StoreTarget, WriterPolicy
+    from scitex_dev.store.testing import ephemeral_cluster_dsn, ephemeral_schema
+    from scitex_scholar.citation_graph._saved_graph_store import schema, STORE_NAME
+
+    with (
+        ephemeral_cluster_dsn() as dsn,
+        ephemeral_schema(dsn, prefix="graph_http") as target,
+    ):
+        store = Store(
+            StoreTarget.postgres(target, pkg="scholar", name=STORE_NAME),
+            schema(),
+            node="http-tests",
+            writer_policy=WriterPolicy.MULTI_WRITER,
+        )
+        try:
+            yield store
+        finally:
+            store.close()
+
+
+def test_graph_delete_hides_the_store_row(tmp_path, graph_mirror):
+    # Arrange -- operator 2026-10-24 (graphs as CUI data): delete must
+    # hide the derived store mirror, or the row resurrects on next read.
+    opener = lambda: graph_mirror
+    saved = json.loads(
+        views.graphs_save(
+            _post(
+                "/api/graphs/save",
+                tmp_path,
+                {"name": "Gone", "seed_doi": "10.1/a"},
+            ),
+            _opener=opener,
+        ).content
+    )
+    # Act
+    resp = views.graphs_delete(
+        _post("/api/graphs/delete", tmp_path, {"id": saved["id"]}),
+        _opener=opener,
+    )
+    # Assert
+    listed = json.loads(
+        views.graphs_list(_get("/api/graphs/list", tmp_path), _opener=opener).content
+    )
+    key = {"user_root": str(tmp_path.resolve()), "graph_id": saved["id"]}
+    assert (resp.status_code, listed["graphs"], graph_mirror.is_hidden(key)) == (
+        200,
+        [],
+        True,
+    )
+
+
+def test_graph_rename_updates_the_store_row(tmp_path, graph_mirror):
+    # Arrange -- operator 2026-10-24 (graphs as CUI data): rename must
+    # reach the derived store mirror, or the next read shows the old name.
+    opener = lambda: graph_mirror
+    saved = json.loads(
+        views.graphs_save(
+            _post(
+                "/api/graphs/save",
+                tmp_path,
+                {"name": "Old name", "seed_doi": "10.1/a"},
+            ),
+            _opener=opener,
+        ).content
+    )
+    # Act
+    resp = views.graphs_rename(
+        _post(
+            "/api/graphs/rename",
+            tmp_path,
+            {"id": saved["id"], "name": "New name"},
+        ),
+        _opener=opener,
+    )
+    # Assert
+    listed = json.loads(
+        views.graphs_list(_get("/api/graphs/list", tmp_path), _opener=opener).content
+    )
+    key = {"user_root": str(tmp_path.resolve()), "graph_id": saved["id"]}
+    assert (
+        resp.status_code,
+        [g["name"] for g in listed["graphs"]],
+        graph_mirror.get(key).values["name"],
+    ) == (
+        200,
+        ["New name"],
+        "New name",
+    )

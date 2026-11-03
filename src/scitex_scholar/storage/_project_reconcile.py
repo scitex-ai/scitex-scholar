@@ -20,6 +20,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Set
 
+from scitex_scholar._library_names import (
+    RESERVED_LIBRARY_DIRS as RESERVED_LIBRARY_DIRS,
+)
+
 
 @dataclass
 class ReconcileReport:
@@ -48,7 +52,6 @@ class ReconcileReport:
 # area. One name, one place --
 # the picker filter in _django.views reads this set too, so a new reserved
 # directory cannot be honoured by one surface and offered by another.
-RESERVED_LIBRARY_DIRS = frozenset({"MASTER", "MASTER_quarantine", "downloads"})
 
 
 def _project_dirs(library_root: Path) -> List[Path]:

@@ -30,6 +30,7 @@ import json
 import os
 import re
 from pathlib import Path
+from urllib.parse import unquote, urlsplit
 
 import pytest
 import scitex_sdk.ui
@@ -59,7 +60,7 @@ def test_index_body_contains_title():
     # Act
     body = resp.content.decode()
     # Assert
-    assert "<title>SciTeX Scholar</title>" in body
+    assert "<title>Scholar</title>" in body
 
 
 def test_index_body_leaks_no_django_template_comment_markers():
@@ -102,18 +103,14 @@ def test_index_body_leaks_no_unrendered_template_tags():
     assert "{% comment %}" not in body
 
 
-def test_index_body_contains_official_navy_favicon():
-    """Operator 2026-10-20: the official SciTeX mark (white snake on navy),
-    like production -- supplied through the shared partial's `favicon_href`
-    contract, not the SDK default green snake."""
+def test_index_body_uses_sdk_official_favicon():
+    """The published SDK owns the official mark; no missing leaf override."""
     # Arrange
-    rf = RequestFactory()
-    request = rf.get("/")
-    resp = views.index(request)
+    request = RequestFactory().get("/")
     # Act
-    body = resp.content.decode()
+    body = views.index(request).content.decode()
     # Assert
-    assert ('<link rel="icon" href="/static/scholar/pwa/favicon-32.png"' in body)
+    assert "scitex_sdk/ui/img/scitex-favicon.svg" in body
 
 
 def test_index_does_not_shadow_shared_favicon_with_inline_icon():
@@ -394,7 +391,7 @@ def test_graph_health_unconfigured_paragraph_is_translated_in_japanese():
     # on their JA-only phrases so an EN fallback fails loudly.
     assert (
         body["error"],
-        "引用グラフは crossref-local" in body["detail"],
+        "citation-data" in body["detail"] and "エンドポイント" in body["detail"],
         "再起動してください" in body["fix"],
     ) == ("CrossRef API 未設定", True, True)
 
@@ -427,7 +424,7 @@ def test_graph_health_degraded_paragraph_is_translated_in_japanese():
     # Assert — error exact, detail/fix keyed on JA-only phrases.
     assert (
         body["error"],
-        "確認用の論文" in body["detail"],
+        "サンプル論文" in body["detail"],
         "想定どおりのコーパス" in body["fix"],
     ) == ("引用グラフ：制限あり", True, True)
 
@@ -447,7 +444,7 @@ def test_graph_health_unavailable_paragraph_is_translated_in_japanese():
         (body["status"], body["probed"]),
         body["error"],
         "到達できないため" in body["detail"],
-        "再試行してください" in body["fix"],
+        "再試行して" in body["fix"],
     ) == (("unavailable", True), "引用グラフ：利用不可", True, True)
 
 
@@ -581,14 +578,14 @@ def test_status_strip_sits_at_right_edge():
     assert placed == (True, True, True)
 
 
-def test_status_strip_uses_led_dots_with_expand():
-    """The strip follows the old Sources style: LED dots + expandable detail.
+def test_status_strip_has_no_shared_expander():
+    """No shared Service Status expander duplicates the per-tab status.
 
-    Hub's old Scholar UI (scholar_base.html) shows per-source LED dots
-    (data-source + data-status) synced with an expandable Sources panel.
-    The strip renders one dot per backend (CrossRef API, citation graph) and
-    the translated detail/fix paragraph inside <details> expanders; the
-    #serviceStatus id stays so checkServiceHealth keeps rendering into it.
+    Operator 2026-10-23: the shared <details class="status-expand"> (LED
+    dots + CrossRef/Citation rows) duplicated what each tab's own Details
+    section already shows. Each backend status lives in its tab's section:
+    CrossRef in Search Advanced, the graph backend (same #serviceStatus id
+    checkServiceHealth renders into) in the Graph section.
     """
     # Arrange
     template = (
@@ -598,13 +595,13 @@ def test_status_strip_uses_led_dots_with_expand():
         / "workspace_content.html"
     ).read_text()
     # Act
-    styled = (
-        'data-source="crossref"' in template and 'data-source="graph"' in template,
-        "<details" in template and 'id="serviceStatus"' in template,
-        "data-status" in template,
+    per_tab = (
+        "status-expand" not in template,
+        "status-led" not in template,
+        'id="serviceStatus"' in template,
     )
     # Assert
-    assert styled == (True, True, True)
+    assert per_tab == (True, True, True)
 
 
 def test_status_strip_is_collapsible():
@@ -680,7 +677,7 @@ def test_header_links_sdk_ssot_stylesheet():
 
 
 def test_header_does_not_redefine_the_row():
-    """Scholar carries no .stx-app-header rules: the shared sheet owns shape."""
+    """The SDK owns the shared header appearance."""
     # Arrange
     layout = (
         Path(views.__file__).parent
@@ -690,14 +687,19 @@ def test_header_does_not_redefine_the_row():
         / "_partials"
         / "_layout.css"
     ).read_text()
-    # Act — a RULE (selector + block), not a prose mention in a comment.
-    redefined = re.search(r"\.stx-app-header[\w-]*\s*\{", layout)
+    # Act -- a bare shared-sheet selector (not the scoped exception below).
+    lines = [
+        line
+        for line in layout.splitlines()
+        if ".scholar-app-header" not in line
+    ]
+    redefined = re.search(r"\.stx-app-header[\w-]*\s*\{", "\n".join(lines))
     # Assert
     assert redefined is None
 
 
 def test_header_shows_leaf_version_without_subtitle():
-    """Title + leaf version (writer shape), no subtitle element."""
+    """Title + leaf version via the shared AppHeader mount, no subtitle element."""
     # Arrange
     template = (
         Path(views.__file__).parent
@@ -707,7 +709,7 @@ def test_header_shows_leaf_version_without_subtitle():
     ).read_text()
     # Act
     shaped = (
-        "stx-app-header__version" in template and "scholar_version" in template,
+        "data-app-version" in template and "scholar_version" in template,
         "stx-app-header__subtitle" not in template,
     )
     # Assert
@@ -723,8 +725,8 @@ def test_header_version_matches_installed_package():
     request = rf.get("/")
     # Act
     html = views.index(request).content.decode()
-    # Assert
-    assert ("v" + importlib.metadata.version("scitex-scholar")) in html
+    # Assert — the badge renders client-side; the server contract is the attr.
+    assert ('data-app-version="' + importlib.metadata.version("scitex-scholar") + '"') in html
 
 
 def test_saved_graphs_roundtrip_through_list(tmp_path):
@@ -922,6 +924,24 @@ def test_search_rejects_non_integer_max_results():
     assert resp.status_code == 400
 
 
+def test_search_clamps_max_results_to_1000():
+    # Arrange — operator 2026-10-22 ("Results ... To unlimited"): the
+    # leaf no longer caps at 500; the server-side safety bound is 1000
+    # (per-engine fan-out stays bounded on throttled external APIs).
+    seen = {}
+
+    class _StubEngine:
+        async def search(self, query, mode=None, max_results=20, sources=None, filters=None, on_progress=None):
+            seen["max_results"] = max_results
+            return {"results": [], "metadata": {}}
+
+    request = RequestFactory().get("/api/search?q=hippocampus&max_results=5000&no_cache=true")
+    # Act
+    views.search(request, _engine=_StubEngine())
+    # Assert
+    assert seen["max_results"] == 1000
+
+
 def test_search_rejects_unknown_mode():
     # Arrange
     rf = RequestFactory()
@@ -979,7 +999,7 @@ def test_search_serves_cached_result_without_calling_engine():
         "hippocampus",
         views._cache_scope(request),
         mode="parallel",
-        max_results=20,
+        max_results=50,
         sources="",
         filters="",
     )
@@ -998,7 +1018,7 @@ def test_search_marks_cached_results_as_cached():
         "sharp wave",
         views._cache_scope(request),
         mode="parallel",
-        max_results=20,
+        max_results=50,
         sources="",
         filters="",
     )
@@ -1320,13 +1340,16 @@ def _resolve_css(entry: Path, _seen: set | None = None) -> str:
     """
     seen = _seen if _seen is not None else set()
     entry = entry.resolve()
-    if entry in seen or not entry.exists():
+    if entry in seen:
         return ""
     seen.add(entry)
     text = entry.read_text()
     parts = [text]
     for href in _IMPORT_RE.findall(text):
-        parts.append(_resolve_css(entry.parent / href, seen))
+        parsed = urlsplit(href)
+        if parsed.scheme or parsed.netloc:
+            continue  # Remote fonts cannot declare this local page's theme tokens.
+        parts.append(_resolve_css(entry.parent / unquote(parsed.path), seen))
     return "\n".join(parts)
 
 
@@ -2046,6 +2069,46 @@ def _compass_index_body() -> str:
     return views.index(RequestFactory().get("/")).content.decode()
 
 
+def test_search_results_header_carries_pipeline_stepper():
+    # Arrange -- old-direct parity slice 2: Ready -> Searching -> Done +
+    # timer, ported from hub toolbar-status onto the leaf fetch lifecycle.
+    body = _compass_index_body()
+    # Act
+    stepper = 'id="searchStepper"' in body
+    phases = ('id="searchStep1"' in body, 'id="searchStep2"' in body, 'id="searchStep3"' in body)
+    timer = 'id="searchTimer"' in body
+    # Assert
+    assert (stepper, all(phases), timer) == (True, True, True)
+
+
+def test_search_sources_grouped_in_old_direct_tiers():
+    # Arrange -- old-direct parity slice 3: local unlimited tier +
+    # external tier with per-source rate labels + email/rate notice.
+    body = _compass_index_body()
+    # Act
+    tiers = ("Local (fast)" in body, "External APIs (slower, limited results)" in body)
+    rates = ("3/s" in body, "50/s" in body, "10/s" in body)
+    notice = "higher rate limits" in body
+    # Assert
+    assert (all(tiers), all(rates), notice) == (True, True, True)
+
+
+def test_search_results_dropdown_offers_up_to_1000():
+    # Arrange -- operator 2026-10-22 ("Results ... To unlimited"): the leaf
+    # no longer caps at 500; the dropdown offers 10-1000 with 50 the
+    # default, and the CUI backend clamps 1-1000 (views.search).
+    body = _compass_index_body()
+    # Act — scope to the RESULTS select: value="1000" also appears in the
+    # unrelated AI auto-accept interval select, so a body-wide check is
+    # vacuous for this option.
+    select = body.split('id="searchMaxResults"')[1].split("</select>")[0]
+    options = ('value="200"' in select, 'value="500"' in select, 'value="1000"' in select, 'value="50" selected' in select)
+    js = COMPASS_SEARCH_JS.read_text()
+    lifecycle = ("stepperSearching()" in js, "stepperDone(" in js, "stepperReset()" in js)
+    # Assert
+    assert (all(options), all(lifecycle)) == (True, True)
+
+
 def test_search_is_the_default_selected_tab():
     # Arrange
     body = _compass_index_body()
@@ -2069,24 +2132,67 @@ def test_graph_tab_is_not_default_but_still_present():
     assert graph_present and graph_not_default and graph_panel_not_active
 
 
-def test_advanced_section_is_collapsed_by_default():
-    # Arrange
+def test_advanced_section_is_flat_not_a_details_card():
+    # Arrange -- operator 2026-10-24 (old-direct parity, flat Details):
+    # the Advanced <details> card is deleted; sources + filters render
+    # as flat rows directly under the one Search section.
     body = _compass_index_body()
     # Act
-    present = "search-advanced" in body
-    closed_on_load = '<details class="search-advanced">' in body  # no open attr
+    rows_present = "search-advanced__row" in body
+    no_details_card = '<details class="search-advanced">' not in body
     # Assert
-    assert present and closed_on_load
+    assert rows_present and no_details_card
 
 
-def test_advanced_hides_query_syntax_until_requested():
-    # Arrange
+def _query_syntax_controls():
+    # Arrange -- the existing in-field help owns syntax, not duplicate prose
+    # inside the Sources group. The endpoint's operator data has its own tests.
+    from html.parser import HTMLParser
+
+    class HelpControls(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.controls = {}
+
+        def handle_starttag(self, tag, attrs):
+            attrs = dict(attrs)
+            if attrs.get("id") in {"searchSyntaxPanel", "searchSyntaxToggle"}:
+                self.controls[attrs["id"]] = attrs
+
     body = _compass_index_body()
     # Act
-    syntax_block = "search-advanced__syntax" in body
-    impact_factor_syntax = "if:&gt;5" in body  # escaped in the template
+    parser = HelpControls()
+    parser.feed(body)
+    panel = parser.controls["searchSyntaxPanel"]
+    toggle = parser.controls["searchSyntaxToggle"]
+    return panel, toggle
+
+def test_query_syntax_panel_is_initially_hidden():
+    # Arrange
+    panel, toggle = _query_syntax_controls()
+    # Act
+    valid = "hidden" in panel
     # Assert
-    assert syntax_block and impact_factor_syntax
+    assert valid
+
+
+def test_query_syntax_toggle_is_initially_collapsed():
+    # Arrange
+    panel, toggle = _query_syntax_controls()
+    # Act
+    valid = toggle["aria-expanded"] == "false"
+    # Assert
+    assert valid
+
+
+def test_query_syntax_toggle_targets_panel():
+    # Arrange
+    panel, toggle = _query_syntax_controls()
+    # Act
+    valid = toggle["aria-controls"] == panel["id"]
+    # Assert
+    assert valid
+
 
 
 def test_ignore_cache_and_source_are_wired_to_the_api():
@@ -2148,7 +2254,7 @@ def test_search_results_offer_build_citation_graph():
     assert action_in_js and styled
 
 
-def test_search_input_has_a_44px_touch_target():
+def test_search_input_uses_shared_two_line_height():
     # Arrange
     forms_css = (COMPASS_CSS_DIR / "_forms.css").read_text()
     base_css = (COMPASS_CSS_DIR / "_base.css").read_text()
@@ -2156,11 +2262,16 @@ def test_search_input_has_a_44px_touch_target():
     # #93: the search input is sized via a scholar-owned token (declared in
     # _base.css, always linked) rather than a raw px or an unlinked scitex-ui
     # --input-height fallback. The token must be declared AND referenced.
+    # Operator 2026-10-23: two-line activation height, shared across the
+    # row's inputs, selects, and buttons (old-direct one-height parity).
     token_declared = "--scholar-search-height" in base_css
     token_referenced = "min-height: var(--scholar-search-height)" in forms_css
     no_raw_fallback = "var(--input-height, 44px)" not in forms_css
+    shared_row_height = (
+        forms_css.count("min-height: var(--scholar-search-height)") >= 3
+    )
     # Assert
-    assert token_declared and token_referenced and no_raw_fallback
+    assert (token_declared, token_referenced, no_raw_fallback, shared_row_height) == (True,) * 4
 
 
 # --- item 94: the search placeholder must tell the user WHAT to type --------
@@ -2178,31 +2289,31 @@ def test_search_placeholder_is_clear_and_example_driven():
     # Arrange
     body = _compass_index_body()
     # Act
-    has_example = 'placeholder="e.g. ' in body
+    has_example = 'e.g. hippocampus' in body
     no_generic = 'Enter keywords' not in body
     # Assert -- the placeholder models a concrete query and the generic
     # "Enter keywords…" label is gone.
     assert has_example and no_generic
 
 
-# --- item 116/115/114: "Search" must say WHERE it searches ------------------
+# --- operator 2026-10-26: tab + button read "Search" ---------------------------
 #
-# Compass 2026-09-10: a bare "Search" label does not tell a researcher whether
-# they are querying the external databases or their own library -- and the
-# library does not exist yet. The tab and the submit button now read
-# "Search databases" and the description names the external databases and
-# contrasts them with the Library tab.
+# Operator feedback batch 2026-10-26 explicitly renames "Search databases" to
+# "Search" (old-direct parity: hub tab short label + submit button both read
+# "Search"). This SUPERSEDES the compass 2026-09-10 item 116/115/114 decision
+# that introduced "Search databases" — the WHERE-clarity now lives in the
+# description paragraph (external databases vs Library), not the labels.
 # ---------------------------------------------------------------------------
 
 
-def test_search_tab_and_button_are_labelled_databases():
+def test_search_tab_and_button_are_labelled_search():
     # Arrange
     body = _compass_index_body()
     # Act
-    tab_label = 'aria-controls="tab-search" tabindex="0">Search databases<' in body
+    tab_label = 'aria-controls="tab-search" tabindex="0">Search<' in body
     # #95: the search submit is the PRIMARY action, so it carries btn-primary
     # (NOT btn-build, which is the secondary Build Graph / per-row class).
-    button_label = 'class="btn-primary">Search databases<' in body
+    button_label = 'class="btn-primary btn-primary--query">Search<' in body
     # Assert
     assert tab_label and button_label
 
@@ -2223,28 +2334,32 @@ def test_search_primary_distinct_from_build_graph():
     body = _compass_index_body()
     # Act
     # The Search submit is btn-primary; the Build Graph submit stays btn-build.
-    search_is_primary = 'class="btn-primary">Search databases<' in body
-    build_graph_stays_secondary = 'class="btn-build">Build Graph<' in body
+    # (Matched by id-then-label, not by the full tag: the button carries an
+    # id + disabled attribute for the empty-DOI arming behavior.)
+    search_is_primary = 'class="btn-primary btn-primary--query">Search<' in body
+    build_graph_stays_secondary = 'id="graphBuildBtn"' not in body
     # Negative control: the search button is NOT also btn-build (that was the
     # pre-fix state — a single shared class with no visual distinction).
-    search_not_btn_build = 'class="btn-build">Search databases<' not in body
+    search_not_btn_build = 'class="btn-build">Search<' not in body
     # Assert
     assert search_is_primary and build_graph_stays_secondary and search_not_btn_build
 
 
-def test_btn_primary_uses_accent_token_and_44px_minimum():
+def test_btn_primary_uses_accent_token_and_shared_height():
     # Arrange
     forms_css = (COMPASS_CSS_DIR / "_forms.css").read_text()
     # Act
     # .btn-primary must be present and use the shared scitex-ui --accent token
-    # (theme-aware: light + dark both resolve from theme.css) with a 44px
-    # touch-target minimum, so it reads as primary AND stays tappable on
-    # mobile without hardcoding a colour or a sub-44px height.
+    # (theme-aware: light + dark both resolve from theme.css). Operator
+    # 2026-10-23: its height is the shared two-line token, not a raw px, so
+    # the primary button aligns exactly with its input row (old-direct
+    # one-height parity) while staying above the 44px touch minimum.
     has_btn_primary = ".btn-primary {" in forms_css
     uses_accent = "background: var(--accent)" in forms_css
-    touch_44 = "min-height: 44px" in forms_css
+    shared_height = "min-height: var(--scholar-search-height)" in forms_css
+    no_raw_height = "min-height: 44px" not in forms_css
     # Assert
-    assert has_btn_primary and uses_accent and touch_44
+    assert (has_btn_primary, uses_accent, shared_height, no_raw_height) == (True,) * 4
 
 
 def test_search_description_clarifies_external_databases_not_library():
@@ -2315,8 +2430,10 @@ def test_tabs_sdk_stylesheet_exists_in_installed_package():
     Regression guard for the 0.3.6 hold: the template linked
     scitex_sdk/ui/css/app/content-tabs.css while no PyPI release carried it,
     so the URL 404'd and tabs shipped unstyled. Linking the path is not
-    enough — the file must exist in the installed scitex-sdk (floor >=0.3.7)
-    and carry the selected-state rule the contract depends on.
+    enough — the file must exist in the installed scitex-sdk (floor >=0.3.9)
+    and carry the selected-state rule the contract depends on: underline-only
+    (transparent border/background, accent underline -- SDK #60), never the
+    pre-#60 boxed + brand-blue look the operator vetoed.
     """
     # Arrange
     import scitex_sdk.ui
@@ -2332,8 +2449,21 @@ def test_tabs_sdk_stylesheet_exists_in_installed_package():
     )
     # Act
     text = sheet.read_text()
-    # Assert
-    assert '.stx-content-tabs__tab[aria-selected="true"]' in text
+    # Assert -- one tuple compare: the contract selector exists AND the
+    # selected state is underline-only (transparent box), never the
+    # vetoed boxed + brand-blue language.
+    selected = re.search(
+        r'\.stx-content-tabs__tab\[aria-selected="true"\]\s*\{(.*?)\}',
+        text,
+        re.S,
+    )
+    body = selected.group(1) if selected else ""
+    assert (
+        selected is not None,
+        "border-color: transparent" in body,
+        "background: transparent" in body,
+        "--accent" in body,
+    ) == (True, True, True, True)
 
 
 def test_tabs_do_not_redefine_the_bar():
@@ -2458,7 +2588,7 @@ def test_search_form_row_stacks_on_mobile():
 
 def test_search_input_button_stack_vertically_on_mobile():
     # Arrange
-    # The input + "Search databases" button share a flex ROW inside
+    # The input + "Search" button share a flex ROW inside
     # .input-wrapper. On a 390px viewport that row leaves the input only
     # ~182px wide with its placeholder truncated. Below the breakpoint the
     # wrapper must stack vertically (input full-width, button full-width under
@@ -2483,6 +2613,40 @@ def test_search_input_button_stack_vertically_on_mobile():
     assert in_mobile and wrapper_rule and button_rule
 
 
+def test_containers_are_square_only_buttons_badges_textareas_rounded():
+    # Arrange -- operator color discipline (no rounded items other than
+    # textarea, button, badge): cards, rows, bars, and strips must not
+    # declare a radius. Buttons keep theirs; badges/chips keep theirs;
+    # the stepper/queue dots and spinner stay circular (functional).
+    import re
+
+    css = "".join(
+        (COMPASS_CSS_DIR / name).read_text()
+        for name in ("_library.css", "_search.css", "_graph.css", "_cards.css")
+    )
+    # Act
+    square = [
+        ".library-item",
+        ".library-io",
+        ".library-filter",
+        ".library-item__details",
+        ".library-import-preview",
+        ".library-ext",
+        ".search-stepper",
+        ".search-queue",
+        ".graph-library-seed__item",
+    ]
+    rounded = [
+        re.search(re.escape(sel) + r"\s*\{[^}]*border-radius", css)
+        for sel in square
+    ]
+    # Assert
+    assert (all(r is None for r in rounded), ".graph-saved-list__item" not in css) == (
+        True,
+        True,
+    )
+
+
 def test_mobile_form_row_stretches_groups_full_width():
     # Arrange
     # Root cause of the 182px-truncated-placeholder defect: `_forms.css` loads
@@ -2502,7 +2666,7 @@ def test_mobile_form_row_stretches_groups_full_width():
         r"\.graph-form\s+\.form-row\s*{[^}]*align-items:\s*stretch[^}]*}", block
     )
     full_width_groups = re.search(
-        r"\.graph-form\s+\.form-row\s+\.form-group--doi\s*,?\s*\n?\s*"
+        r"\.graph-form\s+\.form-row\s+\.form-group--query\s*,?\s*\n?\s*"
         r"\.graph-form\s+\.form-row\s+\.form-group--options\s*{[^}]*width:\s*100%[^}]*}",
         block,
     )
@@ -3369,7 +3533,7 @@ def test_main_page_renders_in_english_by_default():
     # Act
     en = _render_index_in("en")
     # Assert -- the EN default carries the English header and the i18n JS dict.
-    assert "SciTeX Scholar" in en and "SCHOLAR_I18N" in en
+    assert "Scholar" in en and "SCHOLAR_I18N" in en
 
 
 def _i18n_script_body(page: str) -> str:
@@ -3440,8 +3604,10 @@ def test_main_page_ja_render_has_no_untranslated_labels():
     # Act
     ja = _render_index_in("ja")
     # Assert -- the EN source of a header label is absent (replaced by JA) and
-    # the JA catalog produced Japanese text on the page.
-    assert "Service Status" not in ja and "サービス状態" in ja
+    # the JA catalog produced Japanese text on the page. Operator 2026-10-23
+    # deleted the shared Service Status expander, so the probe label is the
+    # Graph tab's own backend-status label (per-tab status, no duplication).
+    assert "Citation Graph" not in ja and "引用グラフ" in ja
 
 
 def test_ja_catalog_translates_every_msgid():
@@ -3456,7 +3622,7 @@ def test_ja_catalog_translates_every_msgid():
     # Proper nouns / format labels that stay in Latin in Japanese UI (translating
     # them would be wrong, not a missed translation).
     proper_nouns = {
-        "SciTeX Scholar", "DOI", "CrossRef API",
+        "Scholar", "SciTeX Scholar", "DOI", "CrossRef API",
         "BibTeX (.bib)", "RIS (.ris)", "EndNote (.enw)", "CSV (.csv)",
         "Zotero", "Connected Papers",
     }
@@ -3467,10 +3633,10 @@ def test_ja_catalog_translates_every_msgid():
         (i, m) for i, m in pairs
         if i != "" and i not in proper_nouns and (m == "" or m == i)
     ]
-    # Assert -- at least one msgid (the status strip title, known JA) and zero
+    # Assert -- at least one msgid (the Details strip title, known JA) and zero
     # untranslated (proper nouns excluded by the explicit list above).
     assert (
-        any("サービス状態" in m for _, m in pairs) and not untranslated
+        any("詳細" in m for _, m in pairs) and not untranslated
     )
 
 
@@ -3575,6 +3741,72 @@ def test_standalone_provider_hides_symlinked_entries(tmp_path):
     assert [project["id"] for project in payload["projects"]] == ["Alpha"]
 
 
+def test_scoped_view_standalone_get_keeps_legacy_keys(tmp_path):
+    # Arrange -- SDK 0.3.16 scoped view on an unscoped local provider must
+    # answer the legacy byte-compatible shape (PR #90 host adoption).
+    (tmp_path / "Alpha").mkdir()
+    request = RequestFactory().get("/api/projects")
+    # Act
+    with _project_root_env(tmp_path), override_settings(SCITEX_PROJECT_PROVIDER=""):
+        payload = json.loads(views.project_scope(request).content)
+    # Assert
+    assert set(payload) == {"projects", "current", "allow_user_scope"}
+
+
+def test_scoped_view_standalone_get_disallows_user_scope(tmp_path):
+    # Arrange -- the standalone local provider offers no tagged scope.
+    (tmp_path / "Alpha").mkdir()
+    request = RequestFactory().get("/api/projects")
+    # Act
+    with _project_root_env(tmp_path), override_settings(SCITEX_PROJECT_PROVIDER=""):
+        payload = json.loads(views.project_scope(request).content)
+    # Assert
+    assert payload["allow_user_scope"] is False
+
+
+def test_scoped_view_legacy_post_id_still_remembers(tmp_path):
+    # Arrange -- legacy POST {id} keeps working under the scoped view.
+    (tmp_path / "Alpha").mkdir()
+    request = RequestFactory().post(
+        "/api/projects", data=json.dumps({"id": "Alpha"}), content_type="application/json"
+    )
+    # Act
+    with _project_root_env(tmp_path), override_settings(SCITEX_PROJECT_PROVIDER=""):
+        response = views.project_scope(request)
+    # Assert
+    assert (response.status_code, json.loads(response.content)) == (
+        200,
+        {"current": "Alpha"},
+    )
+
+
+def test_scoped_view_tagged_user_scope_refused_standalone(tmp_path):
+    # Arrange -- an unscoped provider must refuse the tagged All selection.
+    (tmp_path / "Alpha").mkdir()
+    request = RequestFactory().post(
+        "/api/projects",
+        data=json.dumps({"scope": "user", "id": None}),
+        content_type="application/json",
+    )
+    # Act
+    with _project_root_env(tmp_path), override_settings(SCITEX_PROJECT_PROVIDER=""):
+        response = views.project_scope(request)
+    # Assert
+    assert response.status_code == 403
+
+
+def test_local_provider_keeps_user_scope_available(tmp_path):
+    # Arrange -- Scholar never disables All; the hook stays dormant
+    # standalone and the host provider owns it when mounted.
+    # Act
+    with _project_root_env(tmp_path), override_settings(SCITEX_PROJECT_PROVIDER=""):
+        reason = views.ScholarLocalProjectProvider(tmp_path).user_scope_disabled_reason(
+            RequestFactory().get("/api/projects")
+        )
+    # Assert
+    assert reason is None
+
+
 @contextlib.contextmanager
 def _scitex_dir_env(root: Path):
     """Point SCITEX_DIR at a temp root and clear the Scholar overrides.
@@ -3648,7 +3880,7 @@ def _rendered_user_scope_header(request, tmp_path):
         html = response.content.decode()
         project_html = render_to_string(
             "scholar/scholar.html",
-            {"app_scope": "project", "current_project": "Alpha"},
+            {"app_scope": "project", "current_project": "Alpha", "current_scope": "project"},
             request=http_request,
         )
     return {
@@ -3678,28 +3910,36 @@ def test_index_user_scope_agrees_with_manifest(_rendered_user_scope_header):
 
 
 def test_index_user_scope_keeps_canonical_identity(_rendered_user_scope_header):
-    # Arrange
+    # Arrange — the app row is the shared primitive mount, not hand-rolled markup.
     # Act
     html = _rendered_user_scope_header["html"]
     # Assert
-    assert html.count('class="stx-app-header__identity"') == 1
+    assert html.count("<div data-stx-app-header") == 1
 
 
 def test_index_user_scope_keeps_canonical_picker_slot(_rendered_user_scope_header):
-    # Arrange
+    # Arrange — the slot is created client-side by the primitive; the server
+    # contract is the picker partial feeding it.
     # Act
     html = _rendered_user_scope_header["html"]
+    source = (Path(views.__file__).parent / "templates" / "scholar" / "workspace_content.html").read_text()
     # Assert
-    assert html.count('class="stx-app-header__slot--project-selector"') == 1
+    assert "_project_picker.html" in source
 
 
-def test_index_user_scope_suppresses_picker(_rendered_user_scope_header):
+def test_index_user_scope_carries_picker_with_user_scope(_rendered_user_scope_header):
     # Arrange
-    # A project query cannot turn the user-level index into a project-scoped page.
+    # Operator 2026-10-23: user scope opts into the header picker, so the
+    # user-level index carries exactly one picker with the explicit user
+    # state (the "No project selected" choice), not a suppressed slot.
     # Act
     # Read the actual index markup supplied by the fixture.
     # Assert
-    assert _rendered_user_scope_header["html"].count("data-stx-project-picker") == 0
+    html = _rendered_user_scope_header["html"]
+    # The default param selects nothing (explicit user scope); the
+    # explicit-project param resolves Alpha (explicit project scope).
+    # Either way the picker is present exactly once with an explicit state.
+    assert (html.count("data-stx-project-picker"), 'data-current-scope=' in html) == (1, True)
 
 
 def test_project_header_renders_one_picker(_rendered_user_scope_header):
@@ -3725,18 +3965,22 @@ def _rendered_project_query_header(tmp_path):
         html = views.index(request).content.decode()
         project_html = render_to_string(
             "scholar/scholar.html",
-            {"app_scope": "project", "current_project": "Alpha"},
+            {"app_scope": "project", "current_project": "Alpha", "current_scope": "project"},
             request=request,
         )
     return {"html": html, "project_html": project_html}
 
 
-def test_user_index_has_no_project_navigation(_rendered_project_query_header):
+def test_user_index_picker_carries_resolved_project_navigation(_rendered_project_query_header):
     # Arrange
+    # Operator 2026-10-23: the header picker is the scope indicator, so a
+    # resolved ?project= selection surfaces its navigation contract on the
+    # user-level index (the picker shows the project; it does not imply a
+    # project-scoped page).
     # Act
     html = _rendered_project_query_header["html"]
     # Assert
-    assert 'data-current="Alpha" data-navigate="?project={id}"' not in html
+    assert 'data-current="Alpha" data-navigate="?project={id}"' in html
 
 
 def test_project_header_keeps_project_navigation(_rendered_project_query_header):
@@ -3760,17 +4004,23 @@ def _rendered_host_scope_header(tmp_path):
     with _project_root_env(tmp_path), settings_override:
         html = views.index(request).content.decode()
         project_html = render_to_string(
-            "scholar/scholar.html", {"app_scope": "project"}, request=request
+            "scholar/scholar.html",
+            {"app_scope": "project", "current_scope": "project"},
+            request=request,
         )
     return {"html": html, "project_html": project_html}
 
 
-def test_user_index_has_no_host_project_picker(_rendered_host_scope_header):
+def test_user_index_picker_uses_host_provider_url(_rendered_host_scope_header):
     # Arrange
+    # Operator 2026-10-23: user scope opts into the header picker, so the
+    # user-level index carries it against the host URL when the host
+    # registers a provider (the picker lists host projects; the leaf holds
+    # no Hub model or authorization logic).
     # Act
     html = _rendered_host_scope_header["html"]
     # Assert
-    assert 'data-provider-url="/host/api/project-scope/"' not in html
+    assert 'data-provider-url="/host/api/project-scope/"' in html
 
 
 def test_project_header_keeps_host_provider_url(_rendered_host_scope_header):
@@ -3786,8 +4036,8 @@ def test_header_source_places_picker_after_identity_before_content():
     source = _scholar_template_source(TEMPLATE)
     # Act
     positions = [
-        source.index('class="stx-app-header__identity"'),
-        source.index('class="stx-app-header__slot--project-selector"'),
+        source.index("data-stx-app-header"),
+        source.index("_project_picker.html"),
         source.index('class="app-container"'),
     ]
     # Assert
@@ -3933,12 +4183,15 @@ def test_user_index_returns_200_for_each_bound_user(_user_scope_library_outcomes
     assert all(result["status"] == 200 for result in results)
 
 
-def test_user_index_suppresses_picker_for_each_bound_user(_user_scope_library_outcomes):
+def test_user_index_carries_picker_for_each_bound_user(_user_scope_library_outcomes):
     # Arrange
+    # Operator 2026-10-23: every bound user gets the header picker (user
+    # scope opts in); the picker lists their projects, the roots stay
+    # request-bound (pinned by test_user_index_keeps_request_bound...).
     # Act
     results = _user_scope_library_outcomes["results"]
     # Assert
-    assert all("data-stx-project-picker" not in result["html"] for result in results)
+    assert all(result["html"].count("data-stx-project-picker") == 1 for result in results)
 
 
 def test_user_index_lists_one_paper_for_each_bound_user(_user_scope_library_outcomes):
@@ -4035,14 +4288,22 @@ def test_library_empty_state_names_no_action_that_does_not_exist():
 
 def test_library_empty_state_actions_are_real_controls():
     # Arrange -- each action the empty state renders must hit a control or
-    # endpoint that exists: Import -> the Library's own import button (POST
-    # /api/library/import), Clear -> the filter input beside the list.
+    # endpoint that exists: Import -> the Details strip's library-section
+    # import button (operator 2026-10-22: library ops live in the Details
+    # space; POST /api/library/import), Clear -> the filter input beside
+    # the list, which stays in the Library tab's main area.
     script = _library_js()
     panel = _library_panel_html()
+    page = views.index(RequestFactory().get("/")).content.decode()
+    strip_library = page.split(
+        '<div class="sidebar-section hidden" data-library-hint>', 1
+    )[1].split(
+        '<div class="sidebar-section graph-controls-hint hidden" data-graph-hint>', 1
+    )[0]
     # Act
     imports_existing_button = (
         'document.getElementById("libraryImportBtn")' in script
-        and 'id="libraryImportBtn"' in panel
+        and 'id="libraryImportBtn"' in strip_library
     )
     clears_existing_filter = (
         'document.getElementById("libraryFilter")' in script
@@ -4262,28 +4523,33 @@ def test_library_filter_field_label_is_translated_in_japanese():
 def test_graph_initial_state_explains_seed_and_library_workflow():
     # Arrange
     html = views.index(RequestFactory().get("/")).content.decode()
-    # Act
-    expected = ["Start with a DOI", "Search or your Library", "Max papers in graph"]
+    # Act -- operator 2026-10-23 seed-only: no DOI typing, no max-papers.
+    expected = ["Seed from work(s) selected in", 'data-scholar-seed-tab="search"', 'data-scholar-seed-tab="library"']
+    dropped = ["Start with a DOI", "Max papers in graph", 'id="doiInput"']
     # Assert
-    assert all(text in html for text in expected)
+    assert all(text in html for text in expected) and all(text not in html for text in dropped)
 
 
-def test_graph_seed_is_required_and_not_prefilled():
-    # Arrange
+def test_graph_tab_uses_search_library_selection_without_a_duplicate_seed_list():
+    # Arrange -- operator 2026-10-23 seed-only: DOI input deleted.
     html = views.index(RequestFactory().get("/")).content.decode()
     # Act
-    input_tag = re.search(r'<input[^>]+id="doiInput"[^>]*>', html).group(0)
+    seed_only = ('id="graphSeedGuidance"' in html, 'id="graphLibrarySeed"' not in html, 'id="doiInput"' not in html)
     # Assert
-    assert "required" in input_tag and "value=" not in input_tag
+    assert seed_only == (True, True, True)
 
 
-def test_graph_limit_has_visible_and_accessible_meaning():
-    # Arrange
-    html = views.index(RequestFactory().get("/")).content.decode()
+def test_graph_width_is_a_fixed_constant():
+    # Arrange -- operator 2026-10-23 seed-only: no topN select.
+    from pathlib import Path as _Path
+    leaf_js = (
+        _Path(views.__file__).parent
+        / "static" / "scholar" / "js" / "graph" / "citation-graph.js"
+    ).read_text()
     # Act
-    select_tag = re.search(r'<select[^>]+id="topN"[^>]*>', html).group(0)
+    fixed = ("DEFAULT_TOP_N" in leaf_js, 'id="topN"' not in leaf_js)
     # Assert
-    assert 'aria-label="Maximum papers in citation graph"' in select_tag
+    assert fixed == (True, True)
 
 
 def _save_payload(paper_id="PID9", doi="10.9/example", title="Saved paper"):
@@ -5167,7 +5433,7 @@ def test_library_save_bulk_saved_entries_do_not_leak_server_path(tmp_path):
 
 # New Library command controls; all existing source above is retained exactly.
 from django.contrib.auth import get_user_model
-from tests.scitex_scholar._django.test_views_shell_context import _private_context
+from tests.scitex_scholar._django.test_views_shell_context import _private_context as _private_context
 
 
 def _command_library_request(root, user, query="", **query_hints):
@@ -5571,3 +5837,52 @@ class TestLibraryCanonicalCommandParser:
         parsed = SearchQueryParser.from_shell_syntax(query).get_filters()
         # Assert
         assert parsed == {"positive_keywords": query.split()}
+
+
+def test_search_empty_state_visible_before_first_search():
+    # Arrange
+    body = _compass_index_body()
+    # Act
+    present = 'id="searchEmptyState"' in body and "Run a search to see results" in body
+    hidden_on_submit = 'hide(emptyState)' in (
+        Path(views.__file__).parent / "static" / "scholar" / "js" / "search.js"
+    ).read_text()
+    # Assert
+    assert present and hidden_on_submit
+
+
+def test_compact_rows_share_one_44px_control_height():
+    # Arrange -- brief-04 follow-up: every control OUTSIDE the tall query
+    # row (search toolbar, library filter, 208px Details strip) shares the
+    # compact 44px floor so rows align old-direct style.
+    search_css = (COMPASS_CSS_DIR / "_search.css").read_text()
+    sidebar_css = (COMPASS_CSS_DIR / "_sidebar.css").read_text()
+    # Act
+    scoped = (
+        ".search-toolbar-row .form-select" in search_css,
+        ".search-toolbar-row .btn-control-library" in search_css,
+        ".library-filter .form-select" in search_css,
+        ".status-strip__body .form-select" in sidebar_css,
+        ".status-strip__body .form-input" in sidebar_css,
+    )
+    floors = (
+        search_css.count("min-height: 44px"),
+        sidebar_css.count("min-height: 44px"),
+    )
+    # Assert
+    assert scoped == (True,) * 5 and floors[0] >= 2 and floors[1] >= 1
+
+
+def test_details_strip_wrapped_rows_stay_legible():
+    # Arrange -- brief-05 Details polish: the 208px strip forces wraps;
+    # checkboxes pin to the first line, rates sit in a fixed right lane.
+    sidebar_css = (COMPASS_CSS_DIR / "_sidebar.css").read_text()
+    # Act
+    pinned = (
+        ".status-strip__body .search-advanced__check" in sidebar_css
+        and "align-items: flex-start" in sidebar_css,
+        ".status-strip__body .source-rate" in sidebar_css
+        and "min-width: 36px" in sidebar_css,
+    )
+    # Assert
+    assert pinned == (True, True)

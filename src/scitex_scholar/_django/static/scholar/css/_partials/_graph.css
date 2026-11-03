@@ -241,7 +241,6 @@
 .graph-library-seed__item {
   padding: 8px 10px;
   border: 1px solid var(--border-default);
-  border-radius: 6px;
   cursor: pointer;
 }
 
@@ -262,50 +261,6 @@
   margin-top: 2px;
 }
 
-/*
- * Slice 9 (old-direct unification): saved-graphs bar + list. Rows reuse
- * the library-seed item shape.
- */
-.graph-saved-bar {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin-bottom: 8px;
-}
-.graph-saved-bar__input {
-  flex: 1 1 auto;
-}
-.graph-saved-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-height: 220px;
-  overflow-y: auto;
-}
-.graph-saved-list__item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  border: 1px solid var(--border-default);
-  border-radius: 6px;
-}
-.graph-saved-list__name {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-primary);
-}
-.graph-saved-list__seed {
-  font-size: 12px;
-  color: var(--text-muted);
-  flex: 1 1 auto;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.graph-saved-list__rename {
-  flex: 1 1 auto;
-}
 
 .info-list {
   display: flex;

@@ -1,0 +1,125 @@
+{
+  "schema": "scitex-scholar.showcase/v1",
+  "id": "mnist",
+  "version": 1,
+  "verified_on": "2026-11-02",
+  "scope": "Curated supporting references; not a claim that an existing manuscript cites them, that full texts are downloaded, or that research claims are verified.",
+  "references": [
+    {
+      "key": "lecun1998",
+      "role": "MNIST background",
+      "title": "Gradient-based learning applied to document recognition",
+      "authors": [
+        "Yann Le Cun",
+        "Léon Bottou",
+        "Yoshua Bengio",
+        "Patrick Haffner"
+      ],
+      "year": 1998,
+      "doi": "10.1109/5.726791",
+      "journal": "Proceedings of the IEEE",
+      "volume": "86",
+      "issue": "11",
+      "pages": "2278-2324",
+      "sources": [
+        "https://ieeexplore.ieee.org/document/726791",
+        "https://bottou.org/papers/lecun-98h",
+        "https://api.crossref.org/works/10.1109/5.726791"
+      ]
+    },
+    {
+      "key": "pedregosa2011",
+      "role": "software used by the computed bundle",
+      "title": "Scikit-learn: Machine Learning in Python",
+      "authors": [
+        "Fabian Pedregosa",
+        "Gaël Varoquaux",
+        "Alexandre Gramfort",
+        "Vincent Michel",
+        "Bertrand Thirion",
+        "Olivier Grisel",
+        "Mathieu Blondel",
+        "Peter Prettenhofer",
+        "Ron Weiss",
+        "Vincent Dubourg",
+        "Jake Vanderplas",
+        "Alexandre Passos",
+        "David Cournapeau",
+        "Matthieu Brucher",
+        "Matthieu Perrot",
+        "Édouard Duchesnay"
+      ],
+      "year": 2011,
+      "doi": null,
+      "journal": "Journal of Machine Learning Research",
+      "volume": "12",
+      "issue": "85",
+      "pages": "2825-2830",
+      "sources": [
+        "https://jmlr.org/papers/v12/pedregosa11a.html"
+      ]
+    },
+    {
+      "key": "vanschoren2014",
+      "role": "dataset platform used by the computed bundle",
+      "title": "OpenML: networked science in machine learning",
+      "authors": [
+        "Joaquin Vanschoren",
+        "Jan N. van Rijn",
+        "Bernd Bischl",
+        "Luis Torgo"
+      ],
+      "year": 2014,
+      "doi": "10.1145/2641190.2641198",
+      "arxiv_id": "1407.7722",
+      "journal": "ACM SIGKDD Explorations Newsletter",
+      "volume": "15",
+      "issue": "2",
+      "pages": "49-60",
+      "sources": [
+        "https://arxiv.org/abs/1407.7722",
+        "https://dl.acm.org/doi/10.1145/2641190.2641198",
+        "https://api.crossref.org/works/10.1145/2641190.2641198"
+      ]
+    },
+    {
+      "key": "hunter2007",
+      "role": "plotting software used by the computed bundle",
+      "title": "Matplotlib: A 2D Graphics Environment",
+      "authors": [
+        "John D. Hunter"
+      ],
+      "year": 2007,
+      "doi": "10.1109/MCSE.2007.55",
+      "journal": "Computing in Science & Engineering",
+      "volume": "9",
+      "issue": "3",
+      "pages": "90-95",
+      "sources": [
+        "https://matplotlib.org/stable/project/citing.html",
+        "https://ieeexplore.ieee.org/document/4160265",
+        "https://api.crossref.org/works/10.1109/MCSE.2007.55"
+      ]
+    }
+  ],
+  "artifacts": {
+    "computed_bundle": {
+      "owner": "scitex-live-paper",
+      "generator": "examples/make_example_project_mnist.py",
+      "dataset": "OpenML mnist_784 version 1",
+      "models": [
+        "logistic regression",
+        "k-nearest neighbors"
+      ],
+      "provenance": "Read the selected project provenance.yaml for actual runs; this seeder does not execute or validate scientific results."
+    },
+    "template_pipeline": {
+      "owner": "scitex-research-template",
+      "location": "scripts/mnist/",
+      "description": "Illustrative torchvision, UMAP and SVM templates; distinct from the computed Live Paper bundle."
+    },
+    "writer_bibliography": {
+      "policy": "Consumer-owned files are preserved. Existing placeholder citations are not imported as research."
+    }
+  }
+}

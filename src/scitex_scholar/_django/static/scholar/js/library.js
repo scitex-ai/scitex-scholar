@@ -30,12 +30,95 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const show = (el) => el && el.classList.remove("hidden");
   const hide = (el) => el && el.classList.add("hidden");
+  // Non-JSON guard (apps-lead probe 2026-10-22: an expired/missing
+  // credential is 302'd to the hub login page, so the pane gets HTML
+  // where JSON was expected). The login-page shape becomes a re-login
+  // prompt; any other non-JSON body keeps its status. Every parse site
+  // below goes through here so a wrong-content response never surfaces
+  // a raw SyntaxError.
+  async function readJson(resp) {
+    const text = await resp.text();
+    let data = null;
+    try {
+      data = JSON.parse(text);
+    } catch (err) {
+      data = null;
+    }
+    if (data !== null) return data;
+    const location = resp.url || "";
+    const contentType = (resp.headers && resp.headers.get("content-type")) || "";
+    const loginShaped =
+      /login/i.test(location) &&
+      (/text\/html/i.test(contentType) || /^\s*</.test(text));
+    if (loginShaped) {
+      throw new Error(scholarT("Session expired. Please log in again."));
+    }
+    throw new Error(
+      scholarT("Server returned non-JSON (status %(status)s)", {
+        status: resp.status,
+      }),
+    );
+  }
   let loaded = false;
   let filterTimer = null;
   // Slice 4b (old-direct unification): the loaded rows stay cached so the
   // sort select re-renders client-side (hub sorts the list from its toolbar).
   let lastRows = [];
+  let readerKey = null;
+  let readerPaper = null;
+  const reader = document.getElementById("libraryPaperDetails");
+  const readerContent = document.getElementById("libraryReaderContent");
+  const readerEmpty = document.getElementById("libraryReaderEmpty");
+  const readerStatus = document.getElementById("libraryReaderStatus");
+  const copyCitation = document.getElementById("libraryReaderCopyCitation");
   const sortEl = document.getElementById("librarySort");
+  const selectedSeeds = new Set();
+  const selectAllSeeds = document.getElementById("librarySelectAll");
+  const graphSelectedButton = document.getElementById("libraryGraphSelected");
+  const seedStatus = document.getElementById("librarySelectionStatus");
+  const GRAPH_SEED_LIMIT = 20;
+
+  function seedDoi(paper) {
+    const doi = String(paper.doi || "").trim().replace(/^https?:\/\/(?:dx\.)?doi\.org\//i, "").replace(/^doi:\s*/i, "");
+    return /^10\.\d{4,9}\/\S+$/i.test(doi) ? doi.toLowerCase() : "";
+  }
+
+  function seedKey(paper) {
+    return paper.paper_id || seedDoi(paper);
+  }
+
+  function selectedDois() {
+    return Array.from(new Set(lastRows.filter((paper) => selectedSeeds.has(seedKey(paper))).map(seedDoi).filter(Boolean)));
+  }
+
+  function syncSeedSelection() {
+    const dois = selectedDois();
+    const available = lastRows.filter(seedDoi);
+    if (graphSelectedButton) graphSelectedButton.disabled = dois.length === 0 || dois.length > GRAPH_SEED_LIMIT;
+    if (selectAllSeeds) {
+      selectAllSeeds.disabled = available.length === 0;
+      selectAllSeeds.checked = available.length > 0 && available.every((paper) => selectedSeeds.has(seedKey(paper)));
+      selectAllSeeds.indeterminate = dois.length > 0 && !selectAllSeeds.checked;
+    }
+    if (seedStatus) seedStatus.textContent = dois.length > GRAPH_SEED_LIMIT
+      ? scholarT("Select at most %(n)s distinct DOIs for one graph.", { n: GRAPH_SEED_LIMIT })
+      : scholarT("%(n)s graph seeds selected", { n: dois.length });
+  }
+
+  if (selectAllSeeds) selectAllSeeds.addEventListener("change", () => {
+    lastRows.filter(seedDoi).forEach((paper) => {
+      if (selectAllSeeds.checked) selectedSeeds.add(seedKey(paper));
+      else selectedSeeds.delete(seedKey(paper));
+    });
+    renderRows();
+  });
+  if (graphSelectedButton) graphSelectedButton.addEventListener("click", () => {
+    const dois = selectedDois();
+    if (!dois.length || dois.length > GRAPH_SEED_LIMIT) return;
+    document.getElementById("scholar-tab-graph")?.click();
+    document.dispatchEvent(new CustomEvent("scholar:build-graph", { detail: dois.length === 1 ? { doi: dois[0] } : { dois } }));
+  });
+  syncSeedSelection();
 
   function annotationOf(paper) {
     return (paper && paper.annotations) || {};
@@ -69,6 +152,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!listEl) return;
     listEl.replaceChildren();
     sortedRows().forEach((p) => listEl.appendChild(makeRow(p)));
+    syncSeedSelection();
+    refreshReader();
   }
 
   if (sortEl) {
@@ -77,10 +162,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Project sync (parity slice 3c): the header picker navigates with
-  // ?project=<id> (the SDK picker's default contract), so the selection is
-  // readable here with no extra state. Saves elsewhere (search.js) file
-  // into the same selection; the list filters to it server-side.
+  // Project sync: the header picker's ?project=<id> (SDK picker default
+  // contract) is readable here with no extra state. Saves elsewhere
+  // (search.js) file into the same selection; the list filters to it
+  // server-side. Operator 2026-10-23: NO project selector lives in the
+  // Details strip — header picker only — so the chips + indicator that
+  // used to mirror the selection here are deleted.
   function currentProject() {
     try {
       return new URLSearchParams(window.location.search).get("project") || "";
@@ -89,49 +176,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Project chips + sync indicator, from the existing /api/projects
-  // endpoint (the picker's provider contract). Chips navigate with
-  // ?project= so the server resolves and remembers the selection.
-  const projectChipsEl = document.getElementById("libraryProjectChips");
-  const projectCurrentEl = document.getElementById("libraryProjectCurrent");
-  async function loadProjectChips() {
-    if (!projectChipsEl && !projectCurrentEl) return;
-    const current = currentProject();
-    if (projectCurrentEl) {
-      projectCurrentEl.textContent = current
-        ? scholarT("Project: %(project)s", { project: current })
-        : scholarT("All projects");
-    }
-    if (!projectChipsEl || projectChipsEl.dataset.done) return;
-    try {
-      const resp = await fetch(`${STX_MOUNT}/api/projects`);
-      const data = await resp.json();
-      if (!resp.ok) return;
-      projectChipsEl.dataset.done = "1";
-      const all = document.createElement("a");
-      all.className = "library-project__chip" + (current ? "" : " library-project__chip--active");
-      all.href = window.location.pathname;
-      all.textContent = scholarT("All projects");
-      projectChipsEl.appendChild(all);
-      (data.projects || []).forEach((p) => {
-        const chip = document.createElement("a");
-        const id = typeof p === "string" ? p : p.id || "";
-        if (!id) return;
-        chip.className = "library-project__chip" + (id === current ? " library-project__chip--active" : "");
-        chip.href = `${window.location.pathname}?project=${encodeURIComponent(id)}`;
-        chip.textContent = (typeof p === "string" ? p : p.name || p.id) || "";
-        projectChipsEl.appendChild(chip);
-      });
-    } catch (e) {
-      /* chips are progressive enhancement; the list still loads */
-    }
-  }
-
-  function formatAuthors(paper) {
+  function formatAuthors(paper, truncate = true) {
     const authors = paper.authors || [];
     if (!authors.length) return "";
     const names = authors.map((a) => (typeof a === "string" ? a : a.name || ""));
-    return names.length > 3
+    return truncate && names.length > 3
       ? `${names.slice(0, 3).join(", ")} et al.`
       : names.join(", ");
   }
@@ -140,12 +189,28 @@ document.addEventListener("DOMContentLoaded", () => {
     const item = document.createElement("div");
     item.className = "library-item";
     item.dataset.paperId = paper.paper_id || "";
+    item.dataset.readerActive = String(readerKey === paper.paper_id);
+    const select = document.createElement("input");
+    select.type = "checkbox";
+    select.className = "library-item__select";
+    select.disabled = !seedDoi(paper);
+    select.checked = selectedSeeds.has(seedKey(paper));
+    select.setAttribute("aria-label", scholarT("Select %(title)s for a citation graph", { title: paper.title || paper.paper_id || "Untitled" }));
+    select.addEventListener("change", () => {
+      if (select.checked) selectedSeeds.add(seedKey(paper));
+      else selectedSeeds.delete(seedKey(paper));
+      syncSeedSelection();
+    });
+    item.appendChild(select);
 
     const main = document.createElement("div");
     main.className = "library-item__main";
 
-    const title = document.createElement("div");
-    title.className = "library-item__title";
+    const title = document.createElement("button");
+    title.type = "button";
+    title.className = "library-item__title library-item__reader-trigger";
+    title.setAttribute("aria-pressed", String(readerKey === paper.paper_id));
+    title.addEventListener("click", () => selectReader(paper));
     title.textContent = paper.title || paper.paper_id || "Untitled";
     main.appendChild(title);
 
@@ -161,11 +226,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     if (bits.length) main.appendChild(meta);
 
-    if (paper.doi) {
+    if (seedDoi(paper)) {
       const doi = document.createElement("div");
       doi.className = "library-item__meta";
       const link = document.createElement("a");
-      link.href = `https://doi.org/${paper.doi}`;
+      link.href = `https://doi.org/${seedDoi(paper)}`;
       link.target = "_blank";
       link.rel = "noopener noreferrer";
       link.textContent = paper.doi;
@@ -215,6 +280,26 @@ document.addEventListener("DOMContentLoaded", () => {
     );
     actions.appendChild(enrichBtn);
 
+    // Brief-05: seed the Citation Graph from this work (Search-tab per-row
+    // parity). Only DOI rows seed; the tab click switches panes and the
+    // one-shot event carries the seed (same path as search.js).
+    if (seedDoi(paper)) {
+      const graphBtn = document.createElement("button");
+      graphBtn.type = "button";
+      graphBtn.className = "library-enrich-btn";
+      graphBtn.textContent = scholarT("Graph");
+      graphBtn.addEventListener("click", () => {
+        const graphTab = document.querySelector(
+          '.stx-content-tabs__tab[aria-controls="tab-graph"]',
+        );
+        if (graphTab) graphTab.click();
+        document.dispatchEvent(
+          new CustomEvent("scholar:build-graph", { detail: { doi: seedDoi(paper) } }),
+        );
+      });
+      actions.appendChild(graphBtn);
+    }
+
     // Slice 4b: per-row Details toggle -- hub expands a details panel from
     // each library row (status, stars, tags, notes, save).
     const detailsToggle = document.createElement("button");
@@ -228,12 +313,103 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const details = makeDetails(paper, badges);
     details.hidden = true;
-    detailsToggle.addEventListener("click", () => {
+    detailsToggle.setAttribute("aria-pressed", String(readerKey === paper.paper_id));
+    detailsToggle.addEventListener("click", () => selectReader(paper));
+    const notesToggle = document.createElement("button");
+    notesToggle.type = "button";
+    notesToggle.className = "library-notes-toggle library-enrich-btn";
+    notesToggle.textContent = reader?.dataset.notesLabel || scholarT("Details");
+    notesToggle.setAttribute("aria-expanded", "false");
+    notesToggle.addEventListener("click", () => {
       details.hidden = !details.hidden;
+      notesToggle.setAttribute("aria-expanded", String(!details.hidden));
     });
+    actions.appendChild(notesToggle);
     item.appendChild(details);
     return item;
   }
+
+  function refreshReader() {
+    if (!reader) return;
+    const paper = readerKey ? lastRows.find((row) => row.paper_id === readerKey) : null;
+    if (!paper) {
+      readerKey = null;
+      readerPaper = null;
+      readerContent.hidden = true;
+      readerEmpty.hidden = false;
+      readerStatus.textContent = "";
+      return;
+    }
+    if (readerPaper === paper) return; // Sorting must not replace the reader.
+    readerPaper = paper;
+    readerContent.hidden = false;
+    readerEmpty.hidden = true;
+    readerStatus.textContent = "";
+    const missing = reader.dataset.missing;
+    document.getElementById("libraryReaderTitle").textContent = typeof paper.title === "string" && paper.title.trim() ? paper.title : missing;
+    document.getElementById("libraryReaderAuthors").textContent = formatAuthors(paper, false) || missing;
+    document.getElementById("libraryReaderPublication").textContent = [paper.venue, paper.year].filter(Boolean).join(" · ") || missing;
+    const citations = paper.citation_count;
+    document.getElementById("libraryReaderCitations").textContent = typeof citations === "number" && Number.isFinite(citations) && citations >= 0 ? String(citations) : missing;
+    document.getElementById("libraryReaderAbstract").textContent = typeof paper.abstract === "string" && paper.abstract.trim() ? paper.abstract : reader.dataset.noAbstract;
+    const doiElement = document.getElementById("libraryReaderDoi");
+    doiElement.replaceChildren();
+    const doi = seedDoi(paper);
+    if (doi) {
+      const link = document.createElement("a");
+      link.href = `https://doi.org/${doi}`;
+      link.textContent = doi;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      doiElement.appendChild(link);
+    } else doiElement.textContent = missing;
+    copyCitation.disabled = !paper.paper_id;
+  }
+
+  function selectReader(paper) {
+    if (!reader || !paper.paper_id) return;
+    readerKey = paper.paper_id;
+    refreshReader();
+    listEl.querySelectorAll(".library-item").forEach((item) => {
+      const active = item.dataset.paperId === readerKey;
+      item.dataset.readerActive = String(active);
+      item.querySelectorAll(".library-item__reader-trigger,.library-details-toggle")
+        .forEach((button) => button.setAttribute("aria-pressed", String(active)));
+    });
+    // Ask the existing SDK pane switcher on phones; never create another pane.
+    const pane = reader.closest("[data-stx-pane]");
+    if (pane?.id) document.querySelector(`[role="tab"][aria-controls="${pane.id}"]`)?.click();
+    const toggle = document.querySelector("[data-status-strip-toggle]");
+    if (toggle?.getAttribute("aria-expanded") === "false") toggle.click();
+    reader.focus({ preventScroll: true });
+  }
+
+  document.getElementById("libraryReaderClose")?.addEventListener("click", () => {
+    readerKey = null;
+    refreshReader();
+    listEl.querySelectorAll("[data-reader-active]").forEach((item) => item.dataset.readerActive = "false");
+    listEl.querySelectorAll(".library-item__reader-trigger,.library-details-toggle")
+      .forEach((button) => button.setAttribute("aria-pressed", "false"));
+  });
+  copyCitation?.addEventListener("click", async () => {
+    const key = readerKey;
+    if (!key) return;
+    copyCitation.disabled = true;
+    readerStatus.textContent = "";
+    try {
+      const params = new URLSearchParams({library_id: key, format: "bibtex"});
+      const response = await fetch(`${STX_MOUNT}/api/library/citation?${params}`);
+      const data = await readJson(response);
+      if (!response.ok || typeof data.citation !== "string") throw new Error("Citation unavailable");
+      if (readerKey !== key) return;
+      await navigator.clipboard.writeText(data.citation);
+      if (readerKey === key) readerStatus.textContent = reader.dataset.copySuccess;
+    } catch (error) {
+      if (readerKey === key) readerStatus.textContent = reader.dataset.copyFailure;
+    } finally {
+      if (readerKey === key) copyCitation.disabled = false;
+    }
+  });
 
   // Slice 4b: status radios + star rating + tags + notes, saved through the
   // slice-4a /api/library/annotate endpoint (partial merge, same doc the
@@ -382,7 +558,7 @@ document.addEventListener("DOMContentLoaded", () => {
           headers: csrfJsonHeaders(),
           body: JSON.stringify(payload),
         });
-        const data = await resp.json();
+        const data = await readJson(resp);
         if (!resp.ok) throw new Error(data.error || scholarT("Save failed"));
         paper.annotations = data.annotations || {};
         renderBadges(badgesEl, paper);
@@ -416,7 +592,7 @@ document.addEventListener("DOMContentLoaded", () => {
           headers: csrfJsonHeaders(),
           body: JSON.stringify({ library_ids: [paper.paper_id] }),
         });
-        const data = await resp.json();
+        const data = await readJson(resp);
         if (!resp.ok) throw new Error(data.error || scholarT("Download failed"));
         if ((data.downloaded || []).length) {
           pdfMsg.textContent = scholarT("PDF downloaded");
@@ -452,7 +628,7 @@ document.addEventListener("DOMContentLoaded", () => {
           headers: csrfJsonHeaders(),
           body: JSON.stringify({ library_id: paper.paper_id }),
         });
-        const data = await resp.json();
+        const data = await readJson(resp);
         if (!resp.ok) throw new Error(data.error || scholarT("Remove failed"));
         lastRows = lastRows.filter((p) => p.paper_id !== paper.paper_id);
         renderRows();
@@ -478,7 +654,7 @@ document.addEventListener("DOMContentLoaded", () => {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: params.toString(),
       });
-      const data = await resp.json();
+      const data = await readJson(resp);
       if (!resp.ok) throw new Error(data.error || scholarT("Enrichment failed (HTTP %(status)s)", { status: resp.status }));
       // Reflect the fresh metadata on the row without a full reload.
       if (data.abstract_chars) {
@@ -567,16 +743,27 @@ document.addEventListener("DOMContentLoaded", () => {
         ? `${STX_MOUNT}/api/library?${qp.join("&")}`
         : `${STX_MOUNT}/api/library`;
       const resp = await fetch(url);
-      const data = await resp.json();
+      const data = await readJson(resp);
       if (!resp.ok) throw new Error(data.error || `Library load failed (${resp.status})`);
       hide(loadingEl);
       listEl.replaceChildren();
       const papers = data.papers || [];
+      lastRows = papers;
+      const availableKeys = new Set(papers.map(seedKey));
+      selectedSeeds.forEach((key) => { if (!availableKeys.has(key)) selectedSeeds.delete(key); });
       if (statsEl) {
         const n = papers.length;
         statsEl.textContent = data.filtered
           ? scholarT("%(count)s of %(total)s Papers", { count: n, total: data.total })
           : n + " " + scholarT(n === 1 ? "Paper" : "Papers");
+        // Details strip: the Library section mirrors the list counts.
+        // The project selection itself lives in the header picker
+        // (operator 2026-10-23: no selector in Details), so the strip
+        // carries no project scope suffix.
+        const stripSummary = document.getElementById("libraryStripSummary");
+        if (stripSummary) {
+          stripSummary.textContent = statsEl.textContent;
+        }
       }
       if (!papers.length) {
         listEl.appendChild(emptyState(data));
@@ -585,6 +772,8 @@ document.addEventListener("DOMContentLoaded", () => {
         renderRows();
       }
       loaded = true;
+      syncSeedSelection();
+      refreshReader();
     } catch (err) {
       hide(loadingEl);
       errorMsgEl.textContent = String(err.message || err);
@@ -701,7 +890,7 @@ document.addEventListener("DOMContentLoaded", () => {
         headers: importHeaders(),
         body: params.toString(),
       });
-      const data = await resp.json();
+      const data = await readJson(resp);
       if (!resp.ok) throw new Error(data.error || `Import failed (${resp.status})`);
       // A dict keyed call, not a template literal: scholarT looks the string
       // up verbatim, so an interpolated literal could never match the
@@ -748,7 +937,7 @@ document.addEventListener("DOMContentLoaded", () => {
           headers: importHeaders(),
           body: params.toString(),
         });
-        const data = await resp.json();
+        const data = await readJson(resp);
         if (!resp.ok) throw new Error(data.error || `Import failed (${resp.status})`);
         pendingImportText = text;
         pendingImportName = file.name;
@@ -940,7 +1129,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (libTabBtn) {
     libTabBtn.addEventListener("click", () => {
       if (!loaded) loadLibrary();
-      loadProjectChips();
       checkExtStatuses();
     });
   }
@@ -962,7 +1150,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // If the page loads with Library already active (it does not by default), load now.
   if (listPanel.classList.contains("active")) {
     loadLibrary();
-    loadProjectChips();
     checkExtStatuses();
   }
 });

@@ -7,6 +7,217 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.29.1] - 2026-11-03
+
+- Declare pytest-xdist for the full native test runner instead of inheriting an
+  undeclared copy from the base image. Keep complete dependency resolution,
+  coverage, required private PostgreSQL and source-bound release artifacts.
+
+- Use the published SDK official favicon instead of a removed leaf asset, so
+  strict production static-file manifests render the Scholar page successfully.
+
+- Add an accessible selected-paper Library reader in the shared SDK Details
+  pane with full stored metadata/abstract, truthful missing states and explicit
+  citation copying. Preserve selection through sorting and clear filtered-out
+  papers. Keep annotations/actions explicit and honor their hidden state.
+
+- Keep the shared SDK Details pane while grouping Sources, Sorters and Filters
+  like the reference UI. Add stable citation/impact-factor sorting of loaded
+  results, preserve work selection and provider relevance order, and reset
+  paired search bounds without triggering another search.
+- Escape plain bibliographic text for BibTeX/LaTeX exactly once, preserving identifiers, URLs and non-TeX exports. Limit abstracts before encoding so escape commands remain complete; actual MNIST bibliography now typesets its journal ampersand.
+
+- Add an explicit, dry-run-first MNIST showcase Library adapter with four primary-source-verified references, no-overwrite Paper/PaperIO admission and additive project links. Preserve existing user metadata, links and bibliographies; no automatic GET seeding, network, model run or derived-store write.
+
+- Require SDK 0.3.17 for the declared user/project scope capability contract in
+  GUI and development installs. The shared SDK owns version-badge appearance;
+  remove the leaf typography/color override.
+
+- Opt into the shared SDK main-details desktop layout: 320px Details default,
+  responsive phone panes, and preserved host-restored inline widths through
+  collapse/expansion. Remove Scholar's competing 208px/flex column geometry.
+- Use the SDK app_static content-hash helper for active CSS/JavaScript URLs,
+  including the graph client. The required shared layout and scope contracts
+  are available in the published SDK 0.3.17.
+
+- Add Library work selection and Graph selected, preserving selection while
+  sorting. Both Search and Library accept 1–20 distinct valid DOI seeds and
+  refuse larger selections explicitly instead of silently truncating them.
+- Keep Graph focused on its visualization, with compact links to select works
+  in Search or Library and the saved Graph Library below the visualization.
+
+- Add explicit local Crossref search pages with provider totals, continuation
+  offsets, and Load more. Page requests remain bounded while total access is
+  no longer capped at 1000. Counts identify source matches before filters and
+  deduplication; online/multi-source search retains its bounded list contract.
+
+- Remove redundant Search/Library card titles and the duplicate search-help
+  trigger; keep one functional in-field help control.
+- Keep sorting and collapsible source/filter options in the shared Details pane,
+  freeing the main toolbar for actions on selected papers. Selection actions
+  are disabled until applicable works are selected.
+- Label the current result request size honestly and version updated search
+  assets for ordinary reloads.
+
+Graph Library keeps its per-user JSON file authoritative even when the optional
+shared mirror is stale or read-only. Lock and atomically replace graph recipes,
+retain legacy database-only recipes, and use the actual shared-store read API.
+Save/load all DOI seeds and graph width for multi-paper networks. Mounted hosts
+can provide an authorized user-home capability for durable `.scitex/scholar/library`
+persistence; existing explicit root/base overrides remain supported.
+
+- Keep release checks aligned with current behavior: follow content-versioned
+  stylesheet imports, test actual collapsible controls and source labels, and
+  exercise real local pagination through correctly owned test modules. Document
+  bounded multi-source searches and saved graph recipes without snapshot claims.
+
+## [1.29.0] - 2026-11-01
+
+Operator 2026-10-22 checklist ("Results ... To unlimited"): the
+results cap rises 500 -> 1000 across the Search tab dropdown, the
+`search` API clamp, and the CLI `--max-results` range (default stays
+50). Fully unbounded stays out: per-engine fan-out derives from this
+bound and throttled external sources (1-3/s) would stall.
+
+## [1.28.1] - 2026-11-01
+
+Patch: project picker adopts the SDK scoped project listing view
+(0.3.16, PR #90; legacy byte-compat standalone,
+user_scope_disabled_reason=None on ScholarLocalProjectProvider).
+Search tab renamed "Search databases" -> "Search" (old-direct
+parity, JA catalog recompiled); Search API emits
+metadata.sources_unavailable and the tab renders an
+"unavailable on this server" notice instead of a bare
+"No papers matched" when the default corpus is absent.
+
+## [1.28.0] - 2026-10-26
+
+New CLI verb: scitex-scholar search QUERY (thin adapter over
+ScholarSearchEngine.search, the same CUI api/search forwards to).
+Options: --max-results (default 50), --mode, --json, --dry-run.
+Documented in docs/sphinx/cli.rst.
+
+## [1.27.3] - 2026-10-26
+
+Details-strip polish: wrapped source rows stay legible in the fixed
+208px strip (checkbox pinned to first line, rates in a fixed right
+lane, tier labels breathing, stacked rows gapped). Scoped to the
+strip; main search form untouched.
+
+## [1.27.2] - 2026-10-26
+
+Brief-04 follow-up: compact 44px controls outside the tall query row
+(search toolbar selects, Library filter sort select, Details-strip
+controls) so rows align old-direct style. Pinned by
+test_compact_rows_share_one_44px_control_height.
+
+## [1.27.1] - 2026-10-26
+
+Operator color discipline: no rounded containers — radius removed from
+Library rows/cards/toolbars, the stepper bar, the search queue, and
+graph seed items (buttons, badges, dots, and textarea keep theirs);
+dead .graph-saved-list CSS deleted.
+
+## [1.27.0] - 2026-10-26
+
+Operator brief-05 Graph tab: seed-from-works (Search bulk Graph pill +
+Library per-row Graph button, single or multi-seed dispatch) and a Graph
+Library card with full CRUD UI (save/list/rename/delete over
+api/graphs/*). Supersedes the 2026-10-23 seed-only direction.
+
+## [1.26.0] - 2026-10-25
+
+Operator brief-04 parity: Details columns are the shared scitex-sdk
+panes element (layout="app"); results default 20 -> 50 (old-direct
+fetches 25-50/source, no UI cap); toolbar controls share compact 44px;
+JA catalog extended (Browse, stepper, empty state, tier labels, updated
+graph-health wordings) with translate-as extraction fix.
+
+## [1.25.0] - 2026-10-24
+
+Old-direct Search parity (operator 2026-10-24 screenshots): the query is a
+multi-line textarea with a syntax-teaching placeholder and in-field
+Ctrl+K + `?` help (Enter submits, Ctrl+K focuses); the shared control
+height matches old-direct's tall query box; the action toolbar + pipeline
+stepper stay visible pre-search; Details defaults to old-direct (only
+Crossref (SciTeX) checked). JA catalog regenerated.
+
+## [1.24.0] - 2026-10-24
+
+Graphs as CUI package data: `citation_graph/_saved_graph_store.py` gains
+`list_graphs`/`save_graph`/`delete_graph`/`rename_graph` (per-user file
+authoritative, `scitex_dev.store` best-effort mirror: put on save, hide on
+delete, put on rename). Fixes `api/graphs/*` delete/rename never reaching
+the store mirror (rows resurrected, renames lost on provisioned hosts) and
+the `Query.eq` drift against scitex-dev 0.62 (store reads now use the
+`rows()` door, like `storage/_library_index`). The Django views are thin
+adapters with an `_opener` injection seam (no mocks).
+
+## [1.23.0] - 2026-10-24
+
+Old-direct parity slices 2-3 + CUI storage: the Results header gains the
+Ready -> Searching -> Done pipeline stepper with timer (ported from hub
+`_toolbar-status.ts` onto the leaf fetch lifecycle); the result-count
+dropdown offers 200/500 (backend clamp lifted 100 -> 500, 20 stays
+default). Sources regroup into Local (fast, unlimited, infinity badges)
++ External APIs (per-source 1/s-50/s rate labels, email/rate notice).
+Saved graphs move onto `scitex_dev.store` (declared Schema, file stays
+authoritative with backfill/dual-write; store outage serves the file).
+New `_hook_rules.py` declares scholar's leaf scope (5 rules) with the
+`scitex_dev.hooks` entry point, mirroring scitex-storage.
+
+## [1.22.0] - 2026-10-24
+
+Old-direct parity slice 1 -- flat Search Details: the nested
+`Details > Databases > +Advanced` card stack is deleted. Sources (11),
+Filters (6), search mode, ignore-cache, and CrossRef status render as flat
+rows under one Search section; control ids and JS wiring unchanged. Served
+from the hub venv by direct template/static sync for the live check.
+
+## [1.21.0] - 2026-10-23
+
+Seed-only Graph tab: the typed-DOI Build Citation Network card and the
+Saved graphs card are deleted (backend `api/graphs/*` endpoints kept for
+Library-tab CRUD). Seeds build directly at the fixed graph width; Search
+per-result buttons jump to the Graph tab and dispatch one-shot
+`scholar:build-graph` events. Tab content full-bleed: the 16px wrapper
+padding is removed (cards keep their own inner padding).
+
+## [1.20.0] - 2026-10-23
+
+Operator Scholar UI batch (2026-10-23): header, Details, inputs, favicon,
+and the old-direct Details follow-ups.
+
+### Added
+- Header project picker with user-scope opt-in: an explicit "No project
+  selected" user-space state; the selection is the on-screen scope
+  indicator and drives `?project=` filtering/saves.
+- Collapsible Details sections (old-direct ctrl-section parity): click or
+  Enter/Space on a section header toggles it, chevron rotates,
+  `aria-expanded` stays in sync.
+- Graph backend status row inside the Graph Details section (same
+  `#serviceStatus` id the health probe renders into).
+
+### Changed
+- Shared control height is the two-line `--scholar-search-height` (52px):
+  inputs, selects, and buttons resolve the same token, so each row's
+  controls align exactly (old-direct one-height parity).
+- Official-mark favicon via a leaf `favicon_href` override (white snake on
+  navy, byte copy of the SDK-develop mark). SUNSET: drop the override once
+  the installed SDK serves the official mark.
+- Library Details carries no project selector (header picker only);
+  per-row filed-project chips stay (display only).
+- Export select clamps to the narrow Details strip (`flex: 1 1 8em`,
+  `min-width: 0`) instead of overrunning its card.
+- Advanced toggle marker is ASCII-safe (`+`/`–`, was tofu-prone U+25B8/25BE).
+- The shared Service Status expander is deleted (it duplicated the per-tab
+  status rows).
+
+### Fixed
+- `?project=owner/slug` (SDK picker id contract) accepted by the library
+  project filter; unknown-but-safe selections degrade to unfiltered,
+  writes stay fail-closed (verified live with hub slugs).
+
 ## [1.19.0] - 2026-10-20
 
 Old-direct unification tail (U1-U8, PR #252-#259) + the four hub-only

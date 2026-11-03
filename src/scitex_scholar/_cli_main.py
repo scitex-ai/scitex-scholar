@@ -182,6 +182,16 @@ cli.add_command(library)
 
 
 # ---------------------------------------------------------------------------
+# Verb: search  (extracted -> ._cli.search; thin adapter over
+# ScholarSearchEngine.search, the same CUI api/search forwards to)
+# ---------------------------------------------------------------------------
+
+from ._cli.search import search  # noqa: E402
+
+cli.add_command(search)
+
+
+# ---------------------------------------------------------------------------
 # Group: mcp  (extracted -> ._cli.mcp; see GITIGNORED/REFACTORING.md)
 # ---------------------------------------------------------------------------
 

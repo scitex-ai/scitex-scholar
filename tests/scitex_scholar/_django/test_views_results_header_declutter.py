@@ -56,13 +56,15 @@ def test_sorter_label_is_an_aria_label_not_visible_text():
 
 
 def test_source_filter_label_is_an_aria_label_not_visible_text():
-    """The source select names itself accessibly; no "Source" text label."""
+    """Keep labels out of the results toolbar; Details may explain its fields."""
     # Arrange
     # Act
     visible = '<label class="form-label" for="searchSourceFilter"'
     accessible = 'aria-label="{% trans "Source" %}"'
     # Assert
-    assert visible not in TEMPLATE and accessible in TEMPLATE
+    toolbar = TEMPLATE.index('class="search-results-toolbar"')
+    content = TEMPLATE.index('id="searchResultsContent"', toolbar)
+    assert visible not in TEMPLATE[toolbar:content] and accessible in TEMPLATE
 
 
 def test_stats_meta_omits_cache_and_mode_flags():

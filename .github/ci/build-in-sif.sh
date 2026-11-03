@@ -1,69 +1,43 @@
 #!/usr/bin/env bash
-# Runs INSIDE the reused scitex-ci SIF (apptainer exec — invoked via
-# exec-in-sif.sh). Builds scitex-scholar's wheel + sdist into ./dist/.
-#
-# WHY build in the SIF: the self-hosted Spartan runner has no Python on the
-# bare node (the whole reason the old `actions/setup-python@v5` step failed:
-# "version 3.x not found for this OS"). The SIF bakes python 3.11/3.12/3.13 +
-# pip + uv at /opt/venv-<ver>, exactly like the working pytest-matrix CI.
-#
-# `python -m build` needs the `build` frontend, which is NOT baked in the SIF
-# (only scitex-dev[all,dev] deps are). Mirror run-in-sif.sh: install `build`
-# into a writable --target on node-local /tmp and put it on PYTHONPATH. The
-# SIF's /opt/venv-* are root-owned + RO and the compute-node HOME is RO inside
-# the container, so a normal install fails Permission denied — a --target on
-# writable scratch sidesteps both.
-#
-# Fail-loud (operator directive): a missing interpreter or a failed build is a
-# HARD error, never a silent fallback.
+# Whole source-bound wheel/sdist plus actual normally resolved wheel smoke.
 set -euo pipefail
-
-V="${1:-3.12}"
-VENV="/opt/venv-$V"
-PY="$VENV/bin/python"
-test -x "$PY" || {
-    echo "::error::baked python missing in $VENV — rebuild the SIF: scitex-container apptainer build ci-cpu"
-    exit 1
-}
-
+version="${1:?Python version required}"; [ "$version" = 3.12 ] && [ "$#" -eq 1 ]
+python="/opt/venv-$version/bin/python"; test -x "$python"
+: "${GITHUB_RUN_ID:?}" "${GITHUB_RUN_ATTEMPT:?}" "${RELEASE_TAG:?}" "${RELEASE_COMMIT:?}"
 export LC_ALL=C.UTF-8 LANG=C.UTF-8
+export PATH="/opt/venv-$version/bin:/usr/lib/postgresql/16/bin:$PATH"
+SCRATCH_PREFIX="/tmp/scholar-build-$version-"
+source .github/ci/release-context.sh
 
-# Writable scratch (the runner's TMPDIR=~/.cache/tmp is a host path that does
-# NOT resolve inside the container). Node-local /tmp is writable + ephemeral.
-TMPDIR="/tmp/build-scitex_scholar-${GITHUB_RUN_ID:-0}-${GITHUB_RUN_ATTEMPT:-0}-$V"
-export TMPDIR
-rm -rf "$TMPDIR"
-mkdir -p "$TMPDIR/site" "$TMPDIR/uv-cache"
-
-# The compute-node $HOME is RO inside the container — point every cache the
-# installer might touch at the writable scratch (else uv/pip die creating
-# ~/.cache).
-export UV_CACHE_DIR="$TMPDIR/uv-cache"
-export XDG_CACHE_HOME="$TMPDIR"
-export PIP_CACHE_DIR="$TMPDIR/pip-cache"
-
-# A VIRTUAL_ENV leaked from the runner profile (~/.env-3.11) is a broken
-# symlink in here; unset it so no tool follows it.
-unset VIRTUAL_ENV || true
-
-export PATH="$VENV/bin:$PATH"
-echo "build: py=$("$PY" -V) target=$TMPDIR/site"
-
-# Install the PEP 517 build frontend into the writable target (uv fast path,
-# pip safety net), then build with it. Clean dist/ first so only the freshly
-# built artifacts are uploaded.
-uv pip install --python "$PY" --target="$TMPDIR/site" build ||
-    "$PY" -m pip install --target="$TMPDIR/site" build
-
-export PYTHONPATH="$TMPDIR/site${PYTHONPATH:+:$PYTHONPATH}"
-
-rm -rf dist
-"$PY" -m build --outdir dist
-
-echo "=== built artifacts ==="
-ls -l dist
-# fail-loud: refuse to continue the pipeline with an empty dist/.
-test -n "$(ls -A dist 2>/dev/null)" || {
-    echo "::error::python -m build produced no artifacts in dist/"
-    exit 1
+driver_body() {
+    [ ! -e dist ] && [ ! -L dist ] || { echo '::error::stale release output refused' >&2; exit 1; }
+    "$python" -I -S .github/ci/probe-first-observer.py --early
+    uv venv --python "$python" --seed "$TMPDIR/build-venv"
+    local build_python="$TMPDIR/build-venv/bin/python"
+    uv pip install --python "$build_python" build hatchling
+    "$build_python" -m pip check
+    "$build_python" -m build --outdir dist
+    "$python" -I -S -B .github/ci/release-identity.py write-proof --tag "$RELEASE_TAG" --commit "$RELEASE_COMMIT"
+    local wheels=(dist/*.whl)
+    [ "${#wheels[@]}" -eq 1 ] && [ -f "${wheels[0]}" ]
+    uv venv --python "$python" --seed "$TMPDIR/wheel-venv"
+    local wheel_python="$TMPDIR/wheel-venv/bin/python"
+    uv pip install --python "$wheel_python" "${wheels[0]}[all,dev]"
+    "$wheel_python" -m pip check
+    "$wheel_python" -I .github/ci/with-test-postgres.py -- "$wheel_python" -I -c '
+import importlib.metadata,json,os,pathlib,sys
+import scitex_scholar
+root=pathlib.Path(sys.executable).parent.parent
+if not pathlib.Path(scitex_scholar.__file__).resolve().is_relative_to(root):
+ raise RuntimeError("Wheel smoke imported editable/source namespace")
+if importlib.metadata.version("scitex-scholar")!=os.environ["RELEASE_TAG"][1:]:
+ raise RuntimeError("Installed wheel metadata differs")
+from scitex_scholar.showcase import mnist_reference_bibtex
+bibtex=mnist_reference_bibtex()
+if not isinstance(bibtex,str)or not bibtex:
+ raise RuntimeError("Published read-only example reference capability missing")
+print(json.dumps({"actual_wheel_namespace":True,"public_reference_catalog":True}))
+'
+    "$python" -I -S -B .github/ci/release-identity.py verify-proof --tag "$RELEASE_TAG" --commit "$RELEASE_COMMIT"
 }
+run_owned_body

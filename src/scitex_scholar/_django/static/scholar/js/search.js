@@ -23,6 +23,25 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!form) return;
 
   const input = document.getElementById("searchInput");
+  // Old-direct parity 2026-10-24: the query is a textarea. Enter (no
+  // Shift) submits the form; Shift+Enter inserts a newline. Ctrl+K /
+  // Cmd+K (the in-field badge) focuses the box from anywhere.
+  if (input && input.tagName === "TEXTAREA") {
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        form.requestSubmit();
+      }
+    });
+  }
+  document.addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+      const tag = (document.activeElement || {}).tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
+      e.preventDefault();
+      if (input) input.focus();
+    }
+  });
   const maxResults = document.getElementById("searchMaxResults");
   const modeSelect = document.getElementById("searchMode");
   const sourcesGrid = document.getElementById("searchSourcesGrid");
@@ -43,6 +62,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const retryBtn = document.getElementById("searchRetryBtn");
   const results = document.getElementById("searchResults");
   const resultsContent = document.getElementById("searchResultsContent");
+  // Pre-search empty state (operator 2026-10-22): hidden on first submit,
+  // never re-shown — zero-result searches use the in-results empty-message.
+  const emptyState = document.getElementById("searchEmptyState");
   const stats = document.getElementById("searchStats");
   const sortSelect = document.getElementById("searchSort");
   const sourceFilter = document.getElementById("searchSourceFilter");
@@ -72,12 +94,34 @@ document.addEventListener("DOMContentLoaded", () => {
     Object.values(doc.syntax || {}).forEach((op) => {
       const dt = document.createElement("dt");
       dt.textContent = [op.short, op.long].filter(Boolean).join(" / ");
+      dt.className = "syntax-help-panel__insert";
+      dt.setAttribute("role", "button");
+      dt.setAttribute("tabindex", "0");
+      dt.addEventListener("click", () => insertSyntaxToken(op.short || op.long));
+      dt.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); insertSyntaxToken(op.short || op.long); }
+      });
       const dd = document.createElement("dd");
       dd.textContent = [op.description, op.include_example || op.example, op.exclude_example]
         .filter(Boolean).join(" — ");
       frag.append(dt, dd);
     });
     return frag;
+  }
+  // Catch-up: old-direct clickable operator chips. Inserts the flag at
+  // the cursor (appending with a space when the box is non-empty).
+  function insertSyntaxToken(token) {
+    if (!token || !input) return;
+    const insert = token.trim() + " ";
+    const start = typeof input.selectionStart === "number" ? input.selectionStart : input.value.length;
+    const end = typeof input.selectionEnd === "number" ? input.selectionEnd : input.value.length;
+    const before = input.value.slice(0, start);
+    const after = input.value.slice(end);
+    const spacer = before && !before.endsWith(" ") ? " " : "";
+    input.value = before + spacer + insert + after;
+    const caret = (before + spacer + insert).length;
+    input.focus();
+    try { input.setSelectionRange(caret, caret); } catch (err) { /* older WebViews */ }
   }
   function renderSyntaxExamples(doc) {
     const frag = document.createDocumentFragment();
@@ -124,6 +168,15 @@ document.addEventListener("DOMContentLoaded", () => {
   // selection, keyed by DOI-or-title so re-sorts keep the checked rows.
   let lastPapers = [];
   const selected = new Set();
+  const GRAPH_SEED_LIMIT = 20;
+  let graphSelectionError = false;
+  let bulkBusy = false;
+  let pageState = null;
+  let pageBusy = false;
+  let searchRequestId = 0;
+  const paginationPanel = document.getElementById("searchPagination");
+  const paginationStatus = document.getElementById("searchPaginationStatus");
+  const loadMoreButton = document.getElementById("searchLoadMore");
 
   // Enrichment fans one request per paper; cap the pipeline pill so one
   // click cannot queue hundreds of sequential enrichment runs.
@@ -145,6 +198,70 @@ document.addEventListener("DOMContentLoaded", () => {
     if (queueTotal) queueTotal.textContent = "…";
     if (queueEngines) queueEngines.replaceChildren();
   }
+  // Old-direct parity slice 2: pipeline stepper state machine (port of
+  // hub _toolbar-status.ts). Ready -> Searching (timer) -> Done (count +
+  // elapsed, auto-reset). Pure interface over the fetch below.
+  let searchStartTime = 0;
+  let timerInterval = null;
+  function stepperEls() {
+    return {
+      step1: document.getElementById("searchStep1"),
+      step2: document.getElementById("searchStep2"),
+      step3: document.getElementById("searchStep3"),
+      line1: document.getElementById("searchLine1"),
+      line2: document.getElementById("searchLine2"),
+      text2: document.getElementById("searchStepText2"),
+      text3: document.getElementById("searchStepText3"),
+      timer: document.getElementById("searchTimer"),
+    };
+  }
+  function stepperSearching() {
+    const e = stepperEls();
+    e.step1.classList.remove("active");
+    e.step1.classList.add("complete");
+    e.step2.classList.add("active", "searching");
+    e.step3.classList.remove("active", "complete", "done");
+    e.line1.classList.add("active");
+    searchStartTime = Date.now();
+    if (timerInterval) clearInterval(timerInterval);
+    if (e.timer) {
+      e.timer.textContent = "0s";
+      timerInterval = setInterval(() => {
+        const el = document.getElementById("searchTimer");
+        if (el) el.textContent = `${Math.floor((Date.now() - searchStartTime) / 1000)}s`;
+      }, 500);
+    }
+  }
+  function stepperDone(count) {
+    const e = stepperEls();
+    const elapsed = Math.floor((Date.now() - searchStartTime) / 1000);
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    if (e.timer) e.timer.textContent = `${elapsed}s`;
+    e.step1.classList.remove("active", "searching");
+    e.step1.classList.add("complete");
+    e.step2.classList.remove("active", "searching");
+    e.step2.classList.add("complete");
+    e.step3.classList.remove("active", "searching");
+    e.step3.classList.add("done");
+    e.line1.classList.add("active");
+    e.line2.classList.add("active");
+    if (e.text3) e.text3.textContent = `Done (${count}, ${elapsed}s)`;
+    setTimeout(stepperReset, 5000);
+  }
+  function stepperReset() {
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    const e = stepperEls();
+    e.step1.classList.remove("complete", "searching", "done");
+    e.step1.classList.add("active");
+    e.step2.classList.remove("active", "complete", "searching", "done");
+    e.step3.classList.remove("active", "complete", "searching", "done");
+    e.line1.classList.remove("active");
+    e.line2.classList.remove("active");
+    if (e.text2) e.text2.textContent = "Searching";
+    if (e.text3) e.text3.textContent = "Done";
+    if (e.timer) e.timer.textContent = "";
+  }
+
   function fillQueue(metadata) {
     const events = (metadata && metadata.engine_events) || [];
     let active = 0;
@@ -282,20 +399,21 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /**
-   * Jump to the Citation Graph tab with this paper's DOI prefilled.
-   * Does NOT auto-submit -- the user still presses "Build Graph", so the
-   * action stays explicit rather than surprising.
+   * Operator 2026-10-23 (seed-only Graph tab): the per-result action
+   * jumps to the Graph tab and asks the graph manager to build
+   * directly at the fixed width -- no DOI typing, no prefill-then-submit.
+   * The manager may not be constructed yet, so the DOI rides a one-shot
+   * event the manager consumes on init (same path as a stored seed).
    */
   function buildGraphFromDoi(doi) {
-    const doiInput = document.getElementById("doiInput");
-    if (doiInput && doi) {
-      doiInput.value = doi;
-    }
+    if (!doi) return;
     const graphTab = document.querySelector(
       '.stx-content-tabs__tab[aria-controls="tab-graph"]',
     );
     if (graphTab) graphTab.click();
-    if (doiInput) doiInput.focus();
+    document.dispatchEvent(
+      new CustomEvent("scholar:build-graph", { detail: { doi } }),
+    );
   }
 
   // The flat shape library_save accepts (same rows library_list returns).
@@ -369,7 +487,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const bits = [formatAuthors(paper)];
     if (paper.year) bits.push(String(paper.year));
     if (paper.journal) bits.push(paper.journal);
-    if (paper.source) bits.push(paper.source);
+    const sourceNames = window.ScholarSearchOrder.sourceNames(paper);
+    if (sourceNames.length) bits.push(sourceNames.join(", "));
     bits.forEach((text) => {
       const span = document.createElement("span");
       span.textContent = text;
@@ -442,21 +561,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const order = sortSelect ? sortSelect.value : "relevance";
     let papers = lastPapers.map((paper, index) => ({ paper, index }));
     if (source) {
-      papers = papers.filter(({ paper }) => (paper.source || "") === source);
+      papers = papers.filter(({ paper }) => window.ScholarSearchOrder.sourceNames(paper).includes(source));
     }
-    if (order === "year-desc" || order === "year-asc") {
-      const dir = order === "year-desc" ? -1 : 1;
-      papers = papers
-        .slice()
-        .sort((a, b) => ((a.paper.year || 0) - (b.paper.year || 0)) * dir);
-    } else if (order === "title") {
-      papers = papers
-        .slice()
-        .sort((a, b) =>
-          String(a.paper.title || "").localeCompare(String(b.paper.title || "")),
-        );
-    }
-    return papers;
+    return window.ScholarSearchOrder.sortEntries(papers, order);
   }
 
   function refreshSourceOptions() {
@@ -469,8 +576,9 @@ document.addEventListener("DOMContentLoaded", () => {
       staticAll && staticAll.textContent ? staticAll.textContent : "All sources";
     const sources = [];
     lastPapers.forEach((paper) => {
-      const source = paper.source || "";
-      if (source && !sources.includes(source)) sources.push(source);
+      window.ScholarSearchOrder.sourceNames(paper).forEach((source) => {
+        if (!sources.includes(source)) sources.push(source);
+      });
     });
     sourceFilter.replaceChildren();
     const all = document.createElement("option");
@@ -489,6 +597,23 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function syncSelectAll() {
+    const papers = selectedPapers();
+    [saveSelectedBtn, enrichSelectedBtn, openUrlsBtn, exportBibtexBtn, downloadPdfsBtn]
+      .forEach((button) => {
+        if (button) button.disabled = bulkBusy || papers.length === 0;
+      });
+    const graphButton = document.getElementById("searchGraphSelected");
+    const seedCount = selectedGraphDois().length;
+    if (graphButton) {
+      graphButton.disabled = bulkBusy || seedCount === 0 || seedCount > GRAPH_SEED_LIMIT;
+    }
+    if (seedCount > GRAPH_SEED_LIMIT) {
+      graphSelectionError = true;
+      if (bulkStatus) bulkStatus.textContent = scholarT("Select at most %(n)s distinct DOIs for one graph.", { n: GRAPH_SEED_LIMIT });
+    } else if (graphSelectionError) {
+      graphSelectionError = false;
+      if (bulkStatus) bulkStatus.textContent = "";
+    }
     if (!selectAll) return;
     const visible = viewPapers().map(({ paper, index }) =>
       paperKey(paper, index),
@@ -658,18 +783,35 @@ document.addEventListener("DOMContentLoaded", () => {
     URL.revokeObjectURL(url);
   }
 
-  function renderResults(data) {
-    const papers = data.results || [];
-    lastPapers = papers;
-    selected.clear();
+  function renderResults(data, append = false) {
+    if (append) {
+      const seen = new Set(lastPapers.map(paperKey));
+      (data.results || []).forEach((paper) => {
+        const key = paperKey(paper, lastPapers.length);
+        if (!seen.has(key)) { lastPapers.push(paper); seen.add(key); }
+      });
+    } else {
+      lastPapers = data.results || [];
+      selected.clear();
+    }
+    const papers = lastPapers;
     refreshSourceOptions();
     resultsContent.replaceChildren();
 
     const visible = viewPapers();
+    const metadata = data.metadata || {};
     if (!visible.length) {
       const empty = document.createElement("div");
       empty.className = "empty-message";
-      empty.textContent = scholarT("No papers matched this query.");
+      // Operator 2026-10-26: an explicit local-corpus selection on a host
+      // without that corpus is not "no match" -- say which corpus is
+      // missing so the user checks more sources instead of rephrasing.
+      const unavailable = metadata.sources_unavailable || [];
+      empty.textContent = metadata.pagination && metadata.pagination.total > 0
+        ? scholarT("No papers on the loaded pages pass these filters.")
+        : unavailable.length
+        ? scholarT("%(names)s unavailable on this server — check more sources to widen the search.", { names: unavailable.join(", ") })
+        : scholarT("No papers matched this query.");
       resultsContent.appendChild(empty);
     } else {
       visible.forEach(({ paper, index }) =>
@@ -678,12 +820,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     syncSelectAll();
 
-    const metadata = data.metadata || {};
     // Declutter (CCT4429): header meta is count + corpus tier only. The
     // cached flag and the search mode already have visible owners (the
     // request path and the Advanced block's source control); repeating them
     // here is the clutter the operator flagged.
     const parts = [`${papers.length} paper${papers.length === 1 ? "" : "s"}`];
+    const pagination = metadata.pagination;
+    if (pagination) {
+      parts.push(scholarT("%(n)s Crossref source matches before filters and deduplication", { n: pagination.total.toLocaleString() }));
+    } else {
+      parts.push(scholarT("Bounded search; no global total"));
+    }
     // READINESS: which corpus answered. The configured policy is local-first,
     // and the user (and a bug report) must be able to see when the network was
     // actually needed -- a silent fallback is indistinguishable from a local
@@ -700,14 +847,60 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     const counts = metadata.engine_counts || {};
     const counted = Object.keys(counts);
-    if (counted.length) {
+    if (counted.length && !pagination) {
       // Per-source options are corpus proper nouns and stay as-is (same
       // convention as the source filter's dynamically built options).
       parts.push(counted.map((name) => `${name} ${counts[name]}`).join(", "));
     }
     stats.textContent = parts.join(" · ");
+    // Details strip (operator 2026-10-22): the Databases section mirrors
+    // the database side of the header meta (tier + per-source counts).
+    // The count already owns the results header; the strip keeps what
+    // that header deliberately omits.
+    const stripSummary = document.getElementById("searchStripSummary");
+    if (stripSummary) {
+      const tail = parts.slice(1);
+      stripSummary.textContent = tail.length ? tail.join(" · ") : parts[0];
+    }
     show(results);
+    if (paginationPanel) {
+      paginationPanel.classList.toggle("hidden", !pagination);
+      if (pagination) {
+        if (paginationStatus) paginationStatus.textContent = scholarT("%(n)s papers loaded", { n: papers.length });
+        if (loadMoreButton) {
+          loadMoreButton.disabled = pageBusy || !pagination.has_more;
+          loadMoreButton.textContent = pagination.has_more ? scholarT("Load more") : scholarT("All source pages scanned");
+        }
+      }
+    }
   }
+
+  async function loadMore() {
+    if (!pageState || pageBusy || pageState.nextOffset == null) return;
+    const requestId = searchRequestId;
+    pageBusy = true;
+    if (loadMoreButton) loadMoreButton.disabled = true;
+    hide(errorBox);
+    try {
+      const params = new URLSearchParams(pageState.params);
+      params.set("offset", String(pageState.nextOffset));
+      const response = await fetch(`${STX_MOUNT}/api/search/page?${params}`);
+      const data = await response.json();
+      if (requestId !== searchRequestId) return;
+      if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
+      pageState.nextOffset = data.metadata.pagination.next_offset;
+      pageBusy = false;
+      renderResults(data, true);
+    } catch (error) {
+      if (requestId === searchRequestId) showError(`Search page failed: ${error.message}`, loadMore);
+    } finally {
+      if (requestId === searchRequestId) {
+        pageBusy = false;
+        if (loadMoreButton) loadMoreButton.disabled = pageState.nextOffset == null;
+      }
+    }
+  }
+  if (loadMoreButton) loadMoreButton.addEventListener("click", loadMore);
 
   function selectedPapers() {
     return lastPapers.filter((paper, index) =>
@@ -716,9 +909,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function setBulkBusy(btn, busy) {
-    [saveSelectedBtn, enrichSelectedBtn].forEach((b) => {
-      if (b) b.disabled = busy;
-    });
+    bulkBusy = busy;
+    syncSelectAll();
     if (btn && busy && !btn.dataset.label) {
       btn.dataset.label = btn.textContent;
       btn.textContent = scholarT("Saving…");
@@ -796,16 +988,39 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  if (sortSelect) {
-    sortSelect.addEventListener("change", () => {
-      resultsContent.replaceChildren();
-      const visible = viewPapers();
-      visible.forEach(({ paper, index }) =>
-        resultsContent.appendChild(renderPaper(paper, index)),
-      );
-      syncSelectAll();
+  const sortButtons = document.querySelectorAll("[data-search-sort]");
+  function syncSortButtons() {
+    sortButtons.forEach((button) => {
+      const direction = window.ScholarSearchOrder.direction(sortSelect.value, button.dataset.searchSort);
+      button.setAttribute("aria-pressed", String(direction !== "none"));
+      button.dataset.direction = direction;
+      button.querySelector("[data-sort-indicator]").textContent = direction === "asc" ? "↑" : direction === "desc" ? "↓" : "↕";
+      const label = button.querySelector("span").textContent;
+      button.setAttribute("aria-label", `${label}: ${direction === "asc" ? button.dataset.labelAscending : direction === "desc" ? button.dataset.labelDescending : button.dataset.labelUnsorted}`);
     });
   }
+  function refreshLoadedResults() {
+    resultsContent.replaceChildren();
+    viewPapers().forEach(({ paper, index }) => resultsContent.appendChild(renderPaper(paper, index)));
+    syncSelectAll();
+  }
+  if (sortSelect) {
+    sortSelect.addEventListener("change", () => { syncSortButtons(); refreshLoadedResults(); });
+    sortButtons.forEach((button) => button.addEventListener("click", () => {
+      sortSelect.value = window.ScholarSearchOrder.nextOrder(sortSelect.value, button.dataset.searchSort);
+      sortSelect.dispatchEvent(new Event("change"));
+    }));
+    document.getElementById("searchResetSort")?.addEventListener("click", () => {
+      sortSelect.value = "relevance";
+      sortSelect.dispatchEvent(new Event("change"));
+    });
+    syncSortButtons();
+  }
+  document.getElementById("searchResetFilters")?.addEventListener("click", () => {
+    Object.values(filterInputs).forEach((input) => { if (input) input.value = ""; });
+    if (sourceFilter) sourceFilter.value = "";
+    refreshLoadedResults();
+  });
   if (sourceFilter) {
     sourceFilter.addEventListener("change", () => {
       resultsContent.replaceChildren();
@@ -833,6 +1048,33 @@ document.addEventListener("DOMContentLoaded", () => {
   if (enrichSelectedBtn) {
     enrichSelectedBtn.addEventListener("click", enrichSelected);
   }
+  // Brief-05: seed the Citation Graph from checked works. One DOI builds
+  // directly; several build a multi-seed network (api/graph/network/multi,
+  // at most 20 seeds). Rows without a DOI are skipped.
+  const graphSelectedBtn = document.getElementById("searchGraphSelected");
+  function selectedGraphDois() {
+    return Array.from(new Set(selectedPapers().map((paper) =>
+      String(paper.doi || "").trim().replace(/^https?:\/\/(?:dx\.)?doi\.org\//i, "").replace(/^doi:\s*/i, "").toLowerCase(),
+    ).filter((doi) => /^10\.\d{4,9}\/\S+$/i.test(doi))));
+  }
+  function graphSelected() {
+    const dois = selectedGraphDois();
+    if (!dois.length) {
+      if (bulkStatus) bulkStatus.textContent = scholarT("Select results with a DOI first.");
+      return;
+    }
+    if (dois.length > GRAPH_SEED_LIMIT) {
+      if (bulkStatus) bulkStatus.textContent = scholarT("Select at most %(n)s distinct DOIs for one graph.", { n: GRAPH_SEED_LIMIT });
+      return;
+    }
+    const graphTab = document.querySelector(
+      '.stx-content-tabs__tab[aria-controls="tab-graph"]',
+    );
+    if (graphTab) graphTab.click();
+    const detail = dois.length === 1 ? { doi: dois[0] } : { dois };
+    document.dispatchEvent(new CustomEvent("scholar:build-graph", { detail }));
+  }
+  if (graphSelectedBtn) graphSelectedBtn.addEventListener("click", graphSelected);
   // Slice 11: save-then-download. Search rows are not library papers, so
   // the pill files the selection first (existing save-bulk), then fetches
   // OA PDFs for the filed ids (max 10 per the endpoint cap).
@@ -936,13 +1178,19 @@ document.addEventListener("DOMContentLoaded", () => {
       showError("Enter a search query.");
       return;
     }
+    const requestId = ++searchRequestId;
+    pageState = null;
+    pageBusy = false;
+    hide(paginationPanel);
 
     hide(errorBox);
     hide(results);
+    hide(emptyState);
     show(loading);
     // Old-direct U2: reveal the queue panel in its searching state.
     if (queuePanel) queuePanel.hidden = false;
     resetQueue();
+    stepperSearching();
 
     try {
       const params = new URLSearchParams({
@@ -971,8 +1219,15 @@ document.addEventListener("DOMContentLoaded", () => {
         if (el && el.value.trim() !== "") params.set(name, el.value.trim());
       });
       if (noCache && noCache.checked) params.set("no_cache", "true");
-      const response = await fetch(`${STX_MOUNT}/api/search?${params}`);
+      const isLocalPage = params.get("sources") === "crossref_local";
+      if (isLocalPage) {
+        params.set("page_size", maxResults.value);
+        params.set("offset", "0");
+        params.delete("max_results");
+      }
+      const response = await fetch(`${STX_MOUNT}/api/search${isLocalPage ? "/page" : ""}?${params}`);
       const data = await response.json();
+      if (requestId !== searchRequestId) return;
 
       if (!response.ok) {
         showError(
@@ -980,15 +1235,25 @@ document.addEventListener("DOMContentLoaded", () => {
           () => form.requestSubmit(),
         );
         if (queuePanel) queuePanel.hidden = true;
+        stepperReset();
         return;
       }
+      if (isLocalPage) pageState = { params: params.toString(), nextOffset: data.metadata.pagination.next_offset };
       renderResults(data);
-      fillQueue(data.metadata);
+      if (isLocalPage) {
+        if (queuePanel) queuePanel.hidden = true;
+      } else {
+        fillQueue(data.metadata);
+      }
+      stepperDone(((data && data.results) || []).length);
     } catch (err) {
+      if (requestId !== searchRequestId) return;
       showError(`Search failed: ${err.message}`, () => form.requestSubmit());
       if (queuePanel) queuePanel.hidden = true;
+      stepperReset();
     } finally {
-      hide(loading);
+      if (requestId === searchRequestId) hide(loading);
     }
   });
+  syncSelectAll();
 });

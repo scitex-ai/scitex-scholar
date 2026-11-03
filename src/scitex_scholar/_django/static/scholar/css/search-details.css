@@ -1,0 +1,18 @@
+/* Leaf search controls inside the SDK-owned Details pane. The SDK retains
+ * pane sizing, resizing, collapse and phone navigation. */
+[data-search-hint] .search-options-group { margin-block: 8px; border-inline: 0; }
+[data-search-hint] .search-options-group > summary { padding: 10px 4px; min-height: 44px; box-sizing: border-box; }
+[data-search-hint] .search-options-group > :not(summary) { margin-inline: 4px; }
+[data-search-hint] .search-sort-toggles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+[data-search-hint] .search-sort-toggle { display: flex; justify-content: space-between; align-items: center; min-height: 44px; padding: 6px 8px; }
+[data-search-hint] .search-sort-toggle[aria-pressed="true"] { border-color: var(--accent); color: var(--text-primary); font-weight: 600; }
+[data-search-hint] .search-options-reset { min-height: 44px; margin-block: 8px; }
+[data-search-hint] .search-options-note { color: var(--text-muted); font-size: 11px; margin-block: 6px; }
+[data-search-hint] .search-filter-range { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; border: 0; padding: 0; margin-block: 10px; min-width: 0; }
+[data-search-hint] .search-filter-range legend { font-weight: 600; font-size: 12px; padding: 0; }
+[data-search-hint] .search-filter-range label { min-width: 0; display: grid; gap: 4px; font-size: 11px; }
+[data-search-hint] .search-filter-range input { width: 100%; min-width: 0; box-sizing: border-box; min-height: 44px; }
+[data-search-hint] .search-advanced__api { display: flex; flex-flow: row wrap; align-items: center; gap: 6px; }
+[data-search-hint] .source-notice { font-size: 11px; color: var(--text-muted); }
+
+[data-search-hint] #searchSort[hidden] { display: none; }

@@ -219,6 +219,20 @@ class ScholarSearchEngine:
             logger.error(f"{self.name}: Search failed: {e}")
             raise
 
+    async def search_page(self, query, *, offset=0, page_size=50, filters=None, _search=None):
+        """One local Crossref page; source totals precede post-search filters.
+
+        The established multi-source ``search`` method keeps its list contract.
+        Paging is explicit and never fans out to rate-limited online sources.
+        """
+        import asyncio
+        from ._crossref_pages import search_crossref_page
+
+        return await asyncio.to_thread(
+            search_crossref_page, query, offset=offset, page_size=page_size,
+            filters=filters, pipeline=self.parallel_pipeline, search=_search,
+        )
+
     async def search_by_doi(
         self,
         doi: str,

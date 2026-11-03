@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "scitex-scholar"
-version = "1.19.0"
+version = "1.29.1"
 description = "Scientific paper search, enrichment, download, and management for the SciTeX ecosystem"
 readme = "README.md"
 license = "AGPL-3.0-only"
@@ -76,7 +76,7 @@ dependencies = [
     # `impact_factor/jcr/*` import it on the path a plain `pip install
     # scitex-scholar` exercises. `sql-manager` + `sqlalchemy` were the
     # previous JCR backend and are gone with it.
-    "scitex-dev>=0.30.0",
+    "scitex-dev>=0.62.6",
     "tenacity>=8.0.0",
     "tqdm>=4.64.0",
     # ------------------------------------------------------------------
@@ -117,9 +117,11 @@ dependencies = [
 # (playwright is a core dep); `[server]`'s aiohttp/scitex-dev lines were
 # core-redundant. Surviving feature pins live FLAT in `[all]` below.
 dev = [
-    "scitex-dev>=0.30.0",
+    "scitex-dev>=0.62.6",
+    "packaging>=23.0",  # verify the minimum SDK capability requirement in tests
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
+    "pytest-xdist>=3.0.0",  # full native driver uses -n / --dist
     "numpy>=1.21.0",
     # Mirror all optional extras so a fresh `pip install -e .[dev]`
     # runs the full test suite without ImportError on guarded imports.
@@ -129,7 +131,7 @@ dev = [
     "aiohttp>=3.8.0",
     "django>=4.2",
     "scitex-app>=0.11.0",  # hosts_to_allow public name (fleet single implementation)
-    "scitex-sdk>=0.3.7",  # content-tabs.css SSoT primitive (tab convergence); 0.3.7 first release carrying it
+    "scitex-sdk>=0.3.17",  # public manifest scope_capabilities contract
     # The rest of the `[all]` feature stack. Its imports in src/ are GUARDED now
     # (PS-233, 2026-09-20), so a `-e .[dev]` install missing these imports
     # fine and then fails every Django test on the guard's message. They stay
@@ -177,7 +179,7 @@ all = [
     # three-valued `PortHolder` whose `ours is None` the `gui open` code
     # branches on. Against 0.4.x those branches read a different shape.
     "scitex-app>=0.11.0",  # hosts_to_allow public name (fleet single implementation)
-    "scitex-sdk>=0.3.7",  # content-tabs.css SSoT primitive (tab convergence); 0.3.7 first release carrying it
+    "scitex-sdk>=0.3.17",  # public manifest scope_capabilities contract
     # scholar.html EXTENDS `scitex_ui/standalone_shell.html` (since 1.9.0).
     # >=0.22.0 for the `.stx-app-header__slot--project-selector` guard plus
     # the earlier >=0.19.0 `<html lang>` accessibility floor (screen-reader
@@ -207,6 +209,11 @@ scitex-scholar = "scitex_scholar"
 [project.entry-points."scitex_dev.skills"]
 scitex-scholar = "scitex_scholar"
 
+# Leaf scope of the hooks federation: scholar's own agent guardrails,
+# mirroring the scitex-storage provider shape (no privileged position).
+[project.entry-points."scitex_dev.hooks"]
+scitex-scholar = "scitex_scholar._hook_rules:provide"
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/scitex_scholar"]
 
@@ -216,6 +223,8 @@ python_files = ["test_*.py"]
 markers = [
     "smoke: fast CLI happy-path tests (<60s, runs on every PR)",
     "e2e: end-to-end workflows (slow, gated by RUN_E2E=1)",
+    "slow: tests that spawn real subprocesses or take >10s (excluded from the 60s pre-push gate)",
+    "integration: live integration tests under tests/integration/ (excluded from the 60s pre-push gate)",
 ]
 # THE PACKAGE UNDER TEST IS THIS CHECKOUT, NOT WHATEVER IS INSTALLED.
 #
