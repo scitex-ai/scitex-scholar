@@ -40,7 +40,10 @@ and hardlinks, not a new host admission mechanism.
 
 Apply serializes **new** entries through the real `Paper` and `PaperIO` into a
 private stage, then publishes missing metadata without replacing existing
-files. It matches existing DOI/title identities, preserves their metadata and
+files. It locks the library directory before inspecting existing records, so
+concurrent jobs cannot mistake an in-progress publication for a conflict. This
+requires no new lock file when an incompatible existing library is refused.
+It matches existing DOI/title identities, preserves their metadata and
 annotations byte for byte, honors existing readable project links and adds
 only missing standard links into `MASTER/`. New records carry their project;
 existing metadata remains untouched because filesystem links are the library's

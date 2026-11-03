@@ -2,6 +2,8 @@
 
 import hashlib
 import json
+import multiprocessing
+import os
 from pathlib import Path
 
 import pytest
@@ -15,6 +17,95 @@ from scitex_scholar.showcase._catalog import identifier
 from scitex_scholar.showcase._files import ShowcaseConflict
 
 PROJECT = "example-project-mnist"
+
+
+def _publishing_worker(root, paused, release, results):
+    """Hold the real publication between directory creation and metadata link."""
+    original = os.link
+    intercepted = False
+
+    def link(source, destination, *args, **kwargs):
+        nonlocal intercepted
+        path = Path(destination)
+        if (
+            not intercepted
+            and path.name == "metadata.json"
+            and path.parent.parent == root / "MASTER"
+        ):
+            intercepted = True
+            paused.set()
+            if not release.wait(15):
+                raise TimeoutError("Owned publication fixture was not released")
+        return original(source, destination, *args, **kwargs)
+
+    os.link = link
+    try:
+        result = seed_mnist_library(root, project=PROJECT, dry_run=False)
+        results.put((result["new_papers"], result["new_memberships"]))
+    except Exception as error:
+        results.put(type(error).__name__)
+    finally:
+        os.link = original
+
+
+def _waiting_worker(root, attempted, results):
+    """Observe a real second writer's lock attempt in its own child process."""
+    import fcntl
+
+    original = fcntl.flock
+
+    def flock(descriptor, operation):
+        attempted.set()
+        return original(descriptor, operation)
+
+    fcntl.flock = flock
+    try:
+        result = seed_mnist_library(root, project=PROJECT, dry_run=False)
+        results.put((result["new_papers"], result["new_memberships"]))
+    except Exception as error:
+        results.put(type(error).__name__)
+    finally:
+        fcntl.flock = original
+
+
+def test_second_writer_waits_for_incomplete_locked_publication(tmp_path):
+    # Arrange: the first real writer has made a directory, not its metadata yet.
+    root = tmp_path / "library"
+    context = multiprocessing.get_context("fork")
+    paused, release, attempted = (context.Event() for _ in range(3))
+    results = context.Queue()
+    first = context.Process(
+        target=_publishing_worker, args=(root, paused, release, results)
+    )
+    second = context.Process(target=_waiting_worker, args=(root, attempted, results))
+    first.start()
+    second_started = False
+    try:
+        if not paused.wait(10):
+            raise TimeoutError("First writer did not reach the publication boundary")
+        # Act: the second must acquire the library lock before reading that state.
+        second.start()
+        second_started = True
+        waited = attempted.wait(10)
+        release.set()
+        actual = [results.get(timeout=15), results.get(timeout=15)]
+        first.join(timeout=10)
+        second.join(timeout=10)
+        # Assert: no spurious collision or duplicate publication is admitted.
+        assert (waited, sorted(actual, key=str), first.exitcode, second.exitcode) == (
+            True,
+            [(0, 0), (4, 4)],
+            0,
+            0,
+        )
+    finally:
+        release.set()
+        for process in [first, second] if second_started else [first]:
+            if process.is_alive():
+                process.terminate()
+            process.join(timeout=10)
+        results.close()
+        results.join_thread()
 
 
 def snapshot(root):
