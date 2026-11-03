@@ -18,4 +18,8 @@ jobs:
   pytest-matrix:
     # New required-status-check context: "pytest-matrix / pytest-matrix-on-ubuntu-py<X.YY>"
     uses: scitex-ai/.github/.github/workflows/pytest-matrix.yml@main
+    with:
+      # Real frontend sorter tests require Node on every Python matrix leg.
+      # The preparation hook appends only a checksum-verified, job-owned runtime.
+      pre_test_command: bash .github/ci/setup-node-owned.sh
     secrets: inherit
