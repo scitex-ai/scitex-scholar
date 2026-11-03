@@ -21,7 +21,7 @@ env:
 
 jobs:
   admission:
-    uses: scitex-ai/.github/.github/workflows/runner-admission.yml@93cd0f8b55eb4719b831ffe2eb185d9736ef4f97
+    uses: scitex-ai/.github/.github/workflows/runner-admission.yml@07d86a83e571c44ae8ba5e1dccb35299a53e9d03
     with:
       runs_on: '["self-hosted","Linux","X64","scitex-org-cpu"]'
 
@@ -70,9 +70,9 @@ jobs:
   verify:
     needs: [admission, preflight]
     if: needs.admission.outputs.native_authorized == 'true'
-    # This pinned candidate remains fail-closed until the exact native Scholar
-    # image/runtime/eight-helper registration is qualified and accepted.
-    uses: scitex-ai/.github/.github/workflows/leaf-release-sif.yml@93cd0f8b55eb4719b831ffe2eb185d9736ef4f97
+    # The accepted central profile binds the qualified native image/runtime,
+    # exact eight-helper closure, private PostgreSQL and fixed runner policy.
+    uses: scitex-ai/.github/.github/workflows/leaf-release-sif.yml@07d86a83e571c44ae8ba5e1dccb35299a53e9d03
     with:
       operation: test
       source_commit: ${{ needs.preflight.outputs.source_sha }}
@@ -81,7 +81,7 @@ jobs:
   build:
     needs: [admission, preflight, verify]
     if: needs.admission.outputs.native_authorized == 'true'
-    uses: scitex-ai/.github/.github/workflows/leaf-release-sif.yml@93cd0f8b55eb4719b831ffe2eb185d9736ef4f97
+    uses: scitex-ai/.github/.github/workflows/leaf-release-sif.yml@07d86a83e571c44ae8ba5e1dccb35299a53e9d03
     with:
       operation: build
       source_commit: ${{ needs.preflight.outputs.source_sha }}
