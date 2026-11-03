@@ -88,9 +88,14 @@ def test_sdk_favicon_has_actual_collected_bytes(collected_branding):
 def test_strict_manifest_refuses_removed_leaf_icon(collected_branding):
     # Arrange
     missing = "scholar/img/scitex-favicon-official.svg"
-    # Act / Assert
-    with pytest.raises(ValueError, match="manifest entry"):
+    caught = None
+    # Act
+    try:
         staticfiles_storage.url(missing)
+    except ValueError as error:
+        caught = error
+    # Assert
+    assert caught is not None and "manifest entry" in str(caught)
 
 
 def test_branding_does_not_render_removed_leaf_icon(collected_branding):
