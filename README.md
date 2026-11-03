@@ -91,7 +91,7 @@ uv pip install "scitex-scholar[all]"
 | Install | Contents |
 |---|---|
 | `pip install scitex-scholar` | core: search, enrich, library (Playwright browser automation included) |
-| `pip install "scitex-scholar[all]"` | everything: GUI server (Django / scitex-sdk), MCP server (fastmcp), PDF text extraction (pdfplumber), XLSX export (openpyxl), library watcher (watchdog), provenance hashing (scitex-clew) |
+| `pip install "scitex-scholar[all]"` | everything: GUI server (Django; SDK core is included in the base install), MCP server (fastmcp), PDF text extraction (pdfplumber), XLSX export (openpyxl), library watcher (watchdog), provenance hashing (scitex-clew) |
 
 </details>
 
@@ -116,7 +116,7 @@ flowchart TB
 
 The CLI is a thin layer over the Python API: every `scitex-scholar <noun> <verb>` command dispatches into one of `core/`, `pipelines/`, `storage/`, or `auth/`. The MCP server (`_mcp/`) exposes the same handlers as `scholar_*` tools consumed by the unified `scitex serve` server.
 
-## 4 Interfaces
+## 5 Interfaces
 
 <details open>
 <summary><strong>Python API</strong></summary>
@@ -231,6 +231,20 @@ server (tools prefixed `scholar_*`). A standalone server at
 `scitex_scholar.mcp_server` is still shipped but deprecated. See the
 [Skills documentation](https://scitex-scholar.readthedocs.io/en/latest/skills.html)
 for the full tool list.
+
+</details>
+
+<details>
+<summary><strong>Web API descriptor</strong></summary>
+
+<br>
+
+The canonical `scitex.apis` provider `scitex-scholar` describes one existing
+operation: relative `GET api/search/syntax-help`, returning static syntax
+help. Metadata discovery does not run a search or activate a host route.
+Search, library and graph endpoints are outside this descriptor. See the
+[static API contract](docs/static-api-provider.md) for inert metadata,
+optional Django serving and explicit host admission.
 
 </details>
 

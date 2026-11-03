@@ -51,6 +51,7 @@ rule and empirical verification table.
 ### Core / interfaces
 - [05_mcp-tools.md](05_mcp-tools.md) — MCP tools (`scholar_*` namespace)
 - [06_api-overview.md](06_api-overview.md) — top-level re-exports, subpackages, storage layout, install extras
+- [07_web-api-contract.md](07_web-api-contract.md) — static syntax-help descriptor, inert discovery and explicit host admission
 
 ## Workflows
 
