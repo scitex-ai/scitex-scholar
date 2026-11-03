@@ -46,7 +46,10 @@ record-of-paper file stays read-only; annotated copies live next to it
 under their own `notes-…pdf` / `supple-…pdf`). `library audit-files`
 verifies presence + SHA-256 across all roles.
 
-The 8-digit ID is a deterministic hash of `(normalized_title, first_author, year)`, so the *same paper* added to multiple projects always resolves to the same primary entry — no duplication, no wasted disk.
+Primary IDs depend on the importing flow; they are stable record handles, not
+project names. The Web importer and explicit MNIST seed prefer a DOI/title hash.
+The seed reuses matching existing IDs without renaming records. Project links
+can refer to the same primary entry without duplicating its files.
 
 ## Why primary store + symlinks
 
@@ -147,3 +150,27 @@ shared mirror: an empty file is a deliberate empty library. Invalid JSON fails
 without replacing the original. Missing files may import existing database-only
 recipes; mirror provisioning uses the authorized operator path, not an API
 request or a broad database grant.
+
+
+## Explicit MNIST starting library
+
+Use `scitex_scholar.showcase.seed_mnist_library(authorized_library_root,
+project=authorized_project_slug)` to inspect a dry-run; the default writes
+nothing. Only an authorized bootstrap should pass `dry_run=False`. The caller
+resolves the authenticated user-home capability and authorizes the project.
+No GET, import, project selection or library listing triggers example seeding.
+
+The four bundled references have primary-source provenance. Existing records,
+annotations, readable links and Writer bibliographies stay intact. Filesystem
+project membership is authoritative; an existing record's metadata is not
+rewritten. The helper creates no PDFs, abstracts, citation counts or scientific
+results and opens no shared index. Conflicts require review, not forced replace.
+`mnist_reference_bibtex()` exports the same catalog as content for an explicitly
+chosen consumer file; do not overwrite placeholder or authored bibliography
+files. Distinguish the computed Live Paper OpenML/logreg/KNN bundle from the
+illustrative template torchvision/UMAP/SVM scripts.
+
+BibTeX exports escape plain bibliographic text (including ampersands and other
+TeX special characters) once. Identifiers, URLs and citation keys retain their
+syntax; raw manuscript LaTeX is not bibliographic input. Other export formats
+keep their existing text behavior.

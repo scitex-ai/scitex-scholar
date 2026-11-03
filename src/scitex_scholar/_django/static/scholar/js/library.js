@@ -64,6 +64,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // Slice 4b (old-direct unification): the loaded rows stay cached so the
   // sort select re-renders client-side (hub sorts the list from its toolbar).
   let lastRows = [];
+  let readerKey = null;
+  let readerPaper = null;
+  const reader = document.getElementById("libraryPaperDetails");
+  const readerContent = document.getElementById("libraryReaderContent");
+  const readerEmpty = document.getElementById("libraryReaderEmpty");
+  const readerStatus = document.getElementById("libraryReaderStatus");
+  const copyCitation = document.getElementById("libraryReaderCopyCitation");
   const sortEl = document.getElementById("librarySort");
   const selectedSeeds = new Set();
   const selectAllSeeds = document.getElementById("librarySelectAll");
@@ -146,6 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
     listEl.replaceChildren();
     sortedRows().forEach((p) => listEl.appendChild(makeRow(p)));
     syncSeedSelection();
+    refreshReader();
   }
 
   if (sortEl) {
@@ -168,11 +176,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function formatAuthors(paper) {
+  function formatAuthors(paper, truncate = true) {
     const authors = paper.authors || [];
     if (!authors.length) return "";
     const names = authors.map((a) => (typeof a === "string" ? a : a.name || ""));
-    return names.length > 3
+    return truncate && names.length > 3
       ? `${names.slice(0, 3).join(", ")} et al.`
       : names.join(", ");
   }
@@ -181,6 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const item = document.createElement("div");
     item.className = "library-item";
     item.dataset.paperId = paper.paper_id || "";
+    item.dataset.readerActive = String(readerKey === paper.paper_id);
     const select = document.createElement("input");
     select.type = "checkbox";
     select.className = "library-item__select";
@@ -197,8 +206,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const main = document.createElement("div");
     main.className = "library-item__main";
 
-    const title = document.createElement("div");
-    title.className = "library-item__title";
+    const title = document.createElement("button");
+    title.type = "button";
+    title.className = "library-item__title library-item__reader-trigger";
+    title.setAttribute("aria-pressed", String(readerKey === paper.paper_id));
+    title.addEventListener("click", () => selectReader(paper));
     title.textContent = paper.title || paper.paper_id || "Untitled";
     main.appendChild(title);
 
@@ -301,12 +313,103 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const details = makeDetails(paper, badges);
     details.hidden = true;
-    detailsToggle.addEventListener("click", () => {
+    detailsToggle.setAttribute("aria-pressed", String(readerKey === paper.paper_id));
+    detailsToggle.addEventListener("click", () => selectReader(paper));
+    const notesToggle = document.createElement("button");
+    notesToggle.type = "button";
+    notesToggle.className = "library-notes-toggle library-enrich-btn";
+    notesToggle.textContent = reader?.dataset.notesLabel || scholarT("Details");
+    notesToggle.setAttribute("aria-expanded", "false");
+    notesToggle.addEventListener("click", () => {
       details.hidden = !details.hidden;
+      notesToggle.setAttribute("aria-expanded", String(!details.hidden));
     });
+    actions.appendChild(notesToggle);
     item.appendChild(details);
     return item;
   }
+
+  function refreshReader() {
+    if (!reader) return;
+    const paper = readerKey ? lastRows.find((row) => row.paper_id === readerKey) : null;
+    if (!paper) {
+      readerKey = null;
+      readerPaper = null;
+      readerContent.hidden = true;
+      readerEmpty.hidden = false;
+      readerStatus.textContent = "";
+      return;
+    }
+    if (readerPaper === paper) return; // Sorting must not replace the reader.
+    readerPaper = paper;
+    readerContent.hidden = false;
+    readerEmpty.hidden = true;
+    readerStatus.textContent = "";
+    const missing = reader.dataset.missing;
+    document.getElementById("libraryReaderTitle").textContent = typeof paper.title === "string" && paper.title.trim() ? paper.title : missing;
+    document.getElementById("libraryReaderAuthors").textContent = formatAuthors(paper, false) || missing;
+    document.getElementById("libraryReaderPublication").textContent = [paper.venue, paper.year].filter(Boolean).join(" · ") || missing;
+    const citations = paper.citation_count;
+    document.getElementById("libraryReaderCitations").textContent = typeof citations === "number" && Number.isFinite(citations) && citations >= 0 ? String(citations) : missing;
+    document.getElementById("libraryReaderAbstract").textContent = typeof paper.abstract === "string" && paper.abstract.trim() ? paper.abstract : reader.dataset.noAbstract;
+    const doiElement = document.getElementById("libraryReaderDoi");
+    doiElement.replaceChildren();
+    const doi = seedDoi(paper);
+    if (doi) {
+      const link = document.createElement("a");
+      link.href = `https://doi.org/${doi}`;
+      link.textContent = doi;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      doiElement.appendChild(link);
+    } else doiElement.textContent = missing;
+    copyCitation.disabled = !paper.paper_id;
+  }
+
+  function selectReader(paper) {
+    if (!reader || !paper.paper_id) return;
+    readerKey = paper.paper_id;
+    refreshReader();
+    listEl.querySelectorAll(".library-item").forEach((item) => {
+      const active = item.dataset.paperId === readerKey;
+      item.dataset.readerActive = String(active);
+      item.querySelectorAll(".library-item__reader-trigger,.library-details-toggle")
+        .forEach((button) => button.setAttribute("aria-pressed", String(active)));
+    });
+    // Ask the existing SDK pane switcher on phones; never create another pane.
+    const pane = reader.closest("[data-stx-pane]");
+    if (pane?.id) document.querySelector(`[role="tab"][aria-controls="${pane.id}"]`)?.click();
+    const toggle = document.querySelector("[data-status-strip-toggle]");
+    if (toggle?.getAttribute("aria-expanded") === "false") toggle.click();
+    reader.focus({ preventScroll: true });
+  }
+
+  document.getElementById("libraryReaderClose")?.addEventListener("click", () => {
+    readerKey = null;
+    refreshReader();
+    listEl.querySelectorAll("[data-reader-active]").forEach((item) => item.dataset.readerActive = "false");
+    listEl.querySelectorAll(".library-item__reader-trigger,.library-details-toggle")
+      .forEach((button) => button.setAttribute("aria-pressed", "false"));
+  });
+  copyCitation?.addEventListener("click", async () => {
+    const key = readerKey;
+    if (!key) return;
+    copyCitation.disabled = true;
+    readerStatus.textContent = "";
+    try {
+      const params = new URLSearchParams({library_id: key, format: "bibtex"});
+      const response = await fetch(`${STX_MOUNT}/api/library/citation?${params}`);
+      const data = await readJson(response);
+      if (!response.ok || typeof data.citation !== "string") throw new Error("Citation unavailable");
+      if (readerKey !== key) return;
+      await navigator.clipboard.writeText(data.citation);
+      if (readerKey === key) readerStatus.textContent = reader.dataset.copySuccess;
+    } catch (error) {
+      if (readerKey === key) readerStatus.textContent = reader.dataset.copyFailure;
+    } finally {
+      if (readerKey === key) copyCitation.disabled = false;
+    }
+  });
 
   // Slice 4b: status radios + star rating + tags + notes, saved through the
   // slice-4a /api/library/annotate endpoint (partial merge, same doc the
@@ -670,6 +773,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       loaded = true;
       syncSeedSelection();
+      refreshReader();
     } catch (err) {
       hide(loadingEl);
       errorMsgEl.textContent = String(err.message || err);

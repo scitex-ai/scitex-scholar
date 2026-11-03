@@ -55,6 +55,8 @@ Literature management spans many tools and APIs: searching databases, resolving 
 For local Crossref GUI paging beyond the former 1000-result ceiling, see
 [Search page semantics and limits](docs/gui/search-pages.md). Online and
 multiple-source searches retain their bounded list behavior.
+[Details controls and loaded-result sorting](docs/gui/details-pane.md) describes
+search sorting, source selection, filter reset and the selected-paper Library reader.
 [Graph Library persistence and limits](docs/gui/graph-library.md) describes saved
 recipes and per-user storage.
 
@@ -89,7 +91,7 @@ uv pip install "scitex-scholar[all]"
 | Install | Contents |
 |---|---|
 | `pip install scitex-scholar` | core: search, enrich, library (Playwright browser automation included) |
-| `pip install "scitex-scholar[all]"` | everything: GUI server (django / scitex-app / scitex-ui), MCP server (fastmcp), PDF text extraction (pdfplumber), XLSX export (openpyxl), library watcher (watchdog), provenance hashing (scitex-clew) |
+| `pip install "scitex-scholar[all]"` | everything: GUI server (Django / scitex-sdk), MCP server (fastmcp), PDF text extraction (pdfplumber), XLSX export (openpyxl), library watcher (watchdog), provenance hashing (scitex-clew) |
 
 </details>
 
@@ -331,3 +333,7 @@ the umbrella with `pip install scitex[scholar]` to use as
 <p align="center">
   <a href="https://scitex.ai" target="_blank"><img src="docs/scitex-icon-navy-inverted.png" alt="SciTeX" width="40"/></a>
 </p>
+
+For an explicit, additive starting Library for the worked MNIST project, see
+[the MNIST showcase guide](docs/mnist-showcase.md). It preserves user data and
+does not run models or populate apps automatically.

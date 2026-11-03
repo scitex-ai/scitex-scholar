@@ -18,7 +18,7 @@ from scitex_scholar._django import views
 pytest_plugins = ("tests.scitex_scholar._django.test_views_shell_context",)
 
 _SCRIPT_NAMES = (
-    "stx-mount.js", "app.js", "search.js", "library.js",
+    "stx-mount.js", "app.js", "search-order.js", "search.js", "library.js",
     "graph/ForceSimulation.js", "graph/GraphRenderer.js", "graph/citation-graph.js",
     "header-picker.js",
 )
@@ -31,6 +31,7 @@ _CONTENT_IDS = {
     "searchSort", "searchSourceFilter", "searchBulkBar", "searchSelectAll",
     "searchSaveSelected", "searchEnrichSelected", "searchBulkStatus",
     "searchStripSummary", "libraryStripSummary", "graphStripSummary",
+    "libraryPaperDetails", "libraryReaderEmpty", "libraryReaderContent", "libraryReaderTitle",
 }
 
 
@@ -168,7 +169,7 @@ def test_index_workspace_content_preserves_native_rendering(
             "library_text": {"en": "Library", "ja": "ライブラリ"}[language],
             "shell_content_panes": 1,
             "scripts": tuple("/static/scholar/js/" + name for name in _SCRIPT_NAMES),
-            "stylesheets": ["/static/scholar/css/scholar.css"],
+            "stylesheets": ["/static/scholar/css/scholar.css", "/static/scholar/css/search-details.css", "/static/scholar/css/library-reader.css"],
             "mounts": [path.rstrip("/")],
             "pwa": ["/static/scholar/pwa/manifest.json"],
             "project_scope": ("Alpha", "user"),

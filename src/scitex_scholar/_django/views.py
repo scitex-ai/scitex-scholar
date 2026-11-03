@@ -39,7 +39,6 @@ try:
     from django.core.exceptions import ImproperlyConfigured, PermissionDenied
     from django.http import HttpResponse, JsonResponse
     from django.template.loader import render_to_string
-    from django.templatetags.static import static as _static_url
     from django.utils.module_loading import import_string
     from django.utils.translation import gettext as _i18n  # noqa: N816  (JS string dict)
     from django.views.decorators.http import (
@@ -456,14 +455,7 @@ def index_context(request, current_project=None):
         "stx_mount": mount_prefix(request),
         "app_label": _app_label("Scholar"),
         "app_scope": "user",
-        # Operator 2026-10-23: the tab icon is the official mark (white
-        # snake on navy), no dev/prod switching. The installed SDK SSOT
-        # (0.3.12) still serves the retired green snake; the official mark
-        # exists only in SDK develop (unreleased). SUNSET: drop this
-        # override + the file once the installed SDK serves the official
-        # mark, and pin that SDK floor in pyproject.toml. Provenance: byte
-        # copy of SDK develop's scitex-favicon.svg (same snake artwork).
-        "favicon_href": _static_url("scholar/img/scitex-favicon-official.svg"),
+        # Shared SDK branding owns the official favicon in every deployment.
         "current_project": current_project,
         "current_scope": current_scope,
         # i18n (operator directive 2026-09-14): the whole page flips via

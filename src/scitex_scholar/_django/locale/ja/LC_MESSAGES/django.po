@@ -6,6 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: scitex-scholar\n"
 "Language: ja\n"
+"Language-Team: Japanese\n"
+"MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "PO-Revision-Date: 2026-09-14 00:00+0900\n"
@@ -766,3 +768,123 @@ msgstr "先にグラフを作成してください。"
 
 msgid "Select between 1 and 20 works with DOIs."
 msgstr "DOI を持つ文献を 1 ～ 20 件選択してください。"
+
+#: templates/scholar/workspace_content.html
+msgid "Year"
+msgstr "発行年"
+
+#: templates/scholar/workspace_content.html
+msgid "Citations"
+msgstr "引用数"
+
+#: templates/scholar/workspace_content.html
+msgid "Impact factor"
+msgstr "インパクトファクター"
+
+#: templates/scholar/workspace_content.html
+msgid "Ascending"
+msgstr "昇順"
+
+#: templates/scholar/workspace_content.html
+msgid "Descending"
+msgstr "降順"
+
+#: templates/scholar/workspace_content.html
+msgid "Unsorted"
+msgstr "並べ替えなし"
+
+#: templates/scholar/workspace_content.html
+msgid "Title"
+msgstr "タイトル"
+
+#: templates/scholar/workspace_content.html
+msgid "Citations (highest)"
+msgstr "引用数（多い順）"
+
+#: templates/scholar/workspace_content.html
+msgid "Citations (lowest)"
+msgstr "引用数（少ない順）"
+
+#: templates/scholar/workspace_content.html
+msgid "Impact factor (highest)"
+msgstr "インパクトファクター（高い順）"
+
+#: templates/scholar/workspace_content.html
+msgid "Impact factor (lowest)"
+msgstr "インパクトファクター（低い順）"
+
+#: templates/scholar/workspace_content.html
+msgid "Sorts loaded results only."
+msgstr "読み込み済みの結果だけを並べ替えます。"
+
+#: templates/scholar/workspace_content.html
+msgid "Loaded source"
+msgstr "読み込み済みの出典"
+
+#: templates/scholar/workspace_content.html
+msgid "From"
+msgstr "下限"
+
+#: templates/scholar/workspace_content.html
+msgid "To"
+msgstr "上限"
+
+#: templates/scholar/workspace_content.html
+msgid "Reset filters"
+msgstr "フィルターをリセット"
+
+#: templates/scholar/workspace_content.html
+msgid "Ranges apply to the next search."
+msgstr "範囲は次の検索に適用されます。"
+
+#: templates/scholar/workspace_content.html
+msgid "Selected paper"
+msgstr "選択した論文"
+
+#: templates/scholar/workspace_content.html
+msgid "Not recorded"
+msgstr "記録されていません"
+
+#: templates/scholar/workspace_content.html
+msgid "No abstract is stored for this paper."
+msgstr "この論文の要旨は保存されていません。"
+
+#: templates/scholar/workspace_content.html
+msgid "Citation copied."
+msgstr "引用をコピーしました。"
+
+#: templates/scholar/workspace_content.html
+msgid "Citation could not be copied. Try again."
+msgstr "引用をコピーできませんでした。もう一度お試しください。"
+
+#: templates/scholar/workspace_content.html
+msgid "Notes and actions"
+msgstr "メモと操作"
+
+#: templates/scholar/workspace_content.html
+msgid "Select a paper to view its details."
+msgstr "論文を選択すると詳細が表示されます。"
+
+#: templates/scholar/workspace_content.html
+msgid "Close paper details"
+msgstr "論文の詳細を閉じる"
+
+#: templates/scholar/workspace_content.html
+msgid "Authors"
+msgstr "著者"
+
+#: templates/scholar/workspace_content.html
+msgid "Publication"
+msgstr "出版情報"
+
+#: templates/scholar/workspace_content.html
+msgid "Abstract"
+msgstr "要旨"
+
+#: templates/scholar/workspace_content.html
+msgid "Copy BibTeX citation"
+msgstr "BibTeX形式の引用をコピー"
+
+#: templates/scholar/workspace_content.html
+msgid "Library tools"
+msgstr "ライブラリの操作"

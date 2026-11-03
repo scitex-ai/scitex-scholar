@@ -17,6 +17,8 @@ from __future__ import annotations
 import re
 from typing import Dict, List
 
+from ._bibtex_text import _escape_plain_text
+
 # ── Type mappings ───────────────────────────────────────────────
 
 DOC_TYPE_TO_BIBTEX = {
@@ -142,28 +144,35 @@ def paper_normalize(data: dict) -> dict:
 
 
 def to_bibtex(paper: dict) -> str:
-    """Format a standard paper dict as a BibTeX entry."""
+    """Format a standard paper dict as a BibTeX entry.
+
+    Bibliographic text fields are plain text: TeX special characters are
+    escaped once, including already emitted safe escapes. Unicode remains
+    Unicode. Abstracts are limited to 500 normalized input characters before
+    escaping. Citation keys, identifiers and URLs are preserved verbatim;
+    this formatter does not validate or rewrite their syntax.
+    """
     doc_type = paper.get("document_type", "article")
     entry_type = DOC_TYPE_TO_BIBTEX.get(doc_type, "article")
     key = paper.get("cite_key") or generate_cite_key(paper)
 
     lines = [f"@{entry_type}{{{key},"]
 
-    title = clean_text(paper.get("title") or "")
+    title = _escape_plain_text(paper.get("title") or "")
     if title:
         lines.append(f"  title = {{{title}}},")
 
-    authors = paper.get("authors_str") or ""
+    authors = _escape_plain_text(paper.get("authors_str") or "")
     lines.append(f"  author = {{{authors or 'Unknown'}}},")
 
-    journal = clean_text(paper.get("journal") or "")
+    journal = _escape_plain_text(paper.get("journal") or "")
     if journal:
         lines.append(f"  journal = {{{journal}}},")
     if paper.get("year"):
-        lines.append(f"  year = {{{paper['year']}}},")
+        lines.append(f"  year = {{{_escape_plain_text(str(paper['year']))}}},")
     for field in ("volume", "number", "pages"):
         if paper.get(field):
-            lines.append(f"  {field} = {{{paper[field]}}},")
+            lines.append(f"  {field} = {{{_escape_plain_text(str(paper[field]))}}},")
     if paper.get("doi"):
         lines.append(f"  doi = {{{paper['doi']}}},")
     if paper.get("pmid"):
@@ -174,9 +183,7 @@ def to_bibtex(paper: dict) -> str:
     if paper.get("url"):
         lines.append(f"  url = {{{paper['url']}}},")
     if paper.get("abstract"):
-        abstract = clean_text(paper["abstract"])
-        if len(abstract) > 500:
-            abstract = abstract[:500] + "..."
+        abstract = _escape_plain_text(paper["abstract"], limit=500)
         lines.append(f"  abstract = {{{abstract}}},")
 
     if lines[-1].endswith(","):

@@ -7,7 +7,23 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-## [1.29.1] - 2026-11-02
+## [1.29.1] - 2026-11-03
+
+- Use the published SDK official favicon instead of a removed leaf asset, so
+  strict production static-file manifests render the Scholar page successfully.
+
+- Add an accessible selected-paper Library reader in the shared SDK Details
+  pane with full stored metadata/abstract, truthful missing states and explicit
+  citation copying. Preserve selection through sorting and clear filtered-out
+  papers. Keep annotations/actions explicit and honor their hidden state.
+
+- Keep the shared SDK Details pane while grouping Sources, Sorters and Filters
+  like the reference UI. Add stable citation/impact-factor sorting of loaded
+  results, preserve work selection and provider relevance order, and reset
+  paired search bounds without triggering another search.
+- Escape plain bibliographic text for BibTeX/LaTeX exactly once, preserving identifiers, URLs and non-TeX exports. Limit abstracts before encoding so escape commands remain complete; actual MNIST bibliography now typesets its journal ampersand.
+
+- Add an explicit, dry-run-first MNIST showcase Library adapter with four primary-source-verified references, no-overwrite Paper/PaperIO admission and additive project links. Preserve existing user metadata, links and bibliographies; no automatic GET seeding, network, model run or derived-store write.
 
 - Require SDK 0.3.17 for the declared user/project scope capability contract in
   GUI and development installs. The shared SDK owns version-badge appearance;

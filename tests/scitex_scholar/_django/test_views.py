@@ -103,22 +103,14 @@ def test_index_body_leaks_no_unrendered_template_tags():
     assert "{% comment %}" not in body
 
 
-def test_index_body_contains_official_favicon_override():
-    """Operator 2026-10-23: the tab icon is the official mark (white snake
-    on navy), no dev/prod switching. The installed SDK SSOT (0.3.12) still
-    serves the retired green snake, so Scholar supplies its own official
-    file via `favicon_href` (SUNSET once the SDK ships the mark)."""
+def test_index_body_uses_sdk_official_favicon():
+    """The published SDK owns the official mark; no missing leaf override."""
     # Arrange
-    rf = RequestFactory()
-    request = rf.get("/")
-    resp = views.index(request)
+    request = RequestFactory().get("/")
     # Act
-    body = resp.content.decode()
+    body = views.index(request).content.decode()
     # Assert
-    assert (
-        "scholar/img/scitex-favicon-official.svg" in body,
-        "scitex_sdk/ui/img/scitex-favicon.svg" not in body,
-    ) == (True, True)
+    assert "scitex_sdk/ui/img/scitex-favicon.svg" in body
 
 
 def test_index_does_not_shadow_shared_favicon_with_inline_icon():
@@ -2152,14 +2144,55 @@ def test_advanced_section_is_flat_not_a_details_card():
     assert rows_present and no_details_card
 
 
-def test_advanced_hides_query_syntax_until_requested():
-    # Arrange
+def _query_syntax_controls():
+    # Arrange -- the existing in-field help owns syntax, not duplicate prose
+    # inside the Sources group. The endpoint's operator data has its own tests.
+    from html.parser import HTMLParser
+
+    class HelpControls(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.controls = {}
+
+        def handle_starttag(self, tag, attrs):
+            attrs = dict(attrs)
+            if attrs.get("id") in {"searchSyntaxPanel", "searchSyntaxToggle"}:
+                self.controls[attrs["id"]] = attrs
+
     body = _compass_index_body()
     # Act
-    syntax_block = "search-advanced__syntax" in body
-    impact_factor_syntax = "if:&gt;5" in body  # escaped in the template
+    parser = HelpControls()
+    parser.feed(body)
+    panel = parser.controls["searchSyntaxPanel"]
+    toggle = parser.controls["searchSyntaxToggle"]
+    return panel, toggle
+
+def test_query_syntax_panel_is_initially_hidden():
+    # Arrange
+    panel, toggle = _query_syntax_controls()
+    # Act
+    valid = "hidden" in panel
     # Assert
-    assert syntax_block and impact_factor_syntax
+    assert valid
+
+
+def test_query_syntax_toggle_is_initially_collapsed():
+    # Arrange
+    panel, toggle = _query_syntax_controls()
+    # Act
+    valid = toggle["aria-expanded"] == "false"
+    # Assert
+    assert valid
+
+
+def test_query_syntax_toggle_targets_panel():
+    # Arrange
+    panel, toggle = _query_syntax_controls()
+    # Act
+    valid = toggle["aria-controls"] == panel["id"]
+    # Assert
+    assert valid
+
 
 
 def test_ignore_cache_and_source_are_wired_to_the_api():
