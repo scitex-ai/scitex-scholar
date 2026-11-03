@@ -169,3 +169,8 @@ results and opens no shared index. Conflicts require review, not forced replace.
 chosen consumer file; do not overwrite placeholder or authored bibliography
 files. Distinguish the computed Live Paper OpenML/logreg/KNN bundle from the
 illustrative template torchvision/UMAP/SVM scripts.
+
+BibTeX exports escape plain bibliographic text (including ampersands and other
+TeX special characters) once. Identifiers, URLs and citation keys retain their
+syntax; raw manuscript LaTeX is not bibliographic input. Other export formats
+keep their existing text behavior.
