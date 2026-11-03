@@ -52,8 +52,12 @@ def entries(directory):
 
 @contextlib.contextmanager
 def locked(root):
-    path = checked(root / ".mnist-showcase.lock", root)
-    descriptor = os.open(path, os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW, 0o600)
+    """Lock the library inode without changing a refused job's file inventory."""
+    # Preserve the existing refusal of an unsafe legacy marker. Do not create
+    # or delete one: unlinking a lock file can split concurrent waiters across
+    # different inodes. All writers now lock the actual library directory.
+    checked(root / ".mnist-showcase.lock", root)
+    descriptor = os.open(root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
     try:
         deadline = time.monotonic() + 10
         while True:

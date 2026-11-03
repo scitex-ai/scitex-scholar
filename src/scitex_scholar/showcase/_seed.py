@@ -186,7 +186,6 @@ def seed_mnist_library(library_root, *, project, dry_run=True):
     if not isinstance(dry_run, bool):
         raise ValueError("dry_run must be a boolean")
     root, master, pdir = _targets(library_root, project)
-    rows, manifest = _plan(root, master, pdir)
 
     def report(items):
         return {
@@ -199,6 +198,7 @@ def seed_mnist_library(library_root, *, project, dry_run=True):
         }
 
     if dry_run:
+        rows, _ = _plan(root, master, pdir)
         return report(rows)
     root.mkdir(parents=True, exist_ok=True)
     with locked(root):
