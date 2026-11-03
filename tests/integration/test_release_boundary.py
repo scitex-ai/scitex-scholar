@@ -98,3 +98,17 @@ def test_first_observer_refuses_network_store(owned_boundary):
     result = run_probe(environment)
     # Assert
     assert result.returncode != 0 and "explicit unavailable store" in result.stderr
+
+
+def test_parallel_release_runner_declares_its_test_dependency():
+    # Arrange
+    import tomllib
+    from packaging.requirements import Requirement
+
+    project = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
+    # Act
+    declared = {
+        Requirement(value).name for value in project["optional-dependencies"]["dev"]
+    }
+    # Assert
+    assert "pytest-xdist" in declared
