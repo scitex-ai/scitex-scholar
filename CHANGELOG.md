@@ -9,6 +9,10 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [1.29.1] - 2026-11-03
 
+- Declare pytest-xdist for the full native test runner instead of inheriting an
+  undeclared copy from the base image. Keep complete dependency resolution,
+  coverage, required private PostgreSQL and source-bound release artifacts.
+
 - Use the published SDK official favicon instead of a removed leaf asset, so
   strict production static-file manifests render the Scholar page successfully.
 

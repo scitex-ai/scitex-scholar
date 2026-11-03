@@ -67,3 +67,11 @@ pytest tests/ -x -q
 By contributing, you agree to the terms of the [CLA](CLA.md), which includes
 licensing under AGPL-3.0 (see [LICENSE](LICENSE)) and the dual-licensing
 provisions described therein.
+
+## Release qualification
+
+The normal Python test job prepares its required Node runtime in a job-owned
+verified directory; no global Node installation is required. Release tests use
+the complete declared dependency closure and the separate registered immutable
+native image, private PostgreSQL context, source-bound artifacts and normal
+protected-main promotion described in [native release qualification](docs/release-qualification.md).

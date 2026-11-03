@@ -121,6 +121,7 @@ dev = [
     "packaging>=23.0",  # verify the minimum SDK capability requirement in tests
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
+    "pytest-xdist>=3.0.0",  # full native driver uses -n / --dist
     "numpy>=1.21.0",
     # Mirror all optional extras so a fresh `pip install -e .[dev]`
     # runs the full test suite without ImportError on guarded imports.
