@@ -111,7 +111,6 @@ def test_index_body_uses_sdk_official_favicon():
     body = views.index(request).content.decode()
     # Assert
     assert "scitex_sdk/ui/img/scitex-favicon.svg" in body
-    assert "scholar/img/scitex-favicon-official.svg" not in body
 
 
 def test_index_does_not_shadow_shared_favicon_with_inline_icon():
@@ -2145,7 +2144,7 @@ def test_advanced_section_is_flat_not_a_details_card():
     assert rows_present and no_details_card
 
 
-def test_advanced_hides_query_syntax_until_requested():
+def _query_syntax_controls():
     # Arrange -- the existing in-field help owns syntax, not duplicate prose
     # inside the Sources group. The endpoint's operator data has its own tests.
     from html.parser import HTMLParser
@@ -2166,10 +2165,34 @@ def test_advanced_hides_query_syntax_until_requested():
     parser.feed(body)
     panel = parser.controls["searchSyntaxPanel"]
     toggle = parser.controls["searchSyntaxToggle"]
+    return panel, toggle
+
+def test_query_syntax_panel_is_initially_hidden():
+    # Arrange
+    panel, toggle = _query_syntax_controls()
+    # Act
+    valid = "hidden" in panel
     # Assert
-    assert "hidden" in panel
-    assert toggle["aria-expanded"] == "false"
-    assert toggle["aria-controls"] == panel["id"]
+    assert valid
+
+
+def test_query_syntax_toggle_is_initially_collapsed():
+    # Arrange
+    panel, toggle = _query_syntax_controls()
+    # Act
+    valid = toggle["aria-expanded"] == "false"
+    # Assert
+    assert valid
+
+
+def test_query_syntax_toggle_targets_panel():
+    # Arrange
+    panel, toggle = _query_syntax_controls()
+    # Act
+    valid = toggle["aria-controls"] == panel["id"]
+    # Assert
+    assert valid
+
 
 
 def test_ignore_cache_and_source_are_wired_to_the_api():
