@@ -103,22 +103,15 @@ def test_index_body_leaks_no_unrendered_template_tags():
     assert "{% comment %}" not in body
 
 
-def test_index_body_contains_official_favicon_override():
-    """Operator 2026-10-23: the tab icon is the official mark (white snake
-    on navy), no dev/prod switching. The installed SDK SSOT (0.3.12) still
-    serves the retired green snake, so Scholar supplies its own official
-    file via `favicon_href` (SUNSET once the SDK ships the mark)."""
+def test_index_body_uses_sdk_official_favicon():
+    """The published SDK owns the official mark; no missing leaf override."""
     # Arrange
-    rf = RequestFactory()
-    request = rf.get("/")
-    resp = views.index(request)
+    request = RequestFactory().get("/")
     # Act
-    body = resp.content.decode()
+    body = views.index(request).content.decode()
     # Assert
-    assert (
-        "scholar/img/scitex-favicon-official.svg" in body,
-        "scitex_sdk/ui/img/scitex-favicon.svg" not in body,
-    ) == (True, True)
+    assert "scitex_sdk/ui/img/scitex-favicon.svg" in body
+    assert "scholar/img/scitex-favicon-official.svg" not in body
 
 
 def test_index_does_not_shadow_shared_favicon_with_inline_icon():
