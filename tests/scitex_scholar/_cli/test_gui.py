@@ -391,3 +391,16 @@ def test_gui_open_prescribes_force_for_our_own_orphan(
 
 
 # EOF
+
+
+def test_embed_uses_sdk_owned_launcher_without_invocation():
+    """The GUI adapter returns the canonical SDK lifecycle implementation."""
+    # Arrange
+    from scitex_sdk.app import embed
+    from scitex_scholar._cli.gui import _embed
+
+    # Act
+    actual = _embed().run_standalone
+
+    # Assert
+    assert actual is embed.run_standalone
