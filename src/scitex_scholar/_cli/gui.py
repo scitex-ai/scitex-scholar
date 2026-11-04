@@ -8,7 +8,7 @@ Follows the ecosystem-wide canonical shape (scitex-dev skill
 browser-based surface a package ships mounts under one group, ``gui``,
 with exactly four verbs -- ``open``, ``serve``, ``status``, ``stop``.
 Lifecycle bookkeeping (pid/port/host state file, liveness, idempotent
-stop, port-holder identification) is delegated to ``scitex_app.embed``
+stop, port-holder identification) is delegated to ``scitex_sdk.app.embed``
 rather than reimplemented here (scitex-writer and figrecipe
 independently wrote the same ~140 lines before it was generalized).
 
@@ -52,18 +52,18 @@ PACKAGE = "scitex-scholar"
 
 
 def _state_path():
-    """Path of the GUI runtime-state file (scholar decides; scitex-app uses)."""
+    """Path of the GUI runtime-state file (scholar decides; scitex-sdk uses)."""
     from ..config import ScholarConfig
 
     return ScholarConfig().path_manager.scholar_dir / "runtime" / "gui.json"
 
 
 def _embed():
-    """Return `scitex_app.embed`, or exit with an actionable message.
+    """Return `scitex_sdk.app.embed`, or exit with an actionable message.
 
     ONLY the import is guarded: an ImportError raised from inside
-    scitex-app is a real bug, not an absent optional dependency, and
-    must not be reported as "install scitex-app".
+    scitex-sdk is a real bug, not an absent optional dependency, and
+    must not be reported as "install scitex-sdk".
     """
     try:
         from scitex_sdk import app as _sdk_app
@@ -71,9 +71,9 @@ def _embed():
         embed = _sdk_app.embed
     except ImportError:
         click.secho(
-            "scitex-app is not installed -- the GUI lifecycle (serve/status/"
+            "scitex-sdk is not installed -- the GUI lifecycle (serve/status/"
             "stop) is delegated to it. Install it with: "
-            "pip install 'scitex-scholar[all]' (needs scitex-app >= 0.11.0).",
+            "pip install 'scitex-scholar[all]' (needs scitex-sdk >= 0.3.17).",
             fg="red",
             err=True,
         )
