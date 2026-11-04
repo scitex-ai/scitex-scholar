@@ -1,6 +1,8 @@
 ---
-description: Discover Scholar's static syntax-help Web API descriptor without activating a host route.
-tags: [scitex-scholar, web-api, metadata]
+description: |
+  [TOPIC] Static syntax-help Web API.
+  [DETAILS] Discover Scholar's static syntax-help descriptor without activating a host route.
+tags: [scitex-scholar-web-api-contract, web-api, metadata]
 ---
 
 # Static syntax-help Web API
