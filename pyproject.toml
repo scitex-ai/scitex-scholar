@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling>=1.27", "scitex-sdk>=0.3.20"]
 build-backend = "hatchling.build"
 
 [project]
@@ -37,6 +37,8 @@ classifiers = [
 ]
 dependencies = [
     "click>=8.0",
+    # Inert API descriptors use the SDK core; Django remains optional.
+    "scitex-sdk>=0.3.17",
     "mcp",
     # Peer standalones replacing the previous `scitex[session]` umbrella
     # (PS-139). Imported directly from their peer module:
@@ -118,6 +120,7 @@ dependencies = [
 # core-redundant. Surviving feature pins live FLAT in `[all]` below.
 dev = [
     "scitex-dev>=0.62.6",
+    "hatchling>=1.27",
     "packaging>=23.0",  # verify the minimum SDK capability requirement in tests
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
@@ -131,7 +134,7 @@ dev = [
     "aiohttp>=3.8.0",
     "django>=4.2",
     "scitex-app>=0.11.0",  # hosts_to_allow public name (fleet single implementation)
-    "scitex-sdk>=0.3.17",  # public manifest scope_capabilities contract
+    "scitex-sdk>=0.3.20",  # SDK-owned inert metadata producer tests
     # The rest of the `[all]` feature stack. Its imports in src/ are GUARDED now
     # (PS-233, 2026-09-20), so a `-e .[dev]` install missing these imports
     # fine and then fails every Django test on the guard's message. They stay
@@ -200,6 +203,9 @@ Documentation = "https://scitex-scholar.readthedocs.io"
 Repository = "https://github.com/scitex-ai/scitex-scholar.git"
 Issues = "https://github.com/scitex-ai/scitex-scholar/issues"
 
+[project.entry-points."scitex.apis"]
+scitex-scholar = "scitex_scholar._web._api:plugin"
+
 [project.entry-points."scitex.apps"]
 scholar = "scitex_scholar._django.apps:ScholarEditorConfig"
 
@@ -214,8 +220,14 @@ scitex-scholar = "scitex_scholar"
 [project.entry-points."scitex_dev.hooks"]
 scitex-scholar = "scitex_scholar._hook_rules:provide"
 
+[tool.hatch.build.hooks.custom]
+path = "scripts/hatch_build.py"
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/scitex_scholar"]
+
+[tool.hatch.build.targets.sdist.force-include]
+"scripts/hatch_build.py" = "scripts/hatch_build.py"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
