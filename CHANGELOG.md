@@ -7,6 +7,10 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+- Include the canonical Scholar CLI vocabulary in wheels and source distributions,
+  so installed audit dispatchers recognize Scholar terminology when its CLI is
+  mounted by the SciTeX umbrella.
+
 ## [1.29.1] - 2026-11-03
 
 - Declare pytest-xdist for the full native test runner instead of inheriting an
