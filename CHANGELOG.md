@@ -7,9 +7,16 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.29.2] - 2026-11-08
+
 - Include the canonical Scholar CLI vocabulary in wheels and source distributions,
   so installed audit dispatchers recognize Scholar terminology when its CLI is
   mounted by the SciTeX umbrella.
+
+- Use the SDK-owned app and UI capabilities after retiring the separate
+  app/UI distributions, with regression checks for shared header assets. Run the
+  port-ownership controls against the SDK provider rather than skipping them
+  because the retired app package is absent.
 
 ## [1.29.1] - 2026-11-03
 

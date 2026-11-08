@@ -21,9 +21,9 @@ in the ecosystem's 3129X standalone-GUI port block), imported from
 
 Scholar owns WHERE its runtime state lives (``_state_path()``, derived
 from ``ScholarConfig``, so ``gui.json`` sits with the rest of scholar's
-state under ``.scitex/scholar/``); scitex-app owns HOW that state is
+state under ``.scitex/scholar/``); scitex-sdk owns HOW that state is
 read, written and healed. ``state_path=`` is the dependency-injection
-seam scitex-app provides for exactly this -- taking its default would
+seam scitex-sdk provides for exactly this -- taking its default would
 scatter scholar's state across two directories.
 """
 
@@ -43,8 +43,8 @@ from .._django._server import DEFAULT_PORT
 
 DEFAULT_HOST = "127.0.0.1"
 
-# Passed to scitex-app as `package`. This is the DISTRIBUTION name on
-# purpose: it is what scitex-app prints back in its remedy lines, and it
+# Passed to scitex-sdk as `package`. This is the DISTRIBUTION name on
+# purpose: it is what scitex-sdk prints back in its remedy lines, and it
 # is the string `argv_is_ours()` matches against a running process's argv
 # (`python -m scitex_scholar ...` normalizes to the same token). A short
 # "scholar" would print a command that does not exist.

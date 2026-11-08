@@ -24,7 +24,7 @@ permissions:
 
 jobs:
   call:
-    uses: scitex-ai/.github/.github/workflows/cla.yml@main
+    uses: scitex-ai/.github/.github/workflows/cla.yml@49ecabbd7e6876f1712f43c1f6b901aa77f4b1ae
     with:
       owner_allowlist: "bot*,ywatanabe1989,LLEmacs"
     # Pass the ONE secret the callee declares, never `secrets: inherit`.
