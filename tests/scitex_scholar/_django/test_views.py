@@ -4202,27 +4202,28 @@ def test_user_index_lists_one_paper_for_each_bound_user(_user_scope_library_outc
     assert all(result["library"]["count"] == 1 for result in results)
 
 
-def test_all_extra_requires_header_slot_capable_scitex_ui():
+def test_all_extra_requires_header_slot_capable_scitex_sdk():
     # Arrange — per-feature extras are retired (PS-225): the GUI/server
-    # stack (incl. scitex-ui) ships flat in `[all]`.
+    # stack comes from its canonical SDK owner in `[all]`.
     repo_root = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").is_file())
     # Act
     requirements = tomllib.loads((repo_root / "pyproject.toml").read_text())["project"]["optional-dependencies"]["all"]
     # Assert
-    assert "scitex-ui>=0.22.0" in requirements
+    assert ("scitex-sdk>=0.3.17" in requirements, any(r.startswith(("scitex-app", "scitex-ui")) for r in requirements)) == (True, False)
 
 
 def test_390px_header_wraps_picker_without_horizontal_overflow():
     # Arrange
     # The SHARED sheet owns the phone behaviour now (operator header mandate
     # 2026-10-17): read what the browser reads, resolved off the installed
-    # scitex-ui exactly as the template's {% static %} link does.
-    import scitex_ui
+    # SDK exactly as the template's {% static %} link does.
+    from scitex_sdk import ui
 
     shared = (
-        Path(scitex_ui.__file__).parent
+        Path(ui.__file__).parent
         / "static"
-        / "scitex_ui"
+        / "scitex_sdk"
+        / "ui"
         / "css"
         / "app"
         / "app-header.css"
