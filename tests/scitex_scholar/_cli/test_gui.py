@@ -3,8 +3,8 @@
 
 Mirrors `src/scitex_scholar/_cli/gui.py`. GUI lifecycle (state file,
 liveness, port-holder identification, orphan reclaim) is delegated to
-`scitex_app.embed`; scitex-app is an optional dependency (the `server`
-extra), so the tests that only assert the CLI *contract* must pass
+`scitex_sdk.app.embed`; scitex-sdk is included in the `all`
+extra, so the tests that only assert the CLI *contract* must pass
 whether or not it is importable -- they accept either the real state or
 the documented install-guidance message.
 
@@ -30,7 +30,7 @@ from click.testing import CliRunner
 from scitex_scholar import _cli
 from scitex_scholar._cli_main import cli
 
-_SCITEX_APP_MISSING_MSG = "scitex-app is not installed"
+_SCITEX_SDK_MISSING_MSG = "scitex-sdk is not installed"
 
 # Read via the `_cli` PACKAGE dir, not by importing `_cli.gui`: every
 # `_cli/*` module imports its Click scaffolding from `_cli_main`, which
@@ -74,7 +74,7 @@ def _free_port() -> int:
 def _hold_port(tmp_path, linkname: str, *, expect_ours: bool):
     """Start a real process LISTENing on a free port; return (port, proc).
 
-    Asserts up front that scitex-app actually reads the holder's ownership
+    Asserts up front that scitex-sdk actually reads the holder's ownership
     as `expect_ours`. Without that check a test can pass while exercising
     the OPPOSITE branch -- which is exactly what happened on CI, where the
     interpreter path contained the package name and turned the "stranger"
@@ -88,8 +88,8 @@ def _hold_port(tmp_path, linkname: str, *, expect_ours: bool):
     stream.
     """
     embed = pytest.importorskip(
-        "scitex_app.embed",
-        reason="port-holder branching is scitex-app's answer to interpret",
+        "scitex_sdk.app.embed",
+        reason="port-holder branching is scitex-sdk's answer to interpret",
     )
     interpreter = tmp_path / linkname
     interpreter.symlink_to(sys.executable)
@@ -116,7 +116,7 @@ def _hold_port(tmp_path, linkname: str, *, expect_ours: bool):
                     proc.kill()
                     pytest.fail(
                         f"fixture did not build the case under test: wanted "
-                        f"ours={expect_ours}, scitex-app read ours="
+                        f"ours={expect_ours}, scitex-sdk read ours="
                         f"{holder.ours} from argv {holder.argv!r}"
                     )
                 return port, proc
@@ -136,7 +136,7 @@ def foreign_port_holder(tmp_path):
 
 @pytest.fixture
 def orphaned_scholar_port_holder(tmp_path):
-    """Yield a port held by a process scitex-app identifies as OUR OWN.
+    """Yield a port held by a process scitex-sdk identifies as OUR OWN.
 
     This is the case `gui status` structurally cannot see (no live entry
     in the state file) and that the old socket probe reported as a
@@ -186,7 +186,7 @@ def test_gui_status_reports_real_state_or_the_documented_install_message():
     result = runner.invoke(cli, ["gui", "status"])
     # Assert
     assert (
-        _SCITEX_APP_MISSING_MSG in result.output
+        _SCITEX_SDK_MISSING_MSG in result.output
         or "running" in result.output
         or "not running" in result.output
     )
@@ -269,7 +269,7 @@ def test_default_port_is_imported_not_restated():
 
 
 def test_gui_module_does_not_reimplement_port_probing():
-    """Port identification belongs to `scitex_app.embed.gui_port_holder`,
+    """Port identification belongs to `scitex_sdk.app.embed.gui_port_holder`,
     which answers WHO holds the port (three-valued). A local `socket` probe
     can only answer "something is there", which is how the previous version
     reported our own orphan as a stranger. Importing socket here again is
@@ -289,7 +289,7 @@ def test_gui_module_does_not_reimplement_port_probing():
 
 def test_gui_lifecycle_is_not_delegated_to_two_packages_at_once():
     """`scitex_dev.gui_runtime` was the previous lifecycle owner. Keeping it
-    alongside `scitex_app.embed` would be two owners of one state file."""
+    alongside `scitex_sdk.app.embed` would be two owners of one state file."""
     # Arrange
     source = _GUI_SOURCE
     # Act
@@ -312,8 +312,8 @@ def test_gui_open_names_a_foreign_port_holder_as_a_different_process(
     runner = CliRunner()
     # Act
     result = runner.invoke(cli, ["gui", "open", "--port", str(foreign_port_holder)])
-    # Assert -- no `or scitex-app missing` escape hatch: the fixture has
-    # already proven scitex-app is present AND reads this holder as a
+    # Assert -- no `or scitex-sdk missing` escape hatch: the fixture has
+    # already proven scitex-sdk is present AND reads this holder as a
     # stranger, so a disjunction here could only ever hide a real failure.
     assert "different process" in result.output
 
