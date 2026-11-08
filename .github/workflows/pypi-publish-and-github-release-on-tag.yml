@@ -72,7 +72,7 @@ jobs:
     if: needs.admission.outputs.native_authorized == 'true'
     # The accepted central profile binds the qualified native image/runtime,
     # exact eight-helper closure, private PostgreSQL and fixed runner policy.
-    uses: scitex-ai/.github/.github/workflows/leaf-release-sif.yml@07d86a83e571c44ae8ba5e1dccb35299a53e9d03
+    uses: scitex-ai/.github/.github/workflows/leaf-release-sif.yml@f07514a894088e4e109c26b5a023f3f9868747ab
     with:
       operation: test
       source_commit: ${{ needs.preflight.outputs.source_sha }}
@@ -81,7 +81,7 @@ jobs:
   build:
     needs: [admission, preflight, verify]
     if: needs.admission.outputs.native_authorized == 'true'
-    uses: scitex-ai/.github/.github/workflows/leaf-release-sif.yml@07d86a83e571c44ae8ba5e1dccb35299a53e9d03
+    uses: scitex-ai/.github/.github/workflows/leaf-release-sif.yml@f07514a894088e4e109c26b5a023f3f9868747ab
     with:
       operation: build
       source_commit: ${{ needs.preflight.outputs.source_sha }}
