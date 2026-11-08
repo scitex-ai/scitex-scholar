@@ -203,6 +203,14 @@ scitex-scholar = "scitex_scholar._hook_rules:provide"
 [tool.hatch.build.targets.wheel]
 packages = ["src/scitex_scholar"]
 
+# Keep the package-owned CLI vocabulary available to installed audit dispatchers.
+# The repository dictionary remains the single maintained source.
+[tool.hatch.build.targets.wheel.force-include]
+".scitex/dev/cli-audit-dict.yaml" = "scitex_scholar/_cli_audit_dict.yaml"
+
+[tool.hatch.build.targets.sdist.force-include]
+".scitex/dev/cli-audit-dict.yaml" = ".scitex/dev/cli-audit-dict.yaml"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
