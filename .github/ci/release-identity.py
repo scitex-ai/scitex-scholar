@@ -22,17 +22,17 @@ TAG = re.compile(r"v(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)")
 SHA = re.compile(r"[0-9a-f]{40}")
 LOGIN = re.compile(r"[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?")
 PROOF = "release-proof.json"
-CORE_COMMIT = "93cd0f8b55eb4719b831ffe2eb185d9736ef4f97"
+CORE_COMMIT = "286e52925a53a8a8549db860a9e4af0dfbf58474"
 CORE_FILES = {
     "release_core/__init__.py": "205c84c8b79b50d7abca4196165d169f07666039c118e79539df71a77e5df85f",
     "release_core/__main__.py": "43575b4e51c1c24948d03cad287dec672e55cb6120b930d8d27448a536a76857",
     "release_core/_metadata.py": "de9ad24888e6f2595d9d87837e4e7bee738011d02c5e847743ebecc7aed3afd8",
     "release_core/artifacts.py": "724f1d3db064de2a2935b8637c3d70445e19c99c922ff00fb16bb347474e8321",
     "release_core/files.py": "29a98f933f717bae5f44660f35729b44e37fa9224bf8ebf5a5e32b444fc5d3fb",
-    "release_core/policy.py": "eda8892dc706b48560a6421714e041cbf8e8026364da550dd85e0593ede7c4a5",
-    "release_core/registered.py": "3f107e2ffddbb7250ffe5193883c554264979a431ca1855362daaf7f7213c675",
+    "release_core/policy.py": "184ed54885c8516777110ec814abd2b9cafdd1bf37a5ba7d64636714091eae51",
+    "release_core/registered.py": "b927cca22ed0c3ed2c2f1c10bba41c4b52fff6fc53a69473d0caa2b711db9c91",
     "release_core/registry.py": "f79fe92d038d735704fca2169730c8e8f06e8270ca36344503f656b2aca7545d",
-    "release_core/source.py": "f20576e5752f89de025ea02121ba803970603ab347f4557987dbddf59af1bd46",
+    "release_core/source.py": "3e157685f0141a6f4e73350c75d6659bece6e1afed48b9095ba629c8ca7f2839",
 }
 
 
