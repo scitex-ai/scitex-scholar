@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>API Reference &mdash; SciTeX Scholar v1.19.0</title>
+  <title>API Reference &mdash; SciTeX Scholar v1.29.2</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=54b9a5ca"></script>
+      <script src="../_static/documentation_options.js?v=f073ef97"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -66,6 +66,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../cli.html">CLI Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../cli.html#top-level-groups">Top-level groups</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../cli.html#paper">paper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#search">search</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../cli.html#bibtex">bibtex</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../cli.html#mcp">mcp</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../cli.html#pdf">pdf</a></li>
@@ -376,6 +377,7 @@
 <li class="toctree-l2"><a class="reference internal" href="formatting.html#scitex_scholar.formatting.to_text_citation"><code class="docutils literal notranslate"><span class="pre">to_text_citation()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="formatting.html#scitex_scholar.formatting.clean_bibtex_for_arxiv"><code class="docutils literal notranslate"><span class="pre">clean_bibtex_for_arxiv()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="formatting.html#scitex_scholar.formatting.papers_to_format"><code class="docutils literal notranslate"><span class="pre">papers_to_format()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="formatting.html#bibtex-plain-text">BibTeX plain text</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="citation_graph.html">scitex_scholar.citation_graph</a><ul>
@@ -1081,8 +1083,8 @@ This method is kept for backward compatibility.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>config_path</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a>, <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]</span>) – Path to custom config YAML file</p></li>
-<li><p><strong>scholar_dir</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a>, <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]</span>) – Direct path to scholar directory (e.g., /data/users/alice/.scitex)
+<li><p><strong>config_path</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a>, <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]</span>) – Path to custom config YAML file</p></li>
+<li><p><strong>scholar_dir</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a>, <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]</span>) – Direct path to scholar directory (e.g., /data/users/alice/.scitex)
 This bypasses SCITEX_DIR env var for thread-safe multi-user usage.
 Use this in Django/multi-user environments to avoid race conditions.</p></li>
 </ul>
@@ -1714,6 +1716,11 @@ Pyvis returns <code class="docutils literal notranslate"><span class="pre">{'out
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">scitex_scholar.</span></span><span class="sig-name descname"><span class="pre">to_bibtex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paper</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/formatting.html#to_bibtex"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Format a standard paper dict as a BibTeX entry.</p>
+<p>Bibliographic text fields are plain text: TeX special characters are
+escaped once, including already emitted safe escapes. Unicode remains
+Unicode. Abstracts are limited to 500 normalized input characters before
+escaping. Citation keys, identifiers and URLs are preserved verbatim;
+this formatter does not validate or rewrite their syntax.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
@@ -1997,6 +2004,14 @@ None (default) keeps existing behavior exactly.</p></li>
 </pre></div>
 </div>
 </div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">search_page</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">page_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_search</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/search_engines/ScholarSearchEngine.html#ScholarSearchEngine.search_page"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>One local Crossref page; source totals precede post-search filters.</p>
+<p>The established multi-source <code class="docutils literal notranslate"><span class="pre">search</span></code> method keeps its list contract.
+Paging is explicit and never fans out to rate-limited online sources.</p>
 </dd></dl>
 
 <dl class="py method">
