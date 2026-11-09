@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scitex_scholar.search_engines.ScholarSearchEngine &mdash; SciTeX Scholar v1.19.0</title>
+  <title>scitex_scholar.search_engines.ScholarSearchEngine &mdash; SciTeX Scholar v1.29.2</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=54b9a5ca"></script>
+      <script src="../../../_static/documentation_options.js?v=f073ef97"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -63,6 +63,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../cli.html">CLI Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../cli.html#top-level-groups">Top-level groups</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../cli.html#paper">paper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../cli.html#search">search</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../cli.html#bibtex">bibtex</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../cli.html#mcp">mcp</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../cli.html#pdf">pdf</a></li>
@@ -373,6 +374,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../api/formatting.html#scitex_scholar.formatting.to_text_citation"><code class="docutils literal notranslate"><span class="pre">to_text_citation()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/formatting.html#scitex_scholar.formatting.clean_bibtex_for_arxiv"><code class="docutils literal notranslate"><span class="pre">clean_bibtex_for_arxiv()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/formatting.html#scitex_scholar.formatting.papers_to_format"><code class="docutils literal notranslate"><span class="pre">papers_to_format()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/formatting.html#bibtex-plain-text">BibTeX plain text</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/citation_graph.html">scitex_scholar.citation_graph</a><ul>
@@ -728,6 +730,23 @@
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Search failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="k">raise</span></div>
+
+
+<div class="viewcode-block" id="ScholarSearchEngine.search_page">
+<a class="viewcode-back" href="../../../api/index.html#scitex_scholar.ScholarSearchEngine.search_page">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">search_page</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">page_size</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">_search</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""One local Crossref page; source totals precede post-search filters.</span>
+
+<span class="sd">        The established multi-source ``search`` method keeps its list contract.</span>
+<span class="sd">        Paging is explicit and never fans out to rate-limited online sources.</span>
+<span class="sd">        """</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">._crossref_pages</span><span class="w"> </span><span class="kn">import</span> <span class="n">search_crossref_page</span>
+
+        <span class="k">return</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span>
+            <span class="n">search_crossref_page</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span> <span class="n">page_size</span><span class="o">=</span><span class="n">page_size</span><span class="p">,</span>
+            <span class="n">filters</span><span class="o">=</span><span class="n">filters</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parallel_pipeline</span><span class="p">,</span> <span class="n">search</span><span class="o">=</span><span class="n">_search</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ScholarSearchEngine.search_by_doi">

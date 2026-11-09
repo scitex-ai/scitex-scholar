@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scitex_scholar.formatting &mdash; SciTeX Scholar v1.19.0</title>
+  <title>scitex_scholar.formatting &mdash; SciTeX Scholar v1.29.2</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=54b9a5ca"></script>
+      <script src="../_static/documentation_options.js?v=f073ef97"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -66,6 +66,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../cli.html">CLI Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../cli.html#top-level-groups">Top-level groups</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../cli.html#paper">paper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html#search">search</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../cli.html#bibtex">bibtex</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../cli.html#mcp">mcp</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../cli.html#pdf">pdf</a></li>
@@ -376,6 +377,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#scitex_scholar.formatting.to_text_citation"><code class="docutils literal notranslate"><span class="pre">to_text_citation()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#scitex_scholar.formatting.clean_bibtex_for_arxiv"><code class="docutils literal notranslate"><span class="pre">clean_bibtex_for_arxiv()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#scitex_scholar.formatting.papers_to_format"><code class="docutils literal notranslate"><span class="pre">papers_to_format()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#bibtex-plain-text">BibTeX plain text</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="citation_graph.html">scitex_scholar.citation_graph</a><ul>
@@ -598,6 +600,11 @@ and truncates to <em>max_length</em> characters.</p>
 <dt class="sig sig-object py" id="scitex_scholar.formatting.to_bibtex">
 <span class="sig-prename descclassname"><span class="pre">scitex_scholar.formatting.</span></span><span class="sig-name descname"><span class="pre">to_bibtex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paper</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scitex_scholar/formatting.html#to_bibtex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scitex_scholar.formatting.to_bibtex" title="Link to this definition"></a></dt>
 <dd><p>Format a standard paper dict as a BibTeX entry.</p>
+<p>Bibliographic text fields are plain text: TeX special characters are
+escaped once, including already emitted safe escapes. Unicode remains
+Unicode. Abstracts are limited to 500 normalized input characters before
+escaping. Citation keys, identifiers and URLs are preserved verbatim;
+this formatter does not validate or rewrite their syntax.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
@@ -683,6 +690,16 @@ unsupported fields (url, urldate, file, abstract).</p>
 </dl>
 </dd></dl>
 
+<section id="bibtex-plain-text">
+<h2>BibTeX plain text<a class="headerlink" href="#bibtex-plain-text" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">to_bibtex</span></code> escapes TeX special characters in plain title, author, journal,
+volume, issue, page, year and abstract fields. Safe escapes emitted by the
+encoder remain stable on reuse. Identifiers, URLs and citation keys are not
+rewritten. Raw LaTeX commands in bibliographic text are literal text, not an
+instruction to execute them. Other export formats retain their existing
+plain-text handling. Abstract limits apply before escaping, so generated
+escape commands are not cut in half.</p>
+</section>
 </section>
 
 
