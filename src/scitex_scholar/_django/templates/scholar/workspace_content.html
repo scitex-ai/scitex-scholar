@@ -23,9 +23,10 @@
                 SDK panes.css/js, see workspace_assets) — not leaf-owned
                 layout divs, and not the panes template tag either (it
                 emits link/script mid-fragment, which the native-render
-                purity test forbids). layout="app" keeps scholar's own
-                desktop geometry; the panes contract owns the phone tab
-                bar + pane switching. -->
+                purity test forbids). layout="main-details" delegates the
+                desktop Details width and responsive single-pane layout to
+                the SDK. Scholar supplies its controls and collapsed state;
+                the SDK owns the phone tab bar and pane switching. -->
             <div class="stx-panes" data-stx-panes="scholar" data-stx-panes-layout="main-details" data-stx-active="main">
             <main class="app-main" data-stx-pane="main" data-stx-label="{% trans "Browse" %}" data-stx-order="1">
                 <!-- Tab Navigation: Search is the primary, default action.
