@@ -1771,16 +1771,22 @@ def _assert_safe_project_name(project: str) -> str:
     return project
 
 
-def _checked_project_dir(root: Path, project: str) -> Path:
+def _checked_project_dir(root: Path, project: str, *, request=None) -> Path:
     """Validate a filing/filter target and return its directory.
 
-    Fail-closed: an unsafe name, a reserved store name, or a missing /
-    non-directory / symlinked path raises ValueError BEFORE anything is
-    written, so callers can validate up front and never leave a half-saved
-    paper behind.
+    Unsafe, reserved, non-directory and symlinked targets fail before a paper
+    is written. With a request, a missing directory may be provisioned only
+    for a project offered by that request's SDK provider. Without a request,
+    this remains a check of an existing directory.
     """
     name = _assert_safe_project_name(project)
     pdir = root / name
+    if request is not None and not pdir.exists() and not pdir.is_symlink():
+        from .project_filing import ensure_project_filing
+
+        return ensure_project_filing(
+            root, name, project, request, _project_provider(request)
+        )
     if pdir.is_symlink() or not pdir.is_dir():
         raise ValueError("unknown project: no such project in this library")
     return pdir
@@ -2840,7 +2846,7 @@ def library_save(request):
                 {"error": "unsafe project name: not a string"}, status=400
             )
         try:
-            _checked_project_dir(root, project)
+            _checked_project_dir(root, project, request=request)
             _file_after_save = True
         except ValueError as e:
             return JsonResponse({"error": str(e)}, status=400)
@@ -2913,7 +2919,7 @@ def library_save_bulk(request):
                 {"error": "unsafe project name: not a string"}, status=400
             )
         try:
-            _checked_project_dir(root, project)
+            _checked_project_dir(root, project, request=request)
         except ValueError as e:
             return JsonResponse({"error": str(e)}, status=400)
     saved, failed = [], []
