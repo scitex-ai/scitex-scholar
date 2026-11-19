@@ -7,6 +7,14 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- Saving references into a newly selected project no longer requires an
+  already-created library directory. Single and bulk saves provision a
+  missing filing directory only when the request's SDK project provider offers
+  that project. Unknown, reserved and symlinked targets remain refused, and
+  provider failures propagate before any paper is written.
+
 ## [1.29.2] - 2026-11-08
 
 - Include the canonical Scholar CLI vocabulary in wheels and source distributions,
