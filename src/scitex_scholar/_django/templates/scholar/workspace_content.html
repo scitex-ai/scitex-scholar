@@ -611,6 +611,12 @@ e.g. hippocampus -a Smith -ymin 2020 -ymax 2024{% endblocktrans %}"></textarea>
                                 <h4>{% trans "Abstract" %}</h4>
                                 <p id="libraryReaderAbstract" class="library-paper-reader__abstract"></p>
                                 <button type="button" id="libraryReaderCopyCitation" class="btn-control-library">{% trans "Copy BibTeX citation" %}</button>
+                                <button type="button" id="libraryReaderOpenPdf" class="btn-control-library"
+                                    data-loading="{% trans 'Loading saved PDF…' %}"
+                                    data-not-found="{% trans 'Download the PDF to your library first.' %}"
+                                    data-failed="{% trans 'The saved PDF could not be opened.' %}">{% trans "Read saved PDF" %}</button>
+                                <a id="libraryReaderPdfLink" hidden target="_blank" rel="noopener noreferrer">{% trans "Open PDF in a new tab" %}</a>
+                                <div id="libraryReaderPdf" class="library-paper-reader__pdf" hidden></div>
                                 <p id="libraryReaderStatus" role="status"></p>
                             </div>
                         </section>
