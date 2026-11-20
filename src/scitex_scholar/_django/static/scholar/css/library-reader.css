@@ -20,3 +20,10 @@
   /* A desktop width flex-basis becomes height in the phone column. */
   .app-status-strip .library-io__select { flex-basis: auto; min-height: 44px; }
 }
+
+.library-paper-reader__pdf {
+  block-size: min(55vh, 36rem);
+  min-block-size: 12rem;
+  margin-block: 0.5rem;
+  overflow: auto;
+}

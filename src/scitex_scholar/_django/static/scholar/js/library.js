@@ -71,6 +71,62 @@ document.addEventListener("DOMContentLoaded", () => {
   const readerEmpty = document.getElementById("libraryReaderEmpty");
   const readerStatus = document.getElementById("libraryReaderStatus");
   const copyCitation = document.getElementById("libraryReaderCopyCitation");
+  const openPdf = document.getElementById("libraryReaderOpenPdf");
+  const pdfContainer = document.getElementById("libraryReaderPdf");
+  const pdfLink = document.getElementById("libraryReaderPdfLink");
+  const pdfAssets = document.getElementById("scholar-library-script")?.dataset;
+  let pdfRequest;
+
+  function resetReaderPdf() {
+    pdfRequest?.abort();
+    pdfRequest = undefined;
+    if (pdfContainer) pdfContainer.hidden = true;
+    if (pdfLink) {
+      pdfLink.hidden = true;
+      pdfLink.removeAttribute("href");
+    }
+    if (openPdf) openPdf.disabled = false;
+  }
+
+  openPdf?.addEventListener("click", async () => {
+    const key = readerKey;
+    if (!key) return;
+    resetReaderPdf();
+    const request = new AbortController();
+    pdfRequest = request;
+    const { signal } = request;
+    const params = new URLSearchParams({ library_id: key });
+    const src = `${STX_MOUNT}/api/library/pdf?${params}`;
+    openPdf.disabled = true;
+    readerStatus.textContent = openPdf.dataset.loading;
+    try {
+      const response = await fetch(src, { method: "HEAD", signal });
+      if (response.status === 404) {
+        readerStatus.textContent = openPdf.dataset.notFound;
+        return;
+      }
+      if (!response.ok || !response.headers.get("content-type")?.startsWith("application/pdf")) {
+        throw new Error("Saved PDF unavailable");
+      }
+      signal.throwIfAborted();
+      pdfLink.href = src;
+      pdfLink.hidden = false;
+      if (pdfAssets?.reader) {
+        const { mountLibraryPdf } = await import(pdfAssets.reader);
+        signal.throwIfAborted();
+        pdfContainer.hidden = false;
+        await mountLibraryPdf(pdfContainer, pdfAssets, { id: key, src }, signal);
+      }
+      if (!signal.aborted) readerStatus.textContent = "";
+    } catch (error) {
+      if (!signal.aborted) {
+        pdfContainer.hidden = true;
+        readerStatus.textContent = openPdf.dataset.failed;
+      }
+    } finally {
+      if (pdfRequest === request) openPdf.disabled = false;
+    }
+  });
   const sortEl = document.getElementById("librarySort");
   const selectedSeeds = new Set();
   const selectAllSeeds = document.getElementById("librarySelectAll");
@@ -333,6 +389,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!reader) return;
     const paper = readerKey ? lastRows.find((row) => row.paper_id === readerKey) : null;
     if (!paper) {
+      resetReaderPdf();
       readerKey = null;
       readerPaper = null;
       readerContent.hidden = true;
@@ -341,6 +398,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     if (readerPaper === paper) return; // Sorting must not replace the reader.
+    if (readerPaper?.paper_id !== paper.paper_id) resetReaderPdf();
     readerPaper = paper;
     readerContent.hidden = false;
     readerEmpty.hidden = true;

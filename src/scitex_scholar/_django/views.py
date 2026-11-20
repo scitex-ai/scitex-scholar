@@ -37,7 +37,7 @@ try:
     from django.apps import apps as _django_apps
     from django.conf import settings as django_settings
     from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-    from django.http import HttpResponse, JsonResponse
+    from django.http import FileResponse, HttpResponse, JsonResponse
     from django.template.loader import render_to_string
     from django.utils.module_loading import import_string
     from django.utils.translation import gettext as _i18n  # noqa: N816  (JS string dict)
@@ -453,6 +453,7 @@ def index_context(request, current_project=None):
         "api_available": resolved_api is not None,
         "api_url": resolved_api or "Not configured",
         "stx_mount": mount_prefix(request),
+        "live_paper_reader": _django_apps.is_installed("scitex_live_paper._django"),
         "app_label": _app_label("Scholar"),
         "app_scope": "user",
         # Shared SDK branding owns the official favicon in every deployment.
@@ -3062,6 +3063,31 @@ def library_remove(request):
         logger.error(f"library remove failed: {e}", exc_info=True)
         return JsonResponse({"error": "Remove failed. Try again later."}, status=500)
     return JsonResponse({"removed": True})
+
+
+@require_http_methods(["GET", "HEAD"])
+def library_pdf(request):
+    """Serve a saved library PDF using the current request's library scope."""
+    from ._library_pdf import open_library_pdf
+
+    if (
+        mount_prefix(request, view_path="/api/library/pdf")
+        and not getattr(getattr(request, "user", None), "is_authenticated", False)
+        and not getattr(request, "scholar_library_root", None)
+    ):
+        raise PermissionDenied("Library access requires authentication")
+
+    try:
+        library_id = _assert_safe_library_id(request.GET.get("library_id", ""))
+    except ValueError as exc:
+        return JsonResponse({"error": str(exc)}, status=400)
+    pdf = open_library_pdf(_library_root_for(request), library_id)
+    if pdf is None:
+        return JsonResponse({"error": "Saved PDF not found"}, status=404)
+    response = FileResponse(pdf, content_type="application/pdf", filename="paper.pdf")
+    response["Cache-Control"] = "private, no-store"
+    response["X-Content-Type-Options"] = "nosniff"
+    return response
 
 
 #: Largest accepted download batch (hub parity: one network fetch per item

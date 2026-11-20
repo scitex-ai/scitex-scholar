@@ -64,7 +64,14 @@
         <script type="module" src="{% app_static 'scholar/js/app.js' %}"></script>
 <script src="{% app_static 'scholar/js/search-order.js' %}"></script>
 <script src="{% app_static 'scholar/js/search.js' %}"></script>
-        <script src="{% app_static 'scholar/js/library.js' %}"></script>
+        <script id="scholar-library-script" src="{% app_static 'scholar/js/library.js' %}"
+            {% if live_paper_reader %}
+            data-reader="{% app_static 'scholar/js/library-pdf.js' %}"
+            data-pdf-provider="{% app_static 'live_paper/js/pdf-provider.js' %}"
+            data-pdf-factory="{% app_static 'scitex_sdk/ui/js/app/pdf-viewer.js' %}"
+            data-pdfjs="{% app_static 'live_paper/pdfjs/pdf.min.mjs' %}"
+            data-pdf-worker="{% app_static 'live_paper/pdfjs/pdf.worker.min.mjs' %}"
+            {% endif %}></script>
         <script src="{% app_static 'scholar/js/graph/ForceSimulation.js' %}"></script>
         <script src="{% app_static 'scholar/js/graph/GraphRenderer.js' %}"></script>
         <script src="{% app_static 'scholar/js/graph/citation-graph.js' %}"></script>

@@ -51,6 +51,13 @@ project names. The Web importer and explicit MNIST seed prefer a DOI/title hash.
 The seed reuses matching existing IDs without renaming records. Project links
 can refer to the same primary entry without duplicating its files.
 
+## Read a saved PDF
+
+In the Scholar Library, select a paper and choose **Read saved PDF**.
+The Details pane uses Live Paper when the host has it mounted. The same
+action exposes an **Open PDF in a new tab** link for standalone Scholar.
+Download the paper to your library first if a saved main PDF is missing.
+
 ## Why primary store + symlinks
 
 - A paper cited in three projects costs disk only once
