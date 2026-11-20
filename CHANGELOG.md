@@ -7,6 +7,10 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.29.4] - 2026-11-20
+
+- Read a selected library paper’s saved PDF in the Live Paper component when mounted. Standalone Scholar offers a browser link to the same scoped PDF.
+
 ## [1.29.3] - 2026-11-20
 
 ### Fixed
