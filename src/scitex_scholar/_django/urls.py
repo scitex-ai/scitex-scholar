@@ -47,6 +47,7 @@ urlpatterns = [
     path("api/library/save-bulk", views.library_save_bulk, name="library_save_bulk"),
     path("api/library/annotate", views.library_annotate, name="library_annotate"),
     path("api/library/remove", views.library_remove, name="library_remove"),
+    path("api/library/pdf", views.library_pdf, name="library_pdf"),
     path("api/library/download-pdfs", views.library_download_pdfs, name="library_download_pdfs"),
     path("api/library/citation", views.library_citation, name="library_citation"),
     path("api/searches/save", views.searches_save, name="searches_save"),
