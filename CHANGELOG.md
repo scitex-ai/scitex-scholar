@@ -7,6 +7,8 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.29.3] - 2026-11-20
+
 ### Fixed
 
 - Saving references into a newly selected project no longer requires an
