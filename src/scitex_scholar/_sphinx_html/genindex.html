@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; SciTeX Scholar v1.19.0</title>
+  <title>Index &mdash; SciTeX Scholar v1.29.4</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=54b9a5ca"></script>
+      <script src="_static/documentation_options.js?v=9f82fb43"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -63,6 +63,7 @@
 <li class="toctree-l1"><a class="reference internal" href="cli.html">CLI Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="cli.html#top-level-groups">Top-level groups</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="cli.html#paper">paper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#search">search</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cli.html#bibtex">bibtex</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cli.html#mcp">mcp</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cli.html#pdf">pdf</a></li>
@@ -356,6 +357,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api/filters.html">scitex_scholar.filters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/filters.html#scitex_scholar.filters._operator_bound"><code class="docutils literal notranslate"><span class="pre">_operator_bound()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/filters.html#scitex_scholar.filters.apply_filters"><code class="docutils literal notranslate"><span class="pre">apply_filters()</span></code></a></li>
 </ul>
 </li>
@@ -373,6 +375,7 @@
 <li class="toctree-l2"><a class="reference internal" href="api/formatting.html#scitex_scholar.formatting.to_text_citation"><code class="docutils literal notranslate"><span class="pre">to_text_citation()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/formatting.html#scitex_scholar.formatting.clean_bibtex_for_arxiv"><code class="docutils literal notranslate"><span class="pre">clean_bibtex_for_arxiv()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/formatting.html#scitex_scholar.formatting.papers_to_format"><code class="docutils literal notranslate"><span class="pre">papers_to_format()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/formatting.html#bibtex-plain-text">BibTeX plain text</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api/citation_graph.html">scitex_scholar.citation_graph</a><ul>
@@ -609,10 +612,10 @@
 </li>
       <li><a href="api/index.html#scitex_scholar.pdf_highlight._annotator._chunk_quads_for_sentence">_chunk_quads_for_sentence() (in module scitex_scholar.pdf_highlight._annotator)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/index.html#scitex_scholar.pdf_highlight._classifier._classify_one_batch">_classify_one_batch() (in module scitex_scholar.pdf_highlight._classifier)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/metadata_engines.html#scitex_scholar.metadata_engines.ScholarEngine._combine_metadata">_combine_metadata() (scitex_scholar.metadata_engines.ScholarEngine method)</a>
 </li>
       <li><a href="api/index.html#scitex_scholar.pdf_highlight._annotator._corner_rect">_corner_rect() (in module scitex_scholar.pdf_highlight._annotator)</a>
@@ -664,6 +667,8 @@
       <li><a href="api/index.html#scitex_scholar.pdf_highlight._classifier._model_not_found_error">_model_not_found_error() (in module scitex_scholar.pdf_highlight._classifier)</a>
 </li>
       <li><a href="api/browser.html#scitex_scholar.browser.ScholarBrowserManager._new_context_async">_new_context_async() (scitex_scholar.browser.ScholarBrowserManager method)</a>
+</li>
+      <li><a href="api/filters.html#scitex_scholar.filters._operator_bound">_operator_bound() (in module scitex_scholar.filters)</a>
 </li>
       <li><a href="api/auth.html#scitex_scholar.auth.ScholarAuthManager._register_provider">_register_provider() (scitex_scholar.auth.ScholarAuthManager method)</a>
 </li>
