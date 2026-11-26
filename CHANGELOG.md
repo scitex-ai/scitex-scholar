@@ -7,6 +7,16 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- Library tab: selecting a project whose library folder does not exist yet (a
+  project created on the Hub before its first save, #312) listed the whole
+  library, i.e. other projects' papers. A selected project now lists only the
+  papers filed under it, so a new project starts empty and shows its first
+  save. (First save already creates the folder for SDK-authorized projects
+  since 1.29.4.) Project filing helpers moved from `_django/views.py` to
+  `_django/project_filing.py`; `views` re-exports them.
+
 ## [1.29.4] - 2026-11-20
 
 - Read a selected library paper’s saved PDF in the Live Paper component when mounted. Standalone Scholar offers a browser link to the same scoped PDF.

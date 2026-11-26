@@ -4071,6 +4071,12 @@ def _user_scope_library_outcomes(request, tmp_path):
     root_b = tmp_path / "bob"
     _seed_library(root_a, doi="10.9/alice", title="Alice's paper")
     _seed_library(root_b, doi="10.9/bob", title="Bob's paper")
+    # Each user filed their paper under Alpha, so the explicit-project
+    # listing (which shows only filed papers, issue #312) still proves
+    # each user is served from their own bound root.
+    for root in (root_a, root_b):
+        (root / "Alpha").mkdir()
+        (root / "Alpha" / "PID1").symlink_to("../MASTER/PID1")
     settings_override = override_settings(
         INSTALLED_APPS=installed_apps,
         SCITEX_PROJECT_PROVIDER="",
@@ -5688,7 +5694,17 @@ class TestLibraryCommandQuery:
         fixture = _command_library
         other_root = fixture["private"]["temp_root"] / "command-library" / "bob"
         bob = get_user_model()(username="bob")
-        expected = [row for row in fixture["rows"] if row["paper_id"] == "ALPHA"]
+        # ALPHA is filed under Foreign in alice's bound root: a project
+        # filter lists only filed papers (issue #312).
+        foreign = fixture["root"] / "Foreign"
+        foreign.mkdir(exist_ok=True)
+        if not (foreign / "ALPHA").is_symlink():
+            (foreign / "ALPHA").symlink_to("../MASTER/ALPHA")
+        expected = [
+            {**row, "projects": ["Foreign"]}
+            for row in fixture["rows"]
+            if row["paper_id"] == "ALPHA"
+        ]
         alice_response = views.library_list(_command_library_request(
             fixture["root"], fixture["user"], "-t Sharp -cmax 0",
             project="Foreign", library_root=str(other_root), path=str(other_root),

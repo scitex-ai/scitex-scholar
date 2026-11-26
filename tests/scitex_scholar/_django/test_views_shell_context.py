@@ -230,6 +230,11 @@ def _private_library_results(request, _private_context):
         paper.metadata.basic.title = f"{username.title()} shell-context paper"
         paper.container.library_id = f"{username.upper()}-CONTEXT"
         PaperIO(paper, base_dir=root / "MASTER").save_metadata()
+        # Filed under the selected project: a project filter lists only
+        # filed papers (issue #312).
+        (root / "Alpha").mkdir()
+        library_id = paper.container.library_id
+        (root / "Alpha" / library_id).symlink_to(f"../MASTER/{library_id}")
         index_request = RequestFactory().get(
             path, {"project": "Alpha"}, HTTP_ACCEPT_LANGUAGE=language
         )

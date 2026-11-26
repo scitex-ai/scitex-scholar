@@ -80,6 +80,38 @@ def test_new_project_accepts_real_save(tmp_path, bulk):
     ) == (200, True, True, True), response.content
 
 
+def test_new_project_lists_nothing_then_only_its_first_save(tmp_path):
+    # Arrange -- issue #312: the library already holds a user-scope paper;
+    # the newly created project has no folder yet.
+    root = tmp_path / "alice-library"
+    other = paper()
+    other["metadata"]["id"]["doi"] = "10.1000/user-scope"
+    other["container"]["library_id"] = "USER-1"
+    user_save = RequestFactory().post(
+        "/api/library/save", data=json.dumps(other), content_type="application/json"
+    )
+    user_save.user = SimpleNamespace(username="alice", pk=123, is_authenticated=True)
+    user_save.scholar_library_root = root
+    views.library_save(user_save)
+
+    def listed():
+        request = RequestFactory().get(
+            "/api/library", {"project": "alice/acceptance-project"}
+        )
+        request.scholar_library_root = root
+        return [
+            p["paper_id"]
+            for p in json.loads(views.library_list(request).content)["papers"]
+        ]
+
+    # Act
+    before = listed()
+    saved = views.library_save(request_for(root)).status_code
+    after = listed()
+    # Assert
+    assert (before, saved, after) == ([], 200, ["ACCEPT-1"])
+
+
 def test_bare_slug_can_identify_the_requesters_own_project(tmp_path):
     # Arrange
     request = request_for(tmp_path, key="acceptance-project")
