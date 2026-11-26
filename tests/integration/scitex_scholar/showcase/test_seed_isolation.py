@@ -91,6 +91,10 @@ def test_seeded_library_is_visible_through_actual_per_user_web_root(tmp_path):
                     }
                 )
             )
+            # Bob filed his record under the selected project: a project
+            # filter lists only filed papers (issue #312).
+            (bob_root / PROJECT).mkdir()
+            (bob_root / PROJECT / "B0B0B0B0").symlink_to("../MASTER/B0B0B0B0")
             before = snapshot(bob_root)
             # Act
             seed_mnist_library(alice_root, project=PROJECT, dry_run=False)
