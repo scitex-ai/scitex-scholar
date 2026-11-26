@@ -1735,102 +1735,14 @@ def _assert_safe_library_id(library_id: str) -> str:
     return library_id
 
 
-def _assert_safe_project_name(project: str) -> str:
-    """A project filing/filter target is a single path component.
-
-    Same jail class as ``_assert_safe_library_id``: a project name becomes
-    ``<library_root>/<project>/``, so a separator, NUL, or traversal token
-    would escape the library root. The refusal message is FIXED -- it never
-    carries the value (same reflection class as the library_id echoes).
-    Reserved store names (MASTER, downloads, ...) are refused too: they are
-    real directories under the root but never projects, and the picker
-    filter excludes them for the same reason.
-
-    The SDK header picker navigates with ``?project=<owner>/<slug>`` (the
-    provider id contract), so a value carrying exactly one ``owner/``
-    prefix is accepted by filtering on its last component -- the slug is
-    the filing directory, the owner is identity context, not a path.
-    Anything else with a separator still fails closed.
-    """
-    from scitex_scholar.storage._project_reconcile import RESERVED_LIBRARY_DIRS
-
-    if not isinstance(project, str):
-        raise ValueError("unsafe project name: not a string")
-    if "\\" in project or "\x00" in project:
-        raise ValueError("unsafe project name: not a single path component")
-    # Accept the SDK picker id form ``owner/slug``: the slug (last
-    # component) is the filing directory. Deeper paths stay refused.
-    parts = project.split("/")
-    if len(parts) == 2 and all(parts):
-        project = parts[1]
-    elif not project or "/" in project:
-        raise ValueError("unsafe project name: not a single path component")
-    if project in (".", ".."):
-        raise ValueError("unsafe project name: traversal token")
-    if project.upper() in {name.upper() for name in RESERVED_LIBRARY_DIRS}:
-        raise ValueError("unsafe project name: reserved store name")
-    return project
-
-
-def _checked_project_dir(root: Path, project: str, *, request=None) -> Path:
-    """Validate a filing/filter target and return its directory.
-
-    Unsafe, reserved, non-directory and symlinked targets fail before a paper
-    is written. With a request, a missing directory may be provisioned only
-    for a project offered by that request's SDK provider. Without a request,
-    this remains a check of an existing directory.
-    """
-    name = _assert_safe_project_name(project)
-    pdir = root / name
-    if request is not None and not pdir.exists() and not pdir.is_symlink():
-        from .project_filing import ensure_project_filing
-
-        return ensure_project_filing(
-            root, name, project, request, _project_provider(request)
-        )
-    if pdir.is_symlink() or not pdir.is_dir():
-        raise ValueError("unknown project: no such project in this library")
-    return pdir
-
-
-def _file_paper_into_project(root: Path, library_id: str, project: str) -> None:
-    """File a saved paper under ``<root>/<project>/`` (project sync).
-
-    Creates ``<project>/<library_id> -> ../MASTER/<library_id>`` and stamps
-    ``container.projects`` via the existing reconcile verb. The link name is
-    the validated library_id (safe, unique); membership and reconcile are
-    name-agnostic, so no readable-name machinery is needed here.
-
-    The project directory MUST already exist: callers check it with
-    ``_checked_project_dir`` BEFORE the save. A real file occupying the link
-    path, or a symlink failure, raises OSError (fail loud, fixed message).
-    """
-    from scitex_scholar.storage._project_reconcile import add_project_to_master
-
-    pdir = _checked_project_dir(root, project)
-    master_id = _assert_safe_library_id(library_id)
-    link = pdir / master_id
-    for existing in pdir.iterdir():
-        if not existing.is_symlink() or existing == link:
-            continue
-        try:
-            if existing.resolve().name == master_id:
-                existing.unlink()
-        except (OSError, RuntimeError):
-            continue
-    if link.is_symlink():
-        try:
-            resolved = link.resolve().name == master_id
-        except (OSError, RuntimeError):
-            resolved = False
-        if resolved:
-            add_project_to_master(root, master_id, pdir.name)
-            return
-        link.unlink()
-    elif link.exists():
-        raise OSError("cannot file into project: link path is occupied")
-    link.symlink_to(f"../MASTER/{master_id}")
-    add_project_to_master(root, master_id, pdir.name)
+# Project filing/filter helpers live in project_filing; re-exported here
+# so existing imports (and the views namespace) keep working.
+from .project_filing import (  # noqa: E402
+    _assert_safe_project_name,
+    _checked_project_dir,
+    _file_paper_into_project,
+    listing_project_filter,
+)
 
 
 def _load_library_paper(root: Path, paper_id: str):
@@ -1897,21 +1809,14 @@ def library_list(request):
             {"error": f"q must be at most {_MAX_QUERY_CHARS} characters"},
             status=400,
         )
-    project = (request.GET.get("project") or "").strip()
-    if project:
-        # A filter that escapes the library root fails closed, like the
-        # filing path. The message is fixed; the value is never echoed.
-        try:
-            project = _assert_safe_project_name(project)
-        except ValueError as e:
-            return JsonResponse({"error": str(e)}, status=400)
-        # The filter names a FILING location: it narrows only when that
-        # project exists under this request's library root. A selection
-        # that corresponds to nothing here (a hand-typed query, or a
-        # mounted host's project id) leaves the request-bound root alone --
-        # an explicit project selection never redirects the listing.
-        if (root / project).is_symlink() or not (root / project).is_dir():
-            project = ""
+    # A filter that escapes the library root fails closed, like the
+    # filing path. The message is fixed; the value is never echoed. A
+    # selected project lists only its filed papers, even before its
+    # folder exists (issue #312) -- never the whole library.
+    try:
+        project = listing_project_filter(request.GET.get("project"))
+    except ValueError as e:
+        return JsonResponse({"error": str(e)}, status=400)
     try:
         command = _parse_library_query(query)
     except ValueError as e:

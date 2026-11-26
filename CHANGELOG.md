@@ -9,6 +9,13 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- Library tab: selecting a project whose library folder does not exist yet (a
+  project created on the Hub before its first save, #312) listed the whole
+  library, i.e. other projects' papers. A selected project now lists only the
+  papers filed under it, so a new project starts empty and shows its first
+  save. (First save already creates the folder for SDK-authorized projects
+  since 1.29.4.) Project filing helpers moved from `_django/views.py` to
+  `_django/project_filing.py`; `views` re-exports them.
 - `verify_cites`: a metadata lookup that could not be made (HTTP 429 rate
   limiting, 5xx, no response) is reported as the new status `lookup_failed`,
   with the service and HTTP status in its provenance. Before, a throttled DOI
