@@ -3,16 +3,22 @@
 # File: tests/scitex_scholar/verify_cites/test__resolve.py
 # ----------------------------------------
 """Unit tests for scitex_scholar.verify_cites._resolve."""
+
 from __future__ import annotations
 
+import http.server
+import json
 import os
+import threading
 
 import pytest
 
 vc_resolve = pytest.importorskip("scitex_scholar.verify_cites._resolve")
 from scitex_scholar.verify_cites._resolve import (  # noqa: E402
+    LookupFailed,
     ResolvedRef,
     _authors_list,
+    _lookup,
     _std,
     default_resolver,
 )
@@ -106,6 +112,208 @@ class TestStdRejectsEchoedMissWithoutDoi:
         assert resolved == ResolvedRef(
             title="Real DOI-less Paper", doi=None, source="semantic_scholar"
         )
+
+    def test_rejects_doi_echo_without_title(self):
+        """Regression: a DOI lookup that FAILED (429, 5xx, timeout) makes
+        CrossRef/OpenAlex fall back to _create_minimal_metadata(doi=<query>),
+        which echoes the queried DOI with no title. Accepting that as a hit
+        produced a sim=0.0 "hit but weak title match" verdict for a lookup
+        that never happened."""
+        # Arrange
+        meta = {"id": {"doi": "10.1/queried"}, "basic": {"title": None}}
+        # Act
+        resolved = _std(meta, "crossref")
+        # Assert
+        assert resolved is None
+
+
+# ---------------------------------------------------------------------------
+# Transport failures vs. genuine misses, over REAL HTTP on loopback.
+#
+# A stdlib HTTP server stands in for the metadata service at the HTTP boundary
+# only; the real CrossRef/OpenAlex engines (requests, raise_for_status, their
+# not-found fallback) run unmodified against it.
+# ---------------------------------------------------------------------------
+
+
+class _Service:
+    """Loopback HTTP server answering every GET with a fixed status/body."""
+
+    def __init__(self, status, body=None):
+        self.status = status
+        self.body = body if body is not None else {}
+        self.hits = 0
+        service = self
+
+        class Handler(http.server.BaseHTTPRequestHandler):
+            def do_GET(self):  # noqa: N802 (stdlib hook name)
+                service.hits += 1
+                payload = json.dumps(service.body).encode()
+                self.send_response(service.status)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(payload)))
+                self.end_headers()
+                self.wfile.write(payload)
+
+            def log_message(self, *args):
+                pass
+
+        self.server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        self.url = f"http://127.0.0.1:{self.server.server_address[1]}/works"
+        self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
+
+    def __enter__(self):
+        self.thread.start()
+        return self
+
+    def __exit__(self, *exc):
+        self.server.shutdown()
+        self.server.server_close()
+
+
+def _crossref_at(url):
+    from scitex_scholar.metadata_engines.individual.CrossRefEngine import (
+        CrossRefEngine,
+    )
+
+    engine = CrossRefEngine()
+    engine.base_url = url
+    return engine
+
+
+def _openalex_at(url):
+    from scitex_scholar.metadata_engines.individual.OpenAlexEngine import (
+        OpenAlexEngine,
+    )
+
+    engine = OpenAlexEngine()
+    engine.base_url = url
+    return engine
+
+
+def _raised(fn, *args, **kwargs):
+    """Call ``fn``; return the LookupFailed it raised, else None."""
+    try:
+        fn(*args, **kwargs)
+    except LookupFailed as exc:
+        return exc
+    return None
+
+
+class TestLookupSeparatesTransportFailureFromMiss:
+    def test_rate_limited_doi_lookup_raises_rate_limited_lookup_failed(self):
+        # Arrange
+        with _Service(429, {"message": "Too Many Requests"}) as svc:
+            engine = _crossref_at(svc.url)
+            # Act
+            err = _raised(_lookup, engine, "crossref", doi="10.1/x")
+        # Assert
+        assert isinstance(err, LookupFailed) and err.rate_limited
+
+    def test_rate_limited_failure_names_the_service_and_http_status(self):
+        # Arrange
+        with _Service(429) as svc:
+            engine = _crossref_at(svc.url)
+            # Act
+            err = _raised(_lookup, engine, "crossref", doi="10.1/x")
+        # Assert
+        assert "crossref" in str(err) and "429" in str(err)
+
+    @pytest.mark.parametrize("status", [503, 403])
+    def test_unanswered_query_raises_lookup_failed_not_rate_limited(self, status):
+        # Arrange
+        with _Service(status) as svc:
+            engine = _crossref_at(svc.url)
+            # Act
+            err = _raised(_lookup, engine, "crossref", doi="10.1/x")
+        # Assert
+        assert isinstance(err, LookupFailed) and not err.rate_limited
+
+    def test_unreachable_service_raises_lookup_failed(self):
+        # Arrange: bind a port, then close it so nothing is listening.
+        with _Service(200) as svc:
+            url = svc.url
+        engine = _crossref_at(url)
+        # Act
+        err = _raised(_lookup, engine, "crossref", doi="10.1/x")
+        # Assert
+        assert isinstance(err, LookupFailed)
+
+    def test_not_found_doi_is_a_plain_miss(self):
+        # Arrange
+        with _Service(404, {"message": "Resource not found."}) as svc:
+            engine = _crossref_at(svc.url)
+            # Act
+            resolved = _lookup(engine, "crossref", doi="10.1/x")
+        # Assert
+        assert resolved is None
+
+    def test_found_doi_resolves_with_title(self):
+        # Arrange
+        body = {"message": {"DOI": "10.1/x", "title": ["A Real Title"]}}
+        with _Service(200, body) as svc:
+            engine = _crossref_at(svc.url)
+            # Act
+            resolved = _lookup(engine, "crossref", doi="10.1/x")
+        # Assert
+        assert (resolved.title, resolved.doi) == ("A Real Title", "10.1/x")
+
+
+class TestDefaultResolverUnderRateLimit:
+    def test_doi_entry_raises_lookup_failed_when_every_service_is_throttled(self):
+        # Arrange
+        entry = {"title": "A Real Title", "doi": "10.1/x"}
+        with _Service(429) as svc:
+            engines = {
+                "crossref": _crossref_at(svc.url),
+                "openalex": _openalex_at(svc.url),
+            }
+            # Act
+            err = _raised(default_resolver, entry, engines=engines)
+        # Assert
+        assert isinstance(err, LookupFailed) and err.rate_limited
+
+    def test_title_only_entry_raises_lookup_failed_instead_of_no_hit(self):
+        """A throttled title search used to return None, which classify()
+        turns into HALLUCINATED ("possibly fabricated")."""
+        # Arrange
+        entry = {"title": "A Real Title", "author": "Jane Doe", "year": "2020"}
+        with _Service(429) as svc:
+            engines = {
+                "crossref": _crossref_at(svc.url),
+                "openalex": _openalex_at(svc.url),
+            }
+            # Act
+            err = _raised(default_resolver, entry, engines=engines)
+        # Assert
+        assert isinstance(err, LookupFailed)
+
+    def test_second_service_answering_wins_over_first_service_throttling(self):
+        # Arrange
+        entry = {"title": "A Real Title", "doi": "10.1/x"}
+        body = {"results": [{"doi": "https://doi.org/10.1/x", "title": "A Real Title"}]}
+        with _Service(429) as throttled, _Service(200, body) as healthy:
+            engines = {
+                "crossref": _crossref_at(throttled.url),
+                "openalex": _openalex_at(healthy.url),
+            }
+            # Act
+            resolved = default_resolver(entry, engines=engines)
+        # Assert
+        assert (resolved.source, resolved.title) == ("openalex", "A Real Title")
+
+    def test_genuine_miss_everywhere_is_none_not_a_failure(self):
+        # Arrange
+        entry = {"title": "A Real Title", "doi": "10.1/x"}
+        with _Service(404) as svc:
+            engines = {
+                "crossref": _crossref_at(svc.url),
+                "openalex": _openalex_at(svc.url),
+            }
+            # Act
+            resolved = default_resolver(entry, engines=engines)
+        # Assert
+        assert resolved is None
 
 
 def test_default_resolver_offline_short_circuits_without_network():
@@ -205,5 +413,6 @@ class TestDefaultResolverLiveNetwork:
         status = classify("Berens2009e", entry, resolved, min_confidence=0.6)
         # Assert
         assert status.status != "verified"
+
 
 # EOF

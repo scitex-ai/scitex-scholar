@@ -379,3 +379,24 @@ def test_all_projects_scope_retains_each_membership(two_project_library):
     result = _json.loads(views.library_list(request).content)
     # Assert
     assert ({paper["paper_id"] for paper in result["papers"]}, result["filtered"]) == ({"PID1", "PID2"}, False)
+
+
+def test_new_project_without_folder_lists_none_of_other_projects_papers(two_project_library):
+    # Arrange -- issue #312: a project created on the host has no library
+    # folder until its first save; selecting it showed projA/projB papers.
+    request = two_project_library.get("/api/library", {"project": "alice/projNew"})
+    # Act
+    result = _json.loads(views.library_list(request).content)
+    # Assert
+    assert (result["papers"], result["filtered"], result["total"]) == ([], True, 2)
+
+
+def test_symlinked_project_folder_lists_nothing(two_project_library, tmp_path):
+    # Arrange -- a symlinked folder is never a filing location (save refuses
+    # it), so selecting it must not widen the listing either.
+    (tmp_path / "projLink").symlink_to(tmp_path / "projA", target_is_directory=True)
+    request = two_project_library.get("/api/library", {"project": "projLink"})
+    # Act
+    result = _json.loads(views.library_list(request).content)
+    # Assert
+    assert (result["papers"], result["filtered"]) == ([], True)

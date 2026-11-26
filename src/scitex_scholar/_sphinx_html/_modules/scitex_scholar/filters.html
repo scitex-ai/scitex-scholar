@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>scitex_scholar.filters &mdash; SciTeX Scholar v1.19.0</title>
+  <title>scitex_scholar.filters &mdash; SciTeX Scholar v1.29.4</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=54b9a5ca"></script>
+      <script src="../../_static/documentation_options.js?v=9f82fb43"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -63,6 +63,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../cli.html">CLI Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../cli.html#top-level-groups">Top-level groups</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../cli.html#paper">paper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../cli.html#search">search</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../cli.html#bibtex">bibtex</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../cli.html#mcp">mcp</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../cli.html#pdf">pdf</a></li>
@@ -356,6 +357,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../api/filters.html">scitex_scholar.filters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/filters.html#scitex_scholar.filters._operator_bound"><code class="docutils literal notranslate"><span class="pre">_operator_bound()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/filters.html#scitex_scholar.filters.apply_filters"><code class="docutils literal notranslate"><span class="pre">apply_filters()</span></code></a></li>
 </ul>
 </li>
@@ -373,6 +375,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../api/formatting.html#scitex_scholar.formatting.to_text_citation"><code class="docutils literal notranslate"><span class="pre">to_text_citation()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/formatting.html#scitex_scholar.formatting.clean_bibtex_for_arxiv"><code class="docutils literal notranslate"><span class="pre">clean_bibtex_for_arxiv()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/formatting.html#scitex_scholar.formatting.papers_to_format"><code class="docutils literal notranslate"><span class="pre">papers_to_format()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/formatting.html#bibtex-plain-text">BibTeX plain text</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../api/citation_graph.html">scitex_scholar.citation_graph</a><ul>
@@ -524,6 +527,15 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
 
+<div class="viewcode-block" id="_operator_bound">
+<a class="viewcode-back" href="../../api/filters.html#scitex_scholar.filters._operator_bound">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_operator_bound</span><span class="p">(</span><span class="n">operators</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fallback</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Use the form bound only when the parsed bound is absent or None."""</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fallback</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">value</span></div>
+
+
+
 <div class="viewcode-block" id="apply_filters">
 <a class="viewcode-back" href="../../api/index.html#scitex_scholar.filters.apply_filters">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">apply_filters</span><span class="p">(</span>
@@ -562,6 +574,9 @@
 <span class="sd">        - ``year_min``, ``year_max`` -- int</span>
 <span class="sd">        - ``citations_min``, ``citations_max`` -- int</span>
 <span class="sd">        - ``impact_factor_min``, ``impact_factor_max`` -- float</span>
+
+<span class="sd">        Explicit parsed bounds, including zero, override the corresponding</span>
+<span class="sd">        form filters. Missing or None bounds keep the form-filter fallback.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -631,14 +646,14 @@
                     <span class="k">continue</span>
 
         <span class="c1"># ------------------------------------------------------------------</span>
-        <span class="c1"># Year range  (filters take precedence, parsed_operators can override)</span>
+        <span class="c1"># Year range  (explicit parsed bounds override form filters)</span>
         <span class="c1"># ------------------------------------------------------------------</span>
         <span class="n">year_from</span> <span class="o">=</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"year_from"</span><span class="p">)</span> <span class="k">if</span> <span class="n">filters</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="n">year_to</span> <span class="o">=</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"year_to"</span><span class="p">)</span> <span class="k">if</span> <span class="n">filters</span> <span class="k">else</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="n">parsed_operators</span><span class="p">:</span>
-            <span class="n">year_from</span> <span class="o">=</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"year_min"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">year_from</span>
-            <span class="n">year_to</span> <span class="o">=</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"year_max"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">year_to</span>
+            <span class="n">year_from</span> <span class="o">=</span> <span class="n">_operator_bound</span><span class="p">(</span><span class="n">parsed_operators</span><span class="p">,</span> <span class="s2">"year_min"</span><span class="p">,</span> <span class="n">year_from</span><span class="p">)</span>
+            <span class="n">year_to</span> <span class="o">=</span> <span class="n">_operator_bound</span><span class="p">(</span><span class="n">parsed_operators</span><span class="p">,</span> <span class="s2">"year_max"</span><span class="p">,</span> <span class="n">year_to</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">year_from</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">year_to</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
@@ -657,8 +672,12 @@
         <span class="n">max_citations</span> <span class="o">=</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"max_citations"</span><span class="p">)</span> <span class="k">if</span> <span class="n">filters</span> <span class="k">else</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="n">parsed_operators</span><span class="p">:</span>
-            <span class="n">min_citations</span> <span class="o">=</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"citations_min"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">min_citations</span>
-            <span class="n">max_citations</span> <span class="o">=</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"citations_max"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">max_citations</span>
+            <span class="n">min_citations</span> <span class="o">=</span> <span class="n">_operator_bound</span><span class="p">(</span>
+                <span class="n">parsed_operators</span><span class="p">,</span> <span class="s2">"citations_min"</span><span class="p">,</span> <span class="n">min_citations</span>
+            <span class="p">)</span>
+            <span class="n">max_citations</span> <span class="o">=</span> <span class="n">_operator_bound</span><span class="p">(</span>
+                <span class="n">parsed_operators</span><span class="p">,</span> <span class="s2">"citations_max"</span><span class="p">,</span> <span class="n">max_citations</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">min_citations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">max_citations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
@@ -677,8 +696,8 @@
         <span class="n">max_if</span> <span class="o">=</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"max_impact_factor"</span><span class="p">)</span> <span class="k">if</span> <span class="n">filters</span> <span class="k">else</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="n">parsed_operators</span><span class="p">:</span>
-            <span class="n">min_if</span> <span class="o">=</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"impact_factor_min"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">min_if</span>
-            <span class="n">max_if</span> <span class="o">=</span> <span class="n">parsed_operators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"impact_factor_max"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">max_if</span>
+            <span class="n">min_if</span> <span class="o">=</span> <span class="n">_operator_bound</span><span class="p">(</span><span class="n">parsed_operators</span><span class="p">,</span> <span class="s2">"impact_factor_min"</span><span class="p">,</span> <span class="n">min_if</span><span class="p">)</span>
+            <span class="n">max_if</span> <span class="o">=</span> <span class="n">_operator_bound</span><span class="p">(</span><span class="n">parsed_operators</span><span class="p">,</span> <span class="s2">"impact_factor_max"</span><span class="p">,</span> <span class="n">max_if</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">min_if</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">max_if</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>

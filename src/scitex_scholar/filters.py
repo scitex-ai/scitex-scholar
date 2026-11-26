@@ -21,6 +21,12 @@ Expected paper dict keys:
 from typing import Any, Dict, List, Optional
 
 
+def _operator_bound(operators: Dict[str, Any], key: str, fallback: Any) -> Any:
+    """Use the form bound only when the parsed bound is absent or None."""
+    value = operators.get(key)
+    return fallback if value is None else value
+
+
 def apply_filters(
     papers: List[Dict[str, Any]],
     filters: Optional[Dict[str, Any]] = None,
@@ -57,6 +63,9 @@ def apply_filters(
         - ``year_min``, ``year_max`` -- int
         - ``citations_min``, ``citations_max`` -- int
         - ``impact_factor_min``, ``impact_factor_max`` -- float
+
+        Explicit parsed bounds, including zero, override the corresponding
+        form filters. Missing or None bounds keep the form-filter fallback.
 
     Returns
     -------
@@ -126,14 +135,14 @@ def apply_filters(
                     continue
 
         # ------------------------------------------------------------------
-        # Year range  (filters take precedence, parsed_operators can override)
+        # Year range  (explicit parsed bounds override form filters)
         # ------------------------------------------------------------------
         year_from = filters.get("year_from") if filters else None
         year_to = filters.get("year_to") if filters else None
 
         if parsed_operators:
-            year_from = parsed_operators.get("year_min") or year_from
-            year_to = parsed_operators.get("year_max") or year_to
+            year_from = _operator_bound(parsed_operators, "year_min", year_from)
+            year_to = _operator_bound(parsed_operators, "year_max", year_to)
 
         if year_from is not None or year_to is not None:
             try:
@@ -152,8 +161,12 @@ def apply_filters(
         max_citations = filters.get("max_citations") if filters else None
 
         if parsed_operators:
-            min_citations = parsed_operators.get("citations_min") or min_citations
-            max_citations = parsed_operators.get("citations_max") or max_citations
+            min_citations = _operator_bound(
+                parsed_operators, "citations_min", min_citations
+            )
+            max_citations = _operator_bound(
+                parsed_operators, "citations_max", max_citations
+            )
 
         if min_citations is not None or max_citations is not None:
             try:
@@ -172,8 +185,8 @@ def apply_filters(
         max_if = filters.get("max_impact_factor") if filters else None
 
         if parsed_operators:
-            min_if = parsed_operators.get("impact_factor_min") or min_if
-            max_if = parsed_operators.get("impact_factor_max") or max_if
+            min_if = _operator_bound(parsed_operators, "impact_factor_min", min_if)
+            max_if = _operator_bound(parsed_operators, "impact_factor_max", max_if)
 
         if min_if is not None or max_if is not None:
             try:

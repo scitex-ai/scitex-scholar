@@ -10,7 +10,7 @@ import json
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional
 
-from ._classify import classify
+from ._classify import classify, classify_lookup_failure, is_stub_entry
 from ._model import (
     EXIT_CITATION_STUB,
     EXIT_CITATION_UNLINKED,
@@ -18,12 +18,13 @@ from ._model import (
     EXIT_NO_CITES,
     EXIT_OK,
     HALLUCINATED,
+    LOOKUP_FAILED,
     STUB,
     UNLINKED,
     UNVERIFIED,
     CiteStatus,
 )
-from ._resolve import ResolverFn, default_resolver
+from ._resolve import LookupFailed, ResolverFn, default_resolver
 from ._tex import extract_cited_keys, resolve_compiled_bib
 
 DEFAULT_SIDECAR = Path(".scitex/scholar/citation_status.json")
@@ -109,9 +110,11 @@ def verify_cites(
                 )
             )
             continue
-        from ._classify import is_stub_entry
-
-        resolved = None if is_stub_entry(entry) else resolver(entry)
+        try:
+            resolved = None if is_stub_entry(entry) else resolver(entry)
+        except LookupFailed as exc:
+            statuses.append(classify_lookup_failure(key, entry, exc))
+            continue
         statuses.append(
             classify(key, entry, resolved, min_confidence=min_confidence)
         )
@@ -135,6 +138,9 @@ def compute_exit_code(report: VerifyReport, fail_on: Iterable[str]) -> int:
     """Fail-loud exit code in clew's CITATION namespace.
 
     Precedence stub/hallucinated (14) > unresolved (15) > unlinked (16).
+    A LOOKUP_FAILED citation (service rate-limited / unreachable) was never
+    checked, so it fails an ``unverified`` (or ``lookup_failed``) gate as
+    unresolved (15) -- fail loud, never a silent pass.
     """
     if not report.statuses:
         return EXIT_NO_CITES
@@ -144,6 +150,8 @@ def compute_exit_code(report: VerifyReport, fail_on: Iterable[str]) -> int:
     ):
         return EXIT_CITATION_STUB
     if UNVERIFIED in fail_on and report.by_status(UNVERIFIED):
+        return EXIT_CITATION_UNRESOLVED
+    if fail_on & {UNVERIFIED, LOOKUP_FAILED} and report.by_status(LOOKUP_FAILED):
         return EXIT_CITATION_UNRESOLVED
     if UNLINKED in fail_on and report.by_status(UNLINKED):
         return EXIT_CITATION_UNLINKED
