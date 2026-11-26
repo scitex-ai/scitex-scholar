@@ -21,8 +21,13 @@ UNVERIFIED = "unverified"
 STUB = "stub"
 HALLUCINATED = "hallucinated"
 UNLINKED = "unlinked"  # cited but no entry in the compiled bib (undefined cite)
+# The metadata service could not be ASKED (rate-limited, 5xx, network down).
+# NOT a verdict on the citation: a later run may well verify it. Kept distinct
+# from UNVERIFIED so a throttled lookup is never reported as a content problem
+# ("weak title match") or, for identifier-less entries, as a fabrication.
+LOOKUP_FAILED = "lookup_failed"
 
-LOCAL_STATUSES = (VERIFIED, UNVERIFIED, STUB, HALLUCINATED, UNLINKED)
+LOCAL_STATUSES = (VERIFIED, UNVERIFIED, STUB, HALLUCINATED, UNLINKED, LOOKUP_FAILED)
 
 # Exit codes mirror clew's CITATION namespace (distinct from clew's value-claim
 # codes UNVERIFIED=10 / SOURCE_MISSING=11 / HASH_MISMATCH=12).
@@ -59,6 +64,7 @@ class CiteStatus:
           unverified -> resolved=False, is_stub=False
           stub/hallucinated -> is_stub=True
           unlinked   -> resolved=False, is_stub=False (no entry to link)
+          lookup_failed -> resolved=False, is_stub=False (not checked yet)
         The richer local status + provenance travel in ``metadata``.
         """
         is_stub = self.status in (STUB, HALLUCINATED)

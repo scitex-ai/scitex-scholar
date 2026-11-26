@@ -19,14 +19,16 @@ from scitex_scholar.verify_cites._core import (  # noqa: E402
 from scitex_scholar.verify_cites._model import (  # noqa: E402
     EXIT_CITATION_STUB,
     EXIT_CITATION_UNLINKED,
+    EXIT_CITATION_UNRESOLVED,
     EXIT_NO_CITES,
     EXIT_OK,
     HALLUCINATED,
+    LOOKUP_FAILED,
     STUB,
     UNLINKED,
     VERIFIED,
 )
-from scitex_scholar.verify_cites._resolve import ResolvedRef  # noqa: E402
+from scitex_scholar.verify_cites._resolve import LookupFailed, ResolvedRef  # noqa: E402
 
 
 def _fake_resolver(entry):
@@ -173,6 +175,60 @@ def test_verify_cites_stub_only_gate_exit_code(tmp_path):
     rc = compute_exit_code(report, ["stub"])
     # Assert
     assert rc == EXIT_CITATION_STUB
+
+
+def _throttled_resolver(entry):
+    """What default_resolver raises when every metadata service answered 429."""
+    raise LookupFailed("crossref", "rate-limited (HTTP 429)", rate_limited=True)
+
+
+@pytest.fixture
+def throttled(tmp_path):
+    """verify_cites over a DOI entry and a title-only entry, both throttled."""
+    entries = {
+        "Real2020": {"title": "A real paper", "doi": "10.1/real"},
+        "TitleOnly2019": {"title": "Another real paper", "author": "Jane Doe"},
+    }
+    return verify_cites(
+        tmp_path,
+        entries=entries,
+        cited_keys=sorted(entries),
+        resolver=_throttled_resolver,
+        write=False,
+    )
+
+
+def test_rate_limited_lookup_is_lookup_failed_not_a_content_verdict(throttled):
+    # Arrange
+    # Act
+    statuses = {s.key: s.status for s in throttled.statuses}
+    # Assert
+    assert statuses == {"Real2020": LOOKUP_FAILED, "TitleOnly2019": LOOKUP_FAILED}
+
+
+def test_rate_limited_lookup_provenance_says_rate_limited_not_weak_title(throttled):
+    # Arrange
+    # Act
+    provenance = [s.provenance for s in throttled.statuses]
+    # Assert
+    assert all("rate-limited" in p and "weak title" not in p for p in provenance)
+
+
+def test_lookup_failed_fails_an_unverified_gate(throttled):
+    """Fail loud: a citation that could not be checked is not a pass."""
+    # Arrange
+    # Act
+    rc = compute_exit_code(throttled, ["unverified"])
+    # Assert
+    assert rc == EXIT_CITATION_UNRESOLVED
+
+
+def test_lookup_failed_does_not_fail_a_stub_only_gate(throttled):
+    # Arrange
+    # Act
+    rc = compute_exit_code(throttled, ["stub", "hallucinated"])
+    # Assert
+    assert rc == EXIT_OK
 
 
 def test_build_citations_artifact_carries_schema_marker(tmp_path):

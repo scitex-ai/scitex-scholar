@@ -30,6 +30,43 @@ def test_extract_cited_keys_handles_variants_and_comma_lists(tmp_path):
     assert keys == {"Aaa2020", "Bbb2021", "Ccc2019", "Ddd2018"}
 
 
+def test_macro_parameter_placeholder_is_not_a_cite_key(tmp_path):
+    """Regression: ``\\cite{#1}`` inside a \\newcommand body is a macro
+    parameter, not a key; counting it reported a false UNLINKED citation."""
+    # Arrange
+    (tmp_path / "macros.tex").write_text(
+        r"\newcommand{\mycite}[1]{see \citep{#1}}"
+        r"\newcommand{\twocite}[2]{\cite{#1,##2}}"
+        "\n"
+        r"Body \mycite{Real2020}.",
+        encoding="utf-8",
+    )
+    # Act
+    keys = extract_cited_keys(tmp_path)
+    # Assert: only the real key passed to the wrapper (\\mycite matches the
+    # *cite* family) survives; the #1 / ##2 placeholders do not.
+    assert keys == {"Real2020"}
+
+
+def test_legacy_and_archive_sources_are_not_scanned(tmp_path):
+    """Regression: old manuscript sources moved under legacy/ (and versioned
+    copies under archive/) are not built, so their \\cite keys must not be
+    verified as if they were in the manuscript."""
+    # Arrange
+    (tmp_path / "01_manuscript" / "contents").mkdir(parents=True)
+    (tmp_path / "01_manuscript" / "contents" / "intro.tex").write_text(
+        r"\cite{Live2020}", encoding="utf-8"
+    )
+    for old in ("legacy/contents", "archive"):
+        d = tmp_path / "01_manuscript" / old
+        d.mkdir(parents=True)
+        (d / "old.tex").write_text(r"\cite{Old1999}", encoding="utf-8")
+    # Act
+    keys = extract_cited_keys(tmp_path)
+    # Assert
+    assert keys == {"Live2020"}
+
+
 def test_extract_cited_keys_empty_dir_returns_empty_set(tmp_path):
     # Arrange
     # Act
