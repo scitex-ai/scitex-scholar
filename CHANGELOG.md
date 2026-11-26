@@ -7,6 +7,8 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.29.5] - 2026-11-26
+
 ### Fixed
 
 - Library tab: selecting a project whose library folder does not exist yet (a
