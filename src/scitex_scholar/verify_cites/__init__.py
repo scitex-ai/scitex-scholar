@@ -18,13 +18,14 @@ from ._core import (
 )
 from ._model import (
     HALLUCINATED,
+    LOOKUP_FAILED,
     STUB,
     UNLINKED,
     UNVERIFIED,
     VERIFIED,
     CiteStatus,
 )
-from ._resolve import ResolvedRef, default_resolver
+from ._resolve import LookupFailed, ResolvedRef, default_resolver
 from ._tex import extract_cited_keys, resolve_compiled_bib
 
 __all__ = [
@@ -34,6 +35,7 @@ __all__ = [
     "VerifyReport",
     "CiteStatus",
     "ResolvedRef",
+    "LookupFailed",
     "default_resolver",
     "classify",
     "is_stub_entry",
@@ -46,6 +48,7 @@ __all__ = [
     "STUB",
     "HALLUCINATED",
     "UNLINKED",
+    "LOOKUP_FAILED",
 ]
 
 # EOF
