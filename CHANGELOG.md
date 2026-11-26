@@ -7,6 +7,21 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- `verify_cites`: a metadata lookup that could not be made (HTTP 429 rate
+  limiting, 5xx, no response) is reported as the new status `lookup_failed`,
+  with the service and HTTP status in its provenance. Before, a throttled DOI
+  lookup came out as `unverified` "hit but weak title match (sim=0.0)", and a
+  throttled title-only lookup as `hallucinated`. A genuine miss (404, empty
+  result) is unchanged. `lookup_failed` fails an `unverified` (or
+  `lookup_failed`) gate with exit code 15. `default_resolver` raises
+  `LookupFailed` and takes an optional `engines=` mapping (#314).
+- `verify_cites`: macro parameter placeholders such as `\cite{#1}` in a
+  `\newcommand` body are no longer counted as cite keys, and `.tex` under
+  `legacy/` and `archive/` is no longer scanned (scitex-ai/scitex-writer#527,
+  scitex-ai/scitex-writer#528).
+
 ## [1.29.4] - 2026-11-20
 
 - Read a selected library paper’s saved PDF in the Live Paper component when mounted. Standalone Scholar offers a browser link to the same scoped PDF.

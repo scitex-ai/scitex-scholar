@@ -12,12 +12,13 @@ from typing import Optional
 
 from ._model import (
     HALLUCINATED,
+    LOOKUP_FAILED,
     STUB,
     UNVERIFIED,
     VERIFIED,
     CiteStatus,
 )
-from ._resolve import ResolvedRef
+from ._resolve import LookupFailed, ResolvedRef
 
 # Markers auto-writers leave on placeholder entries.
 _STUB_JOURNAL = "pending scitex-scholar"
@@ -146,6 +147,27 @@ def classify(
         title_bib=bib_title,
         resolved_at=_now(),
         provenance="no identifier and no resolver match by title/author/year",
+    )
+
+
+def classify_lookup_failure(key: str, entry: dict, exc: LookupFailed) -> CiteStatus:
+    """LOOKUP_FAILED for an entry no metadata service could be asked about.
+
+    Not a verdict on the citation: neither "weak title match" nor
+    "hallucinated" can be concluded when the lookup itself did not happen.
+    """
+    kind = "rate-limited" if exc.rate_limited else "failed"
+    return CiteStatus(
+        key=key,
+        status=LOOKUP_FAILED,
+        doi=(entry.get("doi") or None),
+        resolver_source=exc.source,
+        title_bib=entry.get("title"),
+        resolved_at=_now(),
+        provenance=(
+            f"lookup {kind}: {exc} -- citation NOT checked (no verdict); "
+            "re-run later"
+        ),
     )
 
 

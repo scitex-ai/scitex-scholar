@@ -22,19 +22,35 @@ _BIB_RE = re.compile(r"\\(?:bibliography|addbibresource)\s*\{([^}]*)\}")
 _AUX_CITATION_RE = re.compile(r"\\citation\{([^}]*)\}")
 
 
+# Directories whose .tex is never built: generated logs/exports, and old
+# sources kept for reference (writer's legacy/ convention, versioned archive/).
+_SKIP_DIRS = {"logs", "export", "_minted", ".git", "legacy", "archive"}
+
+
 def _split_keys(payload: str) -> List[str]:
     return [k.strip() for k in payload.split(",") if k.strip()]
+
+
+def _cite_keys(payload: str) -> List[str]:
+    """Cite keys in a \\cite payload, minus macro parameter placeholders.
+
+    ``\\cite{#1}`` inside a ``\\newcommand`` body names the macro's argument,
+    not a bibliography key; ``#`` is BibTeX's concatenation operator and can
+    never appear in a real key.
+    """
+    return [k for k in _split_keys(payload) if "#" not in k]
 
 
 def find_tex_files(root: Path) -> List[Path]:
     root = Path(root)
     if root.is_file():
         return [root]
-    # Skip build/backup dirs so we read the live sources, not artifacts.
-    skip = {"logs", "export", "_minted", ".git"}
+    # Skip build/backup/legacy dirs so we read the live sources, not
+    # artifacts or retired drafts. Only parts BELOW root count, so a project
+    # that itself lives under e.g. ~/archive/ is still scanned.
     out = []
     for p in sorted(root.rglob("*.tex")):
-        if any(part in skip for part in p.parts):
+        if any(part in _SKIP_DIRS for part in p.relative_to(root).parts):
             continue
         if p.name.endswith("_diff.tex"):
             continue
@@ -51,7 +67,7 @@ def extract_cited_keys(root: Path) -> Set[str]:
         except OSError:
             continue
         for m in _CITE_RE.finditer(text):
-            keys.update(_split_keys(m.group(1)))
+            keys.update(_cite_keys(m.group(1)))
     return keys
 
 
