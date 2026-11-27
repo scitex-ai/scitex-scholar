@@ -9,6 +9,7 @@ this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- Test infrastructure: subprocess coverage is now configured declaratively via coverage.py's `patch = ["subprocess"]`; `tests/conftest.py` no longer writes a `.pth` hook into site-packages or overwrites caller-owned `COVERAGE_PROCESS_START` / `COVERAGE_FILE`.
 - Library tab: selecting a project whose library folder does not exist yet (a
   project created on the Hub before its first save, #312) listed the whole
   library, i.e. other projects' papers. A selected project now lists only the
